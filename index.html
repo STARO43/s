@@ -887,8 +887,8 @@
 
         <!-- Переключатель раздела -->
         <div class="section-switch">
-            <button class="section-switch-btn active" data-section="syllables">📖</button>
-            <button class="section-switch-btn" data-section="heroes">🌟</button>
+            <button class="section-switch-btn active" data-section="syllables"></button>
+            <button class="section-switch-btn" data-section="heroes"></button>
         </div>
 
         <!-- Динамический подзаголовок -->
@@ -930,7 +930,7 @@
         <button class="exam-exit-btn" id="examExitBtn" title="Выйти">✕</button>
         <div class="exam-header">
             <div class="exam-question" id="examQuestion"></div>
-            <button class="exam-repeat-btn" id="examRepeatBtn" title="Повторить звук">🔊</button>
+            <button class="exam-repeat-btn" id="examRepeatBtn" title="Повторить">🔊</button>
             <button class="exam-next-btn" id="examNextBtn" title="Далее">→</button>
         </div>
         <div class="exam-options" id="examOptions"></div>
@@ -1087,7 +1087,7 @@
                 } else {
                     heroesSection.classList.add('active');
                     syllablesSection.classList.remove('active');
-                    sectionSubtitle.textContent = 'Знакомимся с великими личностями Отечества';
+                    sectionSubtitle.textContent = 'Великие личности Отечества';
                 }
                 sectionBtns.forEach(btn => {
                     btn.classList.toggle('active', btn.dataset.section === section);
