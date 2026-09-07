@@ -126,6 +126,7 @@
             background-clip: text;
             margin: 8px 0 4px;
         }
+
         .header p#sectionSubtitle {
             color: var(--text-secondary);
             font-size: 1rem;
@@ -134,27 +135,81 @@
             min-height: 1.2em;
         }
 
-        /* Кнопка переключения раздела */
-        .section-toggle-btn {
+        /* iOS-подобный тумблер */
+        .ios-switch {
+            display: inline-flex;
+            align-items: center;
             background: var(--bg-card);
             border: 1px solid var(--border);
-            color: var(--text);
-            border-radius: 8px;
-            width: 44px;
-            height: 44px;
+            border-radius: 30px;
+            padding: 3px;
             cursor: pointer;
-            font-size: 1.3rem;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: var(--transition);
-            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
-            margin: 8px auto 0;
+            user-select: none;
+            transition: all var(--transition);
+            position: relative;
+            margin: 10px auto 0;
         }
-        .section-toggle-btn:hover {
-            border-color: var(--accent);
+        .ios-switch .switch-option {
+            padding: 8px 20px;
+            border-radius: 27px;
+            color: var(--text);
+            font-weight: 500;
+            z-index: 1;
+            transition: color 0.3s;
+            white-space: nowrap;
+        }
+        .ios-switch .switch-option.active {
             color: var(--accent);
-            box-shadow: 0 0 12px var(--accent-glow);
+            font-weight: 700;
+        }
+        .ios-switch .switch-thumb {
+            position: absolute;
+            top: 3px;
+            left: 3px;
+            width: calc(50% - 3px);
+            height: calc(100% - 6px);
+            background: var(--accent-glow);
+            border-radius: 27px;
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: 0;
+        }
+        .ios-switch.heroes-mode .switch-thumb {
+            transform: translateX(100%);
+        }
+
+        /* Контентные секции с эффектом перелистывания */
+        .content-wrapper {
+            position: relative;
+            flex: 1;
+            max-width: 900px;
+            width: 100%;
+            margin: 0 auto;
+            overflow: hidden;
+        }
+        .tab-section {
+            display: block;
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            opacity: 0;
+            visibility: hidden;
+            transition: transform 0.4s ease, opacity 0.3s ease, visibility 0.4s;
+        }
+        .tab-section.active-right {
+            transform: translateX(100%);
+            opacity: 0;
+            visibility: hidden;
+        }
+        .tab-section.active-left {
+            transform: translateX(-100%);
+            opacity: 0;
+            visibility: hidden;
+        }
+        .tab-section.active {
+            transform: translateX(0);
+            opacity: 1;
+            visibility: visible;
         }
 
         .progress-container {
@@ -635,7 +690,7 @@
             .theme-cycle { top: 6px; left: 10px; }
             .theme-cycle button { width: 32px; height: 32px; }
             .header { padding: 16px 12px 10px; }
-            .section-toggle-btn { width: 38px; height: 38px; font-size: 1.1rem; }
+            .ios-switch .switch-option { padding: 6px 12px; font-size: 0.8rem; }
         }
     </style>
 </head>
@@ -654,39 +709,46 @@
         </div>
         <h1>Грамотиньо</h1>
 
-        <!-- Кнопка переключения раздела -->
-        <button class="section-toggle-btn" id="sectionToggleBtn" title="Переключить раздел">🌟</button>
+        <!-- iOS-тумблер -->
+        <div class="ios-switch" id="iosSwitch">
+            <span class="switch-thumb"></span>
+            <span class="switch-option active" data-section="syllables">📖 Слоги</span>
+            <span class="switch-option" data-section="heroes">🌟 Личности</span>
+        </div>
 
         <!-- Динамический подзаголовок -->
         <p id="sectionSubtitle">Учим слоги. Жми, слушай, запоминай</p>
     </header>
 
-    <!-- Раздел "Учим слоги" -->
-    <section id="syllablesSection" class="tab-section active">
-        <div class="progress-container">
-            <div class="progress-label" id="progressLabel">Отмечено: 0 из 0</div>
-            <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
-        </div>
+    <!-- Обёртка для перелистывания -->
+    <div class="content-wrapper">
+        <!-- Раздел "Учим слоги" -->
+        <section id="syllablesSection" class="tab-section active">
+            <div class="progress-container">
+                <div class="progress-label" id="progressLabel">Отмечено: 0 из 0</div>
+                <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+            </div>
 
-        <div class="controls">
-            <button id="normalBtn" class="active" data-tooltip="Все">🅰</button>
-            <button id="randomBtn" data-tooltip="Случайно">🎲</button>
-            <button id="hideLearnedBtn" data-tooltip="Скрыть/показать">✂</button>
-            <button id="clearLearnedBtn" data-tooltip="Очистить">↩</button>
-            <button id="examBtn" data-tooltip="Викторина">🍓</button>
-        </div>
+            <div class="controls">
+                <button id="normalBtn" class="active" data-tooltip="Все">🅰</button>
+                <button id="randomBtn" data-tooltip="Случайно">🎲</button>
+                <button id="hideLearnedBtn" data-tooltip="Скрыть/показать">✂</button>
+                <button id="clearLearnedBtn" data-tooltip="Очистить">↩</button>
+                <button id="examBtn" data-tooltip="Викторина">🍓</button>
+            </div>
 
-        <div class="grid-container">
-            <div class="syllable-grid" id="syllableGrid"></div>
-        </div>
-    </section>
+            <div class="grid-container">
+                <div class="syllable-grid" id="syllableGrid"></div>
+            </div>
+        </section>
 
-    <!-- Раздел "Великие личности" -->
-    <section id="heroesSection" class="tab-section">
-        <div style="max-width:900px; margin:0 auto; padding:20px; text-align:center; color:var(--text-secondary);">
-            Здесь скоро появятся великие личности.
-        </div>
-    </section>
+        <!-- Раздел "Великие личности" -->
+        <section id="heroesSection" class="tab-section">
+            <div style="max-width:900px; margin:0 auto; padding:20px; text-align:center; color:var(--text-secondary);">
+                Здесь скоро появятся великие личности.
+            </div>
+        </section>
+    </div>
 
     <button class="scroll-top-btn" id="scrollTopBtn" title="Наверх">↑</button>
 
@@ -719,7 +781,7 @@
 
     <script>
         (function() {
-            // Массив слогов (без изменений)
+            // Массив слогов
             const rawItems = [
                 'ЁЖ', 'ёлка', 'ЁН', 'АБ', 'АВ', 'АГ', 'АЖ', 'АЗ', 'АК', 'АЛ', 'Алла', 'АМ', 'АН', 'Анна', 'АП', 'арка', 'арфа', 'АС', 'АТ', 'АХ', 'АЧ', 'АШ',
                 'БА', 'БАК', 'БАЯН', 'БЕ', 'БИ', 'БО', 'БОК', 'БОР', 'Боря', 'БЫ', 'БЫК', 'БЭ', 'БЯ',
@@ -781,7 +843,9 @@
             const celebrationOverlay = document.getElementById('celebrationOverlay');
             const celebrationGif = document.getElementById('celebrationGif');
             const celebrationClose = document.getElementById('celebrationClose');
-            const sectionToggleBtn = document.getElementById('sectionToggleBtn');
+            const iosSwitch = document.getElementById('iosSwitch');
+            const switchOptions = document.querySelectorAll('.switch-option');
+            const switchThumb = document.querySelector('.switch-thumb');
             const sectionSubtitle = document.getElementById('sectionSubtitle');
             const syllablesSection = document.getElementById('syllablesSection');
             const heroesSection = document.getElementById('heroesSection');
@@ -793,11 +857,8 @@
             let examIndex = 0;
             let examScore = 0;
             let currentExamCorrect = '';
-
-            // Состояние раздела
             let currentSection = 'syllables';
 
-            // Список тем
             const themeList = [
                 'theme-blue', 'theme-green', 'theme-red', 'theme-orange',
                 'theme-purple', 'theme-pink', 'theme-cyan', 'theme-yellow',
@@ -814,7 +875,6 @@
             }
             let learnedSet = loadLearnedSet();
 
-            // Применение темы
             function applyTheme(themeClass) {
                 document.body.className = '';
                 document.body.classList.add(themeClass);
@@ -850,22 +910,41 @@
             function setSection(section) {
                 currentSection = section;
                 if (section === 'syllables') {
+                    syllablesSection.classList.remove('active-right', 'active-left');
                     syllablesSection.classList.add('active');
                     heroesSection.classList.remove('active');
+                    heroesSection.classList.add('active-right');
                     sectionSubtitle.textContent = 'Учим слоги. Жми, слушай, запоминай';
-                    sectionToggleBtn.textContent = '🌟';
-                    sectionToggleBtn.title = 'Перейти к личностям';
+                    iosSwitch.classList.remove('heroes-mode');
+                    switchOptions[0].classList.add('active');
+                    switchOptions[1].classList.remove('active');
                 } else {
+                    heroesSection.classList.remove('active-right', 'active-left');
                     heroesSection.classList.add('active');
                     syllablesSection.classList.remove('active');
+                    syllablesSection.classList.add('active-left');
                     sectionSubtitle.textContent = 'Знакомимся с великими личностями Отечества';
-                    sectionToggleBtn.textContent = '📖';
-                    sectionToggleBtn.title = 'Перейти к слогам';
+                    iosSwitch.classList.add('heroes-mode');
+                    switchOptions[1].classList.add('active');
+                    switchOptions[0].classList.remove('active');
                 }
             }
 
-            sectionToggleBtn.addEventListener('click', () => {
-                setSection(currentSection === 'syllables' ? 'heroes' : 'syllables');
+            // Обработчики кликов по опциям тумблера
+            switchOptions.forEach(option => {
+                option.addEventListener('click', () => {
+                    const section = option.dataset.section;
+                    if (section !== currentSection) {
+                        setSection(section);
+                    }
+                });
+            });
+
+            // Возможность клика по всему тумблеру для переключения
+            iosSwitch.addEventListener('click', (e) => {
+                if (e.target.tagName !== 'SPAN' || !e.target.classList.contains('switch-option')) {
+                    setSection(currentSection === 'syllables' ? 'heroes' : 'syllables');
+                }
             });
 
             window.addEventListener('scroll', () => {
@@ -1010,7 +1089,6 @@
                 examNextBtn.classList.remove('show');
                 examRepeatBtn.style.display = 'flex';
 
-                // Подбор вариантов с той же первой буквой
                 const variants = new Set([correct]);
                 const firstLetter = correct.charAt(0).toUpperCase();
                 const sameLetterPool = syllables.filter(item =>
