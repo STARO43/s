@@ -127,7 +127,6 @@
             margin: 8px 0 4px;
         }
 
-        /* Переключатель раздела */
         .section-switch {
             display: inline-flex;
             background: var(--bg-card);
@@ -158,7 +157,6 @@
             color: var(--text);
         }
 
-        /* Динамический подзаголовок */
         #sectionSubtitle {
             color: var(--text-secondary);
             font-size: 1rem;
@@ -167,13 +165,12 @@
             min-height: 1.2em;
         }
 
-        /* Контейнер секций */
         .content-wrapper {
             flex: 1;
-            max-width: 900px;
+            max-width: 1000px;
             width: 100%;
             margin: 0 auto;
-            padding: 0 20px;
+            padding: 0 20px 40px;
         }
         .tab-section {
             display: none;
@@ -193,7 +190,6 @@
         .progress-container {
             max-width: 900px;
             margin: 8px auto 0;
-            padding: 0 20px;
             text-align: center;
         }
         .progress-label {
@@ -655,9 +651,12 @@
             font-weight: 700;
             color: var(--accent);
             margin-bottom: 15px;
+            text-align: center;
         }
         .timeline-track-wrapper {
             position: relative;
+            display: flex;
+            align-items: center;
         }
         .timeline-track {
             display: flex;
@@ -683,10 +682,11 @@
             top: 50%;
             left: 20px;
             right: 20px;
-            height: 3px;
+            height: 4px;
             background: var(--accent);
             opacity: 0.6;
             z-index: 0;
+            border-radius: 2px;
         }
         .hero-item {
             position: relative;
@@ -698,22 +698,22 @@
             text-align: center;
         }
         .hero-item img {
-            width: 90px;
-            height: 90px;
+            width: 100px;
+            height: 100px;
             border-radius: 50%;
             object-fit: cover;
-            border: 3px solid var(--accent);
-            box-shadow: 0 4px 10px rgba(0,0,0,0.4);
+            border: 4px solid var(--accent);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.5);
         }
         .hero-item:hover {
             transform: scale(1.1);
         }
         .hero-item span {
             display: block;
-            font-size: 0.85rem;
+            font-size: 0.95rem;
             color: var(--text);
-            margin-top: 6px;
-            max-width: 100px;
+            margin-top: 8px;
+            max-width: 110px;
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
@@ -726,10 +726,10 @@
             border: 1px solid var(--border);
             color: var(--text);
             border-radius: 50%;
-            width: 44px;
-            height: 44px;
+            width: 50px;
+            height: 50px;
             cursor: pointer;
-            font-size: 1.8rem;
+            font-size: 2rem;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -739,7 +739,7 @@
         .scroll-arrow:hover {
             border-color: var(--accent);
             color: var(--accent);
-            box-shadow: 0 0 10px var(--accent-glow);
+            box-shadow: 0 0 12px var(--accent-glow);
         }
         .scroll-arrow.left { left: 10px; }
         .scroll-arrow.right { right: 10px; }
@@ -803,13 +803,13 @@
         }
         .hero-modal-portrait {
             max-width: 90%;
-            max-height: 70vh;
+            max-height: 80vh;
             object-fit: contain;
-            border-radius: 8px;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.6);
+            border-radius: 12px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.7);
         }
         .hero-modal h3 {
-            font-size: 2rem;
+            font-size: 2.2rem;
             margin: 20px 0;
             color: var(--accent);
         }
@@ -823,23 +823,26 @@
             justify-content: space-between;
             padding: 0 10px;
             z-index: 10;
+            pointer-events: none;
         }
         .hero-modal-nav button {
-            background: rgba(0,0,0,0.4);
+            pointer-events: auto;
+            background: rgba(0,0,0,0.5);
             border: none;
             color: white;
-            font-size: 4rem;
-            width: 70px;
-            height: 70px;
+            font-size: 5rem;
+            width: 90px;
+            height: 90px;
             cursor: pointer;
             display: flex;
             align-items: center;
             justify-content: center;
-            transition: background 0.2s;
-            border-radius: 8px;
+            transition: background 0.2s, transform 0.2s;
+            border-radius: 12px;
         }
         .hero-modal-nav button:hover {
-            background: rgba(0,0,0,0.7);
+            background: rgba(0,0,0,0.8);
+            transform: scale(1.05);
         }
 
         @media (max-width: 1024px) {
@@ -865,15 +868,14 @@
             .theme-cycle button { width: 32px; height: 32px; }
             .header { padding: 16px 12px 10px; }
             .section-switch-btn { padding: 8px 16px; font-size: 1rem; }
-            .hero-item img { width: 70px; height: 70px; }
-            .hero-modal-nav button { width: 50px; height: 50px; font-size: 3rem; }
+            .hero-item img { width: 80px; height: 80px; }
+            .hero-modal-nav button { width: 60px; height: 60px; font-size: 3.5rem; }
         }
     </style>
 </head>
 <body>
 
     <header class="header">
-        <!-- Кнопка циклической смены темы -->
         <div class="theme-cycle">
             <button id="themeCycleBtn" title="Сменить цвет">
                 <span class="color-indicator" id="colorIndicator"></span>
@@ -885,19 +887,15 @@
         </div>
         <h1>Грамотиньо</h1>
 
-        <!-- Переключатель раздела -->
         <div class="section-switch">
             <button class="section-switch-btn active" data-section="syllables">📖</button>
             <button class="section-switch-btn" data-section="heroes">🌟</button>
         </div>
 
-        <!-- Динамический подзаголовок -->
         <p id="sectionSubtitle">Учим слоги. Жми, слушай, запоминай</p>
     </header>
 
-    <!-- Основной контент -->
     <div class="content-wrapper">
-        <!-- Раздел "Учим слоги" -->
         <section id="syllablesSection" class="tab-section active">
             <div class="progress-container">
                 <div class="progress-label" id="progressLabel">Отмечено: 0 из 0</div>
@@ -917,7 +915,6 @@
             </div>
         </section>
 
-        <!-- Раздел "Великие личности" -->
         <section id="heroesSection" class="tab-section">
             <div class="heroes-timeline" id="heroesTimeline"></div>
         </section>
@@ -925,7 +922,6 @@
 
     <button class="scroll-top-btn" id="scrollTopBtn" title="Наверх">↑</button>
 
-    <!-- Экзаменационный оверлей -->
     <div class="exam-overlay" id="examOverlay">
         <button class="exam-exit-btn" id="examExitBtn" title="Выйти">✕</button>
         <div class="exam-header">
@@ -937,7 +933,6 @@
         <div class="exam-result" id="examResult"></div>
     </div>
 
-    <!-- Окно с гифкой -->
     <div class="celebration-overlay" id="celebrationOverlay">
         <div class="celebration-box">
             <h2>Умница! 😻😻😽😽</h2>
@@ -954,7 +949,6 @@
 
     <script>
         (function() {
-            // Массив слогов
             const rawItems = [
                 'ЁЖ', 'ёлка', 'ЁН', 'АБ', 'АВ', 'АГ', 'АЖ', 'АЗ', 'АК', 'АЛ', 'Алла', 'АМ', 'АН', 'Анна', 'АП', 'арка', 'арфа', 'АС', 'АТ', 'АХ', 'АЧ', 'АШ',
                 'БА', 'БАК', 'БАЯН', 'БЕ', 'БИ', 'БО', 'БОК', 'БОР', 'Боря', 'БЫ', 'БЫК', 'БЭ', 'БЯ',
@@ -992,7 +986,6 @@
                 return a.localeCompare(b, 'ru', { sensitivity: 'base' });
             });
 
-            // DOM элементы
             const grid = document.getElementById('syllableGrid');
             const toastContainer = document.getElementById('toastContainer');
             const themeToggle = document.getElementById('themeToggle');
@@ -1340,7 +1333,6 @@
                 setTimeout(() => toast.remove(), 2000);
             }
 
-            // ============ ВЕЛИКИЕ ЛИЧНОСТИ ============
             const heroesData = [
                 { name: "Александров", year: 1935, images: ["Александров.jpg"], audio: "Александров.wav" },
                 { name: "Белинский", year: 1840, images: ["Белинский.jpg"], audio: "Белинский.wav" },
