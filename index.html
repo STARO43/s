@@ -1424,9 +1424,9 @@
             function renderHeroesTimeline() {
                 if (!heroesTimeline) return;
                 const centuries = {
-                    "": heroesData.filter(h => h.year >= 1700 && h.year < 1800),
-                    "": heroesData.filter(h => h.year >= 1800 && h.year < 1900),
-                    "": heroesData.filter(h => h.year >= 1900 && h.year < 2000)
+                    "XVIII век": heroesData.filter(h => h.year >= 1700 && h.year < 1800),
+                    "XIX век": heroesData.filter(h => h.year >= 1800 && h.year < 1900),
+                    "XX век": heroesData.filter(h => h.year >= 1900 && h.year < 2000)
                 };
 
                 let html = '';
