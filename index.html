@@ -132,6 +132,51 @@
             font-weight: 500;
         }
 
+        /* Навигационные вкладки */
+        .main-tabs {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            margin-top: 16px;
+            flex-wrap: wrap;
+        }
+        .tab-btn {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            color: var(--text);
+            padding: 10px 24px;
+            border-radius: 30px;
+            cursor: pointer;
+            font-family: var(--font);
+            font-size: 1rem;
+            transition: var(--transition);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+        }
+        .tab-btn:hover {
+            border-color: var(--accent);
+            color: var(--accent);
+            box-shadow: 0 0 12px var(--accent-glow);
+        }
+        .tab-btn.active {
+            background: var(--accent-glow);
+            border-color: var(--accent);
+            color: var(--accent);
+            box-shadow: 0 0 16px var(--accent-glow);
+        }
+
+        /* Секции */
+        .tab-section {
+            display: none;
+        }
+        .tab-section.active {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
         .progress-container {
             max-width: 900px;
             margin: 8px auto 0;
@@ -347,7 +392,7 @@
             color: var(--accent);
         }
 
-        /* Экзамен с анимациями */
+        /* Экзамен */
         .exam-overlay {
             position: fixed;
             top: 0;
@@ -366,10 +411,6 @@
         .exam-overlay.show {
             display: flex;
             animation: fadeIn 0.3s ease;
-        }
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
         }
         .exam-header {
             display: flex;
@@ -450,7 +491,6 @@
             animation: fadeIn 0.3s ease;
         }
 
-        /* Кнопка "Далее" (теперь в шапке экзамена) */
         .exam-next-btn {
             display: none;
             background: var(--accent);
@@ -480,32 +520,30 @@
             100% { box-shadow: 0 0 0 0 rgba(0,0,0,0); }
         }
 
-        /* Кнопка выхода */
-.exam-exit-btn {
-    position: absolute;
-    top: 15px;
-    left: 15px;
-    background: var(--bg-card);
-    border: 1px solid var(--border);
-    color: var(--text);
-    border-radius: 50%;
-    width: 40px;
-    height: 40px;
-    cursor: pointer;
-    font-size: 1.4rem;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: var(--transition);
-    z-index: 10;
-}
+        .exam-exit-btn {
+            position: absolute;
+            top: 15px;
+            left: 15px;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            color: var(--text);
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            cursor: pointer;
+            font-size: 1.4rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: var(--transition);
+            z-index: 10;
+        }
         .exam-exit-btn:hover {
             border-color: var(--danger);
             color: var(--danger);
             box-shadow: 0 0 10px var(--danger-glow);
         }
 
-        /* Окно с гифкой */
         .celebration-overlay {
             position: fixed;
             top: 0;
@@ -596,14 +634,13 @@
         }
         @media (max-width: 600px) {
             .exam-exit-btn {
-    top: auto;
-    bottom: 10px;
-    left: 10px;
-    width: 34px;
-    height: 34px;
-    font-size: 1.1rem;
-}
-            
+                top: auto;
+                bottom: 10px;
+                left: 10px;
+                width: 34px;
+                height: 34px;
+                font-size: 1.1rem;
+            }
             .syllable-grid { grid-template-columns: repeat(2, 1fr); gap: 5px; }
             .syllable-card { font-size: 0.95rem; padding: 10px 4px; min-height: 45px; }
             .learn-dot { width: 10px; height: 10px; bottom: 3px; right: 4px; }
@@ -614,7 +651,8 @@
             .theme-cycle { top: 6px; left: 10px; }
             .theme-cycle button { width: 32px; height: 32px; }
             .header { padding: 16px 12px 10px; }
-            
+            .main-tabs { gap: 8px; margin-top: 10px; }
+            .tab-btn { padding: 8px 16px; font-size: 0.9rem; }
         }
     </style>
 </head>
@@ -633,23 +671,42 @@
         </div>
         <h1>Грамотиньо</h1>
         <p>Жми, слушай, запоминай</p>
+
+        <!-- Вкладки разделов -->
+        <nav class="main-tabs">
+            <button class="tab-btn active" data-tab="syllables">Учим слоги</button>
+            <button class="tab-btn" data-tab="heroes">Великие личности</button>
+        </nav>
     </header>
 
-    <div class="progress-container">
-        <div class="progress-label" id="progressLabel">Отмечено: 0 из 0</div>
-        <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
-    </div>
+    <!-- Контент разделов -->
+    <main class="content">
+        <!-- Раздел слогов -->
+        <section id="syllablesSection" class="tab-section active">
+            <div class="progress-container">
+                <div class="progress-label" id="progressLabel">Отмечено: 0 из 0</div>
+                <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+            </div>
 
-    <div class="controls">
-        <button id="normalBtn" class="active" data-tooltip="Все">🅰</button>
-        <button id="randomBtn" data-tooltip="Случайно">🎲</button>
-        <button id="hideLearnedBtn" data-tooltip="Скрыть/показать">✂</button>
-        <button id="clearLearnedBtn" data-tooltip="Очистить">↩</button>
-        <button id="examBtn" data-tooltip="Викторина">🍓</button>
-    </div>
+            <div class="controls">
+                <button id="normalBtn" class="active" data-tooltip="Все">🅰</button>
+                <button id="randomBtn" data-tooltip="Случайно">🎲</button>
+                <button id="hideLearnedBtn" data-tooltip="Скрыть/показать">✂</button>
+                <button id="clearLearnedBtn" data-tooltip="Очистить">↩</button>
+                <button id="examBtn" data-tooltip="Викторина">🍓</button>
+            </div>
 
-    <main class="grid-container">
-        <div class="syllable-grid" id="syllableGrid"></div>
+            <div class="grid-container">
+                <div class="syllable-grid" id="syllableGrid"></div>
+            </div>
+        </section>
+
+        <!-- Раздел великих личностей (заполняется позже) -->
+        <section id="heroesSection" class="tab-section">
+            <div class="heroes-container" id="heroesContainer">
+                <p style="text-align:center; margin-top:40px; color:var(--text-secondary);">Здесь скоро появятся великие личности.</p>
+            </div>
+        </section>
     </main>
 
     <button class="scroll-top-btn" id="scrollTopBtn" title="Наверх">↑</button>
@@ -683,37 +740,37 @@
 
     <script>
         (function() {
-            // Массив
+            // Массив слогов (без изменений)
             const rawItems = [
-    'ЁЖ', 'ёлка', 'ЁН', 'АБ', 'АВ', 'АГ', 'АЖ', 'АЗ', 'АК', 'АЛ', 'Алла', 'АМ', 'АН', 'Анна', 'АП', 'арка', 'арфа', 'АС', 'АТ', 'АХ', 'АЧ', 'АШ',
-    'БА', 'БАК', 'БАЯН', 'БЕ', 'БИ', 'БО', 'БОК', 'БОР', 'Боря', 'БЫ', 'БЫК', 'БЭ', 'БЯ',
-    'ВА', 'Валя', 'ВЕ', 'ВЕЕР', 'ВИ', 'Витя', 'Вова', 'ВОЗ', 'ВОЛ', 'ВОЛК', 'ВУ', 'ВЫ', 'ВЭ', 'ВЮ',
-    'ГА', 'ГАЗ', 'Галя', 'ГЕ', 'Гена', 'ГИ', 'ГО', 'ГОД', 'ГЫ', 'ГЭ',
-    'ДА', 'ДИ', 'ДОМ', 'ДУ', 'ДУБ', 'ДУШ', 'ДЫ', 'ДЫМ', 'ДЭ', 'ДЮ', 'ДЯ',
-    'ЕГ', 'ЕЖ', 'ЕЛ', 'ЕМ', 'ЕН', 'ЕР', 'ЕС', 'если', 'ЕТ', 'ЕФ', 'ЕХ', 'ЕЦ', 'ЕЧ', 'ЕШ',
-    'ЖА', 'Женя', 'ЖИ', 'ЖО', 'ЖУ', 'ЖУК', 'ЖЭ',
-    'ЗА', 'ЗИ', 'Зина', 'ЗО', 'ЗУ', 'ЗЫ', 'ЗЭ', 'ЗЮ', 'ЗЯ',
-    'ИБ', 'ИВ', 'игра', 'ИЖ', 'ИК', 'икра', 'ИЛ', 'ИМ', 'ИН', 'ИР', 'ИС', 'ИТ', 'ИФ', 'ИЧ', 'ИШ',
-    'ЙОД', 'КА', 'Катя', 'КЕ', 'КИ', 'КИТ', 'КОЛ', 'Коля', 'КОМ', 'КОТ', 'КОФЕ', 'КРАЙ', 'КРАН', 'КУ', 'КЫ', 'КЭ',
-    'ЛЁ', 'Лёва', 'Лёша', 'ЛАК', 'ЛЕ', 'ЛЕВ', 'Лена', 'ЛЕС', 'ЛЕЩ', 'ЛИ', 'ЛИФТ', 'ЛО', 'ЛОМ', 'ЛУ', 'ЛЫ', 'ЛЫЖИ', 'ЛЭ', 'ЛЮ', 'Люба', 'Люда', 'ЛЮК', 'ЛЯ',
-    'МА', 'МАК', 'МЕ', 'МЕЛ', 'МЕХ', 'МЕЧ', 'МИ', 'Миша', 'МО', 'МОХ', 'МУ', 'МУХА', 'МЫ', 'МЫЛО', 'МЫС', 'МЭ', 'МЯ', 'МЯЧ',
-    'НЁ', 'НА', 'НЕ', 'Нина', 'НО', 'НОЖ', 'НОС', 'НУ', 'НЫ', 'НЭ', 'НЯ',
-    'одна', 'ОЖ', 'ОКНО', 'ОЛ', 'ОМ', 'ОН', 'ОП', 'ОР', 'ОС', 'ОФ', 'ОХ', 'ОЧ', 'очки', 'ОШ',
-    'ПА', 'ПАУК', 'ПЕРО', 'Петя', 'ПИ', 'ПУ', 'ПУХ', 'ПЫ', 'ПЭ', 'ПЯ',
-    'РА', 'РАК', 'РИ', 'РИС', 'РО', 'Рома', 'РОТ', 'РУ', 'РЫ', 'РЫБА', 'РЭ', 'РЮ', 'РЯ',
-    'СЁ', 'СА', 'Саша', 'СЕ', 'СИ', 'СОК', 'СОМ', 'СОР', 'СТУЛ', 'СУ', 'СУК', 'СУП', 'СЫ', 'СЫР', 'СЭ', 'СЮ', 'СЯ',
-    'Тёма', 'ТА', 'ТАЗ', 'Таня', 'ТЕ', 'ТИ', 'ТО', 'Толя', 'Тома', 'ТОРТ', 'ТРОС', 'ТУ', 'ТЫ', 'ТЭ', 'ТЮ', 'ТЯ',
-    'УБ', 'УГОЛ', 'УЖ', 'УЛ', 'УМ', 'УН', 'УР', 'урна', 'УС', 'УТ', 'утка', 'утро', 'УФ', 'УХ', 'УХО', 'УЧ', 'УШ', 'ушко',
-    'ФА', 'ФЕ', 'Федя', 'ФИ', 'ФО', 'ФУ', 'ФЫ', 'ФЭ',
-    'ХА', 'ХЕ', 'ХО', 'ХУ', 'ХЫ', 'ХЭ',
-    'ЦА', 'ЦЕ', 'ЦИ', 'ЦО', 'ЦУ', 'ЦЭ',
-    'ЧА', 'ЧАЙ', 'ЧЕК', 'ЧИ', 'ЧУ', 'ЧЭ',
-    'ША', 'ШАГ', 'ШЕ', 'ШИ', 'ШОВ', 'ШУ', 'ШЭ',
-    'ЩИ', 'ЩИТ',
-    'ЫВ', 'ЫК', 'ЫМ', 'ЫН', 'ЫС', 'ЫТ', 'ЫХ',
-    'ЭБ', 'ЭК', 'ЭЛ', 'ЭМ', 'ЭН', 'ЭП', 'ЭР', 'ЭС', 'ЭТ', 'ЭФ', 'ЭХ', 'ЭЦ',
-    'юбка', 'ЮГ', 'юнга', 'ЯБ', 'ЯВ', 'ЯД', 'ЯК', 'ЯЛ', 'ЯМ', 'ЯН', 'ЯП', 'ЯР', 'ЯС', 'ЯТ', 'ЯХ', 'яхта', 'ЯЦ'
-];
+                'ЁЖ', 'ёлка', 'ЁН', 'АБ', 'АВ', 'АГ', 'АЖ', 'АЗ', 'АК', 'АЛ', 'Алла', 'АМ', 'АН', 'Анна', 'АП', 'арка', 'арфа', 'АС', 'АТ', 'АХ', 'АЧ', 'АШ',
+                'БА', 'БАК', 'БАЯН', 'БЕ', 'БИ', 'БО', 'БОК', 'БОР', 'Боря', 'БЫ', 'БЫК', 'БЭ', 'БЯ',
+                'ВА', 'Валя', 'ВЕ', 'ВЕЕР', 'ВИ', 'Витя', 'Вова', 'ВОЗ', 'ВОЛ', 'ВОЛК', 'ВУ', 'ВЫ', 'ВЭ', 'ВЮ',
+                'ГА', 'ГАЗ', 'Галя', 'ГЕ', 'Гена', 'ГИ', 'ГО', 'ГОД', 'ГЫ', 'ГЭ',
+                'ДА', 'ДИ', 'ДОМ', 'ДУ', 'ДУБ', 'ДУШ', 'ДЫ', 'ДЫМ', 'ДЭ', 'ДЮ', 'ДЯ',
+                'ЕГ', 'ЕЖ', 'ЕЛ', 'ЕМ', 'ЕН', 'ЕР', 'ЕС', 'если', 'ЕТ', 'ЕФ', 'ЕХ', 'ЕЦ', 'ЕЧ', 'ЕШ',
+                'ЖА', 'Женя', 'ЖИ', 'ЖО', 'ЖУ', 'ЖУК', 'ЖЭ',
+                'ЗА', 'ЗИ', 'Зина', 'ЗО', 'ЗУ', 'ЗЫ', 'ЗЭ', 'ЗЮ', 'ЗЯ',
+                'ИБ', 'ИВ', 'игра', 'ИЖ', 'ИК', 'икра', 'ИЛ', 'ИМ', 'ИН', 'ИР', 'ИС', 'ИТ', 'ИФ', 'ИЧ', 'ИШ',
+                'ЙОД', 'КА', 'Катя', 'КЕ', 'КИ', 'КИТ', 'КОЛ', 'Коля', 'КОМ', 'КОТ', 'КОФЕ', 'КРАЙ', 'КРАН', 'КУ', 'КЫ', 'КЭ',
+                'ЛЁ', 'Лёва', 'Лёша', 'ЛАК', 'ЛЕ', 'ЛЕВ', 'Лена', 'ЛЕС', 'ЛЕЩ', 'ЛИ', 'ЛИФТ', 'ЛО', 'ЛОМ', 'ЛУ', 'ЛЫ', 'ЛЫЖИ', 'ЛЭ', 'ЛЮ', 'Люба', 'Люда', 'ЛЮК', 'ЛЯ',
+                'МА', 'МАК', 'МЕ', 'МЕЛ', 'МЕХ', 'МЕЧ', 'МИ', 'Миша', 'МО', 'МОХ', 'МУ', 'МУХА', 'МЫ', 'МЫЛО', 'МЫС', 'МЭ', 'МЯ', 'МЯЧ',
+                'НЁ', 'НА', 'НЕ', 'Нина', 'НО', 'НОЖ', 'НОС', 'НУ', 'НЫ', 'НЭ', 'НЯ',
+                'одна', 'ОЖ', 'ОКНО', 'ОЛ', 'ОМ', 'ОН', 'ОП', 'ОР', 'ОС', 'ОФ', 'ОХ', 'ОЧ', 'очки', 'ОШ',
+                'ПА', 'ПАУК', 'ПЕРО', 'Петя', 'ПИ', 'ПУ', 'ПУХ', 'ПЫ', 'ПЭ', 'ПЯ',
+                'РА', 'РАК', 'РИ', 'РИС', 'РО', 'Рома', 'РОТ', 'РУ', 'РЫ', 'РЫБА', 'РЭ', 'РЮ', 'РЯ',
+                'СЁ', 'СА', 'Саша', 'СЕ', 'СИ', 'СОК', 'СОМ', 'СОР', 'СТУЛ', 'СУ', 'СУК', 'СУП', 'СЫ', 'СЫР', 'СЭ', 'СЮ', 'СЯ',
+                'Тёма', 'ТА', 'ТАЗ', 'Таня', 'ТЕ', 'ТИ', 'ТО', 'Толя', 'Тома', 'ТОРТ', 'ТРОС', 'ТУ', 'ТЫ', 'ТЭ', 'ТЮ', 'ТЯ',
+                'УБ', 'УГОЛ', 'УЖ', 'УЛ', 'УМ', 'УН', 'УР', 'урна', 'УС', 'УТ', 'утка', 'утро', 'УФ', 'УХ', 'УХО', 'УЧ', 'УШ', 'ушко',
+                'ФА', 'ФЕ', 'Федя', 'ФИ', 'ФО', 'ФУ', 'ФЫ', 'ФЭ',
+                'ХА', 'ХЕ', 'ХО', 'ХУ', 'ХЫ', 'ХЭ',
+                'ЦА', 'ЦЕ', 'ЦИ', 'ЦО', 'ЦУ', 'ЦЭ',
+                'ЧА', 'ЧАЙ', 'ЧЕК', 'ЧИ', 'ЧУ', 'ЧЭ',
+                'ША', 'ШАГ', 'ШЕ', 'ШИ', 'ШОВ', 'ШУ', 'ШЭ',
+                'ЩИ', 'ЩИТ',
+                'ЫВ', 'ЫК', 'ЫМ', 'ЫН', 'ЫС', 'ЫТ', 'ЫХ',
+                'ЭБ', 'ЭК', 'ЭЛ', 'ЭМ', 'ЭН', 'ЭП', 'ЭР', 'ЭС', 'ЭТ', 'ЭФ', 'ЭХ', 'ЭЦ',
+                'юбка', 'ЮГ', 'юнга', 'ЯБ', 'ЯВ', 'ЯД', 'ЯК', 'ЯЛ', 'ЯМ', 'ЯН', 'ЯП', 'ЯР', 'ЯС', 'ЯТ', 'ЯХ', 'яхта', 'ЯЦ'
+            ];
 
             const syllables = rawItems.sort((a, b) => {
                 const lenDiff = a.length - b.length;
@@ -745,6 +802,9 @@
             const celebrationOverlay = document.getElementById('celebrationOverlay');
             const celebrationGif = document.getElementById('celebrationGif');
             const celebrationClose = document.getElementById('celebrationClose');
+            const tabButtons = document.querySelectorAll('.tab-btn');
+            const syllablesSection = document.getElementById('syllablesSection');
+            const heroesSection = document.getElementById('heroesSection');
 
             let currentMode = 'all';
             let randomItems = [];
@@ -754,7 +814,7 @@
             let examScore = 0;
             let currentExamCorrect = '';
 
-            // Список тем для циклического переключения
+            // Список тем
             const themeList = [
                 'theme-blue', 'theme-green', 'theme-red', 'theme-orange',
                 'theme-purple', 'theme-pink', 'theme-cyan', 'theme-yellow',
@@ -779,12 +839,10 @@
                     document.body.classList.add('light-mode');
                 }
                 localStorage.setItem('accentTheme', themeClass);
-                // Обновляем индикатор цвета
                 const accent = getComputedStyle(document.body).getPropertyValue('--accent').trim();
                 colorIndicator.style.background = accent;
             }
 
-            // Определяем сохранённую тему или берём первую
             let currentThemeIndex = 0;
             const savedTheme = localStorage.getItem('accentTheme') || 'theme-blue';
             currentThemeIndex = themeList.indexOf(savedTheme);
@@ -800,10 +858,24 @@
                 localStorage.setItem('theme', document.body.classList.contains('light-mode') ? 'light' : 'dark');
             });
 
-            // Циклическая смена цветовой темы
             themeCycleBtn.addEventListener('click', () => {
                 currentThemeIndex = (currentThemeIndex + 1) % themeList.length;
                 applyTheme(themeList[currentThemeIndex]);
+            });
+
+            // Переключение вкладок
+            tabButtons.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    tabButtons.forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    if (btn.dataset.tab === 'syllables') {
+                        syllablesSection.classList.add('active');
+                        heroesSection.classList.remove('active');
+                    } else {
+                        heroesSection.classList.add('active');
+                        syllablesSection.classList.remove('active');
+                    }
+                });
             });
 
             window.addEventListener('scroll', () => {
@@ -947,31 +1019,24 @@
                 examResult.textContent = '';
                 examNextBtn.classList.remove('show');
                 examRepeatBtn.style.display = 'flex';
-                
-                // НОВЫЙ БЛОК ПОДБОРА ВАРИАНТОВ
+
+                // Подбор вариантов с той же первой буквой
                 const variants = new Set([correct]);
                 const firstLetter = correct.charAt(0).toUpperCase();
-
-                // Пул слогов, начинающихся на ту же букву
-                const sameLetterPool = syllables.filter(item => 
+                const sameLetterPool = syllables.filter(item =>
                     item !== correct && item.charAt(0).toUpperCase() === firstLetter
                 );
-
-                // Перемешиваем и берём до 5 элементов (чтобы всего было 6 вариантов)
                 const maxSameLetter = Math.min(5, sameLetterPool.length);
                 const shuffledSame = sameLetterPool.sort(() => Math.random() - 0.5).slice(0, maxSameLetter);
                 shuffledSame.forEach(item => variants.add(item));
-
-                // Если подходящих на ту же букву не хватило до 6 – добавляем случайные
                 const fallbackPool = syllables.filter(item => !variants.has(item));
                 while (variants.size < 6 && fallbackPool.length > 0) {
                     const randomItem = fallbackPool[Math.floor(Math.random() * fallbackPool.length)];
                     variants.add(randomItem);
                     fallbackPool.splice(fallbackPool.indexOf(randomItem), 1);
                 }
-
                 const variantsArray = [...variants].sort(() => Math.random() - 0.5);
-                
+
                 examOptions.innerHTML = '';
                 variantsArray.forEach(variant => {
                     const btn = document.createElement('button');
