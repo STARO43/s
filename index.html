@@ -167,43 +167,27 @@
             min-height: 1.2em;
         }
 
-        /* Контейнер секций с перспективой */
+        /* Контейнер секций */
         .content-wrapper {
             flex: 1;
             max-width: 900px;
             width: 100%;
             margin: 0 auto;
             padding: 0 20px;
-            perspective: 1200px;
-            position: relative;
         }
         .tab-section {
-            display: block;
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            backface-visibility: hidden;
-            transform-style: preserve-3d;
-            transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.4s ease;
+            display: none;
             opacity: 0;
-            visibility: hidden;
+            transition: opacity 0.3s ease;
         }
         .tab-section.active {
-            position: relative;
+            display: block;
             opacity: 1;
-            visibility: visible;
-            transform: rotateY(0deg) translateX(0);
+            animation: fadeIn 0.3s ease;
         }
-        .tab-section.exit-left {
-            transform: rotateY(-90deg) translateX(-100%);
-            opacity: 0;
-            visibility: hidden;
-        }
-        .tab-section.enter-right {
-            transform: rotateY(90deg) translateX(100%);
-            opacity: 0;
-            visibility: hidden;
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
         .progress-container {
@@ -440,10 +424,6 @@
             display: flex;
             animation: fadeIn 0.3s ease;
         }
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
         .exam-header {
             display: flex;
             align-items: center;
@@ -668,13 +648,13 @@
             padding: 0 10px;
         }
         .timeline-century-block {
-            margin-bottom: 30px;
+            margin-bottom: 40px;
         }
         .timeline-century-title {
-            font-size: 1.2rem;
+            font-size: 1.5rem;
             font-weight: 700;
             color: var(--accent);
-            margin-bottom: 10px;
+            margin-bottom: 15px;
         }
         .timeline-track-wrapper {
             position: relative;
@@ -685,7 +665,7 @@
             width: 100%;
             position: relative;
             overflow-x: auto;
-            padding: 10px 0;
+            padding: 15px 0;
             background: var(--bg-card);
             border: 1px solid var(--border);
             border-radius: var(--radius);
@@ -695,44 +675,45 @@
             scrollbar-width: thin;
             scrollbar-color: var(--accent) var(--bg-card);
         }
-        .timeline-track::-webkit-scrollbar { height: 8px; }
+        .timeline-track::-webkit-scrollbar { height: 10px; }
         .timeline-track::-webkit-scrollbar-track { background: var(--bg-card); border-radius: 10px; }
         .timeline-track::-webkit-scrollbar-thumb { background: var(--accent); border-radius: 10px; }
         .timeline-line {
             position: absolute;
             top: 50%;
-            left: 0;
-            right: 0;
-            height: 2px;
-            background: var(--border);
+            left: 20px;
+            right: 20px;
+            height: 3px;
+            background: var(--accent);
+            opacity: 0.6;
             z-index: 0;
         }
         .hero-item {
             position: relative;
             z-index: 1;
-            margin: 0 12px;
+            margin: 0 20px;
             cursor: pointer;
             transition: transform 0.2s;
             flex-shrink: 0;
+            text-align: center;
         }
         .hero-item img {
-            width: 60px;
-            height: 60px;
+            width: 90px;
+            height: 90px;
             border-radius: 50%;
             object-fit: cover;
-            border: 2px solid var(--accent);
-            box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+            border: 3px solid var(--accent);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.4);
         }
         .hero-item:hover {
             transform: scale(1.1);
         }
         .hero-item span {
             display: block;
-            text-align: center;
-            font-size: 0.7rem;
-            color: var(--text-secondary);
-            margin-top: 4px;
-            max-width: 70px;
+            font-size: 0.85rem;
+            color: var(--text);
+            margin-top: 6px;
+            max-width: 100px;
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
@@ -745,10 +726,10 @@
             border: 1px solid var(--border);
             color: var(--text);
             border-radius: 50%;
-            width: 36px;
-            height: 36px;
+            width: 44px;
+            height: 44px;
             cursor: pointer;
-            font-size: 1.5rem;
+            font-size: 1.8rem;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -758,10 +739,10 @@
         .scroll-arrow:hover {
             border-color: var(--accent);
             color: var(--accent);
-            box-shadow: 0 0 8px var(--accent-glow);
+            box-shadow: 0 0 10px var(--accent-glow);
         }
-        .scroll-arrow.left { left: 8px; }
-        .scroll-arrow.right { right: 8px; }
+        .scroll-arrow.left { left: 10px; }
+        .scroll-arrow.right { right: 10px; }
 
         /* Модальное окно героя */
         .hero-modal {
@@ -780,12 +761,11 @@
         .hero-modal-content {
             width: 100%;
             height: 100%;
+            position: relative;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            padding: 20px;
-            position: relative;
         }
         .hero-modal-close {
             position: absolute;
@@ -794,9 +774,9 @@
             background: none;
             border: none;
             color: var(--text);
-            font-size: 2.5rem;
+            font-size: 3rem;
             cursor: pointer;
-            z-index: 10;
+            z-index: 20;
         }
         .hero-modal-repeat {
             position: absolute;
@@ -806,15 +786,15 @@
             border: 1px solid var(--border);
             color: var(--text);
             border-radius: 50%;
-            width: 50px;
-            height: 50px;
+            width: 56px;
+            height: 56px;
             cursor: pointer;
-            font-size: 1.5rem;
+            font-size: 1.8rem;
             display: flex;
             align-items: center;
             justify-content: center;
             transition: var(--transition);
-            z-index: 10;
+            z-index: 20;
         }
         .hero-modal-repeat:hover {
             border-color: var(--accent);
@@ -822,39 +802,44 @@
             box-shadow: 0 0 12px var(--accent-glow);
         }
         .hero-modal-portrait {
-            max-width: 95vw;
-            max-height: 85vh;
-            width: auto;
-            height: auto;
+            max-width: 90%;
+            max-height: 70vh;
             object-fit: contain;
-            border-radius: 16px;
-            box-shadow: 0 8px 30px rgba(0,0,0,0.5);
+            border-radius: 8px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.6);
         }
         .hero-modal h3 {
-            font-size: 1.8rem;
+            font-size: 2rem;
             margin: 20px 0;
             color: var(--accent);
         }
         .hero-modal-nav {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            left: 0;
+            right: 0;
             display: flex;
-            gap: 30px;
-            margin-bottom: 20px;
+            justify-content: space-between;
+            padding: 0 10px;
+            z-index: 10;
         }
         .hero-modal-nav button {
-            background: var(--bg-card);
-            border: 1px solid var(--border);
-            color: var(--text);
-            border-radius: 50%;
-            width: 50px;
-            height: 50px;
+            background: rgba(0,0,0,0.4);
+            border: none;
+            color: white;
+            font-size: 4rem;
+            width: 70px;
+            height: 70px;
             cursor: pointer;
-            font-size: 2rem;
-            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.2s;
+            border-radius: 8px;
         }
         .hero-modal-nav button:hover {
-            border-color: var(--accent);
-            color: var(--accent);
-            box-shadow: 0 0 12px var(--accent-glow);
+            background: rgba(0,0,0,0.7);
         }
 
         @media (max-width: 1024px) {
@@ -880,7 +865,8 @@
             .theme-cycle button { width: 32px; height: 32px; }
             .header { padding: 16px 12px 10px; }
             .section-switch-btn { padding: 8px 16px; font-size: 1rem; }
-            .hero-item img { width: 50px; height: 50px; }
+            .hero-item img { width: 70px; height: 70px; }
+            .hero-modal-nav button { width: 50px; height: 50px; font-size: 3rem; }
         }
     </style>
 </head>
@@ -1045,14 +1031,12 @@
             let currentExamCorrect = '';
             let currentSection = 'syllables';
 
-            // Список тем
             const themeList = [
                 'theme-blue', 'theme-green', 'theme-red', 'theme-orange',
                 'theme-purple', 'theme-pink', 'theme-cyan', 'theme-yellow',
                 'theme-teal', 'theme-indigo'
             ];
 
-            // Изученные
             function loadLearnedSet() {
                 try { return new Set(JSON.parse(localStorage.getItem('learned_syllables') || '[]')); }
                 catch { return new Set(); }
@@ -1062,7 +1046,6 @@
             }
             let learnedSet = loadLearnedSet();
 
-            // Применение темы
             function applyTheme(themeClass) {
                 document.body.className = '';
                 document.body.classList.add(themeClass);
@@ -1094,39 +1077,21 @@
                 applyTheme(themeList[currentThemeIndex]);
             });
 
-            // Функция переключения раздела
             function switchSection(section) {
                 if (section === currentSection) return;
-
-                const currentEl = section === 'syllables' ? heroesSection : syllablesSection;
-                const nextEl = section === 'syllables' ? syllablesSection : heroesSection;
-
-                currentEl.classList.remove('active');
-                currentEl.classList.add('exit-left');
-
-                nextEl.classList.remove('enter-right', 'exit-left');
-                nextEl.classList.add('enter-right');
-                setTimeout(() => {
-                    nextEl.classList.remove('enter-right');
-                    nextEl.classList.add('active');
-                    setTimeout(() => {
-                        currentEl.classList.remove('exit-left');
-                        currentEl.style.visibility = 'hidden';
-                        nextEl.style.visibility = 'visible';
-                    }, 500);
-                }, 20);
-
+                currentSection = section;
+                if (section === 'syllables') {
+                    syllablesSection.classList.add('active');
+                    heroesSection.classList.remove('active');
+                    sectionSubtitle.textContent = 'Учим слоги. Жми, слушай, запоминай';
+                } else {
+                    heroesSection.classList.add('active');
+                    syllablesSection.classList.remove('active');
+                    sectionSubtitle.textContent = 'Знакомимся с великими личностями Отечества';
+                }
                 sectionBtns.forEach(btn => {
                     btn.classList.toggle('active', btn.dataset.section === section);
                 });
-
-                if (section === 'syllables') {
-                    sectionSubtitle.textContent = 'Учим слоги. Жми, слушай, запоминай';
-                } else {
-                    sectionSubtitle.textContent = 'Знакомимся с великими личностями Отечества';
-                }
-
-                currentSection = section;
             }
 
             sectionBtns.forEach(btn => {
@@ -1216,7 +1181,6 @@
                 playAudio(syllable);
             }
 
-            // Режимы
             normalBtn.addEventListener('click', () => {
                 currentMode = 'all';
                 normalBtn.classList.add('active');
@@ -1245,7 +1209,6 @@
                 showToast('Очищено', 'success');
             });
 
-            // Экзамен
             examBtn.addEventListener('click', startExam);
             function startExam() {
                 examOverlay.classList.add('show');
@@ -1340,7 +1303,6 @@
                 if (currentExamCorrect) playAudio(currentExamCorrect);
             });
 
-            // Праздник
             const gifUrls = [
                 'https://media.gifs.ru/2158157ec6a1788936055b9e9911600c84c63e85_300.webp',
                 'https://media.gifs.ru/2771cc0c57b56e4c6cfa23d2d9d3f4eb1aab5aaa_300.webp',
@@ -1430,10 +1392,8 @@
                 { name: "Шолохов", year: 1935, images: ["Шолохов.jpg"], audio: "Шолохов.wav" }
             ];
 
-            // Рендер линии времени по векам
             function renderHeroesTimeline() {
                 if (!heroesTimeline) return;
-
                 const centuries = {
                     "XVIII век": heroesData.filter(h => h.year >= 1700 && h.year < 1800),
                     "XIX век": heroesData.filter(h => h.year >= 1800 && h.year < 1900),
@@ -1445,7 +1405,7 @@
                     if (heroes.length === 0) continue;
                     html += `<div class="timeline-century-block">`;
                     html += `<div class="timeline-century-title">${century}</div>`;
-                    html += `<div class="timeline-track-wrapper" style="position: relative;">`;
+                    html += `<div class="timeline-track-wrapper">`;
                     html += `<button class="scroll-arrow left" data-target="${century}">‹</button>`;
                     html += `<div class="timeline-track" data-century="${century}">`;
                     html += `<div class="timeline-line"></div>`;
@@ -1466,7 +1426,6 @@
 
                 heroesTimeline.innerHTML = html;
 
-                // Обработчики кликов
                 heroesTimeline.querySelectorAll('.hero-item').forEach(item => {
                     item.addEventListener('click', function() {
                         const name = this.dataset.name;
@@ -1476,13 +1435,12 @@
                     });
                 });
 
-                // Обработчики для стрелок прокрутки
                 heroesTimeline.querySelectorAll('.scroll-arrow').forEach(btn => {
                     btn.addEventListener('click', function() {
                         const target = this.dataset.target;
                         const track = heroesTimeline.querySelector(`.timeline-track[data-century="${target}"]`);
                         if (track) {
-                            const scrollAmount = 200;
+                            const scrollAmount = 300;
                             if (this.classList.contains('left')) {
                                 track.scrollBy({ left: -scrollAmount, behavior: 'smooth' });
                             } else {
@@ -1493,7 +1451,6 @@
                 });
             }
 
-            // Модальное окно героя
             let heroModal = null;
             let heroAudio = new Audio();
             let currentImageIndex = 0;
@@ -1514,8 +1471,8 @@
                         <img class="hero-modal-portrait" src="${images[0]}" alt="${name}">
                         <h3>${name}</h3>
                         <div class="hero-modal-nav">
-                            <button class="prev-image" ${images.length <= 1 ? 'style="visibility:hidden;"' : ''}>&lsaquo;</button>
-                            <button class="next-image" ${images.length <= 1 ? 'style="visibility:hidden;"' : ''}>&rsaquo;</button>
+                            <button class="prev-image" style="${images.length <= 1 ? 'display:none;' : ''}">&#10094;</button>
+                            <button class="next-image" style="${images.length <= 1 ? 'display:none;' : ''}">&#10095;</button>
                         </div>
                     </div>
                 `;
@@ -1537,14 +1494,20 @@
                     }
                 });
 
-                heroModal.querySelector('.prev-image').addEventListener('click', () => {
-                    currentImageIndex = (currentImageIndex - 1 + currentImages.length) % currentImages.length;
-                    heroModal.querySelector('.hero-modal-portrait').src = currentImages[currentImageIndex];
-                });
-                heroModal.querySelector('.next-image').addEventListener('click', () => {
-                    currentImageIndex = (currentImageIndex + 1) % currentImages.length;
-                    heroModal.querySelector('.hero-modal-portrait').src = currentImages[currentImageIndex];
-                });
+                const prevBtn = heroModal.querySelector('.prev-image');
+                const nextBtn = heroModal.querySelector('.next-image');
+                if (prevBtn) {
+                    prevBtn.addEventListener('click', () => {
+                        currentImageIndex = (currentImageIndex - 1 + currentImages.length) % currentImages.length;
+                        heroModal.querySelector('.hero-modal-portrait').src = currentImages[currentImageIndex];
+                    });
+                }
+                if (nextBtn) {
+                    nextBtn.addEventListener('click', () => {
+                        currentImageIndex = (currentImageIndex + 1) % currentImages.length;
+                        heroModal.querySelector('.hero-modal-portrait').src = currentImages[currentImageIndex];
+                    });
+                }
 
                 heroModal.querySelector('.hero-modal-repeat').addEventListener('click', () => {
                     playHeroAudio(audioSrc);
@@ -1556,7 +1519,6 @@
                 heroAudio.play().catch(e => console.log('Ошибка воспроизведения', e));
             }
 
-            // Инициализация
             renderHeroesTimeline();
             renderGrid();
         })();
