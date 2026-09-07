@@ -127,6 +127,7 @@
             margin: 8px 0 4px;
         }
 
+        /* Переключатель раздела */
         .section-switch {
             display: inline-flex;
             background: var(--bg-card);
@@ -157,6 +158,7 @@
             color: var(--text);
         }
 
+        /* Динамический подзаголовок */
         #sectionSubtitle {
             color: var(--text-secondary);
             font-size: 1rem;
@@ -165,12 +167,13 @@
             min-height: 1.2em;
         }
 
+        /* Контейнер секций с перспективой */
         .content-wrapper {
             flex: 1;
-            max-width: 1000px;
+            max-width: 900px;
             width: 100%;
             margin: 0 auto;
-            padding: 0 20px 40px;
+            padding: 0 20px;
         }
         .tab-section {
             display: none;
@@ -190,6 +193,7 @@
         .progress-container {
             max-width: 900px;
             margin: 8px auto 0;
+            padding: 0 20px;
             text-align: center;
         }
         .progress-label {
@@ -637,114 +641,84 @@
             border-top: 1px solid var(--border);
         }
 
-        /* Линия времени */
-        .heroes-timeline {
-            max-width: 100%;
-            margin: 20px 0;
-            padding: 0 10px;
-        }
-        .timeline-century-block {
-            margin-bottom: 40px;
-        }
-        .timeline-century-title {
-            font-size: 1.5rem;
-            font-weight: 700;
-            color: var(--accent);
-            margin-bottom: 15px;
-            text-align: center;
-        }
-        .timeline-track-wrapper {
+        /* ========== ВЕРТИКАЛЬНАЯ ЛИНИЯ ВРЕМЕНИ ========== */
+        .vertical-timeline {
             position: relative;
+            max-width: 700px;
+            margin: 20px auto;
+            padding: 20px 0;
+        }
+        .vertical-timeline::before {
+            content: '';
+            position: absolute;
+            left: 30px;
+            top: 0;
+            bottom: 0;
+            width: 4px;
+            background: var(--accent);
+            border-radius: 2px;
+            opacity: 0.5;
+        }
+        .timeline-item {
+            position: relative;
+            margin-bottom: 30px;
+            padding-left: 80px;
+            cursor: pointer;
+        }
+        .timeline-item:last-child {
+            margin-bottom: 0;
+        }
+        .timeline-dot {
+            position: absolute;
+            left: 22px;
+            top: 30px;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: var(--accent);
+            border: 3px solid var(--bg);
+            box-shadow: 0 0 0 3px var(--accent);
+            z-index: 1;
+        }
+        .timeline-content {
             display: flex;
             align-items: center;
-        }
-        .timeline-track {
-            display: flex;
-            align-items: center;
-            width: 100%;
-            position: relative;
-            overflow-x: auto;
-            padding: 15px 0;
+            gap: 15px;
             background: var(--bg-card);
             border: 1px solid var(--border);
             border-radius: var(--radius);
-            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-            scroll-behavior: smooth;
-            -webkit-overflow-scrolling: touch;
-            scrollbar-width: thin;
-            scrollbar-color: var(--accent) var(--bg-card);
+            padding: 12px 18px;
+            transition: var(--transition);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
         }
-        .timeline-track::-webkit-scrollbar { height: 10px; }
-        .timeline-track::-webkit-scrollbar-track { background: var(--bg-card); border-radius: 10px; }
-        .timeline-track::-webkit-scrollbar-thumb { background: var(--accent); border-radius: 10px; }
-        .timeline-line {
-            position: absolute;
-            top: 50%;
-            left: 20px;
-            right: 20px;
-            height: 4px;
-            background: var(--accent);
-            opacity: 0.6;
-            z-index: 0;
-            border-radius: 2px;
+        .timeline-content:hover {
+            background: var(--bg-card-hover);
+            border-color: var(--accent);
+            box-shadow: 0 0 12px var(--accent-glow);
+            transform: translateX(5px);
         }
-        .hero-item {
-            position: relative;
-            z-index: 1;
-            margin: 0 20px;
-            cursor: pointer;
-            transition: transform 0.2s;
-            flex-shrink: 0;
-            text-align: center;
-        }
-        .hero-item img {
-            width: 100px;
-            height: 100px;
+        .timeline-avatar {
+            width: 70px;
+            height: 70px;
             border-radius: 50%;
             object-fit: cover;
-            border: 4px solid var(--accent);
-            box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+            border: 3px solid var(--accent);
+            flex-shrink: 0;
         }
-        .hero-item:hover {
-            transform: scale(1.1);
+        .timeline-info {
+            flex: 1;
         }
-        .hero-item span {
-            display: block;
-            font-size: 0.95rem;
-            color: var(--text);
-            margin-top: 8px;
-            max-width: 110px;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
+        .timeline-name {
+            font-weight: 700;
+            font-size: 1.1rem;
+            margin-bottom: 4px;
         }
-        .scroll-arrow {
-            position: absolute;
-            top: 50%;
-            transform: translateY(-50%);
-            background: var(--bg-card);
-            border: 1px solid var(--border);
-            color: var(--text);
-            border-radius: 50%;
-            width: 50px;
-            height: 50px;
-            cursor: pointer;
-            font-size: 2rem;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: var(--transition);
-            z-index: 2;
+        .timeline-year {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
         }
-        .scroll-arrow:hover {
-            border-color: var(--accent);
-            color: var(--accent);
-            box-shadow: 0 0 12px var(--accent-glow);
-        }
-        .scroll-arrow.left { left: 10px; }
-        .scroll-arrow.right { right: 10px; }
 
-        /* Модальное окно героя */
+        /* Модальное окно героя (оставляем как было) */
         .hero-modal {
             position: fixed;
             top: 0;
@@ -845,30 +819,12 @@
             transform: scale(1.05);
         }
 
-        @media (max-width: 1024px) {
-            .syllable-grid { grid-template-columns: repeat(3, 1fr); gap: 8px; }
-        }
         @media (max-width: 600px) {
-            .exam-exit-btn {
-                top: auto;
-                bottom: 10px;
-                left: 10px;
-                width: 34px;
-                height: 34px;
-                font-size: 1.1rem;
-            }
-            .syllable-grid { grid-template-columns: repeat(2, 1fr); gap: 5px; }
-            .syllable-card { font-size: 0.95rem; padding: 10px 4px; min-height: 45px; }
-            .learn-dot { width: 10px; height: 10px; bottom: 3px; right: 4px; }
-            .controls { gap: 6px; }
-            .controls button { width: 38px; height: 38px; font-size: 1.1rem; }
-            .theme-toggle { top: 6px; right: 10px; }
-            .theme-toggle button { width: 32px; height: 32px; font-size: 1rem; }
-            .theme-cycle { top: 6px; left: 10px; }
-            .theme-cycle button { width: 32px; height: 32px; }
-            .header { padding: 16px 12px 10px; }
-            .section-switch-btn { padding: 8px 16px; font-size: 1rem; }
-            .hero-item img { width: 80px; height: 80px; }
+            .vertical-timeline::before { left: 20px; }
+            .timeline-dot { left: 12px; }
+            .timeline-item { padding-left: 60px; }
+            .timeline-content { padding: 10px 12px; gap: 10px; }
+            .timeline-avatar { width: 55px; height: 55px; }
             .hero-modal-nav button { width: 60px; height: 60px; font-size: 3.5rem; }
         }
     </style>
@@ -876,6 +832,7 @@
 <body>
 
     <header class="header">
+        <!-- Кнопка циклической смены темы -->
         <div class="theme-cycle">
             <button id="themeCycleBtn" title="Сменить цвет">
                 <span class="color-indicator" id="colorIndicator"></span>
@@ -887,15 +844,19 @@
         </div>
         <h1>Грамотиньо</h1>
 
+        <!-- Переключатель раздела -->
         <div class="section-switch">
             <button class="section-switch-btn active" data-section="syllables">📖</button>
             <button class="section-switch-btn" data-section="heroes">🌟</button>
         </div>
 
+        <!-- Динамический подзаголовок -->
         <p id="sectionSubtitle">Учим слоги. Жми, слушай, запоминай</p>
     </header>
 
+    <!-- Основной контент -->
     <div class="content-wrapper">
+        <!-- Раздел "Учим слоги" -->
         <section id="syllablesSection" class="tab-section active">
             <div class="progress-container">
                 <div class="progress-label" id="progressLabel">Отмечено: 0 из 0</div>
@@ -915,13 +876,15 @@
             </div>
         </section>
 
+        <!-- Раздел "Великие личности" -->
         <section id="heroesSection" class="tab-section">
-            <div class="heroes-timeline" id="heroesTimeline"></div>
+            <div class="vertical-timeline" id="heroesTimeline"></div>
         </section>
     </div>
 
     <button class="scroll-top-btn" id="scrollTopBtn" title="Наверх">↑</button>
 
+    <!-- Экзаменационный оверлей -->
     <div class="exam-overlay" id="examOverlay">
         <button class="exam-exit-btn" id="examExitBtn" title="Выйти">✕</button>
         <div class="exam-header">
@@ -933,6 +896,7 @@
         <div class="exam-result" id="examResult"></div>
     </div>
 
+    <!-- Окно с гифкой -->
     <div class="celebration-overlay" id="celebrationOverlay">
         <div class="celebration-box">
             <h2>Умница! 😻😻😽😽</h2>
@@ -949,6 +913,7 @@
 
     <script>
         (function() {
+            // Массив слогов (прежний)
             const rawItems = [
                 'ЁЖ', 'ёлка', 'ЁН', 'АБ', 'АВ', 'АГ', 'АЖ', 'АЗ', 'АК', 'АЛ', 'Алла', 'АМ', 'АН', 'Анна', 'АП', 'арка', 'арфа', 'АС', 'АТ', 'АХ', 'АЧ', 'АШ',
                 'БА', 'БАК', 'БАЯН', 'БЕ', 'БИ', 'БО', 'БОК', 'БОР', 'Боря', 'БЫ', 'БЫК', 'БЭ', 'БЯ',
@@ -986,6 +951,7 @@
                 return a.localeCompare(b, 'ru', { sensitivity: 'base' });
             });
 
+            // DOM элементы
             const grid = document.getElementById('syllableGrid');
             const toastContainer = document.getElementById('toastContainer');
             const themeToggle = document.getElementById('themeToggle');
@@ -1333,6 +1299,7 @@
                 setTimeout(() => toast.remove(), 2000);
             }
 
+            // Данные о великих личностях (исправлены года расцвета)
             const heroesData = [
                 { name: "Александров", year: 1935, images: ["Александров.jpg"], audio: "Александров.wav" },
                 { name: "Белинский", year: 1840, images: ["Белинский.jpg"], audio: "Белинский.wav" },
@@ -1386,59 +1353,32 @@
 
             function renderHeroesTimeline() {
                 if (!heroesTimeline) return;
-                const centuries = {
-                    "XVIII век": heroesData.filter(h => h.year >= 1700 && h.year < 1800),
-                    "XIX век": heroesData.filter(h => h.year >= 1800 && h.year < 1900),
-                    "XX век": heroesData.filter(h => h.year >= 1900 && h.year < 2000)
-                };
-
+                // Сортировка по году (от раннего к позднему)
+                const sortedHeroes = heroesData.slice().sort((a, b) => a.year - b.year);
                 let html = '';
-                for (const [century, heroes] of Object.entries(centuries)) {
-                    if (heroes.length === 0) continue;
-                    html += `<div class="timeline-century-block">`;
-                    html += `<div class="timeline-century-title">${century}</div>`;
-                    html += `<div class="timeline-track-wrapper">`;
-                    html += `<button class="scroll-arrow left" data-target="${century}">‹</button>`;
-                    html += `<div class="timeline-track" data-century="${century}">`;
-                    html += `<div class="timeline-line"></div>`;
-                    heroes.sort((a, b) => a.year - b.year);
-                    heroes.forEach(hero => {
-                        const imagePath = `Great Rus/${hero.images[0]}`;
-                        html += `
-                            <div class="hero-item" data-name="${hero.name}" data-audio="Great Rus/${hero.audio}" data-images='${JSON.stringify(hero.images.map(img => "Great Rus/" + img))}'>
-                                <img src="${imagePath}" alt="${hero.name}" loading="lazy">
-                                <span>${hero.name}</span>
+                sortedHeroes.forEach(hero => {
+                    const imagePath = `Great Rus/${hero.images[0]}`;
+                    html += `
+                        <div class="timeline-item" data-name="${hero.name}" data-audio="Great Rus/${hero.audio}" data-images='${JSON.stringify(hero.images.map(img => "Great Rus/" + img))}'>
+                            <div class="timeline-dot"></div>
+                            <div class="timeline-content">
+                                <img class="timeline-avatar" src="${imagePath}" alt="${hero.name}" loading="lazy">
+                                <div class="timeline-info">
+                                    <div class="timeline-name">${hero.name}</div>
+                                    <div class="timeline-year">${hero.year}</div>
+                                </div>
                             </div>
-                        `;
-                    });
-                    html += `</div>`;
-                    html += `<button class="scroll-arrow right" data-target="${century}">›</button>`;
-                    html += `</div></div>`;
-                }
-
+                        </div>
+                    `;
+                });
                 heroesTimeline.innerHTML = html;
 
-                heroesTimeline.querySelectorAll('.hero-item').forEach(item => {
+                heroesTimeline.querySelectorAll('.timeline-item').forEach(item => {
                     item.addEventListener('click', function() {
                         const name = this.dataset.name;
                         const audioSrc = this.dataset.audio;
                         const images = JSON.parse(this.dataset.images);
                         openHeroModal(name, images, audioSrc);
-                    });
-                });
-
-                heroesTimeline.querySelectorAll('.scroll-arrow').forEach(btn => {
-                    btn.addEventListener('click', function() {
-                        const target = this.dataset.target;
-                        const track = heroesTimeline.querySelector(`.timeline-track[data-century="${target}"]`);
-                        if (track) {
-                            const scrollAmount = 300;
-                            if (this.classList.contains('left')) {
-                                track.scrollBy({ left: -scrollAmount, behavior: 'smooth' });
-                            } else {
-                                track.scrollBy({ left: scrollAmount, behavior: 'smooth' });
-                            }
-                        }
                     });
                 });
             }
@@ -1511,6 +1451,7 @@
                 heroAudio.play().catch(e => console.log('Ошибка воспроизведения', e));
             }
 
+            // Инициализация
             renderHeroesTimeline();
             renderGrid();
         })();
