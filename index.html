@@ -663,23 +663,30 @@
 
         /* Линия времени */
         .heroes-timeline {
-            position: relative;
             max-width: 100%;
-            overflow-x: auto;
-            overflow-y: hidden;
-            padding: 20px 0;
-            margin: 20px auto;
-            background: var(--bg-card);
-            border: 1px solid var(--border);
-            border-radius: var(--radius);
-            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            margin: 20px 0;
+            padding: 0 10px;
+        }
+        .timeline-century-block {
+            margin-bottom: 30px;
+        }
+        .timeline-century-title {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: var(--accent);
+            margin-bottom: 10px;
         }
         .timeline-track {
             display: flex;
             align-items: center;
-            width: max-content;
-            padding: 0 40px;
+            width: 100%;
             position: relative;
+            overflow-x: auto;
+            padding: 10px 0;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
         }
         .timeline-line {
             position: absolute;
@@ -693,13 +700,14 @@
         .hero-item {
             position: relative;
             z-index: 1;
-            margin: 0 10px;
+            margin: 0 12px;
             cursor: pointer;
             transition: transform 0.2s;
+            flex-shrink: 0;
         }
         .hero-item img {
-            width: 60px;
-            height: 60px;
+            width: 70px;
+            height: 70px;
             border-radius: 50%;
             object-fit: cover;
             border: 2px solid var(--accent);
@@ -714,16 +722,10 @@
             font-size: 0.7rem;
             color: var(--text-secondary);
             margin-top: 4px;
-            max-width: 70px;
+            max-width: 80px;
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
-        }
-        .timeline-century {
-            position: absolute;
-            bottom: 0;
-            font-size: 0.8rem;
-            color: var(--text-secondary);
         }
 
         /* Модальное окно героя */
@@ -733,68 +735,83 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0,0,0,0.7);
+            background: var(--bg);
             z-index: 5000;
             display: flex;
             align-items: center;
             justify-content: center;
+            animation: fadeIn 0.3s ease;
         }
         .hero-modal-content {
-            background: var(--bg-card);
-            border-radius: var(--radius);
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
             padding: 20px;
-            max-width: 500px;
-            width: 90%;
-            text-align: center;
             position: relative;
-            animation: scaleIn 0.3s ease;
         }
         .hero-modal-close {
             position: absolute;
-            top: 10px;
-            right: 10px;
+            top: 20px;
+            right: 20px;
             background: none;
             border: none;
             color: var(--text);
-            font-size: 2rem;
+            font-size: 2.5rem;
             cursor: pointer;
+            z-index: 10;
         }
         .hero-modal-portrait {
-            max-width: 200px;
-            max-height: 200px;
-            margin: 0 auto 15px;
-            border-radius: 12px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            max-width: 90%;
+            max-height: 70vh;
+            width: auto;
+            height: auto;
+            object-fit: contain;
+            border-radius: 16px;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.5);
+        }
+        .hero-modal h3 {
+            font-size: 1.8rem;
+            margin: 20px 0;
+            color: var(--accent);
         }
         .hero-modal-nav {
             display: flex;
-            justify-content: center;
-            gap: 20px;
-            margin: 10px 0;
+            gap: 30px;
+            margin-bottom: 20px;
         }
         .hero-modal-nav button {
             background: var(--bg-card);
             border: 1px solid var(--border);
             color: var(--text);
             border-radius: 50%;
-            width: 40px;
-            height: 40px;
+            width: 50px;
+            height: 50px;
             cursor: pointer;
-            font-size: 1.5rem;
+            font-size: 2rem;
+            transition: var(--transition);
         }
         .hero-modal-nav button:hover {
             border-color: var(--accent);
             color: var(--accent);
+            box-shadow: 0 0 12px var(--accent-glow);
         }
         .hero-modal-repeat {
-            margin-top: 15px;
-            padding: 8px 20px;
+            padding: 12px 30px;
             background: var(--accent);
             color: white;
             border: none;
-            border-radius: 6px;
+            border-radius: 30px;
             cursor: pointer;
             font-family: var(--font);
+            font-size: 1.1rem;
+            transition: var(--transition);
+        }
+        .hero-modal-repeat:hover {
+            background: var(--accent-glow);
+            color: var(--accent);
         }
 
         @media (max-width: 1024px) {
@@ -1370,37 +1387,38 @@
                 { name: "Шолохов", year: 1905, images: ["Шолохов.jpg"], audio: "Шолохов.wav" }
             ];
 
-            // Рендер линии времени
+            // Рендер линии времени по векам
             function renderHeroesTimeline() {
                 if (!heroesTimeline) return;
-                const minYear = 1600;
-                const maxYear = 2000;
-                const totalYears = maxYear - minYear;
-                const scale = 5; // пикселей на год
-                const trackWidth = totalYears * scale;
 
-                let html = `<div class="timeline-track" style="position:relative; width:${trackWidth}px;">`;
-                html += `<div class="timeline-line"></div>`;
+                // Группировка по векам
+                const centuries = {
+                    "XVIII век": heroesData.filter(h => h.year >= 1700 && h.year < 1800),
+                    "XIX век": heroesData.filter(h => h.year >= 1800 && h.year < 1900),
+                    "XX век": heroesData.filter(h => h.year >= 1900 && h.year < 2000)
+                };
 
-                // Метки веков
-                const centuries = [1600, 1700, 1800, 1900, 2000];
-                centuries.forEach(year => {
-                    const left = (year - minYear) * scale;
-                    html += `<div class="timeline-century" style="left:${left}px;">${year}</div>`;
-                });
+                let html = '';
+                for (const [century, heroes] of Object.entries(centuries)) {
+                    if (heroes.length === 0) continue;
+                    html += `<div class="timeline-century-block">`;
+                    html += `<div class="timeline-century-title">${century}</div>`;
+                    html += `<div class="timeline-track">`;
+                    html += `<div class="timeline-line"></div>`;
+                    // Сортируем по году для правильного порядка
+                    heroes.sort((a, b) => a.year - b.year);
+                    heroes.forEach(hero => {
+                        const imagePath = `Great Rus/${hero.images[0]}`;
+                        html += `
+                            <div class="hero-item" data-name="${hero.name}" data-audio="Great Rus/${hero.audio}" data-images='${JSON.stringify(hero.images.map(img => "Great Rus/" + img))}'>
+                                <img src="${imagePath}" alt="${hero.name}" loading="lazy">
+                                <span>${hero.name}</span>
+                            </div>
+                        `;
+                    });
+                    html += `</div></div>`;
+                }
 
-                heroesData.forEach(hero => {
-                    const left = (hero.year - minYear) * scale;
-                    const imagePath = `Great Rus/${hero.images[0]}`;
-                    html += `
-                        <div class="hero-item" style="position:absolute; left:${left}px;" data-name="${hero.name}" data-audio="Great Rus/${hero.audio}" data-images='${JSON.stringify(hero.images.map(img => "Great Rus/" + img))}'>
-                            <img src="${imagePath}" alt="${hero.name}" loading="lazy">
-                            <span>${hero.name}</span>
-                        </div>
-                    `;
-                });
-
-                html += `</div>`;
                 heroesTimeline.innerHTML = html;
 
                 // Обработчики кликов
