@@ -947,12 +947,31 @@
                 examResult.textContent = '';
                 examNextBtn.classList.remove('show');
                 examRepeatBtn.style.display = 'flex';
+                
+                // НОВЫЙ БЛОК ПОДБОРА ВАРИАНТОВ
                 const variants = new Set([correct]);
-                while (variants.size < 6) {
-                    const randomItem = syllables[Math.floor(Math.random() * syllables.length)];
-                    if (!variants.has(randomItem)) variants.add(randomItem);
+                const firstLetter = correct.charAt(0).toUpperCase();
+
+                // Пул слогов, начинающихся на ту же букву
+                const sameLetterPool = syllables.filter(item => 
+                    item !== correct && item.charAt(0).toUpperCase() === firstLetter
+                );
+
+                // Перемешиваем и берём до 5 элементов (чтобы всего было 6 вариантов)
+                const maxSameLetter = Math.min(5, sameLetterPool.length);
+                const shuffledSame = sameLetterPool.sort(() => Math.random() - 0.5).slice(0, maxSameLetter);
+                shuffledSame.forEach(item => variants.add(item));
+
+                // Если подходящих на ту же букву не хватило до 6 – добавляем случайные
+                const fallbackPool = syllables.filter(item => !variants.has(item));
+                while (variants.size < 6 && fallbackPool.length > 0) {
+                    const randomItem = fallbackPool[Math.floor(Math.random() * fallbackPool.length)];
+                    variants.add(randomItem);
+                    fallbackPool.splice(fallbackPool.indexOf(randomItem), 1);
                 }
+
                 const variantsArray = [...variants].sort(() => Math.random() - 0.5);
+                
                 examOptions.innerHTML = '';
                 variantsArray.forEach(variant => {
                     const btn = document.createElement('button');
