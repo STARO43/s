@@ -127,7 +127,7 @@
             margin: 8px 0 4px;
         }
 
-        /* Строгий переключатель раздела */
+        /* Переключатель раздела */
         .section-switch {
             display: inline-flex;
             background: var(--bg-card);
@@ -167,7 +167,7 @@
             min-height: 1.2em;
         }
 
-        /* Контейнер с перспективой для перелистывания */
+        /* Контейнер секций с перспективой */
         .content-wrapper {
             flex: 1;
             max-width: 900px;
@@ -661,6 +661,142 @@
             border-top: 1px solid var(--border);
         }
 
+        /* Линия времени */
+        .heroes-timeline {
+            position: relative;
+            max-width: 100%;
+            overflow-x: auto;
+            overflow-y: hidden;
+            padding: 20px 0;
+            margin: 20px auto;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+        }
+        .timeline-track {
+            display: flex;
+            align-items: center;
+            width: max-content;
+            padding: 0 40px;
+            position: relative;
+        }
+        .timeline-line {
+            position: absolute;
+            top: 50%;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: var(--border);
+            z-index: 0;
+        }
+        .hero-item {
+            position: relative;
+            z-index: 1;
+            margin: 0 10px;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        .hero-item img {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid var(--accent);
+            box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+        }
+        .hero-item:hover {
+            transform: scale(1.1);
+        }
+        .hero-item span {
+            display: block;
+            text-align: center;
+            font-size: 0.7rem;
+            color: var(--text-secondary);
+            margin-top: 4px;
+            max-width: 70px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .timeline-century {
+            position: absolute;
+            bottom: 0;
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+        }
+
+        /* Модальное окно героя */
+        .hero-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.7);
+            z-index: 5000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .hero-modal-content {
+            background: var(--bg-card);
+            border-radius: var(--radius);
+            padding: 20px;
+            max-width: 500px;
+            width: 90%;
+            text-align: center;
+            position: relative;
+            animation: scaleIn 0.3s ease;
+        }
+        .hero-modal-close {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: none;
+            border: none;
+            color: var(--text);
+            font-size: 2rem;
+            cursor: pointer;
+        }
+        .hero-modal-portrait {
+            max-width: 200px;
+            max-height: 200px;
+            margin: 0 auto 15px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+        }
+        .hero-modal-nav {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin: 10px 0;
+        }
+        .hero-modal-nav button {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            color: var(--text);
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            cursor: pointer;
+            font-size: 1.5rem;
+        }
+        .hero-modal-nav button:hover {
+            border-color: var(--accent);
+            color: var(--accent);
+        }
+        .hero-modal-repeat {
+            margin-top: 15px;
+            padding: 8px 20px;
+            background: var(--accent);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-family: var(--font);
+        }
+
         @media (max-width: 1024px) {
             .syllable-grid { grid-template-columns: repeat(3, 1fr); gap: 8px; }
         }
@@ -684,6 +820,7 @@
             .theme-cycle button { width: 32px; height: 32px; }
             .header { padding: 16px 12px 10px; }
             .section-switch-btn { padding: 8px 16px; font-size: 1rem; }
+            .hero-item img { width: 50px; height: 50px; }
         }
     </style>
 </head>
@@ -702,7 +839,7 @@
         </div>
         <h1>Грамотиньо</h1>
 
-        <!-- Строгий переключатель раздела (две кнопки в рамке) -->
+        <!-- Переключатель раздела -->
         <div class="section-switch">
             <button class="section-switch-btn active" data-section="syllables">📖</button>
             <button class="section-switch-btn" data-section="heroes">🌟</button>
@@ -736,9 +873,7 @@
 
         <!-- Раздел "Великие личности" -->
         <section id="heroesSection" class="tab-section">
-            <div style="max-width:900px; margin:0 auto; padding:20px; text-align:center; color:var(--text-secondary);">
-                Здесь скоро появятся великие личности.
-            </div>
+            <div class="heroes-timeline" id="heroesTimeline"></div>
         </section>
     </div>
 
@@ -835,10 +970,11 @@
             const celebrationOverlay = document.getElementById('celebrationOverlay');
             const celebrationGif = document.getElementById('celebrationGif');
             const celebrationClose = document.getElementById('celebrationClose');
+            const sectionBtns = document.querySelectorAll('.section-switch-btn');
             const sectionSubtitle = document.getElementById('sectionSubtitle');
             const syllablesSection = document.getElementById('syllablesSection');
             const heroesSection = document.getElementById('heroesSection');
-            const sectionBtns = document.querySelectorAll('.section-switch-btn');
+            const heroesTimeline = document.getElementById('heroesTimeline');
 
             let currentMode = 'all';
             let randomItems = [];
@@ -898,25 +1034,21 @@
                 applyTheme(themeList[currentThemeIndex]);
             });
 
-            // Функция переключения раздела с перелистыванием
+            // Функция переключения раздела
             function switchSection(section) {
                 if (section === currentSection) return;
 
                 const currentEl = section === 'syllables' ? heroesSection : syllablesSection;
                 const nextEl = section === 'syllables' ? syllablesSection : heroesSection;
 
-                // Сначала анимируем уход текущего листа
                 currentEl.classList.remove('active');
                 currentEl.classList.add('exit-left');
 
-                // Подготавливаем новый лист
                 nextEl.classList.remove('enter-right', 'exit-left');
                 nextEl.classList.add('enter-right');
-                // Небольшая задержка, чтобы новый лист успел встать в очередь
                 setTimeout(() => {
                     nextEl.classList.remove('enter-right');
                     nextEl.classList.add('active');
-                    // Убираем класс exit-left после завершения анимации
                     setTimeout(() => {
                         currentEl.classList.remove('exit-left');
                         currentEl.style.visibility = 'hidden';
@@ -924,12 +1056,10 @@
                     }, 500);
                 }, 20);
 
-                // Обновляем активные кнопки
                 sectionBtns.forEach(btn => {
                     btn.classList.toggle('active', btn.dataset.section === section);
                 });
 
-                // Обновляем подзаголовок
                 if (section === 'syllables') {
                     sectionSubtitle.textContent = 'Учим слоги. Жми, слушай, запоминай';
                 } else {
@@ -1188,7 +1318,167 @@
                 setTimeout(() => toast.remove(), 2000);
             }
 
+            // ============ ВЕЛИКИЕ ЛИЧНОСТИ ============
+            const heroesData = [
+                { name: "Александров", year: 1883, images: ["Александров.jpg"], audio: "Александров.wav" },
+                { name: "Белинский", year: 1811, images: ["Белинский.jpg"], audio: "Белинский.wav" },
+                { name: "Бородин", year: 1833, images: ["Бородин.jpg"], audio: "Бородин.wav" },
+                { name: "Брежнев", year: 1906, images: ["Брежнев.jpg"], audio: "Брежнев.wav" },
+                { name: "Ворошилов", year: 1881, images: ["Ворошилов.jpg","Ворошилов2.jpg","Ворошилов3.jpg"], audio: "Ворошилов.wav" },
+                { name: "Гагарин", year: 1934, images: ["Гагарин.jpg"], audio: "Гагарин.wav" },
+                { name: "Глинка", year: 1804, images: ["Глинка.jpg"], audio: "Глинка.wav" },
+                { name: "Гоголь", year: 1809, images: ["Гоголь.jpg"], audio: "Гоголь.wav" },
+                { name: "Горький", year: 1868, images: ["Горький.jpg","Горький2.jpg","Горький 3.jpg"], audio: "Горький.wav" },
+                { name: "Даргомыжский", year: 1813, images: ["Даргомыжский.jpg"], audio: "Даргомыжский.wav" },
+                { name: "Добролюбов", year: 1836, images: ["Добролюбов.jpg"], audio: "Добролюбов.wav" },
+                { name: "Жуковский", year: 1847, images: ["Жуковский.jpg"], audio: "Жуковский.wav" },
+                { name: "Карпинский", year: 1847, images: ["Карпинкий.jpg"], audio: "Карпинский.wav" },
+                { name: "Курчатов", year: 1903, images: ["Курчатов.jpg"], audio: "Курчатов.wav" },
+                { name: "Ленин", year: 1870, images: ["Ленин.jpg","Ленин2.jpg","Ленин3.jpg","Ленин4.jpg","Ленин5.jpg"], audio: "Ленин.wav" },
+                { name: "Лермонтов", year: 1814, images: ["Лермонтов.jpg"], audio: "Лермонтов.wav" },
+                { name: "Ломоносов", year: 1711, images: ["Ломоносов.jpeg"], audio: "Ломоносов.wav" },
+                { name: "Макаренко", year: 1888, images: ["Макаренко.jpg"], audio: "Макаренко.wav" },
+                { name: "Маяковский", year: 1893, images: ["Маяковский.jpg"], audio: "Маяковский.wav" },
+                { name: "Менделеев", year: 1834, images: ["Менделеев.jpg"], audio: "Менделеев.wav" },
+                { name: "Мечников", year: 1845, images: ["Мечников.jpg"], audio: "Мечников.wav" },
+                { name: "Мичурин", year: 1855, images: ["Мичурин.jpg","Мичурин2.jpg","Мичурин3.jpg"], audio: "Мичурин.wav" },
+                { name: "Молотов", year: 1890, images: ["Молотов.jpg"], audio: "Молотов.wav" },
+                { name: "Мусоргский", year: 1839, images: ["Мусоргский.jpg"], audio: "Мусоргский.wav" },
+                { name: "Некрасов", year: 1821, images: ["Некрасов.jpg"], audio: "Некрасов.wav" },
+                { name: "Островский", year: 1904, images: ["Островский.jpg"], audio: "Островский.wav" },
+                { name: "Павлов", year: 1849, images: ["Павлов.png"], audio: "Павлов.wav" },
+                { name: "Папанин", year: 1894, images: ["Папанин.jpg"], audio: "Папанин.wav" },
+                { name: "Пётр I", year: 1672, images: ["Петр.jpg","Пётр2.jpg"], audio: "Первый.wav" },
+                { name: "Писарев", year: 1840, images: ["Писарев.jpg"], audio: "Писарев.wav" },
+                { name: "Попов", year: 1859, images: ["Попов.jpg"], audio: "Попов.wav" },
+                { name: "Пушкин", year: 1799, images: ["Пушкин.jpg","Пушкин3.jpg"], audio: "Пушкин.wav" },
+                { name: "Репин", year: 1844, images: ["Репин.jpg"], audio: "Репин.wav" },
+                { name: "Римский-Корсаков", year: 1844, images: ["Римский-Корсаков.jpg"], audio: "Римский-Корсаков.wav" },
+                { name: "Салтыков-Щедрин", year: 1826, images: ["Салтыков-Щедрин.jpg"], audio: "Салтыков-Щедрин.wav" },
+                { name: "Семашко", year: 1874, images: ["Семашко.jpg"], audio: "Семашко.wav" },
+                { name: "Сеченов", year: 1829, images: ["Сеченов.jpg"], audio: "Сеченов.wav" },
+                { name: "Сталин", year: 1878, images: ["Сталин.jpg","Сталин2.jpg","Сталин3.jpg","Сталин4.jpg","Сталин5.jpg","Сталин6.jpg","Сталин7.jpg","Сталин8.jpg","Сталин9.jpg"], audio: "Сталин.wav" },
+                { name: "Суворов", year: 1730, images: ["Суворов.jpg"], audio: "Суворов.wav" },
+                { name: "Толстой", year: 1828, images: ["Толстой.jpg","Толстой2.jpg","Толстой3.jpg","Толстой4.jpg"], audio: "Толстой.wav" },
+                { name: "Тургенев", year: 1818, images: ["Тургенев.jpg"], audio: "Тургенев.wav" },
+                { name: "Фрунзе", year: 1885, images: ["Фрунзе.jpg"], audio: "Фрунзе.wav" },
+                { name: "Циолковский", year: 1857, images: ["Циолковский.jpg"], audio: "Циолковский.wav" },
+                { name: "Чайковский", year: 1840, images: ["Чайковский.jpg"], audio: "Чайковский.wav" },
+                { name: "Чернышевский", year: 1828, images: ["Чернышевский.jpg"], audio: "Чернышевский.wav" },
+                { name: "Чехов", year: 1860, images: ["Чехов.jpg"], audio: "Чехов.wav" },
+                { name: "Шишкин", year: 1832, images: ["Шишкин.jpg"], audio: "Шишкин.wav" },
+                { name: "Шолохов", year: 1905, images: ["Шолохов.jpg"], audio: "Шолохов.wav" }
+            ];
+
+            // Рендер линии времени
+            function renderHeroesTimeline() {
+                if (!heroesTimeline) return;
+                const minYear = 1600;
+                const maxYear = 2000;
+                const totalYears = maxYear - minYear;
+                const scale = 5; // пикселей на год
+                const trackWidth = totalYears * scale;
+
+                let html = `<div class="timeline-track" style="position:relative; width:${trackWidth}px;">`;
+                html += `<div class="timeline-line"></div>`;
+
+                // Метки веков
+                const centuries = [1600, 1700, 1800, 1900, 2000];
+                centuries.forEach(year => {
+                    const left = (year - minYear) * scale;
+                    html += `<div class="timeline-century" style="left:${left}px;">${year}</div>`;
+                });
+
+                heroesData.forEach(hero => {
+                    const left = (hero.year - minYear) * scale;
+                    const imagePath = `Great Rus/${hero.images[0]}`;
+                    html += `
+                        <div class="hero-item" style="position:absolute; left:${left}px;" data-name="${hero.name}" data-audio="Great Rus/${hero.audio}" data-images='${JSON.stringify(hero.images.map(img => "Great Rus/" + img))}'>
+                            <img src="${imagePath}" alt="${hero.name}" loading="lazy">
+                            <span>${hero.name}</span>
+                        </div>
+                    `;
+                });
+
+                html += `</div>`;
+                heroesTimeline.innerHTML = html;
+
+                // Обработчики кликов
+                heroesTimeline.querySelectorAll('.hero-item').forEach(item => {
+                    item.addEventListener('click', function() {
+                        const name = this.dataset.name;
+                        const audioSrc = this.dataset.audio;
+                        const images = JSON.parse(this.dataset.images);
+                        openHeroModal(name, images, audioSrc);
+                    });
+                });
+            }
+
+            // Модальное окно героя
+            let heroModal = null;
+            let heroAudio = new Audio();
+            let currentImageIndex = 0;
+            let currentImages = [];
+
+            function openHeroModal(name, images, audioSrc) {
+                if (heroModal) heroModal.remove();
+
+                currentImages = images;
+                currentImageIndex = 0;
+
+                heroModal = document.createElement('div');
+                heroModal.className = 'hero-modal';
+                heroModal.innerHTML = `
+                    <div class="hero-modal-content">
+                        <button class="hero-modal-close">&times;</button>
+                        <img class="hero-modal-portrait" src="${images[0]}" alt="${name}">
+                        <h3>${name}</h3>
+                        <div class="hero-modal-nav">
+                            <button class="prev-image" ${images.length <= 1 ? 'style="visibility:hidden;"' : ''}>&lsaquo;</button>
+                            <button class="next-image" ${images.length <= 1 ? 'style="visibility:hidden;"' : ''}>&rsaquo;</button>
+                        </div>
+                        <button class="hero-modal-repeat">🔊 Повторить</button>
+                    </div>
+                `;
+                document.body.appendChild(heroModal);
+
+                playHeroAudio(audioSrc);
+
+                heroModal.querySelector('.hero-modal-close').addEventListener('click', () => {
+                    heroModal.remove();
+                    heroAudio.pause();
+                    heroAudio.currentTime = 0;
+                });
+
+                heroModal.addEventListener('click', (e) => {
+                    if (e.target === heroModal) {
+                        heroModal.remove();
+                        heroAudio.pause();
+                        heroAudio.currentTime = 0;
+                    }
+                });
+
+                heroModal.querySelector('.prev-image').addEventListener('click', () => {
+                    currentImageIndex = (currentImageIndex - 1 + currentImages.length) % currentImages.length;
+                    heroModal.querySelector('.hero-modal-portrait').src = currentImages[currentImageIndex];
+                });
+                heroModal.querySelector('.next-image').addEventListener('click', () => {
+                    currentImageIndex = (currentImageIndex + 1) % currentImages.length;
+                    heroModal.querySelector('.hero-modal-portrait').src = currentImages[currentImageIndex];
+                });
+
+                heroModal.querySelector('.hero-modal-repeat').addEventListener('click', () => {
+                    playHeroAudio(audioSrc);
+                });
+            }
+
+            function playHeroAudio(src) {
+                heroAudio.src = src;
+                heroAudio.play().catch(e => console.log('Ошибка воспроизведения', e));
+            }
+
             // Инициализация
+            renderHeroesTimeline();
             renderGrid();
         })();
     </script>
