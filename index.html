@@ -132,48 +132,70 @@
             font-weight: 500;
         }
 
-        /* Навигационные вкладки */
-        .main-tabs {
-            display: flex;
-            justify-content: center;
-            gap: 12px;
-            margin-top: 16px;
-            flex-wrap: wrap;
-        }
-        .tab-btn {
+        /* ========== СТИЛЬНЫЙ SEGMENTED CONTROL ========== */
+        .segmented-control {
+            display: inline-flex;
             background: var(--bg-card);
             border: 1px solid var(--border);
+            border-radius: 40px;
+            padding: 4px;
+            margin-top: 20px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+            position: relative;
+        }
+        .segmented-control::before {
+            content: '';
+            position: absolute;
+            top: 4px;
+            bottom: 4px;
+            left: 4px;
+            width: calc(50% - 4px);
+            background: var(--accent-glow);
+            border-radius: 30px;
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            transform: translateX(0);
+            z-index: 0;
+        }
+        .segmented-control.heroes-active::before {
+            transform: translateX(100%);
+        }
+        .seg-btn {
+            background: transparent;
+            border: none;
             color: var(--text);
-            padding: 10px 24px;
+            padding: 10px 28px;
             border-radius: 30px;
             cursor: pointer;
             font-family: var(--font);
             font-size: 1rem;
-            transition: var(--transition);
-            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+            transition: color 0.3s;
+            position: relative;
+            z-index: 1;
+            white-space: nowrap;
         }
-        .tab-btn:hover {
-            border-color: var(--accent);
+        .seg-btn.active {
             color: var(--accent);
-            box-shadow: 0 0 12px var(--accent-glow);
+            font-weight: 700;
         }
-        .tab-btn.active {
-            background: var(--accent-glow);
-            border-color: var(--accent);
+        .seg-btn:hover {
             color: var(--accent);
-            box-shadow: 0 0 16px var(--accent-glow);
         }
 
         /* Секции */
         .tab-section {
             display: none;
+            opacity: 0;
+            transform: translateY(12px);
+            transition: opacity 0.3s ease, transform 0.3s ease;
         }
         .tab-section.active {
             display: block;
-            animation: fadeIn 0.3s ease;
+            opacity: 1;
+            transform: translateY(0);
+            animation: fadeIn 0.35s ease;
         }
         @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
+            from { opacity: 0; transform: translateY(12px); }
             to { opacity: 1; transform: translateY(0); }
         }
 
@@ -651,8 +673,8 @@
             .theme-cycle { top: 6px; left: 10px; }
             .theme-cycle button { width: 32px; height: 32px; }
             .header { padding: 16px 12px 10px; }
-            .main-tabs { gap: 8px; margin-top: 10px; }
-            .tab-btn { padding: 8px 16px; font-size: 0.9rem; }
+            .segmented-control { margin-top: 12px; }
+            .seg-btn { padding: 8px 16px; font-size: 0.9rem; }
         }
     </style>
 </head>
@@ -672,11 +694,11 @@
         <h1>Грамотиньо</h1>
         <p>Жми, слушай, запоминай</p>
 
-        <!-- Вкладки разделов -->
-        <nav class="main-tabs">
-            <button class="tab-btn active" data-tab="syllables">Учим слоги</button>
-            <button class="tab-btn" data-tab="heroes">Великие личности</button>
-        </nav>
+        <!-- Сегментированный переключатель -->
+        <div class="segmented-control" id="segmentedControl">
+            <button class="seg-btn active" data-tab="syllables">📖 Учим слоги</button>
+            <button class="seg-btn" data-tab="heroes">🌟 Великие личности</button>
+        </div>
     </header>
 
     <!-- Контент разделов -->
@@ -740,7 +762,7 @@
 
     <script>
         (function() {
-            // Массив слогов (без изменений)
+            // Массив слогов
             const rawItems = [
                 'ЁЖ', 'ёлка', 'ЁН', 'АБ', 'АВ', 'АГ', 'АЖ', 'АЗ', 'АК', 'АЛ', 'Алла', 'АМ', 'АН', 'Анна', 'АП', 'арка', 'арфа', 'АС', 'АТ', 'АХ', 'АЧ', 'АШ',
                 'БА', 'БАК', 'БАЯН', 'БЕ', 'БИ', 'БО', 'БОК', 'БОР', 'Боря', 'БЫ', 'БЫК', 'БЭ', 'БЯ',
@@ -802,7 +824,8 @@
             const celebrationOverlay = document.getElementById('celebrationOverlay');
             const celebrationGif = document.getElementById('celebrationGif');
             const celebrationClose = document.getElementById('celebrationClose');
-            const tabButtons = document.querySelectorAll('.tab-btn');
+            const segmentedControl = document.getElementById('segmentedControl');
+            const segBtns = document.querySelectorAll('.seg-btn');
             const syllablesSection = document.getElementById('syllablesSection');
             const heroesSection = document.getElementById('heroesSection');
 
@@ -864,14 +887,16 @@
             });
 
             // Переключение вкладок
-            tabButtons.forEach(btn => {
+            segBtns.forEach(btn => {
                 btn.addEventListener('click', () => {
-                    tabButtons.forEach(b => b.classList.remove('active'));
+                    segBtns.forEach(b => b.classList.remove('active'));
                     btn.classList.add('active');
                     if (btn.dataset.tab === 'syllables') {
+                        segmentedControl.classList.remove('heroes-active');
                         syllablesSection.classList.add('active');
                         heroesSection.classList.remove('active');
                     } else {
+                        segmentedControl.classList.add('heroes-active');
                         heroesSection.classList.add('active');
                         syllablesSection.classList.remove('active');
                     }
@@ -1020,7 +1045,6 @@
                 examNextBtn.classList.remove('show');
                 examRepeatBtn.style.display = 'flex';
 
-                // Подбор вариантов с той же первой буквой
                 const variants = new Set([correct]);
                 const firstLetter = correct.charAt(0).toUpperCase();
                 const sameLetterPool = syllables.filter(item =>
