@@ -925,8 +925,8 @@
         <h1>Грамотиньо</h1>
 
         <div class="section-switch">
-            <button class="section-switch-btn active" data-section="syllables">📖</button>
-            <button class="section-switch-btn" data-section="heroes">🌟</button>
+            <button class="section-switch-btn active" data-section="syllables"></button>
+            <button class="section-switch-btn" data-section="heroes"></button>
         </div>
 
         <p id="sectionSubtitle">Учим слоги. Жми, слушай, запоминай</p>
@@ -1424,9 +1424,9 @@
             function renderHeroesTimeline() {
                 if (!heroesTimeline) return;
                 const centuries = {
-                    "XVIII век": heroesData.filter(h => h.year >= 1700 && h.year < 1800),
-                    "XIX век": heroesData.filter(h => h.year >= 1800 && h.year < 1900),
-                    "XX век": heroesData.filter(h => h.year >= 1900 && h.year < 2000)
+                    "": heroesData.filter(h => h.year >= 1700 && h.year < 1800),
+                    "": heroesData.filter(h => h.year >= 1800 && h.year < 1900),
+                    "": heroesData.filter(h => h.year >= 1900 && h.year < 2000)
                 };
 
                 let html = '';
