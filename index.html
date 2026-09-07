@@ -658,6 +658,8 @@
         }
         .timeline-track-wrapper {
             position: relative;
+            display: flex;
+            align-items: center;
         }
         .timeline-track {
             display: flex;
@@ -672,12 +674,49 @@
             box-shadow: 0 4px 12px rgba(0,0,0,0.2);
             scroll-behavior: smooth;
             -webkit-overflow-scrolling: touch;
-            scrollbar-width: thin;
-            scrollbar-color: var(--accent) var(--bg-card);
+            scrollbar-width: none; /* Firefox */
+            -ms-overflow-style: none; /* IE/Edge */
+            cursor: grab;
+            user-select: none;
         }
-        .timeline-track::-webkit-scrollbar { height: 10px; }
-        .timeline-track::-webkit-scrollbar-track { background: var(--bg-card); border-radius: 10px; }
-        .timeline-track::-webkit-scrollbar-thumb { background: var(--accent); border-radius: 10px; }
+        .timeline-track:active {
+            cursor: grabbing;
+        }
+        .timeline-track::-webkit-scrollbar {
+            height: 6px;
+            background: transparent;
+        }
+        .timeline-track:hover::-webkit-scrollbar-thumb {
+            background: var(--accent);
+            border-radius: 10px;
+        }
+        .timeline-track::-webkit-scrollbar-thumb {
+            background: transparent;
+        }
+        .timeline-track-wrapper::before,
+        .timeline-track-wrapper::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            width: 50px;
+            pointer-events: none;
+            z-index: 3;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        .timeline-track-wrapper::before {
+            left: 0;
+            background: linear-gradient(to right, var(--bg) 20%, transparent);
+        }
+        .timeline-track-wrapper::after {
+            right: 0;
+            background: linear-gradient(to left, var(--bg) 20%, transparent);
+        }
+        .timeline-track-wrapper:hover::before,
+        .timeline-track-wrapper:hover::after {
+            opacity: 1;
+        }
         .timeline-line {
             position: absolute;
             top: 50%;
@@ -696,6 +735,7 @@
             transition: transform 0.2s;
             flex-shrink: 0;
             text-align: center;
+            scroll-snap-align: center;
         }
         .hero-item img {
             width: 90px;
@@ -873,7 +913,6 @@
 <body>
 
     <header class="header">
-        <!-- Кнопка циклической смены темы -->
         <div class="theme-cycle">
             <button id="themeCycleBtn" title="Сменить цвет">
                 <span class="color-indicator" id="colorIndicator"></span>
@@ -885,19 +924,15 @@
         </div>
         <h1>Грамотиньо</h1>
 
-        <!-- Переключатель раздела -->
         <div class="section-switch">
-            <button class="section-switch-btn active" data-section="syllables"></button>
-            <button class="section-switch-btn" data-section="heroes"></button>
+            <button class="section-switch-btn active" data-section="syllables">📖</button>
+            <button class="section-switch-btn" data-section="heroes">🌟</button>
         </div>
 
-        <!-- Динамический подзаголовок -->
         <p id="sectionSubtitle">Учим слоги. Жми, слушай, запоминай</p>
     </header>
 
-    <!-- Основной контент -->
     <div class="content-wrapper">
-        <!-- Раздел "Учим слоги" -->
         <section id="syllablesSection" class="tab-section active">
             <div class="progress-container">
                 <div class="progress-label" id="progressLabel">Отмечено: 0 из 0</div>
@@ -917,7 +952,6 @@
             </div>
         </section>
 
-        <!-- Раздел "Великие личности" -->
         <section id="heroesSection" class="tab-section">
             <div class="heroes-timeline" id="heroesTimeline"></div>
         </section>
@@ -925,7 +959,6 @@
 
     <button class="scroll-top-btn" id="scrollTopBtn" title="Наверх">↑</button>
 
-    <!-- Экзаменационный оверлей -->
     <div class="exam-overlay" id="examOverlay">
         <button class="exam-exit-btn" id="examExitBtn" title="Выйти">✕</button>
         <div class="exam-header">
@@ -937,7 +970,6 @@
         <div class="exam-result" id="examResult"></div>
     </div>
 
-    <!-- Окно с гифкой -->
     <div class="celebration-overlay" id="celebrationOverlay">
         <div class="celebration-box">
             <h2>Умница! 😻😻😽😽</h2>
@@ -954,7 +986,6 @@
 
     <script>
         (function() {
-            // Массив слогов
             const rawItems = [
                 'ЁЖ', 'ёлка', 'ЁН', 'АБ', 'АВ', 'АГ', 'АЖ', 'АЗ', 'АК', 'АЛ', 'Алла', 'АМ', 'АН', 'Анна', 'АП', 'арка', 'арфа', 'АС', 'АТ', 'АХ', 'АЧ', 'АШ',
                 'БА', 'БАК', 'БАЯН', 'БЕ', 'БИ', 'БО', 'БОК', 'БОР', 'Боря', 'БЫ', 'БЫК', 'БЭ', 'БЯ',
@@ -992,7 +1023,6 @@
                 return a.localeCompare(b, 'ru', { sensitivity: 'base' });
             });
 
-            // DOM элементы
             const grid = document.getElementById('syllableGrid');
             const toastContainer = document.getElementById('toastContainer');
             const themeToggle = document.getElementById('themeToggle');
@@ -1340,7 +1370,6 @@
                 setTimeout(() => toast.remove(), 2000);
             }
 
-            // ============ ВЕЛИКИЕ ЛИЧНОСТИ ============
             const heroesData = [
                 { name: "Александров", year: 1935, images: ["Александров.jpg"], audio: "Александров.wav" },
                 { name: "Белинский", year: 1840, images: ["Белинский.jpg"], audio: "Белинский.wav" },
@@ -1448,6 +1477,46 @@
                             }
                         }
                     });
+                });
+
+                // Улучшенный скроллинг для каждой дорожки
+                document.querySelectorAll('.timeline-track').forEach(track => {
+                    let isDown = false;
+                    let startX;
+                    let scrollLeft;
+
+                    track.addEventListener('mousedown', (e) => {
+                        isDown = true;
+                        track.classList.add('active');
+                        startX = e.pageX - track.offsetLeft;
+                        scrollLeft = track.scrollLeft;
+                    });
+
+                    track.addEventListener('mouseleave', () => {
+                        isDown = false;
+                        track.classList.remove('active');
+                    });
+
+                    track.addEventListener('mouseup', () => {
+                        isDown = false;
+                        track.classList.remove('active');
+                    });
+
+                    track.addEventListener('mousemove', (e) => {
+                        if (!isDown) return;
+                        e.preventDefault();
+                        const x = e.pageX - track.offsetLeft;
+                        const walk = (x - startX) * 2;
+                        track.scrollLeft = scrollLeft - walk;
+                    });
+
+                    // Горизонтальная прокрутка колесом с Shift
+                    track.addEventListener('wheel', (e) => {
+                        if (e.shiftKey) {
+                            e.preventDefault();
+                            track.scrollLeft += e.deltaY;
+                        }
+                    }, { passive: false });
                 });
             }
 
