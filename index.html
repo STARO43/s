@@ -634,163 +634,140 @@
             border-top: 1px solid var(--border);
         }
 
-        /* Линия времени */
+        /* === МИНИМАЛИСТИЧНАЯ ЛИНИЯ ВРЕМЕНИ === */
         .heroes-timeline {
-            max-width: 100%;
-            margin: 30px 0;
-            padding: 0 10px;
+            max-width: 800px;
+            margin: 40px auto;
+            padding: 0 20px;
             position: relative;
-        }
-
-        .timeline-century-block {
-            margin-bottom: 60px;
-            position: relative;
-        }
-
-        .timeline-century-title {
-            font-size: 1.8rem;
-            font-weight: 700;
-            color: var(--accent);
-            margin-bottom: 30px;
-            padding-left: 20px;
-            border-left: 4px solid var(--accent);
-            text-shadow: 0 0 20px var(--accent-glow);
         }
 
         .timeline-container {
-            display: flex;
             position: relative;
-            padding-left: 100px;
+            padding-left: 50px;
         }
 
-        .timeline-axis {
+        .timeline-line {
             position: absolute;
-            left: 0;
+            left: 35px;
             top: 0;
             bottom: 0;
-            width: 100px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
+            width: 2px;
+            background: linear-gradient(to bottom, transparent, var(--accent) 10%, var(--accent) 90%, transparent);
+            z-index: 0;
         }
 
-        .timeline-main-line {
-            position: absolute;
-            left: 50%;
-            top: 0;
-            bottom: 0;
-            width: 4px;
-            background: linear-gradient(to bottom, var(--accent), var(--accent-glow), var(--accent));
-            transform: translateX(-50%);
-            border-radius: 2px;
-        }
-
-        .heroes-track {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
-            padding: 20px;
-            background: var(--bg-card);
-            border: 1px solid var(--border);
-            border-radius: var(--radius);
-            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-        }
-
-        .hero-card {
-            display: flex;
-            align-items: center;
-            gap: 20px;
-            padding: 15px;
-            background: var(--bg-card-hover);
-            border-radius: var(--radius);
-            border: 2px solid transparent;
-            transition: all var(--transition);
-            cursor: pointer;
+        .century-sentinel {
+            height: 1px;
+            margin: 60px 0 40px;
             position: relative;
-            animation: slideIn 0.5s ease;
         }
 
-        @keyframes slideIn {
-            from { 
-                opacity: 0; 
-                transform: translateX(-20px); 
-            }
-            to { 
-                opacity: 1; 
-                transform: translateX(0); 
-            }
-        }
-
-        .hero-card:hover {
-            border-color: var(--accent);
-            transform: translateX(10px);
-            box-shadow: 0 4px 20px var(--accent-glow);
-        }
-
-        .hero-card::before {
+        .century-sentinel::before {
             content: '';
             position: absolute;
-            left: -122px;
+            left: -41px;
             top: 50%;
             transform: translateY(-50%);
-            width: 100px;
-            height: 2px;
-            background: linear-gradient(to right, var(--accent), transparent);
-            opacity: 0;
-            transition: opacity 0.3s;
-        }
-
-        .hero-card:hover::before {
-            opacity: 1;
-        }
-
-        .hero-connector {
-            position: absolute;
-            left: -122px;
-            top: 50%;
-            transform: translateY(-50%);
-            width: 12px;
-            height: 12px;
+            width: 16px;
+            height: 16px;
             background: var(--accent);
             border-radius: 50%;
-            border: 3px solid var(--bg-card);
-            box-shadow: 0 0 10px var(--accent-glow);
-            opacity: 0;
-            transition: opacity 0.3s;
+            box-shadow: 0 0 15px var(--accent-glow);
+            z-index: 1;
         }
 
-        .hero-card:hover .hero-connector {
-            opacity: 1;
+        .hero-item {
+            position: relative;
+            display: flex;
+            align-items: center;
+            gap: 24px;
+            margin-bottom: 30px;
+            cursor: pointer;
+            padding: 10px;
+            border-radius: var(--radius);
+            transition: background 0.3s;
         }
 
-        .hero-image {
-            width: 80px;
-            height: 80px;
+        .hero-item:hover {
+            background: var(--bg-card-hover);
+        }
+
+        .hero-circle {
+            width: 70px;
+            height: 70px;
             border-radius: 50%;
-            object-fit: cover;
             border: 3px solid var(--accent);
-            box-shadow: 0 4px 10px rgba(0,0,0,0.4);
+            overflow: hidden;
             flex-shrink: 0;
+            background: var(--bg-card);
+            box-shadow: 0 0 15px var(--accent-glow);
+            transition: transform 0.3s, box-shadow 0.3s, border-color 0.3s;
+            position: relative;
+            z-index: 2;
+        }
+
+        .hero-item:hover .hero-circle {
+            transform: scale(1.1);
+            box-shadow: 0 0 25px var(--accent-glow);
+            border-color: var(--text);
+        }
+
+        .hero-circle img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
         }
 
         .hero-info {
-            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
         }
 
         .hero-name {
-            font-size: 1.3rem;
+            font-size: 1.2rem;
             font-weight: 700;
             color: var(--text);
-            margin-bottom: 5px;
+            transition: color 0.3s;
+        }
+
+        .hero-item:hover .hero-name {
+            color: var(--accent);
         }
 
         .hero-years {
-            font-size: 1rem;
+            font-size: 0.9rem;
             color: var(--accent);
             font-weight: 700;
             text-shadow: 0 0 10px var(--accent-glow);
             letter-spacing: 0.03em;
+        }
+
+        /* Всплывающий пузырь века */
+        .century-popup {
+            position: fixed;
+            top: 100px;
+            left: 50%;
+            transform: translateX(-50%) translateY(-20px);
+            background: var(--bg-card);
+            border: 1px solid var(--accent);
+            color: var(--accent);
+            padding: 12px 32px;
+            border-radius: 50px;
+            font-size: 1.2rem;
+            font-weight: 700;
+            box-shadow: 0 8px 32px var(--accent-glow);
+            z-index: 100;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.4s ease, transform 0.4s ease;
+            backdrop-filter: blur(10px);
+        }
+
+        .century-popup.show {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
         }
 
         /* Модальное окно героя */
@@ -800,7 +777,8 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: var(--bg);
+            background: rgba(10, 14, 23, 0.95);
+            backdrop-filter: blur(5px);
             z-index: 5000;
             display: flex;
             align-items: center;
@@ -852,7 +830,7 @@
         }
         .hero-modal-portrait {
             max-width: 90%;
-            max-height: 70vh;
+            max-height: 65vh;
             object-fit: contain;
             border-radius: 8px;
             box-shadow: 0 10px 40px rgba(0,0,0,0.6);
@@ -870,16 +848,16 @@
             right: 0;
             display: flex;
             justify-content: space-between;
-            padding: 0 10px;
+            padding: 0 20px;
             z-index: 10;
         }
         .hero-modal-nav button {
             background: rgba(0,0,0,0.4);
             border: none;
             color: white;
-            font-size: 4rem;
-            width: 70px;
-            height: 70px;
+            font-size: 3rem;
+            width: 60px;
+            height: 60px;
             cursor: pointer;
             display: flex;
             align-items: center;
@@ -893,29 +871,9 @@
 
         @media (max-width: 1024px) {
             .syllable-grid { grid-template-columns: repeat(3, 1fr); gap: 8px; }
-            .timeline-container {
-                padding-left: 60px;
-            }
-            .timeline-axis {
-                width: 60px;
-            }
-            .hero-card::before {
-                left: -82px;
-                width: 60px;
-            }
-            .hero-connector {
-                left: -82px;
-            }
         }
         @media (max-width: 600px) {
-            .exam-exit-btn {
-                top: auto;
-                bottom: 10px;
-                left: 10px;
-                width: 34px;
-                height: 34px;
-                font-size: 1.1rem;
-            }
+            .exam-exit-btn { top: auto; bottom: 10px; left: 10px; width: 34px; height: 34px; font-size: 1.1rem; }
             .syllable-grid { grid-template-columns: repeat(2, 1fr); gap: 5px; }
             .syllable-card { font-size: 0.95rem; padding: 10px 4px; min-height: 45px; }
             .learn-dot { width: 10px; height: 10px; bottom: 3px; right: 4px; }
@@ -927,25 +885,14 @@
             .theme-cycle button { width: 32px; height: 32px; }
             .header { padding: 16px 12px 10px; }
             .section-switch-btn { padding: 8px 16px; font-size: 1rem; }
-            .hero-modal-nav button { width: 50px; height: 50px; font-size: 3rem; }
-            .timeline-container {
-                padding-left: 0;
-            }
-            .timeline-axis {
-                display: none;
-            }
-            .hero-card {
-                flex-direction: column;
-                text-align: center;
-            }
-            .hero-card::before,
-            .hero-connector {
-                display: none;
-            }
-            .hero-image {
-                width: 100px;
-                height: 100px;
-            }
+            .hero-modal-nav button { width: 45px; height: 45px; font-size: 2rem; }
+            
+            .timeline-container { padding-left: 40px; }
+            .timeline-line { left: 25px; }
+            .century-sentinel::before { left: -31px; width: 14px; height: 14px; }
+            .hero-circle { width: 60px; height: 60px; }
+            .hero-name { font-size: 1.1rem; }
+            .hero-years { font-size: 0.85rem; }
         }
     </style>
 </head>
@@ -995,6 +942,8 @@
             <div class="heroes-timeline" id="heroesTimeline"></div>
         </section>
     </div>
+
+    <div class="century-popup" id="centuryPopup"></div>
 
     <button class="scroll-top-btn" id="scrollTopBtn" title="Наверх">↑</button>
 
@@ -1090,6 +1039,7 @@
             const syllablesSection = document.getElementById('syllablesSection');
             const heroesSection = document.getElementById('heroesSection');
             const heroesTimeline = document.getElementById('heroesTimeline');
+            const centuryPopup = document.getElementById('centuryPopup');
 
             let currentMode = 'all';
             let randomItems = [];
@@ -1099,6 +1049,7 @@
             let examScore = 0;
             let currentExamCorrect = '';
             let currentSection = 'syllables';
+            let popupTimeout;
 
             const themeList = [
                 'theme-blue', 'theme-green', 'theme-red', 'theme-orange',
@@ -1463,41 +1414,34 @@
             function renderHeroesTimeline() {
                 if (!heroesTimeline) return;
                 
-                const centuries = {
-                    "XVII век": heroesData.filter(h => h.birthYear >= 1600 && h.birthYear < 1700),
-                    "XVIII век": heroesData.filter(h => h.birthYear >= 1700 && h.birthYear < 1800),
-                    "XIX век": heroesData.filter(h => h.birthYear >= 1800 && h.birthYear < 1900),
-                    "XX век": heroesData.filter(h => h.birthYear >= 1900 && h.birthYear < 2000)
-                };
+                // Логика веков по запросу: Пушкин в 19, все после Жуковского (1921) в 20
+                const centuries = [
+                    { name: "XVIII век", filter: h => h.deathYear < 1801 },
+                    { name: "XIX век", filter: h => h.deathYear >= 1801 && h.deathYear <= 1921 },
+                    { name: "XX век", filter: h => h.deathYear > 1921 }
+                ];
 
-                let html = '';
-                for (const [century, heroes] of Object.entries(centuries)) {
-                    if (heroes.length === 0) continue;
-                    
-                    html += `<div class="timeline-century-block">`;
-                    html += `<div class="timeline-century-title">${century}</div>`;
-                    html += `<div class="timeline-container">`;
-                    
-                    html += `<div class="timeline-axis">`;
-                    html += `<div class="timeline-main-line"></div>`;
-                    html += `</div>`;
-                    
-                    html += `<div class="heroes-track">`;
-                    
-                    // Сортировка по году смерти
-                    heroes.sort((a, b) => a.deathYear - b.deathYear);
-                    
+                let html = '<div class="timeline-container">';
+                html += '<div class="timeline-line"></div>';
+
+                centuries.forEach(c => {
+                    const heroes = heroesData.filter(c.filter).sort((a, b) => a.deathYear - b.deathYear);
+                    if (heroes.length === 0) return;
+
+                    html += `<div class="century-sentinel" data-century="${c.name}"></div>`;
+
                     heroes.forEach(hero => {
                         const imagePath = `Great Rus/${hero.images[0]}`;
                         const age = hero.deathYear - hero.birthYear;
                         
                         html += `
-                            <div class="hero-card" 
+                            <div class="hero-item" 
                                  data-name="${hero.name}" 
                                  data-audio="Great Rus/${hero.audio}" 
                                  data-images='${JSON.stringify(hero.images.map(img => "Great Rus/" + img))}'>
-                                <div class="hero-connector"></div>
-                                <img src="${imagePath}" alt="${hero.name}" class="hero-image" loading="lazy">
+                                <div class="hero-circle">
+                                    <img src="${imagePath}" alt="${hero.name}" loading="lazy">
+                                </div>
                                 <div class="hero-info">
                                     <div class="hero-name">${hero.name}</div>
                                     <div class="hero-years">Годы жизни: ${hero.birthYear} — ${hero.deathYear} (${age} лет)</div>
@@ -1505,19 +1449,36 @@
                             </div>
                         `;
                     });
-                    html += `</div>`;
-                    html += `</div></div>`;
-                }
+                });
+                html += '</div>';
 
                 heroesTimeline.innerHTML = html;
 
-                heroesTimeline.querySelectorAll('.hero-card').forEach(card => {
-                    card.addEventListener('click', function() {
-                        const name = this.dataset.name;
-                        const audioSrc = this.dataset.audio;
-                        const images = JSON.parse(this.dataset.images);
-                        openHeroModal(name, images, audioSrc);
+                // Обработчики кликов по кружочкам
+                heroesTimeline.querySelectorAll('.hero-item').forEach(item => {
+                    item.addEventListener('click', function() {
+                        openHeroModal(this.dataset.name, JSON.parse(this.dataset.images), this.dataset.audio);
                     });
+                });
+
+                // Intersection Observer для всплывающего пузыря века
+                const observer = new IntersectionObserver((entries) => {
+                    entries.forEach(entry => {
+                        if (entry.isIntersecting) {
+                            const century = entry.target.dataset.century;
+                            centuryPopup.textContent = century;
+                            centuryPopup.classList.add('show');
+                            
+                            clearTimeout(popupTimeout);
+                            popupTimeout = setTimeout(() => {
+                                centuryPopup.classList.remove('show');
+                            }, 2500);
+                        }
+                    });
+                }, { threshold: 0.3 });
+
+                document.querySelectorAll('.century-sentinel').forEach(sentinel => {
+                    observer.observe(sentinel);
                 });
             }
 
