@@ -689,10 +689,6 @@
             transition: background 0.3s;
         }
 
-        .hero-item:hover {
-            background: var(--bg-card-hover);
-        }
-
         .hero-circle {
             width: 70px;
             height: 70px;
@@ -702,15 +698,14 @@
             flex-shrink: 0;
             background: var(--bg-card);
             box-shadow: 0 0 15px var(--accent-glow);
-            transition: transform 0.3s, box-shadow 0.3s, border-color 0.3s;
+            transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.3s, border-color 0.3s;
             position: relative;
             z-index: 2;
         }
 
         .hero-item:hover .hero-circle {
-            transform: scale(1.1);
-            box-shadow: 0 0 25px var(--accent-glow);
-            border-color: var(--text);
+            transform: scale(1.4);
+            box-shadow: 0 0 35px var(--accent-glow);
         }
 
         .hero-circle img {
@@ -729,11 +724,6 @@
             font-size: 1.2rem;
             font-weight: 700;
             color: var(--text);
-            transition: color 0.3s;
-        }
-
-        .hero-item:hover .hero-name {
-            color: var(--accent);
         }
 
         .hero-years {
@@ -744,12 +734,47 @@
             letter-spacing: 0.03em;
         }
 
+        /* Блок СССР */
+        .soviet-era {
+            background: linear-gradient(180deg, rgba(220, 38, 38, 0.12) 0%, rgba(220, 38, 38, 0.02) 100%);
+            margin: 30px -20px 30px -15px;
+            padding: 40px 20px 40px 15px;
+            position: relative;
+            border-radius: 0 16px 16px 0;
+            border-left: 4px solid #dc2626;
+            box-shadow: 0 0 40px rgba(220, 38, 38, 0.05);
+        }
+        .soviet-era::before {
+            content: '☭';
+            position: absolute;
+            top: 50%;
+            right: 40px;
+            transform: translateY(-50%);
+            font-size: 8rem;
+            font-weight: 900;
+            color: rgba(220, 38, 38, 0.06);
+            pointer-events: none;
+        }
+        .soviet-era::after {
+            content: 'С С С Р';
+            position: absolute;
+            top: 20px;
+            right: 25px;
+            font-size: 1.2rem;
+            font-weight: 800;
+            color: rgba(220, 38, 38, 0.4);
+            letter-spacing: 0.2em;
+            pointer-events: none;
+            text-shadow: 0 0 10px rgba(220, 38, 38, 0.2);
+        }
+
         /* Всплывающий пузырь века */
         .century-popup {
             position: fixed;
-            top: 100px;
+            bottom: 100px;
+            top: auto;
             left: 50%;
-            transform: translateX(-50%) translateY(-20px);
+            transform: translateX(-50%) translateY(20px);
             background: var(--bg-card);
             border: 1px solid var(--accent);
             color: var(--accent);
@@ -893,6 +918,20 @@
             .hero-circle { width: 60px; height: 60px; }
             .hero-name { font-size: 1.1rem; }
             .hero-years { font-size: 0.85rem; }
+            
+            .soviet-era {
+                margin-left: -15px;
+                padding-left: 15px;
+            }
+            .soviet-era::before {
+                font-size: 5rem;
+                right: 10px;
+            }
+            .soviet-era::after {
+                font-size: 0.9rem;
+                right: 15px;
+                top: 10px;
+            }
         }
     </style>
 </head>
@@ -911,8 +950,8 @@
         <h1>Грамотиньо</h1>
 
         <div class="section-switch">
-            <button class="section-switch-btn active" data-section="syllables"></button>
-            <button class="section-switch-btn" data-section="heroes"></button>
+            <button class="section-switch-btn active" data-section="syllables">Слоги</button>
+            <button class="section-switch-btn" data-section="heroes">Личности</button>
         </div>
 
         <p id="sectionSubtitle">Учим слоги. Жми, слушай, запоминай</p>
@@ -1050,6 +1089,7 @@
             let currentExamCorrect = '';
             let currentSection = 'syllables';
             let popupTimeout;
+            let popupShowTimeout;
 
             const themeList = [
                 'theme-blue', 'theme-green', 'theme-red', 'theme-orange',
@@ -1414,7 +1454,6 @@
             function renderHeroesTimeline() {
                 if (!heroesTimeline) return;
                 
-                // Логика веков по запросу: Пушкин в 19, все после Жуковского (1921) в 20
                 const centuries = [
                     { name: "XVIII век", filter: h => h.deathYear < 1801 },
                     { name: "XIX век", filter: h => h.deathYear >= 1801 && h.deathYear <= 1921 },
@@ -1429,8 +1468,15 @@
                     if (heroes.length === 0) return;
 
                     html += `<div class="century-sentinel" data-century="${c.name}"></div>`;
+                    
+                    let sovietStarted = false;
 
                     heroes.forEach(hero => {
+                        if (!sovietStarted && hero.name === "Ленин") {
+                            html += `<div class="soviet-era">`;
+                            sovietStarted = true;
+                        }
+                        
                         const imagePath = `Great Rus/${hero.images[0]}`;
                         const age = hero.deathYear - hero.birthYear;
                         
@@ -1449,30 +1495,38 @@
                             </div>
                         `;
                     });
+                    if (sovietStarted) {
+                        html += `</div>`;
+                    }
                 });
                 html += '</div>';
 
                 heroesTimeline.innerHTML = html;
 
-                // Обработчики кликов по кружочкам
                 heroesTimeline.querySelectorAll('.hero-item').forEach(item => {
                     item.addEventListener('click', function() {
                         openHeroModal(this.dataset.name, JSON.parse(this.dataset.images), this.dataset.audio);
                     });
                 });
 
-                // Intersection Observer для всплывающего пузыря века
                 const observer = new IntersectionObserver((entries) => {
                     entries.forEach(entry => {
                         if (entry.isIntersecting) {
                             const century = entry.target.dataset.century;
-                            centuryPopup.textContent = century;
-                            centuryPopup.classList.add('show');
                             
+                            clearTimeout(popupShowTimeout);
                             clearTimeout(popupTimeout);
-                            popupTimeout = setTimeout(() => {
-                                centuryPopup.classList.remove('show');
-                            }, 2500);
+                            
+                            popupShowTimeout = setTimeout(() => {
+                                centuryPopup.textContent = century;
+                                centuryPopup.classList.add('show');
+                                
+                                popupTimeout = setTimeout(() => {
+                                    centuryPopup.classList.remove('show');
+                                }, 2500);
+                            }, 800);
+                        } else {
+                            clearTimeout(popupShowTimeout);
                         }
                     });
                 }, { threshold: 0.3 });
