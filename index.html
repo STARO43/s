@@ -6,7 +6,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <!-- Добавлен шрифт PT Sans -->
     <link href="https://fonts.googleapis.com/css2?family=PT+Sans:wght@400;700&family=PT+Serif:ital,wght@0,400;0,700;1,400;1,700&display=swap" rel="stylesheet">
     <title>Грамотиньо</title>
     <style>
@@ -128,7 +127,6 @@
             margin: 8px 0 4px;
         }
 
-        /* Стильный переключатель разделов */
         .section-switch {
             display: inline-flex;
             background: var(--bg-card);
@@ -144,7 +142,7 @@
             color: var(--text-secondary);
             padding: 10px 24px;
             cursor: pointer;
-            font-family: 'PT Sans', sans-serif; /* Запрошенный шрифт */
+            font-family: 'PT Sans', sans-serif;
             font-weight: 600;
             font-size: 0.95rem;
             border-radius: 40px;
@@ -180,7 +178,6 @@
             padding: 0 20px;
         }
         
-        /* Анимация переключения разделов */
         .tab-section {
             display: none;
         }
@@ -409,7 +406,6 @@
             color: var(--accent);
         }
 
-        /* Экзамен */
         .exam-overlay {
             position: fixed;
             top: 0;
@@ -646,7 +642,6 @@
             border-top: 1px solid var(--border);
         }
     
-        /* === МИНИМАЛИСТИЧНАЯ ЛИНИЯ ВРЕМЕНИ === */
         .heroes-timeline {
             max-width: 800px;
             margin: 40px auto;
@@ -748,7 +743,6 @@
             gap: 6px;
         }
 
-        /* Специальный стиль для возраста (PT Sans, серый, маленький) */
         .hero-age {
             font-family: 'PT Sans', sans-serif;
             font-size: 0.8rem;
@@ -757,7 +751,6 @@
             opacity: 0.7;
         }
 
-        /* Блок СССР */
         .soviet-era {
             background: linear-gradient(180deg, rgba(220, 38, 38, 0.12) 0%, rgba(220, 38, 38, 0.02) 100%);
             margin: 30px -20px 30px -15px;
@@ -791,7 +784,6 @@
             text-shadow: 0 0 10px rgba(220, 38, 38, 0.2);
         }
 
-        /* Всплывающий пузырь века */
         .century-popup {
             position: fixed;
             bottom: 100px;
@@ -818,7 +810,6 @@
             transform: translateX(-50%) translateY(0);
         }
 
-        /* Модальное окно героя */
         .hero-modal {
             position: fixed;
             top: 0;
@@ -920,6 +911,7 @@
         @media (max-width: 1024px) {
             .syllable-grid { grid-template-columns: repeat(3, 1fr); gap: 8px; }
         }
+        
         @media (max-width: 600px) {
             .exam-exit-btn { top: auto; bottom: 10px; left: 10px; width: 34px; height: 34px; font-size: 1.1rem; }
             .syllable-grid { grid-template-columns: repeat(2, 1fr); gap: 5px; }
@@ -933,10 +925,11 @@
             .theme-cycle button { width: 32px; height: 32px; }
             .header { padding: 16px 12px 10px; }
             
-            /* Адаптация кнопки переключения для мобильных */
+            /* 1. Надписи на кнопке переключения режимов меньше, чтобы не вылезали */
             .section-switch-btn {
-                padding: 8px 16px;
-                font-size: 0.85rem;
+                padding: 6px 10px;
+                font-size: 0.7rem;
+                line-height: 1.2;
             }
             
             .hero-modal-nav button { width: 45px; height: 45px; font-size: 2rem; }
@@ -944,13 +937,44 @@
             .timeline-container { padding-left: 40px; }
             .timeline-line { left: 25px; }
             .century-sentinel::before { left: -31px; width: 14px; height: 14px; }
-            .hero-circle { width: 60px; height: 60px; }
-            .hero-name { font-size: 1.1rem; }
-            .hero-years { font-size: 0.85rem; }
+            
+            /* 2. Портреты крупнее */
+            .hero-circle { 
+                width: 85px; 
+                height: 85px; 
+            }
+            
+            /* 3. Элементы ближе друг к другу */
+            .hero-item { 
+                gap: 12px; 
+                margin-bottom: 20px; 
+                padding: 8px;
+            }
+            
+            /* 4. Имена мельче */
+            .hero-name { 
+                font-size: 0.95rem; 
+                line-height: 1.2;
+            }
+            
+            /* 5. Годы жизни ещё мельче */
+            .hero-years { 
+                font-size: 0.75rem; 
+            }
+            .hero-age {
+                font-size: 0.65rem;
+            }
+            
+            /* 6. Всплывающее века очень маленьким */
+            .century-popup {
+                font-size: 0.75rem;
+                padding: 6px 16px;
+                bottom: 80px;
+            }
             
             .soviet-era {
                 margin-left: -15px;
-                padding-left: 15px;
+                padding: 30px 15px 30px 15px;
             }
             .soviet-era::before {
                 font-size: 5rem;
@@ -1034,9 +1058,9 @@
         </div>
     </div>
 
-  <footer class="footer">
-    <p>Спасибо за вайбкодинг в тегешечку @vnvax</p>
-</footer>
+    <footer class="footer">
+        <p>Спасибо за вайбкодинг в тегешечку @vnvax</p>
+    </footer>
 
     <div class="toast-container" id="toastContainer"></div>
 
