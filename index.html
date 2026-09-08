@@ -1663,9 +1663,7 @@
                 if (!counter) return;
                 
                 try {
-                    // Замените 'gramotinjo' и 'visits' на свои уникальные значения
-                    const response = await fetch('https://api.countapi.xyz/hit/gramotinjo/visits');
-                    const data = await response.json();
+const response = await fetch('https://api.counter.dev/count/gramotinjo/visits');                    const data = await response.json();
                     
                     // Форматирование числа с учётом склонений
                     const count = data.value;
