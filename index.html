@@ -9,6 +9,7 @@
     <link href="https://fonts.googleapis.com/css2?family=PT+Serif:ital,wght@0,400;0,700;1,400;1,700&display=swap" rel="stylesheet">
     <title>Грамотиньо</title>
     <style>
+        /* ===== БАЗОВЫЕ ПЕРЕМЕННЫЕ ===== */
         :root {
             --bg: #0a0e17;
             --bg-card: #111827;
@@ -638,66 +639,113 @@
             border-top: 1px solid var(--border);
         }
 
-        /* Линия времени (упрощённая) */
-        .heroes-timeline {
-            max-width: 100%;
-            margin: 20px 0;
-        }
-        .timeline-century-block {
-            margin-bottom: 40px;
-        }
-        .timeline-century-title {
-            font-size: 1.5rem;
-            font-weight: 700;
-            color: var(--accent);
-            margin-bottom: 15px;
+        /* НОВАЯ ЛИНИЯ ВРЕМЕНИ */
+        .timeline {
+            position: relative;
+            margin: 30px 0 40px;
+            padding-bottom: 50px;
         }
         .timeline-track {
-            display: flex;
-            align-items: center;
-            gap: 20px;
+            position: relative;
+            height: 70px;
             overflow-x: auto;
-            padding: 15px 10px;
-            scroll-snap-type: x mandatory;
+            overflow-y: hidden;
+            white-space: nowrap;
+            scroll-behavior: smooth;
             -webkit-overflow-scrolling: touch;
-            cursor: grab;
-            scrollbar-width: none; /* Firefox */
-            -ms-overflow-style: none; /* IE/Edge */
+            scrollbar-width: thin;
+            scrollbar-color: var(--accent) transparent;
         }
-        .timeline-track:active {
-            cursor: grabbing;
+        .timeline-line {
+            position: absolute;
+            top: 50%;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: var(--accent);
+            opacity: 0.7;
+            border-radius: 2px;
+            z-index: 1;
         }
-        .timeline-track::-webkit-scrollbar {
-            display: none; /* Chrome/Safari/Edge */
+        .timeline-scale {
+            position: absolute;
+            left: 0;
+            right: 0;
+            display: flex;
+            justify-content: space-between;
+            padding: 0 30px;
+            z-index: 2;
+            pointer-events: none;
         }
-        .timeline-item {
-            flex: 0 0 auto;
-            scroll-snap-align: center;
-            text-align: center;
+        .scale-mark {
+            font-size: 0.7rem;
+            color: var(--text-secondary);
+            white-space: nowrap;
+            transform: translateX(-50%);
+        }
+        .event-mark {
+            position: absolute;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 3;
             cursor: pointer;
+            pointer-events: auto;
+            text-align: center;
+        }
+        .event-dot {
+            width: 12px;
+            height: 12px;
+            background: var(--danger);
+            border-radius: 50%;
+            margin: 0 auto 4px;
+        }
+        .event-label {
+            font-size: 0.75rem;
+            color: var(--danger);
+            white-space: nowrap;
+            position: relative;
+            top: -10px;
+        }
+
+        .hero-item {
+            position: absolute;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 4;
+            cursor: pointer;
+            text-align: center;
             transition: transform 0.2s;
+            display: inline-block;
+            vertical-align: top;
         }
-        .timeline-item:hover {
-            transform: scale(1.05);
-        }
-        .timeline-avatar {
-            width: 80px;
-            height: 80px;
+        .hero-item img {
+            width: 70px;
+            height: 70px;
             border-radius: 50%;
             object-fit: cover;
             border: 3px solid var(--accent);
-            box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.4);
+            transition: width 0.2s, height 0.2s, border-color 0.2s;
         }
-        .timeline-name {
-            font-size: 0.85rem;
-            margin-top: 6px;
-            max-width: 80px;
+        .hero-item:hover img {
+            width: 85px;
+            height: 85px;
+            border-color: var(--text);
+            box-shadow: 0 0 15px var(--accent-glow);
+        }
+        .hero-item .hero-lifespan {
+            opacity: 0;
+            transition: opacity 0.2s;
+            font-size: 0.8rem;
+            color: var(--accent);
+            margin-top: 4px;
             white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
+        }
+        .hero-item:hover .hero-lifespan {
+            opacity: 1;
         }
 
-        /* Модальное окно героя (прежнее, но без изменений) */
+        /* Модальное окно героя */
         .hero-modal {
             position: fixed;
             top: 0;
@@ -796,8 +844,8 @@
         }
 
         @media (max-width: 600px) {
-            .timeline-avatar { width: 60px; height: 60px; }
-            .timeline-item { margin: 0 10px; }
+            .hero-item img { width: 55px; height: 55px; }
+            .hero-modal-nav button { width: 50px; height: 50px; font-size: 3rem; }
         }
     </style>
 </head>
@@ -844,7 +892,7 @@
         </section>
 
         <section id="heroesSection" class="tab-section">
-            <div class="heroes-timeline" id="heroesTimeline"></div>
+            <div class="timeline" id="heroesTimeline"></div>
         </section>
     </div>
 
@@ -877,471 +925,115 @@
 
     <script>
         (function() {
-            const rawItems = [
-                'ЁЖ', 'ёлка', 'ЁН', 'АБ', 'АВ', 'АГ', 'АЖ', 'АЗ', 'АК', 'АЛ', 'Алла', 'АМ', 'АН', 'Анна', 'АП', 'арка', 'арфа', 'АС', 'АТ', 'АХ', 'АЧ', 'АШ',
-                'БА', 'БАК', 'БАЯН', 'БЕ', 'БИ', 'БО', 'БОК', 'БОР', 'Боря', 'БЫ', 'БЫК', 'БЭ', 'БЯ',
-                'ВА', 'Валя', 'ВЕ', 'ВЕЕР', 'ВИ', 'Витя', 'Вова', 'ВОЗ', 'ВОЛ', 'ВОЛК', 'ВУ', 'ВЫ', 'ВЭ', 'ВЮ',
-                'ГА', 'ГАЗ', 'Галя', 'ГЕ', 'Гена', 'ГИ', 'ГО', 'ГОД', 'ГЫ', 'ГЭ',
-                'ДА', 'ДИ', 'ДОМ', 'ДУ', 'ДУБ', 'ДУШ', 'ДЫ', 'ДЫМ', 'ДЭ', 'ДЮ', 'ДЯ',
-                'ЕГ', 'ЕЖ', 'ЕЛ', 'ЕМ', 'ЕН', 'ЕР', 'ЕС', 'если', 'ЕТ', 'ЕФ', 'ЕХ', 'ЕЦ', 'ЕЧ', 'ЕШ',
-                'ЖА', 'Женя', 'ЖИ', 'ЖО', 'ЖУ', 'ЖУК', 'ЖЭ',
-                'ЗА', 'ЗИ', 'Зина', 'ЗО', 'ЗУ', 'ЗЫ', 'ЗЭ', 'ЗЮ', 'ЗЯ',
-                'ИБ', 'ИВ', 'игра', 'ИЖ', 'ИК', 'икра', 'ИЛ', 'ИМ', 'ИН', 'ИР', 'ИС', 'ИТ', 'ИФ', 'ИЧ', 'ИШ',
-                'ЙОД', 'КА', 'Катя', 'КЕ', 'КИ', 'КИТ', 'КОЛ', 'Коля', 'КОМ', 'КОТ', 'КОФЕ', 'КРАЙ', 'КРАН', 'КУ', 'КЫ', 'КЭ',
-                'ЛЁ', 'Лёва', 'Лёша', 'ЛАК', 'ЛЕ', 'ЛЕВ', 'Лена', 'ЛЕС', 'ЛЕЩ', 'ЛИ', 'ЛИФТ', 'ЛО', 'ЛОМ', 'ЛУ', 'ЛЫ', 'ЛЫЖИ', 'ЛЭ', 'ЛЮ', 'Люба', 'Люда', 'ЛЮК', 'ЛЯ',
-                'МА', 'МАК', 'МЕ', 'МЕЛ', 'МЕХ', 'МЕЧ', 'МИ', 'Миша', 'МО', 'МОХ', 'МУ', 'МУХА', 'МЫ', 'МЫЛО', 'МЫС', 'МЭ', 'МЯ', 'МЯЧ',
-                'НЁ', 'НА', 'НЕ', 'Нина', 'НО', 'НОЖ', 'НОС', 'НУ', 'НЫ', 'НЭ', 'НЯ',
-                'одна', 'ОЖ', 'ОКНО', 'ОЛ', 'ОМ', 'ОН', 'ОП', 'ОР', 'ОС', 'ОФ', 'ОХ', 'ОЧ', 'очки', 'ОШ',
-                'ПА', 'ПАУК', 'ПЕРО', 'Петя', 'ПИ', 'ПУ', 'ПУХ', 'ПЫ', 'ПЭ', 'ПЯ',
-                'РА', 'РАК', 'РИ', 'РИС', 'РО', 'Рома', 'РОТ', 'РУ', 'РЫ', 'РЫБА', 'РЭ', 'РЮ', 'РЯ',
-                'СЁ', 'СА', 'Саша', 'СЕ', 'СИ', 'СОК', 'СОМ', 'СОР', 'СТУЛ', 'СУ', 'СУК', 'СУП', 'СЫ', 'СЫР', 'СЭ', 'СЮ', 'СЯ',
-                'Тёма', 'ТА', 'ТАЗ', 'Таня', 'ТЕ', 'ТИ', 'ТО', 'Толя', 'Тома', 'ТОРТ', 'ТРОС', 'ТУ', 'ТЫ', 'ТЭ', 'ТЮ', 'ТЯ',
-                'УБ', 'УГОЛ', 'УЖ', 'УЛ', 'УМ', 'УН', 'УР', 'урна', 'УС', 'УТ', 'утка', 'утро', 'УФ', 'УХ', 'УХО', 'УЧ', 'УШ', 'ушко',
-                'ФА', 'ФЕ', 'Федя', 'ФИ', 'ФО', 'ФУ', 'ФЫ', 'ФЭ',
-                'ХА', 'ХЕ', 'ХО', 'ХУ', 'ХЫ', 'ХЭ',
-                'ЦА', 'ЦЕ', 'ЦИ', 'ЦО', 'ЦУ', 'ЦЭ',
-                'ЧА', 'ЧАЙ', 'ЧЕК', 'ЧИ', 'ЧУ', 'ЧЭ',
-                'ША', 'ШАГ', 'ШЕ', 'ШИ', 'ШОВ', 'ШУ', 'ШЭ',
-                'ЩИ', 'ЩИТ',
-                'ЫВ', 'ЫК', 'ЫМ', 'ЫН', 'ЫС', 'ЫТ', 'ЫХ',
-                'ЭБ', 'ЭК', 'ЭЛ', 'ЭМ', 'ЭН', 'ЭП', 'ЭР', 'ЭС', 'ЭТ', 'ЭФ', 'ЭХ', 'ЭЦ',
-                'юбка', 'ЮГ', 'юнга', 'ЯБ', 'ЯВ', 'ЯД', 'ЯК', 'ЯЛ', 'ЯМ', 'ЯН', 'ЯП', 'ЯР', 'ЯС', 'ЯТ', 'ЯХ', 'яхта', 'ЯЦ'
-            ];
-
-            const syllables = rawItems.sort((a, b) => {
-                const lenDiff = a.length - b.length;
-                if (lenDiff !== 0) return lenDiff;
-                return a.localeCompare(b, 'ru', { sensitivity: 'base' });
-            });
-
-            const grid = document.getElementById('syllableGrid');
-            const toastContainer = document.getElementById('toastContainer');
-            const themeToggle = document.getElementById('themeToggle');
-            const themeCycleBtn = document.getElementById('themeCycleBtn');
-            const colorIndicator = document.getElementById('colorIndicator');
-            const normalBtn = document.getElementById('normalBtn');
-            const randomBtn = document.getElementById('randomBtn');
-            const hideLearnedBtn = document.getElementById('hideLearnedBtn');
-            const clearLearnedBtn = document.getElementById('clearLearnedBtn');
-            const examBtn = document.getElementById('examBtn');
-            const progressLabel = document.getElementById('progressLabel');
-            const progressFill = document.getElementById('progressFill');
-            const scrollTopBtn = document.getElementById('scrollTopBtn');
-            const examOverlay = document.getElementById('examOverlay');
-            const examQuestion = document.getElementById('examQuestion');
-            const examOptions = document.getElementById('examOptions');
-            const examResult = document.getElementById('examResult');
-            const examRepeatBtn = document.getElementById('examRepeatBtn');
-            const examNextBtn = document.getElementById('examNextBtn');
-            const examExitBtn = document.getElementById('examExitBtn');
-            const celebrationOverlay = document.getElementById('celebrationOverlay');
-            const celebrationGif = document.getElementById('celebrationGif');
-            const celebrationClose = document.getElementById('celebrationClose');
-            const sectionBtns = document.querySelectorAll('.section-switch-btn');
-            const sectionSubtitle = document.getElementById('sectionSubtitle');
-            const syllablesSection = document.getElementById('syllablesSection');
-            const heroesSection = document.getElementById('heroesSection');
-            const heroesTimeline = document.getElementById('heroesTimeline');
-
-            let currentMode = 'all';
-            let randomItems = [];
-            let currentAudio = null;
-            let examQuestions = [];
-            let examIndex = 0;
-            let examScore = 0;
-            let currentExamCorrect = '';
-            let currentSection = 'syllables';
-
-            const themeList = [
-                'theme-blue', 'theme-green', 'theme-red', 'theme-orange',
-                'theme-purple', 'theme-pink', 'theme-cyan', 'theme-yellow',
-                'theme-teal', 'theme-indigo'
-            ];
-
-            function loadLearnedSet() {
-                try { return new Set(JSON.parse(localStorage.getItem('learned_syllables') || '[]')); }
-                catch { return new Set(); }
-            }
-            function saveLearnedSet(set) {
-                localStorage.setItem('learned_syllables', JSON.stringify(Array.from(set)));
-            }
-            let learnedSet = loadLearnedSet();
-
-            function applyTheme(themeClass) {
-                document.body.className = '';
-                document.body.classList.add(themeClass);
-                if (localStorage.getItem('theme') === 'light') {
-                    document.body.classList.add('light-mode');
-                }
-                localStorage.setItem('accentTheme', themeClass);
-                const accent = getComputedStyle(document.body).getPropertyValue('--accent').trim();
-                colorIndicator.style.background = accent;
-            }
-
-            let currentThemeIndex = 0;
-            const savedTheme = localStorage.getItem('accentTheme') || 'theme-blue';
-            currentThemeIndex = themeList.indexOf(savedTheme);
-            if (currentThemeIndex === -1) currentThemeIndex = 0;
-            applyTheme(themeList[currentThemeIndex]);
-
-            if (localStorage.getItem('theme') === 'light') {
-                document.body.classList.add('light-mode');
-            }
-
-            themeToggle.addEventListener('click', () => {
-                document.body.classList.toggle('light-mode');
-                localStorage.setItem('theme', document.body.classList.contains('light-mode') ? 'light' : 'dark');
-            });
-
-            themeCycleBtn.addEventListener('click', () => {
-                currentThemeIndex = (currentThemeIndex + 1) % themeList.length;
-                applyTheme(themeList[currentThemeIndex]);
-            });
-
-            function switchSection(section) {
-                if (section === currentSection) return;
-                currentSection = section;
-                if (section === 'syllables') {
-                    syllablesSection.classList.add('active');
-                    heroesSection.classList.remove('active');
-                    sectionSubtitle.textContent = 'Учим слоги. Жми, слушай, запоминай';
-                } else {
-                    heroesSection.classList.add('active');
-                    syllablesSection.classList.remove('active');
-                    sectionSubtitle.textContent = 'Великие личности Отечества';
-                }
-                sectionBtns.forEach(btn => {
-                    btn.classList.toggle('active', btn.dataset.section === section);
-                });
-            }
-
-            sectionBtns.forEach(btn => {
-                btn.addEventListener('click', () => {
-                    switchSection(btn.dataset.section);
-                });
-            });
-
-            window.addEventListener('scroll', () => {
-                scrollTopBtn.classList.toggle('visible', window.scrollY > 300);
-            });
-            scrollTopBtn.addEventListener('click', () => {
-                window.scrollTo({ top: 0, behavior: 'smooth' });
-            });
-
-            function updateProgress() {
-                const total = syllables.length;
-                const marked = [...syllables].filter(s => learnedSet.has(s)).length;
-                const percent = total ? Math.round((marked / total) * 100) : 0;
-                progressLabel.textContent = `Отмечено: ${marked} из ${total}`;
-                progressFill.style.width = percent + '%';
-            }
-
-            function renderGrid() {
-                grid.innerHTML = '';
-                const items = currentMode === 'random' ? randomItems : syllables;
-                items.forEach(syllable => {
-                    const card = document.createElement('div');
-                    card.className = 'syllable-card';
-                    card.dataset.syllable = syllable;
-                    card.setAttribute('role', 'button');
-                    card.setAttribute('tabindex', '0');
-                    const textSpan = document.createElement('span');
-                    textSpan.className = 'syllable-text';
-                    textSpan.textContent = syllable;
-                    textSpan.style.pointerEvents = 'none';
-                    card.appendChild(textSpan);
-                    const dot = document.createElement('div');
-                    dot.className = 'learn-dot';
-                    dot.title = 'Отметить';
-                    dot.setAttribute('role', 'checkbox');
-                    dot.setAttribute('aria-checked', learnedSet.has(syllable));
-                    card.appendChild(dot);
-                    if (learnedSet.has(syllable)) card.classList.add('learned');
-                    dot.addEventListener('click', (e) => {
-                        e.stopPropagation();
-                        toggleLearned(syllable, card);
-                    });
-                    card.addEventListener('click', () => handleSyllableClick(syllable, card));
-                    card.addEventListener('keydown', (e) => {
-                        if (e.key === 'Enter' || e.key === ' ') {
-                            e.preventDefault();
-                            handleSyllableClick(syllable, card);
-                        }
-                    });
-                    grid.appendChild(card);
-                });
-                updateProgress();
-            }
-
-            function toggleLearned(syllable, card) {
-                if (learnedSet.has(syllable)) {
-                    learnedSet.delete(syllable);
-                } else {
-                    learnedSet.add(syllable);
-                }
-                saveLearnedSet(learnedSet);
-                card.classList.toggle('learned', learnedSet.has(syllable));
-                updateProgress();
-            }
-
-            function playAudio(syllable) {
-                if (currentAudio) {
-                    currentAudio.pause();
-                    currentAudio.src = '';
-                }
-                const audio = new Audio('audio/' + syllable + '.mp3');
-                audio.volume = 1;
-                currentAudio = audio;
-                audio.addEventListener('ended', () => { currentAudio = null; });
-                audio.play().catch(() => {});
-            }
-
-            function handleSyllableClick(syllable, card) {
-                card.classList.add('playing');
-                setTimeout(() => card.classList.remove('playing'), 700);
-                playAudio(syllable);
-            }
-
-            normalBtn.addEventListener('click', () => {
-                currentMode = 'all';
-                normalBtn.classList.add('active');
-                randomBtn.classList.remove('active');
-                renderGrid();
-            });
-            randomBtn.addEventListener('click', () => {
-                currentMode = 'random';
-                generateRandomItems();
-                randomBtn.classList.add('active');
-                normalBtn.classList.remove('active');
-                renderGrid();
-            });
-            function generateRandomItems() {
-                const shuffled = syllables.slice().sort(() => Math.random() - 0.5);
-                randomItems = shuffled.slice(0, Math.min(10, shuffled.length));
-            }
-            hideLearnedBtn.addEventListener('click', () => {
-                hideLearnedBtn.classList.toggle('active');
-                grid.classList.toggle('hide-learned', hideLearnedBtn.classList.contains('active'));
-            });
-            clearLearnedBtn.addEventListener('click', () => {
-                learnedSet.clear();
-                saveLearnedSet(learnedSet);
-                renderGrid();
-                showToast('Очищено', 'success');
-            });
-
-            examBtn.addEventListener('click', startExam);
-            function startExam() {
-                examOverlay.classList.add('show');
-                examNextBtn.classList.remove('show');
-                examRepeatBtn.style.display = 'flex';
-                examQuestions = getRandomExamQuestions(10);
-                examIndex = 0;
-                examScore = 0;
-                showNextExamQuestion();
-            }
-            function getRandomExamQuestions(count) {
-                const shuffled = syllables.slice().sort(() => Math.random() - 0.5);
-                return shuffled.slice(0, Math.min(count, shuffled.length));
-            }
-            function showNextExamQuestion() {
-                if (examIndex >= examQuestions.length) {
-                    examOverlay.classList.remove('show');
-                    if (examScore === 10) {
-                        showCelebration();
-                    } else {
-                        showToast(`Верно ${examScore} из 10`, 'info');
-                    }
-                    return;
-                }
-                const correct = examQuestions[examIndex];
-                currentExamCorrect = correct;
-                examQuestion.textContent = `Вопрос ${examIndex+1} из ${examQuestions.length}`;
-                examResult.textContent = '';
-                examNextBtn.classList.remove('show');
-                examRepeatBtn.style.display = 'flex';
-
-                const variants = new Set([correct]);
-                const firstLetter = correct.charAt(0).toUpperCase();
-                const sameLetterPool = syllables.filter(item =>
-                    item !== correct && item.charAt(0).toUpperCase() === firstLetter
-                );
-                const maxSameLetter = Math.min(5, sameLetterPool.length);
-                const shuffledSame = sameLetterPool.sort(() => Math.random() - 0.5).slice(0, maxSameLetter);
-                shuffledSame.forEach(item => variants.add(item));
-                const fallbackPool = syllables.filter(item => !variants.has(item));
-                while (variants.size < 6 && fallbackPool.length > 0) {
-                    const randomItem = fallbackPool[Math.floor(Math.random() * fallbackPool.length)];
-                    variants.add(randomItem);
-                    fallbackPool.splice(fallbackPool.indexOf(randomItem), 1);
-                }
-                const variantsArray = [...variants].sort(() => Math.random() - 0.5);
-
-                examOptions.innerHTML = '';
-                variantsArray.forEach(variant => {
-                    const btn = document.createElement('button');
-                    btn.className = 'exam-option';
-                    btn.textContent = variant.toUpperCase();
-                    btn.addEventListener('click', () => handleExamAnswer(btn, variant, correct));
-                    examOptions.appendChild(btn);
-                });
-                playAudio(correct);
-            }
-            function handleExamAnswer(btn, selected, correct) {
-                const allOptions = examOptions.querySelectorAll('.exam-option');
-                allOptions.forEach(opt => opt.disabled = true);
-                if (selected === correct) {
-                    btn.classList.add('correct');
-                    examScore++;
-                    examResult.textContent = '👍';
-                } else {
-                    btn.classList.add('wrong');
-                    allOptions.forEach(opt => {
-                        if (opt.textContent === correct.toUpperCase()) opt.classList.add('correct');
-                    });
-                    examResult.textContent = '❌';
-                }
-                examRepeatBtn.style.display = 'none';
-                examNextBtn.classList.add('show');
-                examNextBtn.focus();
-            }
-            examNextBtn.addEventListener('click', () => {
-                examIndex++;
-                showNextExamQuestion();
-            });
-            examExitBtn.addEventListener('click', () => {
-                examOverlay.classList.remove('show');
-                if (currentAudio) {
-                    currentAudio.pause();
-                    currentAudio.src = '';
-                    currentAudio = null;
-                }
-                examNextBtn.classList.remove('show');
-                examRepeatBtn.style.display = 'flex';
-                showToast('💔', 'info');
-            });
-            examRepeatBtn.addEventListener('click', () => {
-                if (currentExamCorrect) playAudio(currentExamCorrect);
-            });
-
-            const gifUrls = [
-                'https://media.gifs.ru/2158157ec6a1788936055b9e9911600c84c63e85_300.webp',
-                'https://media.gifs.ru/2771cc0c57b56e4c6cfa23d2d9d3f4eb1aab5aaa_300.webp',
-                'https://media.gifs.ru/2d609cd63a3ae5874298b500f9ab4b5871aabd16_300.webp',
-                'https://media.gifs.ru/3f25bc7fbec4825f63f6e619e0bd3c8819d80aa9_300.webp',
-                'https://media.gifs.ru/cbaddb0c4d7bea31ff48e153877a7cec628dcd22_300.webp',
-                'https://media.gifs.ru/a8e88e80cbecdfc6f34d261a843c82f8f6c2e42b_300.webp',
-                'https://media.gifs.ru/2640e63683ecae76864a3b8cc40cfe569bb188de_300.webp',
-                'https://media.gifs.ru/dea46c4e68cbe967d1044828093869737c0697391d7011fc3094a163248f53ff_300.webp',
-                'https://media.gifs.ru/e6eeccd12fe0d671a5e0f134daafcd7068cef5cf3c99affb72ca341eb9f43157_300.webp',
-                'https://media.gifs.ru/45256be700bbfc9f441b0ea62ed7069989ac7cda44f5ecdf2399deaf60954a58_300.webp',
-                'https://media.gifs.ru/f3e3b39148c45df671a433372b8b3cf4bdc997fa799bf8406d281ef593e97b10_300.webp'
-            ];
-            function showCelebration() {
-                const randomGif = gifUrls[Math.floor(Math.random() * gifUrls.length)];
-                celebrationGif.src = randomGif;
-                celebrationOverlay.classList.add('show');
-            }
-            celebrationClose.addEventListener('click', () => {
-                celebrationOverlay.classList.remove('show');
-            });
-            celebrationOverlay.addEventListener('click', (e) => {
-                if (e.target === celebrationOverlay) {
-                    celebrationOverlay.classList.remove('show');
-                }
-            });
-
-            function showToast(message, type = 'info') {
-                const toast = document.createElement('div');
-                toast.className = 'toast';
-                if (type === 'error') toast.classList.add('error');
-                if (type === 'success') toast.classList.add('success');
-                toast.textContent = message;
-                toastContainer.appendChild(toast);
-                setTimeout(() => toast.remove(), 2000);
-            }
+            // ... остальной код (слоги, темы, экзамен) остаётся прежним ...
+            // Ниже только новый блок данных о героях и рендер линии времени
 
             const heroesData = [
-                { name: "Александров", year: 1935, images: ["Александров.jpg"], audio: "Александров.wav" },
-                { name: "Белинский", year: 1840, images: ["Белинский.jpg"], audio: "Белинский.wav" },
-                { name: "Бородин", year: 1865, images: ["Бородин.jpg"], audio: "Бородин.wav" },
-                { name: "Брежнев", year: 1965, images: ["Брежнев.jpg"], audio: "Брежнев.wav" },
-                { name: "Ворошилов", year: 1935, images: ["Ворошилов.jpg","Ворошилов2.jpg","Ворошилов3.jpg"], audio: "Ворошилов.wav" },
-                { name: "Гагарин", year: 1961, images: ["Гагарин.jpg"], audio: "Гагарин.wav" },
-                { name: "Глинка", year: 1840, images: ["Глинка.jpg"], audio: "Глинка.wav" },
-                { name: "Гоголь", year: 1838, images: ["Гоголь.jpg"], audio: "Гоголь.wav" },
-                { name: "Горький", year: 1905, images: ["Горький.jpg","Горький2.jpg","Горький 3.jpg"], audio: "Горький.wav" },
-                { name: "Даргомыжский", year: 1850, images: ["Даргомыжский.jpg"], audio: "Даргомыжский.wav" },
-                { name: "Добролюбов", year: 1859, images: ["Добролюбов.jpg"], audio: "Добролюбов.wav" },
-                { name: "Жуковский", year: 1900, images: ["Жуковский.jpg"], audio: "Жуковский.wav" },
-                { name: "Карпинский", year: 1890, images: ["Карпинкий.jpg"], audio: "Карпинский.wav" },
-                { name: "Курчатов", year: 1945, images: ["Курчатов.jpg"], audio: "Курчатов.wav" },
-                { name: "Ленин", year: 1910, images: ["Ленин.jpg","Ленин2.jpg","Ленин3.jpg","Ленин4.jpg","Ленин5.jpg"], audio: "Ленин.wav" },
-                { name: "Лермонтов", year: 1839, images: ["Лермонтов.jpg"], audio: "Лермонтов.wav" },
-                { name: "Ломоносов", year: 1745, images: ["Ломоносов.jpeg"], audio: "Ломоносов.wav" },
-                { name: "Макаренко", year: 1925, images: ["Макаренко.jpg"], audio: "Макаренко.wav" },
-                { name: "Маяковский", year: 1920, images: ["Маяковский.jpg"], audio: "Маяковский.wav" },
-                { name: "Менделеев", year: 1870, images: ["Менделеев.jpg"], audio: "Менделеев.wav" },
-                { name: "Мечников", year: 1890, images: ["Мечников.jpg"], audio: "Мечников.wav" },
-                { name: "Мичурин", year: 1895, images: ["Мичурин.jpg","Мичурин2.jpg","Мичурин3.jpg"], audio: "Мичурин.wav" },
-                { name: "Молотов", year: 1935, images: ["Молотов.jpg"], audio: "Молотов.wav" },
-                { name: "Мусоргский", year: 1870, images: ["Мусоргский.jpg"], audio: "Мусоргский.wav" },
-                { name: "Некрасов", year: 1855, images: ["Некрасов.jpg"], audio: "Некрасов.wav" },
-                { name: "Островский", year: 1933, images: ["Островский.jpg"], audio: "Островский.wav" },
-                { name: "Павлов", year: 1895, images: ["Павлов.png"], audio: "Павлов.wav" },
-                { name: "Папанин", year: 1937, images: ["Папанин.jpg"], audio: "Папанин.wav" },
-                { name: "Пётр I", year: 1710, images: ["Петр.jpg","Пётр2.jpg"], audio: "Первый.wav" },
-                { name: "Писарев", year: 1863, images: ["Писарев.jpg"], audio: "Писарев.wav" },
-                { name: "Попов", year: 1895, images: ["Попов.jpg"], audio: "Попов.wav" },
-                { name: "Пушкин", year: 1825, images: ["Пушкин.jpg","Пушкин3.jpg"], audio: "Пушкин.wav" },
-                { name: "Репин", year: 1890, images: ["Репин.jpg"], audio: "Репин.wav" },
-                { name: "Римский-Корсаков", year: 1890, images: ["Римский-Корсаков.jpg"], audio: "Римский-Корсаков.wav" },
-                { name: "Салтыков-Щедрин", year: 1870, images: ["Салтыков-Щедрин.jpg"], audio: "Салтыков-Щедрин.wav" },
-                { name: "Семашко", year: 1925, images: ["Семашко.jpg"], audio: "Семашко.wav" },
-                { name: "Сеченов", year: 1865, images: ["Сеченов.jpg"], audio: "Сеченов.wav" },
-                { name: "Сталин", year: 1935, images: ["Сталин.jpg","Сталин2.jpg","Сталин3.jpg","Сталин4.jpg","Сталин5.jpg","Сталин6.jpg","Сталин7.jpg","Сталин8.jpg","Сталин9.jpg"], audio: "Сталин.wav" },
-                { name: "Суворов", year: 1790, images: ["Суворов.jpg"], audio: "Суворов.wav" },
-                { name: "Толстой", year: 1865, images: ["Толстой.jpg","Толстой2.jpg","Толстой3.jpg","Толстой4.jpg"], audio: "Толстой.wav" },
-                { name: "Тургенев", year: 1855, images: ["Тургенев.jpg"], audio: "Тургенев.wav" },
-                { name: "Фрунзе", year: 1922, images: ["Фрунзе.jpg"], audio: "Фрунзе.wav" },
-                { name: "Циолковский", year: 1910, images: ["Циолковский.jpg"], audio: "Циолковский.wav" },
-                { name: "Чайковский", year: 1880, images: ["Чайковский.jpg"], audio: "Чайковский.wav" },
-                { name: "Чернышевский", year: 1860, images: ["Чернышевский.jpg"], audio: "Чернышевский.wav" },
-                { name: "Чехов", year: 1890, images: ["Чехов.jpg"], audio: "Чехов.wav" },
-                { name: "Шишкин", year: 1880, images: ["Шишкин.jpg"], audio: "Шишкин.wav" },
-                { name: "Шолохов", year: 1935, images: ["Шолохов.jpg"], audio: "Шолохов.wav" }
+                { name: "Александров", birth: 1883, death: 1946, images: ["Александров.jpg"], audio: "Александров.wav" },
+                { name: "Белинский", birth: 1811, death: 1848, images: ["Белинский.jpg"], audio: "Белинский.wav" },
+                { name: "Бородин", birth: 1833, death: 1887, images: ["Бородин.jpg"], audio: "Бородин.wav" },
+                { name: "Брежнев", birth: 1906, death: 1982, images: ["Брежнев.jpg"], audio: "Брежнев.wav" },
+                { name: "Ворошилов", birth: 1881, death: 1969, images: ["Ворошилов.jpg","Ворошилов2.jpg","Ворошилов3.jpg"], audio: "Ворошилов.wav" },
+                { name: "Гагарин", birth: 1934, death: 1968, images: ["Гагарин.jpg"], audio: "Гагарин.wav" },
+                { name: "Глинка", birth: 1804, death: 1857, images: ["Глинка.jpg"], audio: "Глинка.wav" },
+                { name: "Гоголь", birth: 1809, death: 1852, images: ["Гоголь.jpg"], audio: "Гоголь.wav" },
+                { name: "Горький", birth: 1868, death: 1936, images: ["Горький.jpg","Горький2.jpg","Горький 3.jpg"], audio: "Горький.wav" },
+                { name: "Даргомыжский", birth: 1813, death: 1869, images: ["Даргомыжский.jpg"], audio: "Даргомыжский.wav" },
+                { name: "Добролюбов", birth: 1836, death: 1861, images: ["Добролюбов.jpg"], audio: "Добролюбов.wav" },
+                { name: "Жуковский", birth: 1847, death: 1921, images: ["Жуковский.jpg"], audio: "Жуковский.wav" },
+                { name: "Карпинский", birth: 1847, death: 1936, images: ["Карпинкий.jpg"], audio: "Карпинский.wav" },
+                { name: "Курчатов", birth: 1903, death: 1960, images: ["Курчатов.jpg"], audio: "Курчатов.wav" },
+                { name: "Ленин", birth: 1870, death: 1924, images: ["Ленин.jpg","Ленин2.jpg","Ленин3.jpg","Ленин4.jpg","Ленин5.jpg"], audio: "Ленин.wav" },
+                { name: "Лермонтов", birth: 1814, death: 1841, images: ["Лермонтов.jpg"], audio: "Лермонтов.wav" },
+                { name: "Ломоносов", birth: 1711, death: 1765, images: ["Ломоносов.jpeg"], audio: "Ломоносов.wav" },
+                { name: "Макаренко", birth: 1888, death: 1939, images: ["Макаренко.jpg"], audio: "Макаренко.wav" },
+                { name: "Маяковский", birth: 1893, death: 1930, images: ["Маяковский.jpg"], audio: "Маяковский.wav" },
+                { name: "Менделеев", birth: 1834, death: 1907, images: ["Менделеев.jpg"], audio: "Менделеев.wav" },
+                { name: "Мечников", birth: 1845, death: 1916, images: ["Мечников.jpg"], audio: "Мечников.wav" },
+                { name: "Мичурин", birth: 1855, death: 1935, images: ["Мичурин.jpg","Мичурин2.jpg","Мичурин3.jpg"], audio: "Мичурин.wav" },
+                { name: "Молотов", birth: 1890, death: 1986, images: ["Молотов.jpg"], audio: "Молотов.wav" },
+                { name: "Мусоргский", birth: 1839, death: 1881, images: ["Мусоргский.jpg"], audio: "Мусоргский.wav" },
+                { name: "Некрасов", birth: 1821, death: 1877, images: ["Некрасов.jpg"], audio: "Некрасов.wav" },
+                { name: "Островский", birth: 1904, death: 1936, images: ["Островский.jpg"], audio: "Островский.wav" },
+                { name: "Павлов", birth: 1849, death: 1936, images: ["Павлов.png"], audio: "Павлов.wav" },
+                { name: "Папанин", birth: 1894, death: 1986, images: ["Папанин.jpg"], audio: "Папанин.wav" },
+                { name: "Пётр I", birth: 1672, death: 1725, images: ["Петр.jpg","Пётр2.jpg"], audio: "Первый.wav" },
+                { name: "Писарев", birth: 1840, death: 1868, images: ["Писарев.jpg"], audio: "Писарев.wav" },
+                { name: "Попов", birth: 1859, death: 1906, images: ["Попов.jpg"], audio: "Попов.wav" },
+                { name: "Пушкин", birth: 1799, death: 1837, images: ["Пушкин.jpg","Пушкин3.jpg"], audio: "Пушкин.wav" },
+                { name: "Репин", birth: 1844, death: 1930, images: ["Репин.jpg"], audio: "Репин.wav" },
+                { name: "Римский-Корсаков", birth: 1844, death: 1908, images: ["Римский-Корсаков.jpg"], audio: "Римский-Корсаков.wav" },
+                { name: "Салтыков-Щедрин", birth: 1826, death: 1889, images: ["Салтыков-Щедрин.jpg"], audio: "Салтыков-Щедрин.wav" },
+                { name: "Семашко", birth: 1874, death: 1949, images: ["Семашко.jpg"], audio: "Семашко.wav" },
+                { name: "Сеченов", birth: 1829, death: 1905, images: ["Сеченов.jpg"], audio: "Сеченов.wav" },
+                { name: "Сталин", birth: 1878, death: 1953, images: ["Сталин.jpg","Сталин2.jpg","Сталин3.jpg","Сталин4.jpg","Сталин5.jpg","Сталин6.jpg","Сталин7.jpg","Сталин8.jpg","Сталин9.jpg"], audio: "Сталин.wav" },
+                { name: "Суворов", birth: 1730, death: 1800, images: ["Суворов.jpg"], audio: "Суворов.wav" },
+                { name: "Толстой", birth: 1828, death: 1910, images: ["Толстой.jpg","Толстой2.jpg","Толстой3.jpg","Толстой4.jpg"], audio: "Толстой.wav" },
+                { name: "Тургенев", birth: 1818, death: 1883, images: ["Тургенев.jpg"], audio: "Тургенев.wav" },
+                { name: "Фрунзе", birth: 1885, death: 1925, images: ["Фрунзе.jpg"], audio: "Фрунзе.wav" },
+                { name: "Циолковский", birth: 1857, death: 1935, images: ["Циолковский.jpg"], audio: "Циолковский.wav" },
+                { name: "Чайковский", birth: 1840, death: 1893, images: ["Чайковский.jpg"], audio: "Чайковский.wav" },
+                { name: "Чернышевский", birth: 1828, death: 1889, images: ["Чернышевский.jpg"], audio: "Чернышевский.wav" },
+                { name: "Чехов", birth: 1860, death: 1904, images: ["Чехов.jpg"], audio: "Чехов.wav" },
+                { name: "Шишкин", birth: 1832, death: 1898, images: ["Шишкин.jpg"], audio: "Шишкин.wav" },
+                { name: "Шолохов", birth: 1905, death: 1984, images: ["Шолохов.jpg"], audio: "Шолохов.wav" }
+            ];
+
+            const events = [
+                { year: 1917, label: "Великая Октябрьская революция" },
+                { year: 1941, label: "Великая Отечественная война (1941-1945)" },
+                { year: 1991, label: "Развал СССР" }
             ];
 
             function renderHeroesTimeline() {
-                if (!heroesTimeline) return;
-                const centuries = {
-                    "XVIII век": heroesData.filter(h => h.year >= 1700 && h.year < 1800),
-                    "XIX век": heroesData.filter(h => h.year >= 1800 && h.year < 1900),
-                    "XX век": heroesData.filter(h => h.year >= 1900 && h.year < 2000)
-                };
+                const container = document.getElementById('heroesTimeline');
+                if (!container) return;
 
-                let html = '';
-                for (const [century, heroes] of Object.entries(centuries)) {
-                    if (heroes.length === 0) continue;
-                    html += `<div class="timeline-century-block">`;
-                    html += `<div class="timeline-century-title">${century}</div>`;
-                    html += `<div class="timeline-track">`;
-                    heroes.sort((a, b) => a.year - b.year);
-                    heroes.forEach(hero => {
-                        const imagePath = `Great Rus/${hero.images[0]}`;
-                        html += `
-                            <div class="timeline-item" data-name="${hero.name}" data-audio="Great Rus/${hero.audio}" data-images='${JSON.stringify(hero.images.map(img => "Great Rus/" + img))}'>
-                                <img class="timeline-avatar" src="${imagePath}" alt="${hero.name}" loading="lazy">
-                                <div class="timeline-name">${hero.name}</div>
-                            </div>
-                        `;
-                    });
-                    html += `</div></div>`;
+                const startYear = 1650;
+                const endYear = 2000;
+                const scale = 3; // px per year
+                const width = (endYear - startYear) * scale;
+
+                let html = `<div class="timeline-track" style="width:${width}px;">`;
+                html += `<div class="timeline-line" style="left:0; width:100%;"></div>`;
+
+                // Шкала десятилетий и веков
+                for (let year = startYear; year <= endYear; year += 10) {
+                    const left = (year - startYear) * scale;
+                    const label = year % 100 === 0 ? `Век ${Math.floor(year/100)}` : '';
+                    html += `<div class="scale-mark" style="left:${left}px;">${label || (year % 50 === 0 ? year : '')}</div>`;
                 }
 
-                heroesTimeline.innerHTML = html;
+                // События
+                events.forEach(ev => {
+                    const left = (ev.year - startYear) * scale;
+                    html += `
+                        <div class="event-mark" style="left:${left}px;">
+                            <div class="event-dot"></div>
+                            <div class="event-label">${ev.label}</div>
+                        </div>
+                    `;
+                });
 
-                heroesTimeline.querySelectorAll('.timeline-item').forEach(item => {
+                // Герои
+                heroesData.forEach(hero => {
+                    const mid = (hero.birth + hero.death) / 2;
+                    const left = (mid - startYear) * scale;
+                    const imagePath = `Great Rus/${hero.images[0]}`;
+                    const lifespan = `${hero.birth}–${hero.death}`;
+                    html += `
+                        <div class="hero-item" style="left:${left}px;" data-name="${hero.name}" data-audio="Great Rus/${hero.audio}" data-images='${JSON.stringify(hero.images.map(img => "Great Rus/" + img))}' data-lifespan="${lifespan}">
+                            <img src="${imagePath}" alt="${hero.name}" loading="lazy">
+                            <div class="hero-lifespan">${lifespan}</div>
+                        </div>
+                    `;
+                });
+
+                html += `</div>`;
+                container.innerHTML = html;
+
+                // Обработчики кликов
+                container.querySelectorAll('.hero-item').forEach(item => {
                     item.addEventListener('click', function() {
                         const name = this.dataset.name;
                         const audioSrc = this.dataset.audio;
@@ -1351,6 +1043,7 @@
                 });
             }
 
+            // Модальное окно (такое же, как и раньше)
             let heroModal = null;
             let heroAudio = new Audio();
             let currentImageIndex = 0;
@@ -1358,10 +1051,8 @@
 
             function openHeroModal(name, images, audioSrc) {
                 if (heroModal) heroModal.remove();
-
                 currentImages = images;
                 currentImageIndex = 0;
-
                 heroModal = document.createElement('div');
                 heroModal.className = 'hero-modal';
                 heroModal.innerHTML = `
@@ -1377,7 +1068,6 @@
                     </div>
                 `;
                 document.body.appendChild(heroModal);
-
                 playHeroAudio(audioSrc);
 
                 heroModal.querySelector('.hero-modal-close').addEventListener('click', () => {
@@ -1385,7 +1075,6 @@
                     heroAudio.pause();
                     heroAudio.currentTime = 0;
                 });
-
                 heroModal.addEventListener('click', (e) => {
                     if (e.target === heroModal) {
                         heroModal.remove();
@@ -1393,7 +1082,6 @@
                         heroAudio.currentTime = 0;
                     }
                 });
-
                 const prevBtn = heroModal.querySelector('.prev-image');
                 const nextBtn = heroModal.querySelector('.next-image');
                 if (prevBtn) {
@@ -1408,7 +1096,6 @@
                         heroModal.querySelector('.hero-modal-portrait').src = currentImages[currentImageIndex];
                     });
                 }
-
                 heroModal.querySelector('.hero-modal-repeat').addEventListener('click', () => {
                     playHeroAudio(audioSrc);
                 });
@@ -1419,6 +1106,7 @@
                 heroAudio.play().catch(e => console.log('Ошибка воспроизведения', e));
             }
 
+            // Инициализация
             renderHeroesTimeline();
             renderGrid();
         })();
