@@ -634,192 +634,165 @@
             border-top: 1px solid var(--border);
         }
 
-        /* === УЛУЧШЕННАЯ ЛИНИЯ ВРЕМЕНИ === */
+        /* Линия времени */
         .heroes-timeline {
             max-width: 100%;
-            margin: 30px 0;
+            margin: 20px 0;
             padding: 0 10px;
         }
-
         .timeline-century-block {
-            position: relative;
-            min-height: 600px; /* Фиксированная высота для пропорционального масштабирования */
-            margin-bottom: 60px;
-            padding-left: 90px; /* Место для оси времени */
+            margin-bottom: 40px;
         }
-
         .timeline-century-title {
-            font-size: 1.8rem;
+            font-size: 1.5rem;
             font-weight: 700;
             color: var(--accent);
-            margin-bottom: 20px;
-            padding-left: 10px;
-            border-left: 4px solid var(--accent);
-            text-shadow: 0 0 20px var(--accent-glow);
+            margin-bottom: 15px;
         }
-
-        .timeline-axis-container {
+        .timeline-track-wrapper {
             position: relative;
-            height: 100%;
-            min-height: 500px;
-        }
-
-        .timeline-main-line {
-            position: absolute;
-            left: 30px;
-            top: 0;
-            bottom: 0;
-            width: 3px;
-            background: linear-gradient(to bottom, transparent, var(--accent), var(--accent), transparent);
-            border-radius: 2px;
-        }
-
-        .decade-marker {
-            position: absolute;
-            left: 0;
-            transform: translateY(-50%);
             display: flex;
             align-items: center;
-            gap: 12px;
-            transition: opacity 0.3s;
         }
-
-        .decade-dot {
-            width: 10px;
-            height: 10px;
-            background: var(--bg);
-            border: 2px solid var(--accent);
-            border-radius: 50%;
-            box-shadow: 0 0 8px var(--accent-glow);
-        }
-
-        .decade-year {
-            font-size: 0.85rem;
-            color: var(--text-secondary);
-            font-weight: 600;
-            background: var(--bg-card);
-            padding: 2px 8px;
-            border-radius: 4px;
-            border: 1px solid var(--border);
-        }
-
-        .hero-card {
-            position: absolute;
-            left: 60px;
-            transform: translateY(-50%);
+        .timeline-track {
             display: flex;
             align-items: center;
-            gap: 15px;
-            padding: 12px 16px;
+            width: 100%;
+            position: relative;
+            overflow-x: auto;
+            padding: 80px 20px;
             background: var(--bg-card);
             border: 1px solid var(--border);
             border-radius: var(--radius);
-            cursor: pointer;
-            transition: all var(--transition);
-            width: calc(100% - 80px);
-            max-width: 500px;
-            z-index: 5;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            scroll-behavior: smooth;
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+            cursor: grab;
+            user-select: none;
         }
-
-        /* Линия-коннектор к оси времени */
-        .hero-card::before {
+        .timeline-track:active {
+            cursor: grabbing;
+        }
+        .timeline-track::-webkit-scrollbar {
+            height: 6px;
+            background: transparent;
+        }
+        .timeline-track:hover::-webkit-scrollbar-thumb {
+            background: var(--accent);
+            border-radius: 10px;
+        }
+        .timeline-track::-webkit-scrollbar-thumb {
+            background: transparent;
+        }
+        .timeline-track-wrapper::before,
+        .timeline-track-wrapper::after {
             content: '';
             position: absolute;
-            left: -32px;
-            top: 50%;
-            transform: translateY(-50%);
-            width: 30px;
-            height: 2px;
-            background: var(--accent);
-            opacity: 0.4;
-            transition: opacity 0.3s, width 0.3s;
+            top: 0;
+            bottom: 0;
+            width: 50px;
+            pointer-events: none;
+            z-index: 3;
+            opacity: 0;
+            transition: opacity 0.3s ease;
         }
-
-        .hero-card::after {
-            content: '';
+        .timeline-track-wrapper::before {
+            left: 0;
+            background: linear-gradient(to right, var(--bg) 20%, transparent);
+        }
+        .timeline-track-wrapper::after {
+            right: 0;
+            background: linear-gradient(to left, var(--bg) 20%, transparent);
+        }
+        .timeline-track-wrapper:hover::before,
+        .timeline-track-wrapper:hover::after {
+            opacity: 1;
+        }
+        .timeline-line {
             position: absolute;
-            left: -36px;
             top: 50%;
-            transform: translateY(-50%);
-            width: 8px;
-            height: 8px;
+            left: 20px;
+            right: 20px;
+            height: 3px;
             background: var(--accent);
-            border-radius: 50%;
-            box-shadow: 0 0 8px var(--accent-glow);
             opacity: 0.6;
-            transition: opacity 0.3s, transform 0.3s;
+            z-index: 0;
         }
-
-        .hero-card:hover {
-            border-color: var(--accent);
-            transform: translateY(-50%) translateX(8px);
-            box-shadow: 0 4px 20px var(--accent-glow);
-            z-index: 20;
-            background: var(--bg-card-hover);
-        }
-
-        .hero-card:hover::before {
-            opacity: 1;
-            width: 34px;
-        }
-
-        .hero-card:hover::after {
-            opacity: 1;
-            transform: translateY(-50%) scale(1.3);
-        }
-
-        .hero-image {
-            width: 70px;
-            height: 70px;
-            border-radius: 50%;
-            object-fit: cover;
-            border: 2px solid var(--accent);
-            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
-            flex-shrink: 0;
-        }
-
-        .hero-info {
-            flex: 1;
-        }
-
-        .hero-name {
-            font-size: 1.2rem;
-            font-weight: 700;
-            color: var(--text);
-            margin-bottom: 4px;
-        }
-
-        .hero-lifespan {
-            font-size: 1rem;
-            font-weight: 700;
-            color: var(--accent);
-            text-shadow: 0 0 10px var(--accent-glow);
-            letter-spacing: 0.05em;
-        }
-
-        /* Пузырь с годом при скролле */
-        .year-bubble {
-            position: fixed;
+        .century-midpoint {
+            position: absolute;
             top: 50%;
             left: 50%;
-            transform: translate(-50%, -50%) scale(0.8);
-            background: var(--accent);
-            color: white;
-            padding: 10px 24px;
-            border-radius: 30px;
-            font-weight: 700;
-            font-size: 1.2rem;
-            box-shadow: 0 8px 30px var(--accent-glow);
-            pointer-events: none;
-            opacity: 0;
-            transition: opacity 0.3s, transform 0.3s;
-            z-index: 1000;
+            transform: translate(-50%, -50%);
+            width: 4px;
+            height: 60px;
+            background: linear-gradient(to bottom, transparent, var(--accent), transparent);
+            z-index: 1;
+            box-shadow: 0 0 10px var(--accent-glow);
         }
-
-        .year-bubble.show {
-            opacity: 1;
-            transform: translate(-50%, -50%) scale(1);
+        .hero-item {
+            position: relative;
+            z-index: 1;
+            margin: 0 15px;
+            cursor: pointer;
+            transition: transform 0.2s;
+            flex-shrink: 0;
+            text-align: center;
+            scroll-snap-align: center;
         }
+        .hero-item img {
+            width: 90px;
+            height: 90px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 3px solid var(--accent);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.4);
+        }
+        .hero-item:hover {
+            transform: scale(1.1);
+        }
+        .hero-item span {
+            display: block;
+            font-size: 0.85rem;
+            color: var(--text);
+            margin-top: 6px;
+            max-width: 100px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .hero-years {
+            font-size: 0.75rem;
+            color: var(--accent);
+            font-weight: 600;
+            margin-top: 2px;
+        }
+        .scroll-arrow {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            color: var(--text);
+            border-radius: 50%;
+            width: 44px;
+            height: 44px;
+            cursor: pointer;
+            font-size: 1.8rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: var(--transition);
+            z-index: 2;
+        }
+        .scroll-arrow:hover {
+            border-color: var(--accent);
+            color: var(--accent);
+            box-shadow: 0 0 10px var(--accent-glow);
+        }
+        .scroll-arrow.left { left: 10px; }
+        .scroll-arrow.right { right: 10px; }
 
         /* Модальное окно героя */
         .hero-modal {
@@ -828,8 +801,7 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(10, 14, 23, 0.95);
-            backdrop-filter: blur(5px);
+            background: var(--bg);
             z-index: 5000;
             display: flex;
             align-items: center;
@@ -881,7 +853,7 @@
         }
         .hero-modal-portrait {
             max-width: 90%;
-            max-height: 65vh;
+            max-height: 70vh;
             object-fit: contain;
             border-radius: 8px;
             box-shadow: 0 10px 40px rgba(0,0,0,0.6);
@@ -899,16 +871,16 @@
             right: 0;
             display: flex;
             justify-content: space-between;
-            padding: 0 20px;
+            padding: 0 10px;
             z-index: 10;
         }
         .hero-modal-nav button {
             background: rgba(0,0,0,0.4);
             border: none;
             color: white;
-            font-size: 3rem;
-            width: 60px;
-            height: 60px;
+            font-size: 4rem;
+            width: 70px;
+            height: 70px;
             cursor: pointer;
             display: flex;
             align-items: center;
@@ -922,15 +894,16 @@
 
         @media (max-width: 1024px) {
             .syllable-grid { grid-template-columns: repeat(3, 1fr); gap: 8px; }
-            .timeline-century-block { padding-left: 70px; }
-            .timeline-main-line { left: 20px; }
-            .hero-card { left: 45px; width: calc(100% - 60px); }
-            .hero-card::before { left: -27px; width: 25px; }
-            .hero-card::after { left: -31px; }
         }
-
         @media (max-width: 600px) {
-            .exam-exit-btn { top: auto; bottom: 10px; left: 10px; width: 34px; height: 34px; font-size: 1.1rem; }
+            .exam-exit-btn {
+                top: auto;
+                bottom: 10px;
+                left: 10px;
+                width: 34px;
+                height: 34px;
+                font-size: 1.1rem;
+            }
             .syllable-grid { grid-template-columns: repeat(2, 1fr); gap: 5px; }
             .syllable-card { font-size: 0.95rem; padding: 10px 4px; min-height: 45px; }
             .learn-dot { width: 10px; height: 10px; bottom: 3px; right: 4px; }
@@ -942,27 +915,8 @@
             .theme-cycle button { width: 32px; height: 32px; }
             .header { padding: 16px 12px 10px; }
             .section-switch-btn { padding: 8px 16px; font-size: 1rem; }
-            .hero-modal-nav button { width: 45px; height: 45px; font-size: 2rem; }
-            
-            /* Мобильная адаптация таймлайна */
-            .timeline-century-block { 
-                padding-left: 50px; 
-                min-height: 400px;
-            }
-            .timeline-main-line { left: 15px; }
-            .decade-marker { gap: 6px; }
-            .decade-year { font-size: 0.75rem; padding: 2px 6px; }
-            .decade-dot { width: 8px; height: 8px; }
-            .hero-card { 
-                left: 35px; 
-                width: calc(100% - 45px); 
-                padding: 10px;
-            }
-            .hero-card::before { left: -22px; width: 20px; }
-            .hero-card::after { left: -26px; width: 6px; height: 6px; }
-            .hero-image { width: 55px; height: 55px; }
-            .hero-name { font-size: 1rem; }
-            .hero-lifespan { font-size: 0.9rem; }
+            .hero-item img { width: 70px; height: 70px; }
+            .hero-modal-nav button { width: 50px; height: 50px; font-size: 3rem; }
         }
     </style>
 </head>
@@ -1012,8 +966,6 @@
             <div class="heroes-timeline" id="heroesTimeline"></div>
         </section>
     </div>
-
-    <div class="year-bubble" id="yearBubble"></div>
 
     <button class="scroll-top-btn" id="scrollTopBtn" title="Наверх">↑</button>
 
@@ -1109,7 +1061,6 @@
             const syllablesSection = document.getElementById('syllablesSection');
             const heroesSection = document.getElementById('heroesSection');
             const heroesTimeline = document.getElementById('heroesTimeline');
-            const yearBubble = document.getElementById('yearBubble');
 
             let currentMode = 'all';
             let randomItems = [];
@@ -1119,7 +1070,6 @@
             let examScore = 0;
             let currentExamCorrect = '';
             let currentSection = 'syllables';
-            let bubbleTimeout;
 
             const themeList = [
                 'theme-blue', 'theme-green', 'theme-red', 'theme-orange',
@@ -1387,7 +1337,7 @@
                 }
                 examNextBtn.classList.remove('show');
                 examRepeatBtn.style.display = 'flex';
-                showToast('Выход из викторины', 'info');
+                showToast('💔', 'info');
             });
             examRepeatBtn.addEventListener('click', () => {
                 if (currentExamCorrect) playAudio(currentExamCorrect);
@@ -1431,152 +1381,160 @@
             }
 
             const heroesData = [
-                { name: "Александров", birthYear: 1905, deathYear: 1994, images: ["Александров.jpg"], audio: "Александров.wav" },
-                { name: "Белинский", birthYear: 1811, deathYear: 1848, images: ["Белинский.jpg"], audio: "Белинский.wav" },
-                { name: "Бородин", birthYear: 1833, deathYear: 1887, images: ["Бородин.jpg"], audio: "Бородин.wav" },
-                { name: "Брежнев", birthYear: 1906, deathYear: 1982, images: ["Брежнев.jpg"], audio: "Брежнев.wav" },
-                { name: "Ворошилов", birthYear: 1881, deathYear: 1969, images: ["Ворошилов.jpg","Ворошилов2.jpg","Ворошилов3.jpg"], audio: "Ворошилов.wav" },
-                { name: "Гагарин", birthYear: 1934, deathYear: 1968, images: ["Гагарин.jpg"], audio: "Гагарин.wav" },
-                { name: "Глинка", birthYear: 1804, deathYear: 1857, images: ["Глинка.jpg"], audio: "Глинка.wav" },
-                { name: "Гоголь", birthYear: 1809, deathYear: 1852, images: ["Гоголь.jpg"], audio: "Гоголь.wav" },
-                { name: "Горький", birthYear: 1868, deathYear: 1936, images: ["Горький.jpg","Горький2.jpg","Горький 3.jpg"], audio: "Горький.wav" },
-                { name: "Даргомыжский", birthYear: 1813, deathYear: 1869, images: ["Даргомыжский.jpg"], audio: "Даргомыжский.wav" },
-                { name: "Добролюбов", birthYear: 1836, deathYear: 1861, images: ["Добролюбов.jpg"], audio: "Добролюбов.wav" },
-                { name: "Жуковский", birthYear: 1783, deathYear: 1852, images: ["Жуковский.jpg"], audio: "Жуковский.wav" },
-                { name: "Карпинский", birthYear: 1846, deathYear: 1936, images: ["Карпинкий.jpg"], audio: "Карпинский.wav" },
-                { name: "Курчатов", birthYear: 1902, deathYear: 1960, images: ["Курчатов.jpg"], audio: "Курчатов.wav" },
-                { name: "Ленин", birthYear: 1870, deathYear: 1924, images: ["Ленин.jpg","Ленин2.jpg","Ленин3.jpg","Ленин4.jpg","Ленин5.jpg"], audio: "Ленин.wav" },
-                { name: "Лермонтов", birthYear: 1814, deathYear: 1841, images: ["Лермонтов.jpg"], audio: "Лермонтов.wav" },
-                { name: "Ломоносов", birthYear: 1711, deathYear: 1765, images: ["Ломоносов.jpeg"], audio: "Ломоносов.wav" },
-                { name: "Макаренко", birthYear: 1888, deathYear: 1939, images: ["Макаренко.jpg"], audio: "Макаренко.wav" },
-                { name: "Маяковский", birthYear: 1893, deathYear: 1930, images: ["Маяковский.jpg"], audio: "Маяковский.wav" },
-                { name: "Менделеев", birthYear: 1834, deathYear: 1907, images: ["Менделеев.jpg"], audio: "Менделеев.wav" },
-                { name: "Мечников", birthYear: 1845, deathYear: 1916, images: ["Мечников.jpg"], audio: "Мечников.wav" },
-                { name: "Мичурин", birthYear: 1855, deathYear: 1935, images: ["Мичурин.jpg","Мичурин2.jpg","Мичурин3.jpg"], audio: "Мичурин.wav" },
-                { name: "Молотов", birthYear: 1890, deathYear: 1986, images: ["Молотов.jpg"], audio: "Молотов.wav" },
-                { name: "Мусоргский", birthYear: 1839, deathYear: 1881, images: ["Мусоргский.jpg"], audio: "Мусоргский.wav" },
-                { name: "Некрасов", birthYear: 1821, deathYear: 1878, images: ["Некрасов.jpg"], audio: "Некрасов.wav" },
-                { name: "Островский", birthYear: 1823, deathYear: 1886, images: ["Островский.jpg"], audio: "Островский.wav" },
-                { name: "Павлов", birthYear: 1849, deathYear: 1936, images: ["Павлов.png"], audio: "Павлов.wav" },
-                { name: "Папанин", birthYear: 1894, deathYear: 1986, images: ["Папанин.jpg"], audio: "Папанин.wav" },
-                { name: "Пётр I", birthYear: 1672, deathYear: 1725, images: ["Петр.jpg","Пётр2.jpg"], audio: "Первый.wav" },
-                { name: "Писарев", birthYear: 1840, deathYear: 1868, images: ["Писарев.jpg"], audio: "Писарев.wav" },
-                { name: "Попов", birthYear: 1859, deathYear: 1906, images: ["Попов.jpg"], audio: "Попов.wav" },
-                { name: "Пушкин", birthYear: 1799, deathYear: 1837, images: ["Пушкин.jpg","Пушкин3.jpg"], audio: "Пушкин.wav" },
-                { name: "Репин", birthYear: 1844, deathYear: 1930, images: ["Репин.jpg"], audio: "Репин.wav" },
-                { name: "Римский-Корсаков", birthYear: 1844, deathYear: 1908, images: ["Римский-Корсаков.jpg"], audio: "Римский-Корсаков.wav" },
-                { name: "Салтыков-Щедрин", birthYear: 1826, deathYear: 1889, images: ["Салтыков-Щедрин.jpg"], audio: "Салтыков-Щедрин.wav" },
-                { name: "Семашко", birthYear: 1874, deathYear: 1949, images: ["Семашко.jpg"], audio: "Семашко.wav" },
-                { name: "Сеченов", birthYear: 1829, deathYear: 1905, images: ["Сеченов.jpg"], audio: "Сеченов.wav" },
-                { name: "Сталин", birthYear: 1878, deathYear: 1953, images: ["Сталин.jpg","Сталин2.jpg","Сталин3.jpg","Сталин4.jpg","Сталин5.jpg","Сталин6.jpg","Сталин7.jpg","Сталин8.jpg","Сталин9.jpg"], audio: "Сталин.wav" },
-                { name: "Суворов", birthYear: 1729, deathYear: 1800, images: ["Суворов.jpg"], audio: "Суворов.wav" },
-                { name: "Толстой", birthYear: 1828, deathYear: 1910, images: ["Толстой.jpg","Толстой2.jpg","Толстой3.jpg","Толстой4.jpg"], audio: "Толстой.wav" },
-                { name: "Тургенев", birthYear: 1818, deathYear: 1883, images: ["Тургенев.jpg"], audio: "Тургенев.wav" },
-                { name: "Фрунзе", birthYear: 1885, deathYear: 1925, images: ["Фрунзе.jpg"], audio: "Фрунзе.wav" },
-                { name: "Циолковский", birthYear: 1857, deathYear: 1935, images: ["Циолковский.jpg"], audio: "Циолковский.wav" },
-                { name: "Чайковский", birthYear: 1840, deathYear: 1893, images: ["Чайковский.jpg"], audio: "Чайковский.wav" },
-                { name: "Чернышевский", birthYear: 1828, deathYear: 1889, images: ["Чернышевский.jpg"], audio: "Чернышевский.wav" },
-                { name: "Чехов", birthYear: 1860, deathYear: 1904, images: ["Чехов.jpg"], audio: "Чехов.wav" },
-                { name: "Шишкин", birthYear: 1832, deathYear: 1898, images: ["Шишкин.jpg"], audio: "Шишкин.wav" },
-                { name: "Шолохов", birthYear: 1905, deathYear: 1984, images: ["Шолохов.jpg"], audio: "Шолохов.wav" }
+                { name: "Александров", birthYear: 1905, deathYear: 1994, category: "musician", images: ["Александров.jpg"], audio: "Александров.wav" },
+                { name: "Белинский", birthYear: 1811, deathYear: 1848, category: "writer", images: ["Белинский.jpg"], audio: "Белинский.wav" },
+                { name: "Бородин", birthYear: 1833, deathYear: 1887, category: "composer", images: ["Бородин.jpg"], audio: "Бородин.wav" },
+                { name: "Брежнев", birthYear: 1906, deathYear: 1982, category: "politician", images: ["Брежнев.jpg"], audio: "Брежнев.wav" },
+                { name: "Ворошилов", birthYear: 1881, deathYear: 1969, category: "politician", images: ["Ворошилов.jpg","Ворошилов2.jpg","Ворошилов3.jpg"], audio: "Ворошилов.wav" },
+                { name: "Гагарин", birthYear: 1934, deathYear: 1968, category: "explorer", images: ["Гагарин.jpg"], audio: "Гагарин.wav" },
+                { name: "Глинка", birthYear: 1804, deathYear: 1857, category: "composer", images: ["Глинка.jpg"], audio: "Глинка.wav" },
+                { name: "Гоголь", birthYear: 1809, deathYear: 1852, category: "writer", images: ["Гоголь.jpg"], audio: "Гоголь.wav" },
+                { name: "Горький", birthYear: 1868, deathYear: 1936, category: "writer", images: ["Горький.jpg","Горький2.jpg","Горький 3.jpg"], audio: "Горький.wav" },
+                { name: "Даргомыжский", birthYear: 1813, deathYear: 1869, category: "composer", images: ["Даргомыжский.jpg"], audio: "Даргомыжский.wav" },
+                { name: "Добролюбов", birthYear: 1836, deathYear: 1861, category: "writer", images: ["Добролюбов.jpg"], audio: "Добролюбов.wav" },
+                { name: "Жуковский", birthYear: 1783, deathYear: 1852, category: "writer", images: ["Жуковский.jpg"], audio: "Жуковский.wav" },
+                { name: "Карпинский", birthYear: 1846, deathYear: 1936, category: "scientist", images: ["Карпинкий.jpg"], audio: "Карпинский.wav" },
+                { name: "Курчатов", birthYear: 1902, deathYear: 1960, category: "scientist", images: ["Курчатов.jpg"], audio: "Курчатов.wav" },
+                { name: "Ленин", birthYear: 1870, deathYear: 1924, category: "politician", images: ["Ленин.jpg","Ленин2.jpg","Ленин3.jpg","Ленин4.jpg","Ленин5.jpg"], audio: "Ленин.wav" },
+                { name: "Лермонтов", birthYear: 1814, deathYear: 1841, category: "writer", images: ["Лермонтов.jpg"], audio: "Лермонтов.wav" },
+                { name: "Ломоносов", birthYear: 1711, deathYear: 1765, category: "scientist", images: ["Ломоносов.jpeg"], audio: "Ломоносов.wav" },
+                { name: "Макаренко", birthYear: 1888, deathYear: 1939, category: "educator", images: ["Макаренко.jpg"], audio: "Макаренко.wav" },
+                { name: "Маяковский", birthYear: 1893, deathYear: 1930, category: "writer", images: ["Маяковский.jpg"], audio: "Маяковский.wav" },
+                { name: "Менделеев", birthYear: 1834, deathYear: 1907, category: "scientist", images: ["Менделеев.jpg"], audio: "Менделеев.wav" },
+                { name: "Мечников", birthYear: 1845, deathYear: 1916, category: "scientist", images: ["Мечников.jpg"], audio: "Мечников.wav" },
+                { name: "Мичурин", birthYear: 1855, deathYear: 1935, category: "scientist", images: ["Мичурин.jpg","Мичурин2.jpg","Мичурин3.jpg"], audio: "Мичурин.wav" },
+                { name: "Молотов", birthYear: 1890, deathYear: 1986, category: "politician", images: ["Молотов.jpg"], audio: "Молотов.wav" },
+                { name: "Мусоргский", birthYear: 1839, deathYear: 1881, category: "composer", images: ["Мусоргский.jpg"], audio: "Мусоргский.wav" },
+                { name: "Некрасов", birthYear: 1821, deathYear: 1878, category: "writer", images: ["Некрасов.jpg"], audio: "Некрасов.wav" },
+                { name: "Островский", birthYear: 1823, deathYear: 1886, category: "writer", images: ["Островский.jpg"], audio: "Островский.wav" },
+                { name: "Павлов", birthYear: 1849, deathYear: 1936, category: "scientist", images: ["Павлов.png"], audio: "Павлов.wav" },
+                { name: "Папанин", birthYear: 1894, deathYear: 1986, category: "explorer", images: ["Папанин.jpg"], audio: "Папанин.wav" },
+                { name: "Пётр I", birthYear: 1672, deathYear: 1725, category: "politician", images: ["Петр.jpg","Пётр2.jpg"], audio: "Первый.wav" },
+                { name: "Писарев", birthYear: 1840, deathYear: 1868, category: "writer", images: ["Писарев.jpg"], audio: "Писарев.wav" },
+                { name: "Попов", birthYear: 1859, deathYear: 1906, category: "scientist", images: ["Попов.jpg"], audio: "Попов.wav" },
+                { name: "Пушкин", birthYear: 1799, deathYear: 1837, category: "writer", images: ["Пушкин.jpg","Пушкин3.jpg"], audio: "Пушкин.wav" },
+                { name: "Репин", birthYear: 1844, deathYear: 1930, category: "artist", images: ["Репин.jpg"], audio: "Репин.wav" },
+                { name: "Римский-Корсаков", birthYear: 1844, deathYear: 1908, category: "composer", images: ["Римский-Корсаков.jpg"], audio: "Римский-Корсаков.wav" },
+                { name: "Салтыков-Щедрин", birthYear: 1826, deathYear: 1889, category: "writer", images: ["Салтыков-Щедрин.jpg"], audio: "Салтыков-Щедрин.wav" },
+                { name: "Семашко", birthYear: 1874, deathYear: 1949, category: "educator", images: ["Семашко.jpg"], audio: "Семашко.wav" },
+                { name: "Сеченов", birthYear: 1829, deathYear: 1905, category: "scientist", images: ["Сеченов.jpg"], audio: "Сеченов.wav" },
+                { name: "Сталин", birthYear: 1878, deathYear: 1953, category: "politician", images: ["Сталин.jpg","Сталин2.jpg","Сталин3.jpg","Сталин4.jpg","Сталин5.jpg","Сталин6.jpg","Сталин7.jpg","Сталин8.jpg","Сталин9.jpg"], audio: "Сталин.wav" },
+                { name: "Суворов", birthYear: 1729, deathYear: 1800, category: "military", images: ["Суворов.jpg"], audio: "Суворов.wav" },
+                { name: "Толстой", birthYear: 1828, deathYear: 1910, category: "writer", images: ["Толстой.jpg","Толстой2.jpg","Толстой3.jpg","Толстой4.jpg"], audio: "Толстой.wav" },
+                { name: "Тургенев", birthYear: 1818, deathYear: 1883, category: "writer", images: ["Тургенев.jpg"], audio: "Тургенев.wav" },
+                { name: "Фрунзе", birthYear: 1885, deathYear: 1925, category: "politician", images: ["Фрунзе.jpg"], audio: "Фрунзе.wav" },
+                { name: "Циолковский", birthYear: 1857, deathYear: 1935, category: "scientist", images: ["Циолковский.jpg"], audio: "Циолковский.wav" },
+                { name: "Чайковский", birthYear: 1840, deathYear: 1893, category: "composer", images: ["Чайковский.jpg"], audio: "Чайковский.wav" },
+                { name: "Чернышевский", birthYear: 1828, deathYear: 1889, category: "writer", images: ["Чернышевский.jpg"], audio: "Чернышевский.wav" },
+                { name: "Чехов", birthYear: 1860, deathYear: 1904, category: "writer", images: ["Чехов.jpg"], audio: "Чехов.wav" },
+                { name: "Шишкин", birthYear: 1832, deathYear: 1898, category: "artist", images: ["Шишкин.jpg"], audio: "Шишкин.wav" },
+                { name: "Шолохов", birthYear: 1905, deathYear: 1984, category: "writer", images: ["Шолохов.jpg"], audio: "Шолохов.wav" }
             ];
 
             function renderHeroesTimeline() {
                 if (!heroesTimeline) return;
                 
                 const centuries = {
-                    "XVII век": { start: 1600, heroes: heroesData.filter(h => h.birthYear >= 1600 && h.birthYear < 1700) },
-                    "XVIII век": { start: 1700, heroes: heroesData.filter(h => h.birthYear >= 1700 && h.birthYear < 1800) },
-                    "XIX век": { start: 1800, heroes: heroesData.filter(h => h.birthYear >= 1800 && h.birthYear < 1900) },
-                    "XX век": { start: 1900, heroes: heroesData.filter(h => h.birthYear >= 1900 && h.birthYear < 2000) }
+                    "XVII век": heroesData.filter(h => h.birthYear >= 1600 && h.birthYear < 1700),
+                    "XVIII век": heroesData.filter(h => h.birthYear >= 1700 && h.birthYear < 1800),
+                    "XIX век": heroesData.filter(h => h.birthYear >= 1800 && h.birthYear < 1900),
+                    "XX век": heroesData.filter(h => h.birthYear >= 1900 && h.birthYear < 2000)
                 };
 
                 let html = '';
-                for (const [centuryName, data] of Object.entries(centuries)) {
-                    if (data.heroes.length === 0) continue;
-
+                for (const [century, heroes] of Object.entries(centuries)) {
+                    if (heroes.length === 0) continue;
+                    
                     html += `<div class="timeline-century-block">`;
-                    html += `<div class="timeline-century-title">${centuryName}</div>`;
-                    html += `<div class="timeline-axis-container">`;
-                    html += `<div class="timeline-main-line"></div>`;
-
-                    // Отметки десятилетий (строго пропорционально)
-                    for (let year = data.start; year < data.start + 100; year += 10) {
-                        const topPercent = ((year - data.start) / 100) * 100;
-                        html += `
-                            <div class="decade-marker" style="top: ${topPercent}%;" data-year="${year}">
-                                <div class="decade-dot"></div>
-                                <span class="decade-year">${year} г.</span>
-                            </div>
-                        `;
-                    }
-
-                    // Карточки героев (позиционирование по середине жизни)
-                    data.heroes.sort((a, b) => a.birthYear - b.birthYear);
-                    data.heroes.forEach((hero, index) => {
-                        const midYear = (hero.birthYear + hero.deathYear) / 2;
-                        const topPercent = ((midYear - data.start) / 100) * 100;
+                    html += `<div class="timeline-century-title">${century}</div>`;
+                    html += `<div class="timeline-track-wrapper">`;
+                    html += `<button class="scroll-arrow left" data-target="${century}">‹</button>`;
+                    html += `<div class="timeline-track" data-century="${century}">`;
+                    html += `<div class="timeline-line"></div>`;
+                    html += `<div class="century-midpoint"></div>`;
+                    
+                    heroes.sort((a, b) => a.deathYear - b.deathYear);
+                    heroes.forEach(hero => {
                         const imagePath = `Great Rus/${hero.images[0]}`;
+                        const age = hero.deathYear - hero.birthYear;
+                        const yearsText = `${hero.birthYear}—${hero.deathYear} (${age})`;
                         
-                        // Небольшое смещение для предотвращения полного наложения карточек
-                        const offset = index % 2 === 0 ? 0 : 15; 
-
                         html += `
-                            <div class="hero-card" 
-                                 style="top: calc(${topPercent}% + ${offset}px);"
-                                 data-name="${hero.name}" 
-                                 data-audio="Great Rus/${hero.audio}" 
-                                 data-images='${JSON.stringify(hero.images.map(img => "Great Rus/" + img))}'>
-                                <img src="${imagePath}" alt="${hero.name}" class="hero-image" loading="lazy">
-                                <div class="hero-info">
-                                    <div class="hero-name">${hero.name}</div>
-                                    <div class="hero-lifespan">${hero.birthYear} — ${hero.deathYear}</div>
-                                </div>
+                            <div class="hero-item" data-name="${hero.name}" data-audio="Great Rus/${hero.audio}" data-images='${JSON.stringify(hero.images.map(img => "Great Rus/" + img))}'>
+                                <img src="${imagePath}" alt="${hero.name}" loading="lazy">
+                                <span>${hero.name}</span>
+                                <div class="hero-years">${yearsText}</div>
                             </div>
                         `;
                     });
-
+                    html += `</div>`;
+                    html += `<button class="scroll-arrow right" data-target="${century}">›</button>`;
                     html += `</div></div>`;
                 }
 
                 heroesTimeline.innerHTML = html;
 
-                // Обработчики кликов по карточкам
-                heroesTimeline.querySelectorAll('.hero-card').forEach(card => {
-                    card.addEventListener('click', function() {
-                        openHeroModal(this.dataset.name, JSON.parse(this.dataset.images), this.dataset.audio);
+                heroesTimeline.querySelectorAll('.hero-item').forEach(item => {
+                    item.addEventListener('click', function() {
+                        const name = this.dataset.name;
+                        const audioSrc = this.dataset.audio;
+                        const images = JSON.parse(this.dataset.images);
+                        openHeroModal(name, images, audioSrc);
                     });
                 });
 
-                // Intersection Observer для пузырей с годами при скролле
-                const observerOptions = {
-                    root: null,
-                    rootMargin: '-40% 0px -40% 0px', // Срабатывает, когда элемент в центральной полосе экрана
-                    threshold: 0
-                };
-
-                const observer = new IntersectionObserver((entries) => {
-                    entries.forEach(entry => {
-                        if (entry.isIntersecting) {
-                            const year = entry.target.dataset.year;
-                            showYearBubble(year);
+                heroesTimeline.querySelectorAll('.scroll-arrow').forEach(btn => {
+                    btn.addEventListener('click', function() {
+                        const target = this.dataset.target;
+                        const track = heroesTimeline.querySelector(`.timeline-track[data-century="${target}"]`);
+                        if (track) {
+                            const scrollAmount = 300;
+                            if (this.classList.contains('left')) {
+                                track.scrollBy({ left: -scrollAmount, behavior: 'smooth' });
+                            } else {
+                                track.scrollBy({ left: scrollAmount, behavior: 'smooth' });
+                            }
                         }
                     });
-                }, observerOptions);
-
-                document.querySelectorAll('.decade-marker').forEach(marker => {
-                    observer.observe(marker);
                 });
-            }
 
-            function showYearBubble(year) {
-                yearBubble.textContent = `${year}-е годы`;
-                yearBubble.classList.add('show');
-                
-                clearTimeout(bubbleTimeout);
-                bubbleTimeout = setTimeout(() => {
-                    yearBubble.classList.remove('show');
-                }, 1500);
+                document.querySelectorAll('.timeline-track').forEach(track => {
+                    let isDown = false;
+                    let startX;
+                    let scrollLeft;
+
+                    track.addEventListener('mousedown', (e) => {
+                        isDown = true;
+                        track.classList.add('active');
+                        startX = e.pageX - track.offsetLeft;
+                        scrollLeft = track.scrollLeft;
+                    });
+
+                    track.addEventListener('mouseleave', () => {
+                        isDown = false;
+                        track.classList.remove('active');
+                    });
+
+                    track.addEventListener('mouseup', () => {
+                        isDown = false;
+                        track.classList.remove('active');
+                    });
+
+                    track.addEventListener('mousemove', (e) => {
+                        if (!isDown) return;
+                        e.preventDefault();
+                        const x = e.pageX - track.offsetLeft;
+                        const walk = (x - startX) * 2;
+                        track.scrollLeft = scrollLeft - walk;
+                    });
+
+                    track.addEventListener('wheel', (e) => {
+                        if (e.shiftKey) {
+                            e.preventDefault();
+                            track.scrollLeft += e.deltaY;
+                        }
+                    }, { passive: false });
+                });
             }
 
             let heroModal = null;
