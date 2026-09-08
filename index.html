@@ -6,7 +6,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=PT+Serif:ital,wght@0,400;0,700;1,400;1,700&display=swap" rel="stylesheet">
+    <!-- Добавлен шрифт PT Sans -->
+    <link href="https://fonts.googleapis.com/css2?family=PT+Sans:wght@400;700&family=PT+Serif:ital,wght@0,400;0,700;1,400;1,700&display=swap" rel="stylesheet">
     <title>Грамотиньо</title>
     <style>
         :root {
@@ -127,14 +128,15 @@
             margin: 8px 0 4px;
         }
 
+        /* Стильный переключатель разделов */
         .section-switch {
             display: inline-flex;
             background: var(--bg-card);
             border: 1px solid var(--border);
-            border-radius: 8px;
-            overflow: hidden;
-            margin-top: 8px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+            border-radius: 50px;
+            padding: 4px;
+            margin-top: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
         }
         .section-switch-btn {
             background: transparent;
@@ -142,19 +144,24 @@
             color: var(--text-secondary);
             padding: 10px 24px;
             cursor: pointer;
-            font-size: 1.2rem;
-            transition: all var(--transition);
+            font-family: 'PT Sans', sans-serif; /* Запрошенный шрифт */
+            font-weight: 600;
+            font-size: 0.95rem;
+            border-radius: 40px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            white-space: nowrap;
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 6px;
         }
         .section-switch-btn.active {
-            background: var(--accent-glow);
-            color: var(--accent);
-            font-weight: 700;
+            background: var(--accent);
+            color: #ffffff;
+            box-shadow: 0 4px 12px var(--accent-glow);
         }
         .section-switch-btn:hover:not(.active) {
             color: var(--text);
+            background: var(--bg-card-hover);
         }
 
         #sectionSubtitle {
@@ -172,19 +179,24 @@
             margin: 0 auto;
             padding: 0 20px;
         }
+        
+        /* Анимация переключения разделов */
         .tab-section {
             display: none;
-            opacity: 0;
-            transition: opacity 0.3s ease;
         }
         .tab-section.active {
             display: block;
-            opacity: 1;
-            animation: fadeIn 0.3s ease;
+            animation: tabEnter 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
         }
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
+        @keyframes tabEnter {
+            from { 
+                opacity: 0; 
+                transform: translateY(15px) scale(0.98); 
+            }
+            to { 
+                opacity: 1; 
+                transform: translateY(0) scale(1); 
+            }
         }
 
         .progress-container {
@@ -726,11 +738,23 @@
         }
 
         .hero-years {
-            font-size: 0.9rem;
+            font-size: 0.95rem;
             color: var(--accent);
             font-weight: 700;
             text-shadow: 0 0 10px var(--accent-glow);
             letter-spacing: 0.03em;
+            display: flex;
+            align-items: baseline;
+            gap: 6px;
+        }
+
+        /* Специальный стиль для возраста (PT Sans, серый, маленький) */
+        .hero-age {
+            font-family: 'PT Sans', sans-serif;
+            font-size: 0.8rem;
+            font-weight: 400;
+            color: var(--text-secondary);
+            opacity: 0.7;
         }
 
         /* Блок СССР */
@@ -908,7 +932,13 @@
             .theme-cycle { top: 6px; left: 10px; }
             .theme-cycle button { width: 32px; height: 32px; }
             .header { padding: 16px 12px 10px; }
-            .section-switch-btn { padding: 8px 16px; font-size: 1rem; }
+            
+            /* Адаптация кнопки переключения для мобильных */
+            .section-switch-btn {
+                padding: 8px 16px;
+                font-size: 0.85rem;
+            }
+            
             .hero-modal-nav button { width: 45px; height: 45px; font-size: 2rem; }
             
             .timeline-container { padding-left: 40px; }
@@ -1146,7 +1176,7 @@
                 } else {
                     heroesSection.classList.add('active');
                     syllablesSection.classList.remove('active');
-                    sectionSubtitle.textContent = 'Великие личности Отечества';
+                    sectionSubtitle.textContent = 'Знакомимся с великими личностями Отечества';
                 }
                 sectionBtns.forEach(btn => {
                     btn.classList.toggle('active', btn.dataset.section === section);
@@ -1453,7 +1483,6 @@
             function renderHeroesTimeline() {
                 if (!heroesTimeline) return;
                 
-                // Обновленная логика: если есть overrideCentury, используем его, иначе считаем по году смерти
                 const centuries = [
                     { 
                         name: "XVIII век", 
@@ -1499,7 +1528,7 @@
                                 </div>
                                 <div class="hero-info">
                                     <div class="hero-name">${hero.name}</div>
-                                    <div class="hero-years">Годы жизни: ${hero.birthYear} — ${hero.deathYear} (${age})</div>
+                                    <div class="hero-years">${hero.birthYear} — ${hero.deathYear} <span class="hero-age">(${age})</span></div>
                                 </div>
                             </div>
                         `;
