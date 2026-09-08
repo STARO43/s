@@ -127,7 +127,6 @@
             margin: 8px 0 4px;
         }
 
-        /* Переключатель раздела */
         .section-switch {
             display: inline-flex;
             background: var(--bg-card);
@@ -158,7 +157,6 @@
             color: var(--text);
         }
 
-        /* Динамический подзаголовок */
         #sectionSubtitle {
             color: var(--text-secondary);
             font-size: 1rem;
@@ -167,7 +165,6 @@
             min-height: 1.2em;
         }
 
-        /* Контейнер секций */
         .content-wrapper {
             flex: 1;
             max-width: 900px;
@@ -322,11 +319,7 @@
             color: var(--text);
             user-select: none;
             -webkit-tap-highlight-color: transparent;
-            transition: background var(--transition),
-                border-color var(--transition),
-                box-shadow var(--transition),
-                transform var(--transition),
-                color 0.3s;
+            transition: background var(--transition), border-color var(--transition), box-shadow var(--transition), transform var(--transition), color 0.3s;
             position: relative;
             font-family: var(--font);
             letter-spacing: 0.04em;
@@ -641,7 +634,7 @@
             border-top: 1px solid var(--border);
         }
 
-        /* Улучшенная линия времени */
+        /* Линия времени */
         .heroes-timeline {
             max-width: 100%;
             margin: 30px 0;
@@ -690,44 +683,6 @@
             background: linear-gradient(to bottom, var(--accent), var(--accent-glow), var(--accent));
             transform: translateX(-50%);
             border-radius: 2px;
-        }
-
-        .decade-marker {
-            position: relative;
-            width: 100%;
-            display: flex;
-            align-items: center;
-            justify-content: flex-end;
-            padding-right: 10px;
-            margin: 20px 0;
-            opacity: 0.7;
-            transition: opacity 0.3s;
-        }
-
-        .decade-marker:hover {
-            opacity: 1;
-        }
-
-        .decade-year {
-            font-size: 0.9rem;
-            font-weight: 700;
-            color: var(--text-secondary);
-            background: var(--bg-card);
-            padding: 4px 8px;
-            border-radius: 6px;
-            border: 1px solid var(--border);
-            white-space: nowrap;
-        }
-
-        .decade-dot {
-            position: absolute;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 12px;
-            height: 12px;
-            background: var(--accent);
-            border-radius: 50%;
-            box-shadow: 0 0 10px var(--accent-glow);
         }
 
         .heroes-track {
@@ -831,35 +786,11 @@
         }
 
         .hero-years {
-            font-size: 0.95rem;
+            font-size: 1rem;
             color: var(--accent);
-            font-weight: 600;
-            margin-bottom: 3px;
-        }
-
-        .hero-lifespan {
-            font-size: 0.85rem;
-            color: var(--text-secondary);
-        }
-
-        .year-bubble {
-            position: fixed;
-            background: var(--accent);
-            color: white;
-            padding: 8px 16px;
-            border-radius: 20px;
             font-weight: 700;
-            font-size: 1.1rem;
-            box-shadow: 0 4px 15px var(--accent-glow);
-            pointer-events: none;
-            opacity: 0;
-            transition: opacity 0.3s;
-            z-index: 1000;
-            transform: translateX(-50%);
-        }
-
-        .year-bubble.show {
-            opacity: 1;
+            text-shadow: 0 0 10px var(--accent-glow);
+            letter-spacing: 0.03em;
         }
 
         /* Модальное окно героя */
@@ -1033,8 +964,8 @@
         <h1>Грамотиньо</h1>
 
         <div class="section-switch">
-            <button class="section-switch-btn active" data-section="syllables"></button>
-            <button class="section-switch-btn" data-section="heroes"></button>
+            <button class="section-switch-btn active" data-section="syllables">Слоги</button>
+            <button class="section-switch-btn" data-section="heroes">Личности</button>
         </div>
 
         <p id="sectionSubtitle">Учим слоги. Жми, слушай, запоминай</p>
@@ -1048,8 +979,8 @@
             </div>
 
             <div class="controls">
-                <button id="normalBtn" class="active" data-tooltip="Все"></button>
-                <button id="randomBtn" data-tooltip="Случайно"></button>
+                <button id="normalBtn" class="active" data-tooltip="Все">🅰</button>
+                <button id="randomBtn" data-tooltip="Случайно">🎲</button>
                 <button id="hideLearnedBtn" data-tooltip="Скрыть/показать">✂</button>
                 <button id="clearLearnedBtn" data-tooltip="Очистить">↩</button>
                 <button id="examBtn" data-tooltip="Викторина">🍓</button>
@@ -1064,8 +995,6 @@
             <div class="heroes-timeline" id="heroesTimeline"></div>
         </section>
     </div>
-
-    <div class="year-bubble" id="yearBubble"></div>
 
     <button class="scroll-top-btn" id="scrollTopBtn" title="Наверх">↑</button>
 
@@ -1161,7 +1090,6 @@
             const syllablesSection = document.getElementById('syllablesSection');
             const heroesSection = document.getElementById('heroesSection');
             const heroesTimeline = document.getElementById('heroesTimeline');
-            const yearBubble = document.getElementById('yearBubble');
 
             let currentMode = 'all';
             let randomItems = [];
@@ -1493,7 +1421,7 @@
                 { name: "Горький", birthYear: 1868, deathYear: 1936, images: ["Горький.jpg","Горький2.jpg","Горький 3.jpg"], audio: "Горький.wav" },
                 { name: "Даргомыжский", birthYear: 1813, deathYear: 1869, images: ["Даргомыжский.jpg"], audio: "Даргомыжский.wav" },
                 { name: "Добролюбов", birthYear: 1836, deathYear: 1861, images: ["Добролюбов.jpg"], audio: "Добролюбов.wav" },
-                { name: "Жуковский", birthYear: 1783, deathYear: 1852, images: ["Жуковский.jpg"], audio: "Жуковский.wav" },
+                { name: "Жуковский", birthYear: 1847, deathYear: 1921, images: ["Жуковский.jpg"], audio: "Жуковский.wav" },
                 { name: "Карпинский", birthYear: 1846, deathYear: 1936, images: ["Карпинкий.jpg"], audio: "Карпинский.wav" },
                 { name: "Курчатов", birthYear: 1902, deathYear: 1960, images: ["Курчатов.jpg"], audio: "Курчатов.wav" },
                 { name: "Ленин", birthYear: 1870, deathYear: 1924, images: ["Ленин.jpg","Ленин2.jpg","Ленин3.jpg","Ленин4.jpg","Ленин5.jpg"], audio: "Ленин.wav" },
@@ -1535,7 +1463,6 @@
             function renderHeroesTimeline() {
                 if (!heroesTimeline) return;
                 
-                // Группировка по векам
                 const centuries = {
                     "XVII век": heroesData.filter(h => h.birthYear >= 1600 && h.birthYear < 1700),
                     "XVIII век": heroesData.filter(h => h.birthYear >= 1700 && h.birthYear < 1800),
@@ -1551,50 +1478,29 @@
                     html += `<div class="timeline-century-title">${century}</div>`;
                     html += `<div class="timeline-container">`;
                     
-                    // Ось времени с десятилетиями
                     html += `<div class="timeline-axis">`;
                     html += `<div class="timeline-main-line"></div>`;
-                    
-                    // Генерация маркеров десятилетий
-                    const startYear = Math.floor(heroes[0].birthYear / 10) * 10;
-                    const endYear = Math.ceil(heroes[heroes.length - 1].birthYear / 10) * 10;
-                    
-                    for (let year = startYear; year <= endYear; year += 10) {
-                        const decadeHeroes = heroes.filter(h => {
-                            const decade = Math.floor(h.birthYear / 10) * 10;
-                            return decade === year;
-                        });
-                        
-                        if (decadeHeroes.length > 0 || year % 50 === 0) {
-                            html += `<div class="decade-marker" data-year="${year}">`;
-                            html += `<div class="decade-dot"></div>`;
-                            html += `<span class="decade-year">${year}-е</span>`;
-                            html += `</div>`;
-                        }
-                    }
-                    
                     html += `</div>`;
                     
-                    // Карточки героев
                     html += `<div class="heroes-track">`;
-                    heroes.sort((a, b) => a.birthYear - b.birthYear);
+                    
+                    // Сортировка по году смерти
+                    heroes.sort((a, b) => a.deathYear - b.deathYear);
+                    
                     heroes.forEach(hero => {
                         const imagePath = `Great Rus/${hero.images[0]}`;
-                        const lifespan = `${hero.birthYear}—${hero.deathYear}`;
                         const age = hero.deathYear - hero.birthYear;
                         
                         html += `
                             <div class="hero-card" 
                                  data-name="${hero.name}" 
-                                 data-birth="${hero.birthYear}"
                                  data-audio="Great Rus/${hero.audio}" 
                                  data-images='${JSON.stringify(hero.images.map(img => "Great Rus/" + img))}'>
                                 <div class="hero-connector"></div>
                                 <img src="${imagePath}" alt="${hero.name}" class="hero-image" loading="lazy">
                                 <div class="hero-info">
                                     <div class="hero-name">${hero.name}</div>
-                                    <div class="hero-years">Родился в ${hero.birthYear} году</div>
-                                    <div class="hero-lifespan">Годы жизни: ${lifespan} (${age} лет)</div>
+                                    <div class="hero-years">Годы жизни: ${hero.birthYear} — ${hero.deathYear} (${age} лет)</div>
                                 </div>
                             </div>
                         `;
@@ -1605,7 +1511,6 @@
 
                 heroesTimeline.innerHTML = html;
 
-                // Обработчики кликов по карточкам
                 heroesTimeline.querySelectorAll('.hero-card').forEach(card => {
                     card.addEventListener('click', function() {
                         const name = this.dataset.name;
@@ -1614,40 +1519,6 @@
                         openHeroModal(name, images, audioSrc);
                     });
                 });
-
-                // Показ пузыря с годом при скролле
-                const decadeMarkers = document.querySelectorAll('.decade-marker');
-                const timelineContainer = document.querySelector('.heroes-timeline');
-                
-                if (timelineContainer && decadeMarkers.length > 0) {
-                    timelineContainer.addEventListener('scroll', () => {
-                        const scrollTop = timelineContainer.scrollTop;
-                        const containerTop = timelineContainer.offsetTop;
-                        
-                        decadeMarkers.forEach(marker => {
-                            const markerTop = marker.offsetTop;
-                            const markerHeight = marker.offsetHeight;
-                            
-                            if (scrollTop + containerTop >= markerTop - 100 && 
-                                scrollTop + containerTop < markerTop + markerHeight + 100) {
-                                const year = marker.dataset.year;
-                                showYearBubble(year, marker);
-                            }
-                        });
-                    });
-                }
-            }
-
-            function showYearBubble(year, element) {
-                const rect = element.getBoundingClientRect();
-                yearBubble.textContent = `${year}-е годы`;
-                yearBubble.style.left = `${rect.left + rect.width / 2}px`;
-                yearBubble.style.top = `${rect.top - 50}px`;
-                yearBubble.classList.add('show');
-                
-                setTimeout(() => {
-                    yearBubble.classList.remove('show');
-                }, 1500);
             }
 
             let heroModal = null;
