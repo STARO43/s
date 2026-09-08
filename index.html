@@ -127,7 +127,6 @@
             margin: 8px 0 4px;
         }
 
-        /* Переключатель раздела */
         .section-switch {
             display: inline-flex;
             background: var(--bg-card);
@@ -158,7 +157,6 @@
             color: var(--text);
         }
 
-        /* Динамический подзаголовок */
         #sectionSubtitle {
             color: var(--text-secondary);
             font-size: 1rem;
@@ -167,7 +165,6 @@
             min-height: 1.2em;
         }
 
-        /* Контейнер секций */
         .content-wrapper {
             flex: 1;
             max-width: 900px;
@@ -641,11 +638,10 @@
             border-top: 1px solid var(--border);
         }
 
-        /* Линия времени */
+        /* Линия времени (упрощённая) */
         .heroes-timeline {
             max-width: 100%;
             margin: 20px 0;
-            padding: 0 10px;
         }
         .timeline-century-block {
             margin-bottom: 40px;
@@ -656,135 +652,52 @@
             color: var(--accent);
             margin-bottom: 15px;
         }
-        .timeline-track-wrapper {
-            position: relative;
-            display: flex;
-            align-items: center;
-        }
         .timeline-track {
             display: flex;
             align-items: center;
-            width: 100%;
-            position: relative;
+            gap: 20px;
             overflow-x: auto;
-            padding: 15px 0;
-            background: var(--bg-card);
-            border: 1px solid var(--border);
-            border-radius: var(--radius);
-            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-            scroll-behavior: smooth;
+            padding: 15px 10px;
+            scroll-snap-type: x mandatory;
             -webkit-overflow-scrolling: touch;
+            cursor: grab;
             scrollbar-width: none; /* Firefox */
             -ms-overflow-style: none; /* IE/Edge */
-            cursor: grab;
-            user-select: none;
         }
         .timeline-track:active {
             cursor: grabbing;
         }
         .timeline-track::-webkit-scrollbar {
-            height: 6px;
-            background: transparent;
+            display: none; /* Chrome/Safari/Edge */
         }
-        .timeline-track:hover::-webkit-scrollbar-thumb {
-            background: var(--accent);
-            border-radius: 10px;
-        }
-        .timeline-track::-webkit-scrollbar-thumb {
-            background: transparent;
-        }
-        .timeline-track-wrapper::before,
-        .timeline-track-wrapper::after {
-            content: '';
-            position: absolute;
-            top: 0;
-            bottom: 0;
-            width: 50px;
-            pointer-events: none;
-            z-index: 3;
-            opacity: 0;
-            transition: opacity 0.3s ease;
-        }
-        .timeline-track-wrapper::before {
-            left: 0;
-            background: linear-gradient(to right, var(--bg) 20%, transparent);
-        }
-        .timeline-track-wrapper::after {
-            right: 0;
-            background: linear-gradient(to left, var(--bg) 20%, transparent);
-        }
-        .timeline-track-wrapper:hover::before,
-        .timeline-track-wrapper:hover::after {
-            opacity: 1;
-        }
-        .timeline-line {
-            position: absolute;
-            top: 50%;
-            left: 20px;
-            right: 20px;
-            height: 3px;
-            background: var(--accent);
-            opacity: 0.6;
-            z-index: 0;
-        }
-        .hero-item {
-            position: relative;
-            z-index: 1;
-            margin: 0 20px;
+        .timeline-item {
+            flex: 0 0 auto;
+            scroll-snap-align: center;
+            text-align: center;
             cursor: pointer;
             transition: transform 0.2s;
-            flex-shrink: 0;
-            text-align: center;
-            scroll-snap-align: center;
         }
-        .hero-item img {
-            width: 90px;
-            height: 90px;
+        .timeline-item:hover {
+            transform: scale(1.05);
+        }
+        .timeline-avatar {
+            width: 80px;
+            height: 80px;
             border-radius: 50%;
             object-fit: cover;
             border: 3px solid var(--accent);
-            box-shadow: 0 4px 10px rgba(0,0,0,0.4);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.4);
         }
-        .hero-item:hover {
-            transform: scale(1.1);
-        }
-        .hero-item span {
-            display: block;
+        .timeline-name {
             font-size: 0.85rem;
-            color: var(--text);
             margin-top: 6px;
-            max-width: 100px;
+            max-width: 80px;
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
         }
-        .scroll-arrow {
-            position: absolute;
-            top: 50%;
-            transform: translateY(-50%);
-            background: var(--bg-card);
-            border: 1px solid var(--border);
-            color: var(--text);
-            border-radius: 50%;
-            width: 44px;
-            height: 44px;
-            cursor: pointer;
-            font-size: 1.8rem;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: var(--transition);
-            z-index: 2;
-        }
-        .scroll-arrow:hover {
-            border-color: var(--accent);
-            color: var(--accent);
-            box-shadow: 0 0 10px var(--accent-glow);
-        }
-        .scroll-arrow.left { left: 10px; }
-        .scroll-arrow.right { right: 10px; }
 
-        /* Модальное окно героя */
+        /* Модальное окно героя (прежнее, но без изменений) */
         .hero-modal {
             position: fixed;
             top: 0;
@@ -882,31 +795,9 @@
             background: rgba(0,0,0,0.7);
         }
 
-        @media (max-width: 1024px) {
-            .syllable-grid { grid-template-columns: repeat(3, 1fr); gap: 8px; }
-        }
         @media (max-width: 600px) {
-            .exam-exit-btn {
-                top: auto;
-                bottom: 10px;
-                left: 10px;
-                width: 34px;
-                height: 34px;
-                font-size: 1.1rem;
-            }
-            .syllable-grid { grid-template-columns: repeat(2, 1fr); gap: 5px; }
-            .syllable-card { font-size: 0.95rem; padding: 10px 4px; min-height: 45px; }
-            .learn-dot { width: 10px; height: 10px; bottom: 3px; right: 4px; }
-            .controls { gap: 6px; }
-            .controls button { width: 38px; height: 38px; font-size: 1.1rem; }
-            .theme-toggle { top: 6px; right: 10px; }
-            .theme-toggle button { width: 32px; height: 32px; font-size: 1rem; }
-            .theme-cycle { top: 6px; left: 10px; }
-            .theme-cycle button { width: 32px; height: 32px; }
-            .header { padding: 16px 12px 10px; }
-            .section-switch-btn { padding: 8px 16px; font-size: 1rem; }
-            .hero-item img { width: 70px; height: 70px; }
-            .hero-modal-nav button { width: 50px; height: 50px; font-size: 3rem; }
+            .timeline-avatar { width: 60px; height: 60px; }
+            .timeline-item { margin: 0 10px; }
         }
     </style>
 </head>
@@ -925,8 +816,8 @@
         <h1>Грамотиньо</h1>
 
         <div class="section-switch">
-            <button class="section-switch-btn active" data-section="syllables"></button>
-            <button class="section-switch-btn" data-section="heroes"></button>
+            <button class="section-switch-btn active" data-section="syllables">📖</button>
+            <button class="section-switch-btn" data-section="heroes">🌟</button>
         </div>
 
         <p id="sectionSubtitle">Учим слоги. Жми, слушай, запоминай</p>
@@ -1434,89 +1325,29 @@
                     if (heroes.length === 0) continue;
                     html += `<div class="timeline-century-block">`;
                     html += `<div class="timeline-century-title">${century}</div>`;
-                    html += `<div class="timeline-track-wrapper">`;
-                    html += `<button class="scroll-arrow left" data-target="${century}">‹</button>`;
-                    html += `<div class="timeline-track" data-century="${century}">`;
-                    html += `<div class="timeline-line"></div>`;
+                    html += `<div class="timeline-track">`;
                     heroes.sort((a, b) => a.year - b.year);
                     heroes.forEach(hero => {
                         const imagePath = `Great Rus/${hero.images[0]}`;
                         html += `
-                            <div class="hero-item" data-name="${hero.name}" data-audio="Great Rus/${hero.audio}" data-images='${JSON.stringify(hero.images.map(img => "Great Rus/" + img))}'>
-                                <img src="${imagePath}" alt="${hero.name}" loading="lazy">
-                                <span>${hero.name}</span>
+                            <div class="timeline-item" data-name="${hero.name}" data-audio="Great Rus/${hero.audio}" data-images='${JSON.stringify(hero.images.map(img => "Great Rus/" + img))}'>
+                                <img class="timeline-avatar" src="${imagePath}" alt="${hero.name}" loading="lazy">
+                                <div class="timeline-name">${hero.name}</div>
                             </div>
                         `;
                     });
-                    html += `</div>`;
-                    html += `<button class="scroll-arrow right" data-target="${century}">›</button>`;
                     html += `</div></div>`;
                 }
 
                 heroesTimeline.innerHTML = html;
 
-                heroesTimeline.querySelectorAll('.hero-item').forEach(item => {
+                heroesTimeline.querySelectorAll('.timeline-item').forEach(item => {
                     item.addEventListener('click', function() {
                         const name = this.dataset.name;
                         const audioSrc = this.dataset.audio;
                         const images = JSON.parse(this.dataset.images);
                         openHeroModal(name, images, audioSrc);
                     });
-                });
-
-                heroesTimeline.querySelectorAll('.scroll-arrow').forEach(btn => {
-                    btn.addEventListener('click', function() {
-                        const target = this.dataset.target;
-                        const track = heroesTimeline.querySelector(`.timeline-track[data-century="${target}"]`);
-                        if (track) {
-                            const scrollAmount = 300;
-                            if (this.classList.contains('left')) {
-                                track.scrollBy({ left: -scrollAmount, behavior: 'smooth' });
-                            } else {
-                                track.scrollBy({ left: scrollAmount, behavior: 'smooth' });
-                            }
-                        }
-                    });
-                });
-
-                // Улучшенный скроллинг для каждой дорожки
-                document.querySelectorAll('.timeline-track').forEach(track => {
-                    let isDown = false;
-                    let startX;
-                    let scrollLeft;
-
-                    track.addEventListener('mousedown', (e) => {
-                        isDown = true;
-                        track.classList.add('active');
-                        startX = e.pageX - track.offsetLeft;
-                        scrollLeft = track.scrollLeft;
-                    });
-
-                    track.addEventListener('mouseleave', () => {
-                        isDown = false;
-                        track.classList.remove('active');
-                    });
-
-                    track.addEventListener('mouseup', () => {
-                        isDown = false;
-                        track.classList.remove('active');
-                    });
-
-                    track.addEventListener('mousemove', (e) => {
-                        if (!isDown) return;
-                        e.preventDefault();
-                        const x = e.pageX - track.offsetLeft;
-                        const walk = (x - startX) * 2;
-                        track.scrollLeft = scrollLeft - walk;
-                    });
-
-                    // Горизонтальная прокрутка колесом с Shift
-                    track.addEventListener('wheel', (e) => {
-                        if (e.shiftKey) {
-                            e.preventDefault();
-                            track.scrollLeft += e.deltaY;
-                        }
-                    }, { passive: false });
                 });
             }
 
