@@ -651,19 +651,20 @@
         }
         .timeline-container {
             position: relative;
-            min-width: 4000px;
-            padding: 80px 20px 60px;
+            min-width: 17000px;
+            padding: 120px 20px 100px;
         }
         .timeline-line-main {
             position: absolute;
             top: 50%;
             left: 20px;
             right: 20px;
-            height: 4px;
+            height: 5px;
             background: linear-gradient(90deg, var(--accent) 0%, var(--accent) 100%);
-            opacity: 0.8;
+            opacity: 0.85;
             z-index: 1;
-            border-radius: 2px;
+            border-radius: 3px;
+            box-shadow: 0 0 10px var(--accent-glow);
         }
         .timeline-markers {
             position: absolute;
@@ -678,21 +679,26 @@
             top: 50%;
             transform: translateY(-50%);
             width: 1px;
-            height: 12px;
+            height: 14px;
             background: var(--text-secondary);
-            opacity: 0.4;
+            opacity: 0.5;
+        }
+        .timeline-decade:nth-child(5n) {
+            height: 20px;
+            opacity: 0.7;
         }
         .timeline-decade:nth-child(10n) {
-            height: 18px;
-            opacity: 0.7;
+            height: 26px;
+            opacity: 0.9;
         }
         .timeline-decade-label {
             position: absolute;
-            top: 25px;
+            top: 30px;
             transform: translateX(-50%);
-            font-size: 0.65rem;
+            font-size: 0.7rem;
             color: var(--text-secondary);
             white-space: nowrap;
+            font-weight: 500;
         }
         .timeline-event-marker {
             position: absolute;
@@ -744,16 +750,16 @@
             z-index: 5;
         }
         .hero-item:hover {
-            transform: translate(-50%, -50%) scale(1.25);
+            transform: translate(-50%, -50%) scale(1.35);
             z-index: 20;
         }
         .hero-item.highlighted {
-            transform: translate(-50%, -50%) scale(1.35);
+            transform: translate(-50%, -50%) scale(1.45);
             z-index: 25;
         }
         .hero-item img {
-            width: 70px;
-            height: 70px;
+            width: 80px;
+            height: 80px;
             border-radius: 50%;
             object-fit: cover;
             border: 3px solid var(--accent);
@@ -763,7 +769,9 @@
         .hero-item:hover img,
         .hero-item.highlighted img {
             border-color: var(--accent);
-            box-shadow: 0 0 20px var(--accent-glow), 0 8px 24px rgba(0,0,0,0.6);
+            box-shadow: 0 0 24px var(--accent-glow), 0 8px 24px rgba(0,0,0,0.6);
+            width: 95px;
+            height: 95px;
         }
         .hero-item span {
             display: block;
@@ -785,18 +793,19 @@
         .hero-years {
             display: none;
             position: absolute;
-            bottom: -22px;
+            bottom: -26px;
             left: 50%;
             transform: translateX(-50%);
-            font-size: 0.65rem;
+            font-size: 0.7rem;
             color: var(--accent);
             white-space: nowrap;
             background: var(--bg-card);
-            padding: 2px 6px;
+            padding: 3px 8px;
             border-radius: 4px;
             border: 1px solid var(--border);
-            box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.4);
             z-index: 30;
+            font-weight: 600;
         }
         .hero-item:hover .hero-years,
         .hero-item.highlighted .hero-years {
@@ -937,7 +946,9 @@
             .theme-cycle button { width: 32px; height: 32px; }
             .header { padding: 16px 12px 10px; }
             .section-switch-btn { padding: 8px 16px; font-size: 1rem; }
-            .hero-item img { width: 70px; height: 70px; }
+            .hero-item img { width: 60px; height: 60px; }
+            .hero-item:hover img,
+            .hero-item.highlighted img { width: 80px; height: 80px; }
             .hero-modal-nav button { width: 50px; height: 50px; font-size: 3rem; }
         }
     </style>
@@ -1465,9 +1476,9 @@
                 const minYear = Math.min(...allYears, 1670);
                 const maxYear = Math.max(...allYears, 2000);
                 
-                // Ширина линии времени: 30 пикселей на год
-                const pixelsPerYear = 30;
-                const timelineWidth = (maxYear - minYear) * pixelsPerYear + 100;
+                // Ширина линии времени: 50 пикселей на год (увеличено для предотвращения наложения)
+                const pixelsPerYear = 50;
+                const timelineWidth = (maxYear - minYear) * pixelsPerYear + 200;
                 
                 timelineContainer.style.minWidth = timelineWidth + 'px';
                 
@@ -1479,10 +1490,10 @@
                 // Маркеры десятилетий
                 html += `<div class="timeline-markers">`;
                 for (let year = Math.ceil(minYear / 10) * 10; year <= maxYear; year += 10) {
-                    const pos = (year - minYear) * pixelsPerYear + 50;
+                    const pos = (year - minYear) * pixelsPerYear + 100;
                     const isCentury = year % 100 === 0;
-                    html += `<div class="timeline-decade" style="left: ${pos}px; height: ${isCentury ? 20 : 12}px; opacity: ${isCentury ? 0.8 : 0.4};"></div>`;
-                    if (isCentury) {
+                    html += `<div class="timeline-decade" style="left: ${pos}px; height: ${isCentury ? 24 : 14}px; opacity: ${isCentury ? 0.9 : 0.5};"></div>`;
+                    if (isCentury || year % 50 === 0) {
                         html += `<div class="timeline-decade-label" style="left: ${pos}px;">${year}</div>`;
                     }
                 }
@@ -1496,7 +1507,7 @@
                 ];
                 
                 events.forEach(event => {
-                    const pos = (event.year - minYear) * pixelsPerYear + 50;
+                    const pos = (event.year - minYear) * pixelsPerYear + 100;
                     html += `<div class="timeline-event-marker" style="left: ${pos}px;">`;
                     html += `<div class="event-label">${event.label}</div>`;
                     html += `<div class="event-dot"></div>`;
@@ -1505,16 +1516,15 @@
                     // Линия для периода ВОВ
                     if (event.span) {
                         const spanWidth = event.span * pixelsPerYear;
-                        html += `<div style="position:absolute; top:50%; left:${pos}px; width:${spanWidth}px; height:2px; background:var(--danger); opacity:0.5; z-index:1;"></div>`;
+                        html += `<div style="position:absolute; top:50%; left:${pos}px; width:${spanWidth}px; height:3px; background:var(--danger); opacity:0.6; z-index:1; border-radius:2px;"></div>`;
                     }
                 });
                 
-                // Портреты личностей
+                // Портреты личностей - все на одной линии
                 heroesData.sort((a, b) => a.birth - b.birth);
                 heroesData.forEach((hero, index) => {
-                    const xPos = (hero.birth - minYear) * pixelsPerYear + 50;
+                    const xPos = (hero.birth - minYear) * pixelsPerYear + 100;
                     const imagePath = `Great Rus/${hero.images[0]}`;
-                    const offsetY = (index % 5 - 2) * 25; // Распределение по вертикали
                     const yearsText = `${hero.birth}–${hero.death}`;
                     
                     html += `\n<div class="hero-item" 
@@ -1522,7 +1532,7 @@
                         data-audio="Great Rus/${hero.audio}" 
                         data-images='${JSON.stringify(hero.images.map(img => "Great Rus/" + img))}'
                         data-years="${yearsText}"
-                        style="left: ${xPos}px; margin-top: ${offsetY}px;">
+                        style="left: ${xPos}px;">
                         <img src="${imagePath}" alt="${hero.name}" loading="lazy">
                         <span class="name-only">${hero.name}</span>
                         <span class="hero-years">${yearsText}</span>
