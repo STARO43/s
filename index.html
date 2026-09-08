@@ -645,6 +645,18 @@
             font-size: 0.7rem;
             border-top: 1px solid var(--border);
         }
+        .visit-counter {
+    margin-top: 8px;
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+    opacity: 0.7;
+    font-family: 'PT Sans', sans-serif;
+    transition: opacity 0.3s;
+}
+
+.visit-counter:hover {
+    opacity: 1;
+}
 
         /* === МИНИМАЛИСТИЧНАЯ ЛИНИЯ ВРЕМЕНИ === */
         .heroes-timeline {
@@ -1034,9 +1046,10 @@
         </div>
     </div>
 
-    <footer class="footer">
-        <p>Спасибо за вайбкодинг в тегешечку @vnvax</p>
-    </footer>
+   <footer class="footer">
+    <p>Спасибо за вайбкодинг в тегешечку @vnvax</p>
+    <div class="visit-counter" id="visitCounter">👁 Загрузка...</div>
+</footer>
 
     <div class="toast-container" id="toastContainer"></div>
 
@@ -1644,6 +1657,37 @@
 
             renderHeroesTimeline();
             renderGrid();
+                        // Счётчик посещений CountAPI
+            async function updateVisitCounter() {
+                const counter = document.getElementById('visitCounter');
+                if (!counter) return;
+                
+                try {
+                    // Замените 'gramotinjo' и 'visits' на свои уникальные значения
+                    const response = await fetch('https://api.countapi.xyz/hit/gramotinjo/visits');
+                    const data = await response.json();
+                    
+                    // Форматирование числа с учётом склонений
+                    const count = data.value;
+                    let text;
+                    
+                    if (count % 10 === 1 && count % 100 !== 11) {
+                        text = `${count} посещение`;
+                    } else if ([2, 3, 4].includes(count % 10) && ![12, 13, 14].includes(count % 100)) {
+                        text = `${count} посещения`;
+                    } else {
+                        text = `${count} посещений`;
+                    }
+                    
+                    counter.textContent = `👁 ${text}`;
+                } catch (e) {
+                    counter.textContent = '👁 Счётчик недоступен';
+                    console.log('Ошибка счётчика:', e);
+                }
+            }
+            
+            // Запускаем счётчик
+            updateVisitCounter();
         })();
     </script>
 </body>
