@@ -9,7 +9,6 @@
     <link href="https://fonts.googleapis.com/css2?family=PT+Serif:ital,wght@0,400;0,700;1,400;1,700&display=swap" rel="stylesheet">
     <title>Грамотиньо</title>
     <style>
-        /* ===== БАЗОВЫЕ ПЕРЕМЕННЫЕ ===== */
         :root {
             --bg: #0a0e17;
             --bg-card: #111827;
@@ -128,6 +127,7 @@
             margin: 8px 0 4px;
         }
 
+        /* Переключатель раздела */
         .section-switch {
             display: inline-flex;
             background: var(--bg-card);
@@ -158,6 +158,7 @@
             color: var(--text);
         }
 
+        /* Динамический подзаголовок */
         #sectionSubtitle {
             color: var(--text-secondary);
             font-size: 1rem;
@@ -166,6 +167,7 @@
             min-height: 1.2em;
         }
 
+        /* Контейнер секций */
         .content-wrapper {
             flex: 1;
             max-width: 900px;
@@ -639,101 +641,100 @@
             border-top: 1px solid var(--border);
         }
 
-        /* НОВАЯ ЛИНИЯ ВРЕМЕНИ */
-        .timeline {
+        /* ========== НОВАЯ ЕДИНАЯ ЛИНИЯ ВРЕМЕНИ ========== */
+        .timeline-single {
             position: relative;
-            margin: 30px 0 40px;
-            padding-bottom: 50px;
-        }
-        .timeline-track {
-            position: relative;
-            height: 70px;
+            margin: 30px 0;
+            padding-bottom: 60px;
             overflow-x: auto;
             overflow-y: hidden;
-            white-space: nowrap;
+            cursor: grab;
             scroll-behavior: smooth;
             -webkit-overflow-scrolling: touch;
             scrollbar-width: thin;
             scrollbar-color: var(--accent) transparent;
         }
+        .timeline-single:active {
+            cursor: grabbing;
+        }
+        .timeline-inner {
+            position: relative;
+            width: max-content;
+            min-width: 100%;
+            height: 160px;
+        }
         .timeline-line {
             position: absolute;
-            top: 50%;
+            top: 80px;
             left: 0;
             right: 0;
             height: 4px;
             background: var(--accent);
             opacity: 0.7;
             border-radius: 2px;
-            z-index: 1;
         }
         .timeline-scale {
             position: absolute;
+            top: 90px;
             left: 0;
             right: 0;
             display: flex;
             justify-content: space-between;
-            padding: 0 30px;
-            z-index: 2;
-            pointer-events: none;
         }
         .scale-mark {
-            font-size: 0.7rem;
+            font-size: 0.75rem;
             color: var(--text-secondary);
             white-space: nowrap;
             transform: translateX(-50%);
         }
-        .event-mark {
+        .event-point {
             position: absolute;
-            top: 50%;
+            top: 80px;
             transform: translate(-50%, -50%);
             z-index: 3;
             cursor: pointer;
-            pointer-events: auto;
             text-align: center;
         }
         .event-dot {
-            width: 12px;
-            height: 12px;
+            width: 14px;
+            height: 14px;
             background: var(--danger);
             border-radius: 50%;
             margin: 0 auto 4px;
+            box-shadow: 0 0 8px var(--danger-glow);
         }
         .event-label {
-            font-size: 0.75rem;
+            font-size: 0.8rem;
             color: var(--danger);
             white-space: nowrap;
             position: relative;
-            top: -10px;
+            top: -22px;
         }
-
-        .hero-item {
+        .hero-point {
             position: absolute;
-            top: 50%;
+            top: 80px;
             transform: translate(-50%, -50%);
             z-index: 4;
             cursor: pointer;
             text-align: center;
             transition: transform 0.2s;
-            display: inline-block;
-            vertical-align: top;
         }
-        .hero-item img {
+        .hero-point img {
             width: 70px;
             height: 70px;
             border-radius: 50%;
             object-fit: cover;
             border: 3px solid var(--accent);
             box-shadow: 0 4px 10px rgba(0,0,0,0.4);
-            transition: width 0.2s, height 0.2s, border-color 0.2s;
+            transition: width 0.2s, height 0.2s, border-color 0.2s, box-shadow 0.2s;
         }
-        .hero-item:hover img {
+        .hero-point:hover img {
             width: 85px;
             height: 85px;
             border-color: var(--text);
-            box-shadow: 0 0 15px var(--accent-glow);
+            box-shadow: 0 0 18px var(--accent-glow);
         }
-        .hero-item .hero-lifespan {
+        .hero-point .lifespan {
             opacity: 0;
             transition: opacity 0.2s;
             font-size: 0.8rem;
@@ -741,111 +742,13 @@
             margin-top: 4px;
             white-space: nowrap;
         }
-        .hero-item:hover .hero-lifespan {
+        .hero-point:hover .lifespan {
             opacity: 1;
         }
 
-        /* Модальное окно героя */
-        .hero-modal {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: var(--bg);
-            z-index: 5000;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            animation: fadeIn 0.3s ease;
-        }
-        .hero-modal-content {
-            width: 100%;
-            height: 100%;
-            position: relative;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-        }
-        .hero-modal-close {
-            position: absolute;
-            top: 20px;
-            right: 20px;
-            background: none;
-            border: none;
-            color: var(--text);
-            font-size: 3rem;
-            cursor: pointer;
-            z-index: 20;
-        }
-        .hero-modal-repeat {
-            position: absolute;
-            top: 20px;
-            left: 20px;
-            background: var(--bg-card);
-            border: 1px solid var(--border);
-            color: var(--text);
-            border-radius: 50%;
-            width: 56px;
-            height: 56px;
-            cursor: pointer;
-            font-size: 1.8rem;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: var(--transition);
-            z-index: 20;
-        }
-        .hero-modal-repeat:hover {
-            border-color: var(--accent);
-            color: var(--accent);
-            box-shadow: 0 0 12px var(--accent-glow);
-        }
-        .hero-modal-portrait {
-            max-width: 90%;
-            max-height: 70vh;
-            object-fit: contain;
-            border-radius: 8px;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.6);
-        }
-        .hero-modal h3 {
-            font-size: 2rem;
-            margin: 20px 0;
-            color: var(--accent);
-        }
-        .hero-modal-nav {
-            position: absolute;
-            top: 50%;
-            transform: translateY(-50%);
-            left: 0;
-            right: 0;
-            display: flex;
-            justify-content: space-between;
-            padding: 0 10px;
-            z-index: 10;
-        }
-        .hero-modal-nav button {
-            background: rgba(0,0,0,0.4);
-            border: none;
-            color: white;
-            font-size: 4rem;
-            width: 70px;
-            height: 70px;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: background 0.2s;
-            border-radius: 8px;
-        }
-        .hero-modal-nav button:hover {
-            background: rgba(0,0,0,0.7);
-        }
-
         @media (max-width: 600px) {
-            .hero-item img { width: 55px; height: 55px; }
-            .hero-modal-nav button { width: 50px; height: 50px; font-size: 3rem; }
+            .hero-point img { width: 55px; height: 55px; }
+            .event-label { font-size: 0.7rem; }
         }
     </style>
 </head>
@@ -864,8 +767,8 @@
         <h1>Грамотиньо</h1>
 
         <div class="section-switch">
-            <button class="section-switch-btn active" data-section="syllables">📖</button>
-            <button class="section-switch-btn" data-section="heroes">🌟</button>
+            <button class="section-switch-btn active" data-section="syllables"></button>
+            <button class="section-switch-btn" data-section="heroes"></button>
         </div>
 
         <p id="sectionSubtitle">Учим слоги. Жми, слушай, запоминай</p>
@@ -892,7 +795,7 @@
         </section>
 
         <section id="heroesSection" class="tab-section">
-            <div class="timeline" id="heroesTimeline"></div>
+            <div class="timeline-single" id="heroesTimeline"></div>
         </section>
     </div>
 
@@ -925,8 +828,389 @@
 
     <script>
         (function() {
-            // ... остальной код (слоги, темы, экзамен) остаётся прежним ...
-            // Ниже только новый блок данных о героях и рендер линии времени
+            const rawItems = [
+                'ЁЖ', 'ёлка', 'ЁН', 'АБ', 'АВ', 'АГ', 'АЖ', 'АЗ', 'АК', 'АЛ', 'Алла', 'АМ', 'АН', 'Анна', 'АП', 'арка', 'арфа', 'АС', 'АТ', 'АХ', 'АЧ', 'АШ',
+                'БА', 'БАК', 'БАЯН', 'БЕ', 'БИ', 'БО', 'БОК', 'БОР', 'Боря', 'БЫ', 'БЫК', 'БЭ', 'БЯ',
+                'ВА', 'Валя', 'ВЕ', 'ВЕЕР', 'ВИ', 'Витя', 'Вова', 'ВОЗ', 'ВОЛ', 'ВОЛК', 'ВУ', 'ВЫ', 'ВЭ', 'ВЮ',
+                'ГА', 'ГАЗ', 'Галя', 'ГЕ', 'Гена', 'ГИ', 'ГО', 'ГОД', 'ГЫ', 'ГЭ',
+                'ДА', 'ДИ', 'ДОМ', 'ДУ', 'ДУБ', 'ДУШ', 'ДЫ', 'ДЫМ', 'ДЭ', 'ДЮ', 'ДЯ',
+                'ЕГ', 'ЕЖ', 'ЕЛ', 'ЕМ', 'ЕН', 'ЕР', 'ЕС', 'если', 'ЕТ', 'ЕФ', 'ЕХ', 'ЕЦ', 'ЕЧ', 'ЕШ',
+                'ЖА', 'Женя', 'ЖИ', 'ЖО', 'ЖУ', 'ЖУК', 'ЖЭ',
+                'ЗА', 'ЗИ', 'Зина', 'ЗО', 'ЗУ', 'ЗЫ', 'ЗЭ', 'ЗЮ', 'ЗЯ',
+                'ИБ', 'ИВ', 'игра', 'ИЖ', 'ИК', 'икра', 'ИЛ', 'ИМ', 'ИН', 'ИР', 'ИС', 'ИТ', 'ИФ', 'ИЧ', 'ИШ',
+                'ЙОД', 'КА', 'Катя', 'КЕ', 'КИ', 'КИТ', 'КОЛ', 'Коля', 'КОМ', 'КОТ', 'КОФЕ', 'КРАЙ', 'КРАН', 'КУ', 'КЫ', 'КЭ',
+                'ЛЁ', 'Лёва', 'Лёша', 'ЛАК', 'ЛЕ', 'ЛЕВ', 'Лена', 'ЛЕС', 'ЛЕЩ', 'ЛИ', 'ЛИФТ', 'ЛО', 'ЛОМ', 'ЛУ', 'ЛЫ', 'ЛЫЖИ', 'ЛЭ', 'ЛЮ', 'Люба', 'Люда', 'ЛЮК', 'ЛЯ',
+                'МА', 'МАК', 'МЕ', 'МЕЛ', 'МЕХ', 'МЕЧ', 'МИ', 'Миша', 'МО', 'МОХ', 'МУ', 'МУХА', 'МЫ', 'МЫЛО', 'МЫС', 'МЭ', 'МЯ', 'МЯЧ',
+                'НЁ', 'НА', 'НЕ', 'Нина', 'НО', 'НОЖ', 'НОС', 'НУ', 'НЫ', 'НЭ', 'НЯ',
+                'одна', 'ОЖ', 'ОКНО', 'ОЛ', 'ОМ', 'ОН', 'ОП', 'ОР', 'ОС', 'ОФ', 'ОХ', 'ОЧ', 'очки', 'ОШ',
+                'ПА', 'ПАУК', 'ПЕРО', 'Петя', 'ПИ', 'ПУ', 'ПУХ', 'ПЫ', 'ПЭ', 'ПЯ',
+                'РА', 'РАК', 'РИ', 'РИС', 'РО', 'Рома', 'РОТ', 'РУ', 'РЫ', 'РЫБА', 'РЭ', 'РЮ', 'РЯ',
+                'СЁ', 'СА', 'Саша', 'СЕ', 'СИ', 'СОК', 'СОМ', 'СОР', 'СТУЛ', 'СУ', 'СУК', 'СУП', 'СЫ', 'СЫР', 'СЭ', 'СЮ', 'СЯ',
+                'Тёма', 'ТА', 'ТАЗ', 'Таня', 'ТЕ', 'ТИ', 'ТО', 'Толя', 'Тома', 'ТОРТ', 'ТРОС', 'ТУ', 'ТЫ', 'ТЭ', 'ТЮ', 'ТЯ',
+                'УБ', 'УГОЛ', 'УЖ', 'УЛ', 'УМ', 'УН', 'УР', 'урна', 'УС', 'УТ', 'утка', 'утро', 'УФ', 'УХ', 'УХО', 'УЧ', 'УШ', 'ушко',
+                'ФА', 'ФЕ', 'Федя', 'ФИ', 'ФО', 'ФУ', 'ФЫ', 'ФЭ',
+                'ХА', 'ХЕ', 'ХО', 'ХУ', 'ХЫ', 'ХЭ',
+                'ЦА', 'ЦЕ', 'ЦИ', 'ЦО', 'ЦУ', 'ЦЭ',
+                'ЧА', 'ЧАЙ', 'ЧЕК', 'ЧИ', 'ЧУ', 'ЧЭ',
+                'ША', 'ШАГ', 'ШЕ', 'ШИ', 'ШОВ', 'ШУ', 'ШЭ',
+                'ЩИ', 'ЩИТ',
+                'ЫВ', 'ЫК', 'ЫМ', 'ЫН', 'ЫС', 'ЫТ', 'ЫХ',
+                'ЭБ', 'ЭК', 'ЭЛ', 'ЭМ', 'ЭН', 'ЭП', 'ЭР', 'ЭС', 'ЭТ', 'ЭФ', 'ЭХ', 'ЭЦ',
+                'юбка', 'ЮГ', 'юнга', 'ЯБ', 'ЯВ', 'ЯД', 'ЯК', 'ЯЛ', 'ЯМ', 'ЯН', 'ЯП', 'ЯР', 'ЯС', 'ЯТ', 'ЯХ', 'яхта', 'ЯЦ'
+            ];
+
+            const syllables = rawItems.sort((a, b) => {
+                const lenDiff = a.length - b.length;
+                if (lenDiff !== 0) return lenDiff;
+                return a.localeCompare(b, 'ru', { sensitivity: 'base' });
+            });
+
+            const grid = document.getElementById('syllableGrid');
+            const toastContainer = document.getElementById('toastContainer');
+            const themeToggle = document.getElementById('themeToggle');
+            const themeCycleBtn = document.getElementById('themeCycleBtn');
+            const colorIndicator = document.getElementById('colorIndicator');
+            const normalBtn = document.getElementById('normalBtn');
+            const randomBtn = document.getElementById('randomBtn');
+            const hideLearnedBtn = document.getElementById('hideLearnedBtn');
+            const clearLearnedBtn = document.getElementById('clearLearnedBtn');
+            const examBtn = document.getElementById('examBtn');
+            const progressLabel = document.getElementById('progressLabel');
+            const progressFill = document.getElementById('progressFill');
+            const scrollTopBtn = document.getElementById('scrollTopBtn');
+            const examOverlay = document.getElementById('examOverlay');
+            const examQuestion = document.getElementById('examQuestion');
+            const examOptions = document.getElementById('examOptions');
+            const examResult = document.getElementById('examResult');
+            const examRepeatBtn = document.getElementById('examRepeatBtn');
+            const examNextBtn = document.getElementById('examNextBtn');
+            const examExitBtn = document.getElementById('examExitBtn');
+            const celebrationOverlay = document.getElementById('celebrationOverlay');
+            const celebrationGif = document.getElementById('celebrationGif');
+            const celebrationClose = document.getElementById('celebrationClose');
+            const sectionBtns = document.querySelectorAll('.section-switch-btn');
+            const sectionSubtitle = document.getElementById('sectionSubtitle');
+            const syllablesSection = document.getElementById('syllablesSection');
+            const heroesSection = document.getElementById('heroesSection');
+            const heroesTimeline = document.getElementById('heroesTimeline');
+
+            let currentMode = 'all';
+            let randomItems = [];
+            let currentAudio = null;
+            let examQuestions = [];
+            let examIndex = 0;
+            let examScore = 0;
+            let currentExamCorrect = '';
+            let currentSection = 'syllables';
+
+            const themeList = [
+                'theme-blue', 'theme-green', 'theme-red', 'theme-orange',
+                'theme-purple', 'theme-pink', 'theme-cyan', 'theme-yellow',
+                'theme-teal', 'theme-indigo'
+            ];
+
+            function loadLearnedSet() {
+                try { return new Set(JSON.parse(localStorage.getItem('learned_syllables') || '[]')); }
+                catch { return new Set(); }
+            }
+            function saveLearnedSet(set) {
+                localStorage.setItem('learned_syllables', JSON.stringify(Array.from(set)));
+            }
+            let learnedSet = loadLearnedSet();
+
+            function applyTheme(themeClass) {
+                document.body.className = '';
+                document.body.classList.add(themeClass);
+                if (localStorage.getItem('theme') === 'light') {
+                    document.body.classList.add('light-mode');
+                }
+                localStorage.setItem('accentTheme', themeClass);
+                const accent = getComputedStyle(document.body).getPropertyValue('--accent').trim();
+                colorIndicator.style.background = accent;
+            }
+
+            let currentThemeIndex = 0;
+            const savedTheme = localStorage.getItem('accentTheme') || 'theme-blue';
+            currentThemeIndex = themeList.indexOf(savedTheme);
+            if (currentThemeIndex === -1) currentThemeIndex = 0;
+            applyTheme(themeList[currentThemeIndex]);
+
+            if (localStorage.getItem('theme') === 'light') {
+                document.body.classList.add('light-mode');
+            }
+
+            themeToggle.addEventListener('click', () => {
+                document.body.classList.toggle('light-mode');
+                localStorage.setItem('theme', document.body.classList.contains('light-mode') ? 'light' : 'dark');
+            });
+
+            themeCycleBtn.addEventListener('click', () => {
+                currentThemeIndex = (currentThemeIndex + 1) % themeList.length;
+                applyTheme(themeList[currentThemeIndex]);
+            });
+
+            function switchSection(section) {
+                if (section === currentSection) return;
+                currentSection = section;
+                if (section === 'syllables') {
+                    syllablesSection.classList.add('active');
+                    heroesSection.classList.remove('active');
+                    sectionSubtitle.textContent = 'Учим слоги. Жми, слушай, запоминай';
+                } else {
+                    heroesSection.classList.add('active');
+                    syllablesSection.classList.remove('active');
+                    sectionSubtitle.textContent = 'Великие личности Отечества';
+                }
+                sectionBtns.forEach(btn => {
+                    btn.classList.toggle('active', btn.dataset.section === section);
+                });
+            }
+
+            sectionBtns.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    switchSection(btn.dataset.section);
+                });
+            });
+
+            window.addEventListener('scroll', () => {
+                scrollTopBtn.classList.toggle('visible', window.scrollY > 300);
+            });
+            scrollTopBtn.addEventListener('click', () => {
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            });
+
+            function updateProgress() {
+                const total = syllables.length;
+                const marked = [...syllables].filter(s => learnedSet.has(s)).length;
+                const percent = total ? Math.round((marked / total) * 100) : 0;
+                progressLabel.textContent = `Отмечено: ${marked} из ${total}`;
+                progressFill.style.width = percent + '%';
+            }
+
+            function renderGrid() {
+                grid.innerHTML = '';
+                const items = currentMode === 'random' ? randomItems : syllables;
+                items.forEach(syllable => {
+                    const card = document.createElement('div');
+                    card.className = 'syllable-card';
+                    card.dataset.syllable = syllable;
+                    card.setAttribute('role', 'button');
+                    card.setAttribute('tabindex', '0');
+                    const textSpan = document.createElement('span');
+                    textSpan.className = 'syllable-text';
+                    textSpan.textContent = syllable;
+                    textSpan.style.pointerEvents = 'none';
+                    card.appendChild(textSpan);
+                    const dot = document.createElement('div');
+                    dot.className = 'learn-dot';
+                    dot.title = 'Отметить';
+                    dot.setAttribute('role', 'checkbox');
+                    dot.setAttribute('aria-checked', learnedSet.has(syllable));
+                    card.appendChild(dot);
+                    if (learnedSet.has(syllable)) card.classList.add('learned');
+                    dot.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        toggleLearned(syllable, card);
+                    });
+                    card.addEventListener('click', () => handleSyllableClick(syllable, card));
+                    card.addEventListener('keydown', (e) => {
+                        if (e.key === 'Enter' || e.key === ' ') {
+                            e.preventDefault();
+                            handleSyllableClick(syllable, card);
+                        }
+                    });
+                    grid.appendChild(card);
+                });
+                updateProgress();
+            }
+
+            function toggleLearned(syllable, card) {
+                if (learnedSet.has(syllable)) {
+                    learnedSet.delete(syllable);
+                } else {
+                    learnedSet.add(syllable);
+                }
+                saveLearnedSet(learnedSet);
+                card.classList.toggle('learned', learnedSet.has(syllable));
+                updateProgress();
+            }
+
+            function playAudio(syllable) {
+                if (currentAudio) {
+                    currentAudio.pause();
+                    currentAudio.src = '';
+                }
+                const audio = new Audio('audio/' + syllable + '.mp3');
+                audio.volume = 1;
+                currentAudio = audio;
+                audio.addEventListener('ended', () => { currentAudio = null; });
+                audio.play().catch(() => {});
+            }
+
+            function handleSyllableClick(syllable, card) {
+                card.classList.add('playing');
+                setTimeout(() => card.classList.remove('playing'), 700);
+                playAudio(syllable);
+            }
+
+            normalBtn.addEventListener('click', () => {
+                currentMode = 'all';
+                normalBtn.classList.add('active');
+                randomBtn.classList.remove('active');
+                renderGrid();
+            });
+            randomBtn.addEventListener('click', () => {
+                currentMode = 'random';
+                generateRandomItems();
+                randomBtn.classList.add('active');
+                normalBtn.classList.remove('active');
+                renderGrid();
+            });
+            function generateRandomItems() {
+                const shuffled = syllables.slice().sort(() => Math.random() - 0.5);
+                randomItems = shuffled.slice(0, Math.min(10, shuffled.length));
+            }
+            hideLearnedBtn.addEventListener('click', () => {
+                hideLearnedBtn.classList.toggle('active');
+                grid.classList.toggle('hide-learned', hideLearnedBtn.classList.contains('active'));
+            });
+            clearLearnedBtn.addEventListener('click', () => {
+                learnedSet.clear();
+                saveLearnedSet(learnedSet);
+                renderGrid();
+                showToast('Очищено', 'success');
+            });
+
+            examBtn.addEventListener('click', startExam);
+            function startExam() {
+                examOverlay.classList.add('show');
+                examNextBtn.classList.remove('show');
+                examRepeatBtn.style.display = 'flex';
+                examQuestions = getRandomExamQuestions(10);
+                examIndex = 0;
+                examScore = 0;
+                showNextExamQuestion();
+            }
+            function getRandomExamQuestions(count) {
+                const shuffled = syllables.slice().sort(() => Math.random() - 0.5);
+                return shuffled.slice(0, Math.min(count, shuffled.length));
+            }
+            function showNextExamQuestion() {
+                if (examIndex >= examQuestions.length) {
+                    examOverlay.classList.remove('show');
+                    if (examScore === 10) {
+                        showCelebration();
+                    } else {
+                        showToast(`Верно ${examScore} из 10`, 'info');
+                    }
+                    return;
+                }
+                const correct = examQuestions[examIndex];
+                currentExamCorrect = correct;
+                examQuestion.textContent = `Вопрос ${examIndex+1} из ${examQuestions.length}`;
+                examResult.textContent = '';
+                examNextBtn.classList.remove('show');
+                examRepeatBtn.style.display = 'flex';
+
+                const variants = new Set([correct]);
+                const firstLetter = correct.charAt(0).toUpperCase();
+                const sameLetterPool = syllables.filter(item =>
+                    item !== correct && item.charAt(0).toUpperCase() === firstLetter
+                );
+                const maxSameLetter = Math.min(5, sameLetterPool.length);
+                const shuffledSame = sameLetterPool.sort(() => Math.random() - 0.5).slice(0, maxSameLetter);
+                shuffledSame.forEach(item => variants.add(item));
+                const fallbackPool = syllables.filter(item => !variants.has(item));
+                while (variants.size < 6 && fallbackPool.length > 0) {
+                    const randomItem = fallbackPool[Math.floor(Math.random() * fallbackPool.length)];
+                    variants.add(randomItem);
+                    fallbackPool.splice(fallbackPool.indexOf(randomItem), 1);
+                }
+                const variantsArray = [...variants].sort(() => Math.random() - 0.5);
+
+                examOptions.innerHTML = '';
+                variantsArray.forEach(variant => {
+                    const btn = document.createElement('button');
+                    btn.className = 'exam-option';
+                    btn.textContent = variant.toUpperCase();
+                    btn.addEventListener('click', () => handleExamAnswer(btn, variant, correct));
+                    examOptions.appendChild(btn);
+                });
+                playAudio(correct);
+            }
+            function handleExamAnswer(btn, selected, correct) {
+                const allOptions = examOptions.querySelectorAll('.exam-option');
+                allOptions.forEach(opt => opt.disabled = true);
+                if (selected === correct) {
+                    btn.classList.add('correct');
+                    examScore++;
+                    examResult.textContent = '👍';
+                } else {
+                    btn.classList.add('wrong');
+                    allOptions.forEach(opt => {
+                        if (opt.textContent === correct.toUpperCase()) opt.classList.add('correct');
+                    });
+                    examResult.textContent = '❌';
+                }
+                examRepeatBtn.style.display = 'none';
+                examNextBtn.classList.add('show');
+                examNextBtn.focus();
+            }
+            examNextBtn.addEventListener('click', () => {
+                examIndex++;
+                showNextExamQuestion();
+            });
+            examExitBtn.addEventListener('click', () => {
+                examOverlay.classList.remove('show');
+                if (currentAudio) {
+                    currentAudio.pause();
+                    currentAudio.src = '';
+                    currentAudio = null;
+                }
+                examNextBtn.classList.remove('show');
+                examRepeatBtn.style.display = 'flex';
+                showToast('💔', 'info');
+            });
+            examRepeatBtn.addEventListener('click', () => {
+                if (currentExamCorrect) playAudio(currentExamCorrect);
+            });
+
+            const gifUrls = [
+                'https://media.gifs.ru/2158157ec6a1788936055b9e9911600c84c63e85_300.webp',
+                'https://media.gifs.ru/2771cc0c57b56e4c6cfa23d2d9d3f4eb1aab5aaa_300.webp',
+                'https://media.gifs.ru/2d609cd63a3ae5874298b500f9ab4b5871aabd16_300.webp',
+                'https://media.gifs.ru/3f25bc7fbec4825f63f6e619e0bd3c8819d80aa9_300.webp',
+                'https://media.gifs.ru/cbaddb0c4d7bea31ff48e153877a7cec628dcd22_300.webp',
+                'https://media.gifs.ru/a8e88e80cbecdfc6f34d261a843c82f8f6c2e42b_300.webp',
+                'https://media.gifs.ru/2640e63683ecae76864a3b8cc40cfe569bb188de_300.webp',
+                'https://media.gifs.ru/dea46c4e68cbe967d1044828093869737c0697391d7011fc3094a163248f53ff_300.webp',
+                'https://media.gifs.ru/e6eeccd12fe0d671a5e0f134daafcd7068cef5cf3c99affb72ca341eb9f43157_300.webp',
+                'https://media.gifs.ru/45256be700bbfc9f441b0ea62ed7069989ac7cda44f5ecdf2399deaf60954a58_300.webp',
+                'https://media.gifs.ru/f3e3b39148c45df671a433372b8b3cf4bdc997fa799bf8406d281ef593e97b10_300.webp'
+            ];
+            function showCelebration() {
+                const randomGif = gifUrls[Math.floor(Math.random() * gifUrls.length)];
+                celebrationGif.src = randomGif;
+                celebrationOverlay.classList.add('show');
+            }
+            celebrationClose.addEventListener('click', () => {
+                celebrationOverlay.classList.remove('show');
+            });
+            celebrationOverlay.addEventListener('click', (e) => {
+                if (e.target === celebrationOverlay) {
+                    celebrationOverlay.classList.remove('show');
+                }
+            });
+
+            function showToast(message, type = 'info') {
+                const toast = document.createElement('div');
+                toast.className = 'toast';
+                if (type === 'error') toast.classList.add('error');
+                if (type === 'success') toast.classList.add('success');
+                toast.textContent = message;
+                toastContainer.appendChild(toast);
+                setTimeout(() => toast.remove(), 2000);
+            }
 
             const heroesData = [
                 { name: "Александров", birth: 1883, death: 1946, images: ["Александров.jpg"], audio: "Александров.wav" },
@@ -992,48 +1276,47 @@
                 const startYear = 1650;
                 const endYear = 2000;
                 const scale = 3; // px per year
-                const width = (endYear - startYear) * scale;
+                const totalWidth = (endYear - startYear) * scale;
 
-                let html = `<div class="timeline-track" style="width:${width}px;">`;
-                html += `<div class="timeline-line" style="left:0; width:100%;"></div>`;
-
-                // Шкала десятилетий и веков
-                for (let year = startYear; year <= endYear; year += 10) {
-                    const left = (year - startYear) * scale;
-                    const label = year % 100 === 0 ? `Век ${Math.floor(year/100)}` : '';
-                    html += `<div class="scale-mark" style="left:${left}px;">${label || (year % 50 === 0 ? year : '')}</div>`;
-                }
-
-                // События
-                events.forEach(ev => {
-                    const left = (ev.year - startYear) * scale;
-                    html += `
-                        <div class="event-mark" style="left:${left}px;">
-                            <div class="event-dot"></div>
-                            <div class="event-label">${ev.label}</div>
+                container.innerHTML = `
+                    <div class="timeline-inner" style="width:${totalWidth}px;">
+                        <div class="timeline-line"></div>
+                        <div class="timeline-scale">
+                            ${(() => {
+                                let marks = '';
+                                for (let year = startYear; year <= endYear; year += 50) {
+                                    const left = (year - startYear) * scale;
+                                    marks += `<div class="scale-mark" style="left:${left}px;">${year}</div>`;
+                                }
+                                return marks;
+                            })()}
                         </div>
-                    `;
-                });
-
-                // Герои
-                heroesData.forEach(hero => {
-                    const mid = (hero.birth + hero.death) / 2;
-                    const left = (mid - startYear) * scale;
-                    const imagePath = `Great Rus/${hero.images[0]}`;
-                    const lifespan = `${hero.birth}–${hero.death}`;
-                    html += `
-                        <div class="hero-item" style="left:${left}px;" data-name="${hero.name}" data-audio="Great Rus/${hero.audio}" data-images='${JSON.stringify(hero.images.map(img => "Great Rus/" + img))}' data-lifespan="${lifespan}">
-                            <img src="${imagePath}" alt="${hero.name}" loading="lazy">
-                            <div class="hero-lifespan">${lifespan}</div>
-                        </div>
-                    `;
-                });
-
-                html += `</div>`;
-                container.innerHTML = html;
+                        ${events.map(ev => {
+                            const left = (ev.year - startYear) * scale;
+                            return `
+                                <div class="event-point" style="left:${left}px;">
+                                    <div class="event-dot"></div>
+                                    <div class="event-label">${ev.label}</div>
+                                </div>
+                            `;
+                        }).join('')}
+                        ${heroesData.map(hero => {
+                            const mid = (hero.birth + hero.death) / 2;
+                            const left = (mid - startYear) * scale;
+                            const imagePath = `Great Rus/${hero.images[0]}`;
+                            const lifespan = `${hero.birth}–${hero.death}`;
+                            return `
+                                <div class="hero-point" style="left:${left}px;" data-name="${hero.name}" data-audio="Great Rus/${hero.audio}" data-images='${JSON.stringify(hero.images.map(img => "Great Rus/" + img))}'>
+                                    <img src="${imagePath}" alt="${hero.name}" loading="lazy">
+                                    <div class="lifespan">${lifespan}</div>
+                                </div>
+                            `;
+                        }).join('')}
+                    </div>
+                `;
 
                 // Обработчики кликов
-                container.querySelectorAll('.hero-item').forEach(item => {
+                container.querySelectorAll('.hero-point').forEach(item => {
                     item.addEventListener('click', function() {
                         const name = this.dataset.name;
                         const audioSrc = this.dataset.audio;
@@ -1043,7 +1326,6 @@
                 });
             }
 
-            // Модальное окно (такое же, как и раньше)
             let heroModal = null;
             let heroAudio = new Audio();
             let currentImageIndex = 0;
@@ -1051,8 +1333,10 @@
 
             function openHeroModal(name, images, audioSrc) {
                 if (heroModal) heroModal.remove();
+
                 currentImages = images;
                 currentImageIndex = 0;
+
                 heroModal = document.createElement('div');
                 heroModal.className = 'hero-modal';
                 heroModal.innerHTML = `
@@ -1068,6 +1352,7 @@
                     </div>
                 `;
                 document.body.appendChild(heroModal);
+
                 playHeroAudio(audioSrc);
 
                 heroModal.querySelector('.hero-modal-close').addEventListener('click', () => {
@@ -1075,6 +1360,7 @@
                     heroAudio.pause();
                     heroAudio.currentTime = 0;
                 });
+
                 heroModal.addEventListener('click', (e) => {
                     if (e.target === heroModal) {
                         heroModal.remove();
@@ -1082,6 +1368,7 @@
                         heroAudio.currentTime = 0;
                     }
                 });
+
                 const prevBtn = heroModal.querySelector('.prev-image');
                 const nextBtn = heroModal.querySelector('.next-image');
                 if (prevBtn) {
@@ -1096,6 +1383,7 @@
                         heroModal.querySelector('.hero-modal-portrait').src = currentImages[currentImageIndex];
                     });
                 }
+
                 heroModal.querySelector('.hero-modal-repeat').addEventListener('click', () => {
                     playHeroAudio(audioSrc);
                 });
@@ -1106,7 +1394,6 @@
                 heroAudio.play().catch(e => console.log('Ошибка воспроизведения', e));
             }
 
-            // Инициализация
             renderHeroesTimeline();
             renderGrid();
         })();
