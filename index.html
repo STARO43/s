@@ -686,7 +686,6 @@
             cursor: pointer;
             padding: 10px;
             border-radius: var(--radius);
-            transition: background 0.3s;
         }
 
         .hero-circle {
@@ -950,8 +949,8 @@
         <h1>Грамотиньо</h1>
 
         <div class="section-switch">
-            <button class="section-switch-btn active" data-section="syllables">Слоги</button>
-            <button class="section-switch-btn" data-section="heroes">Личности</button>
+            <button class="section-switch-btn active" data-section="syllables">Учим слоги</button>
+            <button class="section-switch-btn" data-section="heroes">Знакомимся с великими</button>
         </div>
 
         <p id="sectionSubtitle">Учим слоги. Жми, слушай, запоминай</p>
@@ -1433,7 +1432,7 @@
                 { name: "Писарев", birthYear: 1840, deathYear: 1868, images: ["Писарев.jpg"], audio: "Писарев.wav" },
                 { name: "Попов", birthYear: 1859, deathYear: 1906, images: ["Попов.jpg"], audio: "Попов.wav" },
                 { name: "Пушкин", birthYear: 1799, deathYear: 1837, images: ["Пушкин.jpg","Пушкин3.jpg"], audio: "Пушкин.wav" },
-                { name: "Репин", birthYear: 1844, deathYear: 1930, images: ["Репин.jpg"], audio: "Репин.wav" },
+                { name: "Репин", birthYear: 1844, deathYear: 1930, overrideCentury: 19, images: ["Репин.jpg"], audio: "Репин.wav" },
                 { name: "Римский-Корсаков", birthYear: 1844, deathYear: 1908, images: ["Римский-Корсаков.jpg"], audio: "Римский-Корсаков.wav" },
                 { name: "Салтыков-Щедрин", birthYear: 1826, deathYear: 1889, images: ["Салтыков-Щедрин.jpg"], audio: "Салтыков-Щедрин.wav" },
                 { name: "Семашко", birthYear: 1874, deathYear: 1949, images: ["Семашко.jpg"], audio: "Семашко.wav" },
@@ -1454,10 +1453,20 @@
             function renderHeroesTimeline() {
                 if (!heroesTimeline) return;
                 
+                // Обновленная логика: если есть overrideCentury, используем его, иначе считаем по году смерти
                 const centuries = [
-                    { name: "XVIII век", filter: h => h.deathYear < 1801 },
-                    { name: "XIX век", filter: h => h.deathYear >= 1801 && h.deathYear <= 1921 },
-                    { name: "XX век", filter: h => h.deathYear > 1921 }
+                    { 
+                        name: "XVIII век", 
+                        filter: h => h.overrideCentury === 18 || (!h.overrideCentury && h.deathYear < 1801) 
+                    },
+                    { 
+                        name: "XIX век", 
+                        filter: h => h.overrideCentury === 19 || (!h.overrideCentury && h.deathYear >= 1801 && h.deathYear <= 1921) 
+                    },
+                    { 
+                        name: "XX век", 
+                        filter: h => h.overrideCentury === 20 || (!h.overrideCentury && h.deathYear > 1921) 
+                    }
                 ];
 
                 let html = '<div class="timeline-container">';
