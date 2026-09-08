@@ -127,7 +127,6 @@
             margin: 8px 0 4px;
         }
 
-        /* Переключатель раздела */
         .section-switch {
             display: inline-flex;
             background: var(--bg-card);
@@ -158,7 +157,6 @@
             color: var(--text);
         }
 
-        /* Динамический подзаголовок */
         #sectionSubtitle {
             color: var(--text-secondary);
             font-size: 1rem;
@@ -167,7 +165,6 @@
             min-height: 1.2em;
         }
 
-        /* Контейнер секций */
         .content-wrapper {
             flex: 1;
             max-width: 900px;
@@ -322,11 +319,7 @@
             color: var(--text);
             user-select: none;
             -webkit-tap-highlight-color: transparent;
-            transition: background var(--transition),
-                border-color var(--transition),
-                box-shadow var(--transition),
-                transform var(--transition),
-                color 0.3s;
+            transition: background var(--transition), border-color var(--transition), box-shadow var(--transition), transform var(--transition), color 0.3s;
             position: relative;
             font-family: var(--font);
             letter-spacing: 0.04em;
@@ -641,181 +634,147 @@
             border-top: 1px solid var(--border);
         }
 
-        /* Улучшенная линия времени */
+        /* === УЛУЧШЕННАЯ ЛИНИЯ ВРЕМЕНИ === */
         .heroes-timeline {
             max-width: 100%;
             margin: 30px 0;
             padding: 0 10px;
-            position: relative;
         }
 
         .timeline-century-block {
-            margin-bottom: 60px;
             position: relative;
+            min-height: 600px; /* Фиксированная высота для пропорционального масштабирования */
+            margin-bottom: 60px;
+            padding-left: 90px; /* Место для оси времени */
         }
 
         .timeline-century-title {
             font-size: 1.8rem;
             font-weight: 700;
             color: var(--accent);
-            margin-bottom: 30px;
-            padding-left: 20px;
+            margin-bottom: 20px;
+            padding-left: 10px;
             border-left: 4px solid var(--accent);
             text-shadow: 0 0 20px var(--accent-glow);
         }
 
-        .timeline-container {
-            display: flex;
+        .timeline-axis-container {
             position: relative;
-            padding-left: 100px;
-        }
-
-        .timeline-axis {
-            position: absolute;
-            left: 0;
-            top: 0;
-            bottom: 0;
-            width: 100px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
+            height: 100%;
+            min-height: 500px;
         }
 
         .timeline-main-line {
             position: absolute;
-            left: 50%;
+            left: 30px;
             top: 0;
             bottom: 0;
-            width: 4px;
-            background: linear-gradient(to bottom, var(--accent), var(--accent-glow), var(--accent));
-            transform: translateX(-50%);
+            width: 3px;
+            background: linear-gradient(to bottom, transparent, var(--accent), var(--accent), transparent);
             border-radius: 2px;
         }
 
         .decade-marker {
-            position: relative;
-            width: 100%;
+            position: absolute;
+            left: 0;
+            transform: translateY(-50%);
             display: flex;
             align-items: center;
-            justify-content: flex-end;
-            padding-right: 10px;
-            margin: 20px 0;
-            opacity: 0.7;
+            gap: 12px;
             transition: opacity 0.3s;
         }
 
-        .decade-marker:hover {
-            opacity: 1;
+        .decade-dot {
+            width: 10px;
+            height: 10px;
+            background: var(--bg);
+            border: 2px solid var(--accent);
+            border-radius: 50%;
+            box-shadow: 0 0 8px var(--accent-glow);
         }
 
         .decade-year {
-            font-size: 0.9rem;
-            font-weight: 700;
+            font-size: 0.85rem;
             color: var(--text-secondary);
+            font-weight: 600;
             background: var(--bg-card);
-            padding: 4px 8px;
-            border-radius: 6px;
+            padding: 2px 8px;
+            border-radius: 4px;
             border: 1px solid var(--border);
-            white-space: nowrap;
-        }
-
-        .decade-dot {
-            position: absolute;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 12px;
-            height: 12px;
-            background: var(--accent);
-            border-radius: 50%;
-            box-shadow: 0 0 10px var(--accent-glow);
-        }
-
-        .heroes-track {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
-            padding: 20px;
-            background: var(--bg-card);
-            border: 1px solid var(--border);
-            border-radius: var(--radius);
-            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
         }
 
         .hero-card {
+            position: absolute;
+            left: 60px;
+            transform: translateY(-50%);
             display: flex;
             align-items: center;
-            gap: 20px;
-            padding: 15px;
-            background: var(--bg-card-hover);
+            gap: 15px;
+            padding: 12px 16px;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
             border-radius: var(--radius);
-            border: 2px solid transparent;
-            transition: all var(--transition);
             cursor: pointer;
-            position: relative;
-            animation: slideIn 0.5s ease;
+            transition: all var(--transition);
+            width: calc(100% - 80px);
+            max-width: 500px;
+            z-index: 5;
         }
 
-        @keyframes slideIn {
-            from { 
-                opacity: 0; 
-                transform: translateX(-20px); 
-            }
-            to { 
-                opacity: 1; 
-                transform: translateX(0); 
-            }
+        /* Линия-коннектор к оси времени */
+        .hero-card::before {
+            content: '';
+            position: absolute;
+            left: -32px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 30px;
+            height: 2px;
+            background: var(--accent);
+            opacity: 0.4;
+            transition: opacity 0.3s, width 0.3s;
+        }
+
+        .hero-card::after {
+            content: '';
+            position: absolute;
+            left: -36px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 8px;
+            height: 8px;
+            background: var(--accent);
+            border-radius: 50%;
+            box-shadow: 0 0 8px var(--accent-glow);
+            opacity: 0.6;
+            transition: opacity 0.3s, transform 0.3s;
         }
 
         .hero-card:hover {
             border-color: var(--accent);
-            transform: translateX(10px);
+            transform: translateY(-50%) translateX(8px);
             box-shadow: 0 4px 20px var(--accent-glow);
-        }
-
-        .hero-card::before {
-            content: '';
-            position: absolute;
-            left: -122px;
-            top: 50%;
-            transform: translateY(-50%);
-            width: 100px;
-            height: 2px;
-            background: linear-gradient(to right, var(--accent), transparent);
-            opacity: 0;
-            transition: opacity 0.3s;
+            z-index: 20;
+            background: var(--bg-card-hover);
         }
 
         .hero-card:hover::before {
             opacity: 1;
+            width: 34px;
         }
 
-        .hero-connector {
-            position: absolute;
-            left: -122px;
-            top: 50%;
-            transform: translateY(-50%);
-            width: 12px;
-            height: 12px;
-            background: var(--accent);
-            border-radius: 50%;
-            border: 3px solid var(--bg-card);
-            box-shadow: 0 0 10px var(--accent-glow);
-            opacity: 0;
-            transition: opacity 0.3s;
-        }
-
-        .hero-card:hover .hero-connector {
+        .hero-card:hover::after {
             opacity: 1;
+            transform: translateY(-50%) scale(1.3);
         }
 
         .hero-image {
-            width: 80px;
-            height: 80px;
+            width: 70px;
+            height: 70px;
             border-radius: 50%;
             object-fit: cover;
-            border: 3px solid var(--accent);
-            box-shadow: 0 4px 10px rgba(0,0,0,0.4);
+            border: 2px solid var(--accent);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
             flex-shrink: 0;
         }
 
@@ -824,42 +783,42 @@
         }
 
         .hero-name {
-            font-size: 1.3rem;
+            font-size: 1.2rem;
             font-weight: 700;
             color: var(--text);
-            margin-bottom: 5px;
-        }
-
-        .hero-years {
-            font-size: 0.95rem;
-            color: var(--accent);
-            font-weight: 600;
-            margin-bottom: 3px;
+            margin-bottom: 4px;
         }
 
         .hero-lifespan {
-            font-size: 0.85rem;
-            color: var(--text-secondary);
+            font-size: 1rem;
+            font-weight: 700;
+            color: var(--accent);
+            text-shadow: 0 0 10px var(--accent-glow);
+            letter-spacing: 0.05em;
         }
 
+        /* Пузырь с годом при скролле */
         .year-bubble {
             position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0.8);
             background: var(--accent);
             color: white;
-            padding: 8px 16px;
-            border-radius: 20px;
+            padding: 10px 24px;
+            border-radius: 30px;
             font-weight: 700;
-            font-size: 1.1rem;
-            box-shadow: 0 4px 15px var(--accent-glow);
+            font-size: 1.2rem;
+            box-shadow: 0 8px 30px var(--accent-glow);
             pointer-events: none;
             opacity: 0;
-            transition: opacity 0.3s;
+            transition: opacity 0.3s, transform 0.3s;
             z-index: 1000;
-            transform: translateX(-50%);
         }
 
         .year-bubble.show {
             opacity: 1;
+            transform: translate(-50%, -50%) scale(1);
         }
 
         /* Модальное окно героя */
@@ -869,7 +828,8 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: var(--bg);
+            background: rgba(10, 14, 23, 0.95);
+            backdrop-filter: blur(5px);
             z-index: 5000;
             display: flex;
             align-items: center;
@@ -921,7 +881,7 @@
         }
         .hero-modal-portrait {
             max-width: 90%;
-            max-height: 70vh;
+            max-height: 65vh;
             object-fit: contain;
             border-radius: 8px;
             box-shadow: 0 10px 40px rgba(0,0,0,0.6);
@@ -939,16 +899,16 @@
             right: 0;
             display: flex;
             justify-content: space-between;
-            padding: 0 10px;
+            padding: 0 20px;
             z-index: 10;
         }
         .hero-modal-nav button {
             background: rgba(0,0,0,0.4);
             border: none;
             color: white;
-            font-size: 4rem;
-            width: 70px;
-            height: 70px;
+            font-size: 3rem;
+            width: 60px;
+            height: 60px;
             cursor: pointer;
             display: flex;
             align-items: center;
@@ -962,29 +922,15 @@
 
         @media (max-width: 1024px) {
             .syllable-grid { grid-template-columns: repeat(3, 1fr); gap: 8px; }
-            .timeline-container {
-                padding-left: 60px;
-            }
-            .timeline-axis {
-                width: 60px;
-            }
-            .hero-card::before {
-                left: -82px;
-                width: 60px;
-            }
-            .hero-connector {
-                left: -82px;
-            }
+            .timeline-century-block { padding-left: 70px; }
+            .timeline-main-line { left: 20px; }
+            .hero-card { left: 45px; width: calc(100% - 60px); }
+            .hero-card::before { left: -27px; width: 25px; }
+            .hero-card::after { left: -31px; }
         }
+
         @media (max-width: 600px) {
-            .exam-exit-btn {
-                top: auto;
-                bottom: 10px;
-                left: 10px;
-                width: 34px;
-                height: 34px;
-                font-size: 1.1rem;
-            }
+            .exam-exit-btn { top: auto; bottom: 10px; left: 10px; width: 34px; height: 34px; font-size: 1.1rem; }
             .syllable-grid { grid-template-columns: repeat(2, 1fr); gap: 5px; }
             .syllable-card { font-size: 0.95rem; padding: 10px 4px; min-height: 45px; }
             .learn-dot { width: 10px; height: 10px; bottom: 3px; right: 4px; }
@@ -996,25 +942,27 @@
             .theme-cycle button { width: 32px; height: 32px; }
             .header { padding: 16px 12px 10px; }
             .section-switch-btn { padding: 8px 16px; font-size: 1rem; }
-            .hero-modal-nav button { width: 50px; height: 50px; font-size: 3rem; }
-            .timeline-container {
-                padding-left: 0;
+            .hero-modal-nav button { width: 45px; height: 45px; font-size: 2rem; }
+            
+            /* Мобильная адаптация таймлайна */
+            .timeline-century-block { 
+                padding-left: 50px; 
+                min-height: 400px;
             }
-            .timeline-axis {
-                display: none;
+            .timeline-main-line { left: 15px; }
+            .decade-marker { gap: 6px; }
+            .decade-year { font-size: 0.75rem; padding: 2px 6px; }
+            .decade-dot { width: 8px; height: 8px; }
+            .hero-card { 
+                left: 35px; 
+                width: calc(100% - 45px); 
+                padding: 10px;
             }
-            .hero-card {
-                flex-direction: column;
-                text-align: center;
-            }
-            .hero-card::before,
-            .hero-connector {
-                display: none;
-            }
-            .hero-image {
-                width: 100px;
-                height: 100px;
-            }
+            .hero-card::before { left: -22px; width: 20px; }
+            .hero-card::after { left: -26px; width: 6px; height: 6px; }
+            .hero-image { width: 55px; height: 55px; }
+            .hero-name { font-size: 1rem; }
+            .hero-lifespan { font-size: 0.9rem; }
         }
     </style>
 </head>
@@ -1033,8 +981,8 @@
         <h1>Грамотиньо</h1>
 
         <div class="section-switch">
-            <button class="section-switch-btn active" data-section="syllables"></button>
-            <button class="section-switch-btn" data-section="heroes"></button>
+            <button class="section-switch-btn active" data-section="syllables">Слоги</button>
+            <button class="section-switch-btn" data-section="heroes">Личности</button>
         </div>
 
         <p id="sectionSubtitle">Учим слоги. Жми, слушай, запоминай</p>
@@ -1048,8 +996,8 @@
             </div>
 
             <div class="controls">
-                <button id="normalBtn" class="active" data-tooltip="Все"></button>
-                <button id="randomBtn" data-tooltip="Случайно"></button>
+                <button id="normalBtn" class="active" data-tooltip="Все">🅰</button>
+                <button id="randomBtn" data-tooltip="Случайно">🎲</button>
                 <button id="hideLearnedBtn" data-tooltip="Скрыть/показать">✂</button>
                 <button id="clearLearnedBtn" data-tooltip="Очистить">↩</button>
                 <button id="examBtn" data-tooltip="Викторина">🍓</button>
@@ -1171,6 +1119,7 @@
             let examScore = 0;
             let currentExamCorrect = '';
             let currentSection = 'syllables';
+            let bubbleTimeout;
 
             const themeList = [
                 'theme-blue', 'theme-green', 'theme-red', 'theme-orange',
@@ -1438,7 +1387,7 @@
                 }
                 examNextBtn.classList.remove('show');
                 examRepeatBtn.style.display = 'flex';
-                showToast('💔', 'info');
+                showToast('Выход из викторины', 'info');
             });
             examRepeatBtn.addEventListener('click', () => {
                 if (currentExamCorrect) playAudio(currentExamCorrect);
@@ -1535,71 +1484,58 @@
             function renderHeroesTimeline() {
                 if (!heroesTimeline) return;
                 
-                // Группировка по векам
                 const centuries = {
-                    "XVII век": heroesData.filter(h => h.birthYear >= 1600 && h.birthYear < 1700),
-                    "XVIII век": heroesData.filter(h => h.birthYear >= 1700 && h.birthYear < 1800),
-                    "XIX век": heroesData.filter(h => h.birthYear >= 1800 && h.birthYear < 1900),
-                    "XX век": heroesData.filter(h => h.birthYear >= 1900 && h.birthYear < 2000)
+                    "XVII век": { start: 1600, heroes: heroesData.filter(h => h.birthYear >= 1600 && h.birthYear < 1700) },
+                    "XVIII век": { start: 1700, heroes: heroesData.filter(h => h.birthYear >= 1700 && h.birthYear < 1800) },
+                    "XIX век": { start: 1800, heroes: heroesData.filter(h => h.birthYear >= 1800 && h.birthYear < 1900) },
+                    "XX век": { start: 1900, heroes: heroesData.filter(h => h.birthYear >= 1900 && h.birthYear < 2000) }
                 };
 
                 let html = '';
-                for (const [century, heroes] of Object.entries(centuries)) {
-                    if (heroes.length === 0) continue;
-                    
+                for (const [centuryName, data] of Object.entries(centuries)) {
+                    if (data.heroes.length === 0) continue;
+
                     html += `<div class="timeline-century-block">`;
-                    html += `<div class="timeline-century-title">${century}</div>`;
-                    html += `<div class="timeline-container">`;
-                    
-                    // Ось времени с десятилетиями
-                    html += `<div class="timeline-axis">`;
+                    html += `<div class="timeline-century-title">${centuryName}</div>`;
+                    html += `<div class="timeline-axis-container">`;
                     html += `<div class="timeline-main-line"></div>`;
-                    
-                    // Генерация маркеров десятилетий
-                    const startYear = Math.floor(heroes[0].birthYear / 10) * 10;
-                    const endYear = Math.ceil(heroes[heroes.length - 1].birthYear / 10) * 10;
-                    
-                    for (let year = startYear; year <= endYear; year += 10) {
-                        const decadeHeroes = heroes.filter(h => {
-                            const decade = Math.floor(h.birthYear / 10) * 10;
-                            return decade === year;
-                        });
-                        
-                        if (decadeHeroes.length > 0 || year % 50 === 0) {
-                            html += `<div class="decade-marker" data-year="${year}">`;
-                            html += `<div class="decade-dot"></div>`;
-                            html += `<span class="decade-year">${year}-е</span>`;
-                            html += `</div>`;
-                        }
+
+                    // Отметки десятилетий (строго пропорционально)
+                    for (let year = data.start; year < data.start + 100; year += 10) {
+                        const topPercent = ((year - data.start) / 100) * 100;
+                        html += `
+                            <div class="decade-marker" style="top: ${topPercent}%;" data-year="${year}">
+                                <div class="decade-dot"></div>
+                                <span class="decade-year">${year} г.</span>
+                            </div>
+                        `;
                     }
-                    
-                    html += `</div>`;
-                    
-                    // Карточки героев
-                    html += `<div class="heroes-track">`;
-                    heroes.sort((a, b) => a.birthYear - b.birthYear);
-                    heroes.forEach(hero => {
+
+                    // Карточки героев (позиционирование по середине жизни)
+                    data.heroes.sort((a, b) => a.birthYear - b.birthYear);
+                    data.heroes.forEach((hero, index) => {
+                        const midYear = (hero.birthYear + hero.deathYear) / 2;
+                        const topPercent = ((midYear - data.start) / 100) * 100;
                         const imagePath = `Great Rus/${hero.images[0]}`;
-                        const lifespan = `${hero.birthYear}—${hero.deathYear}`;
-                        const age = hero.deathYear - hero.birthYear;
                         
+                        // Небольшое смещение для предотвращения полного наложения карточек
+                        const offset = index % 2 === 0 ? 0 : 15; 
+
                         html += `
                             <div class="hero-card" 
+                                 style="top: calc(${topPercent}% + ${offset}px);"
                                  data-name="${hero.name}" 
-                                 data-birth="${hero.birthYear}"
                                  data-audio="Great Rus/${hero.audio}" 
                                  data-images='${JSON.stringify(hero.images.map(img => "Great Rus/" + img))}'>
-                                <div class="hero-connector"></div>
                                 <img src="${imagePath}" alt="${hero.name}" class="hero-image" loading="lazy">
                                 <div class="hero-info">
                                     <div class="hero-name">${hero.name}</div>
-                                    <div class="hero-years">Родился в ${hero.birthYear} году</div>
-                                    <div class="hero-lifespan">Годы жизни: ${lifespan} (${age} лет)</div>
+                                    <div class="hero-lifespan">${hero.birthYear} — ${hero.deathYear}</div>
                                 </div>
                             </div>
                         `;
                     });
-                    html += `</div>`;
+
                     html += `</div></div>`;
                 }
 
@@ -1608,44 +1544,37 @@
                 // Обработчики кликов по карточкам
                 heroesTimeline.querySelectorAll('.hero-card').forEach(card => {
                     card.addEventListener('click', function() {
-                        const name = this.dataset.name;
-                        const audioSrc = this.dataset.audio;
-                        const images = JSON.parse(this.dataset.images);
-                        openHeroModal(name, images, audioSrc);
+                        openHeroModal(this.dataset.name, JSON.parse(this.dataset.images), this.dataset.audio);
                     });
                 });
 
-                // Показ пузыря с годом при скролле
-                const decadeMarkers = document.querySelectorAll('.decade-marker');
-                const timelineContainer = document.querySelector('.heroes-timeline');
-                
-                if (timelineContainer && decadeMarkers.length > 0) {
-                    timelineContainer.addEventListener('scroll', () => {
-                        const scrollTop = timelineContainer.scrollTop;
-                        const containerTop = timelineContainer.offsetTop;
-                        
-                        decadeMarkers.forEach(marker => {
-                            const markerTop = marker.offsetTop;
-                            const markerHeight = marker.offsetHeight;
-                            
-                            if (scrollTop + containerTop >= markerTop - 100 && 
-                                scrollTop + containerTop < markerTop + markerHeight + 100) {
-                                const year = marker.dataset.year;
-                                showYearBubble(year, marker);
-                            }
-                        });
+                // Intersection Observer для пузырей с годами при скролле
+                const observerOptions = {
+                    root: null,
+                    rootMargin: '-40% 0px -40% 0px', // Срабатывает, когда элемент в центральной полосе экрана
+                    threshold: 0
+                };
+
+                const observer = new IntersectionObserver((entries) => {
+                    entries.forEach(entry => {
+                        if (entry.isIntersecting) {
+                            const year = entry.target.dataset.year;
+                            showYearBubble(year);
+                        }
                     });
-                }
+                }, observerOptions);
+
+                document.querySelectorAll('.decade-marker').forEach(marker => {
+                    observer.observe(marker);
+                });
             }
 
-            function showYearBubble(year, element) {
-                const rect = element.getBoundingClientRect();
+            function showYearBubble(year) {
                 yearBubble.textContent = `${year}-е годы`;
-                yearBubble.style.left = `${rect.left + rect.width / 2}px`;
-                yearBubble.style.top = `${rect.top - 50}px`;
                 yearBubble.classList.add('show');
                 
-                setTimeout(() => {
+                clearTimeout(bubbleTimeout);
+                bubbleTimeout = setTimeout(() => {
                     yearBubble.classList.remove('show');
                 }, 1500);
             }
