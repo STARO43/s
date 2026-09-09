@@ -1,397 +1,374 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
+    <link rel="icon" type="image/x-icon" href="favicon.ico">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Грамотиньо — студия речи</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=PT+Sans:wght@400;700&family=PT+Serif:ital,wght@0,400;0,700;1,400;1,700&display=swap" rel="stylesheet">
+    <title>Грамотиньо</title>
     <style>
-        /* ========== БАЗА ========== */
         :root {
-            --bg: #0c0f14;
-            --surface: rgba(255, 255, 255, 0.03);
-            --surface-hover: rgba(255, 255, 255, 0.06);
-            --border: rgba(255, 255, 255, 0.08);
-            --text: #f0f2f5;
-            --text-secondary: #8b95a7;
-            --accent: #a78bfa;
-            --accent2: #60a5fa;
-            --accent3: #f472b6;
-            --learned: #34d399;
-            --danger: #f87171;
-            --radius-sm: 10px;
-            --radius-md: 16px;
-            --radius-lg: 24px;
-            --radius-xl: 32px;
-            --font-sans: 'Manrope', sans-serif;
-            --font-display: 'Playfair Display', serif;
-            --shadow-soft: 0 8px 32px rgba(0, 0, 0, 0.25);
-            --shadow-glow: 0 0 40px rgba(167, 139, 250, 0.15);
-            --transition: 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+            --bg: #0a0e17;
+            --bg-card: #111827;
+            --bg-card-hover: #1a2433;
+            --border: #2a3443;
+            --text: #e6edf3;
+            --text-secondary: #8b9bb0;
+            --accent: #4da3ff;
+            --accent-glow: rgba(77, 163, 255, 0.25);
+            --learned: #3fb950;
+            --learned-bg: rgba(63, 185, 80, 0.2);
+            --danger: #f85149;
+            --danger-glow: rgba(248, 81, 73, 0.2);
+            --radius: 12px;
+            --transition: 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            --font: 'PT Serif', serif;
         }
 
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
+        body.light-mode {
+            --bg: #f5f7fa;
+            --bg-card: #ffffff;
+            --bg-card-hover: #eef1f5;
+            --border: #d1d9e2;
+            --text: #1a1f2e;
+            --text-secondary: #4b5a6b;
+            --accent: #1d7be0;
+            --accent-glow: rgba(29, 123, 224, 0.15);
+            --learned: #2e9e4f;
+            --learned-bg: rgba(46, 158, 79, 0.15);
+            --danger: #d9382e;
+            --danger-glow: rgba(217, 56, 46, 0.15);
         }
+
+        body.theme-blue   { --accent: #4da3ff; --accent-glow: rgba(77, 163, 255, 0.25); --learned: #3fb950; --learned-bg: rgba(63, 185, 80, 0.2); }
+        body.theme-green  { --accent: #4ade80; --accent-glow: rgba(74, 222, 128, 0.25); --learned: #38bdf8; --learned-bg: rgba(56, 189, 248, 0.2); }
+        body.theme-red    { --accent: #f87171; --accent-glow: rgba(248, 113, 113, 0.25); --learned: #a78bfa; --learned-bg: rgba(167, 139, 250, 0.2); }
+        body.theme-orange { --accent: #fb923c; --accent-glow: rgba(251, 146, 60, 0.25); --learned: #fbbf24; --learned-bg: rgba(251, 191, 36, 0.2); }
+        body.theme-purple { --accent: #c084fc; --accent-glow: rgba(192, 132, 252, 0.25); --learned: #60a5fa; --learned-bg: rgba(96, 165, 250, 0.2); }
+        body.theme-pink   { --accent: #f472b6; --accent-glow: rgba(244, 114, 182, 0.25); --learned: #34d399; --learned-bg: rgba(52, 211, 153, 0.2); }
+        body.theme-cyan   { --accent: #22d3ee; --accent-glow: rgba(34, 211, 238, 0.25); --learned: #a3e635; --learned-bg: rgba(163, 230, 53, 0.2); }
+        body.theme-yellow { --accent: #facc15; --accent-glow: rgba(250, 204, 21, 0.25); --learned: #10b981; --learned-bg: rgba(16, 185, 129, 0.2); }
+        body.theme-teal   { --accent: #2dd4bf; --accent-glow: rgba(45, 212, 191, 0.25); --learned: #f59e0b; --learned-bg: rgba(245, 158, 11, 0.2); }
+        body.theme-indigo { --accent: #818cf8; --accent-glow: rgba(129, 140, 248, 0.25); --learned: #f472b6; --learned-bg: rgba(244, 114, 182, 0.2); }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
 
         body {
             background: var(--bg);
             color: var(--text);
-            font-family: var(--font-sans);
+            font-family: var(--font);
             min-height: 100vh;
-            line-height: 1.5;
+            line-height: 1.4;
             -webkit-font-smoothing: antialiased;
             display: flex;
             flex-direction: column;
-            overflow-x: hidden;
-            position: relative;
+            transition: background 0.3s, color 0.3s;
+            background-image: radial-gradient(circle at 20% 20%, var(--accent-glow) 0%, transparent 50%),
+                              radial-gradient(circle at 80% 80%, var(--accent-glow) 0%, transparent 50%);
         }
 
-        /* ========== АНИМИРОВАННЫЙ ФОН ========== */
-        .aurora-bg {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: 0;
-            pointer-events: none;
-            overflow: hidden;
-        }
-        .aurora-bg::before,
-        .aurora-bg::after {
-            content: '';
-            position: absolute;
-            width: 60vw;
-            height: 60vw;
-            border-radius: 50%;
-            filter: blur(80px);
-            opacity: 0.4;
-            animation: floatAurora 20s ease-in-out infinite;
-        }
-        .aurora-bg::before {
-            background: var(--accent);
-            top: -20%;
-            left: -10%;
-        }
-        .aurora-bg::after {
-            background: var(--accent2);
-            bottom: -20%;
-            right: -10%;
-            animation-delay: -7s;
-        }
-        .aurora-bg .aurora-3 {
-            position: absolute;
-            width: 40vw;
-            height: 40vw;
-            border-radius: 50%;
-            background: var(--accent3);
-            filter: blur(80px);
-            opacity: 0.3;
-            top: 40%;
-            left: 40%;
-            animation: floatAurora 25s ease-in-out infinite reverse;
-        }
-        @keyframes floatAurora {
-            0%, 100% { transform: translate(0, 0) scale(1); }
-            33% { transform: translate(5vw, -3vw) scale(1.1); }
-            66% { transform: translate(-3vw, 4vw) scale(0.9); }
-        }
-
-        /* ========== КОНТЕЙНЕР ========== */
-        .app-container {
-            position: relative;
-            z-index: 1;
-            max-width: 1200px;
-            width: 100%;
-            margin: 0 auto;
-            padding: 1.5rem;
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            gap: 2rem;
-        }
-
-        /* ========== ШАПКА ========== */
         .header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            flex-wrap: wrap;
-            gap: 1rem;
-            padding: 0.5rem 0;
+            padding: 20px 20px 12px;
+            text-align: center;
+            background: linear-gradient(180deg, var(--accent-glow) 0%, transparent 100%);
+            border-bottom: 1px solid var(--border);
+            position: relative;
         }
-        .logo {
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-            text-decoration: none;
+        .theme-toggle {
+            position: absolute;
+            top: 12px;
+            right: 16px;
         }
-        .logo-icon {
-            width: 42px;
-            height: 42px;
-            border-radius: 14px;
-            background: linear-gradient(135deg, var(--accent), var(--accent2));
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.4rem;
-            color: #fff;
-            box-shadow: 0 4px 16px rgba(167, 139, 250, 0.4);
+        .theme-cycle {
+            position: absolute;
+            top: 12px;
+            left: 16px;
         }
-        .logo-text {
-            font-family: var(--font-display);
-            font-size: 1.6rem;
-            font-weight: 700;
-            letter-spacing: -0.02em;
-        }
-        .header-actions {
-            display: flex;
-            gap: 0.5rem;
-            align-items: center;
-        }
-        .icon-btn {
-            background: var(--surface);
+        .theme-toggle button,
+        .theme-cycle button {
+            background: var(--bg-card);
             border: 1px solid var(--border);
-            color: var(--text-secondary);
-            width: 40px;
-            height: 40px;
+            color: var(--text);
             border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            width: 36px;
+            height: 36px;
             cursor: pointer;
             font-size: 1.1rem;
-            transition: all var(--transition);
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: var(--transition);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
         }
-        .icon-btn:hover {
-            background: var(--surface-hover);
-            color: var(--text);
-            border-color: rgba(255,255,255,0.2);
-            transform: translateY(-2px);
-            box-shadow: var(--shadow-soft);
+        .theme-toggle button:hover,
+        .theme-cycle button:hover {
+            border-color: var(--accent);
+            color: var(--accent);
+            box-shadow: 0 0 10px var(--accent-glow);
         }
-        .color-dot {
-            width: 12px;
-            height: 12px;
+        .theme-cycle .color-indicator {
+            width: 18px;
+            height: 18px;
             border-radius: 50%;
             background: var(--accent);
-            display: inline-block;
             transition: background 0.3s;
         }
 
-        /* ========== ПЕРЕКЛЮЧАТЕЛЬ СЕКЦИЙ ========== */
-        .section-nav {
-            display: flex;
-            gap: 0.5rem;
-            background: var(--surface);
+        .header h1 {
+            font-size: clamp(1.8rem, 5vw, 2.8rem);
+            font-weight: 700;
+            letter-spacing: 0.05em;
+            background: linear-gradient(135deg, var(--text) 60%, var(--accent) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin: 8px 0 4px;
+        }
+
+        .section-switch {
+            display: inline-flex;
+            background: var(--bg-card);
             border: 1px solid var(--border);
-            border-radius: 100px;
-            padding: 0.3rem;
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-            align-self: center;
+            border-radius: 50px;
+            padding: 4px;
+            margin-top: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
         }
-        .section-btn {
-            padding: 0.7rem 1.8rem;
-            border: none;
+        .section-switch-btn {
             background: transparent;
+            border: none;
             color: var(--text-secondary);
-            font-family: var(--font-sans);
-            font-weight: 600;
-            font-size: 0.85rem;
-            border-radius: 100px;
+            padding: 10px 24px;
             cursor: pointer;
-            transition: all var(--transition);
-            letter-spacing: 0.02em;
-        }
-        .section-btn.active {
-            background: rgba(167, 139, 250, 0.2);
-            color: var(--accent);
-            box-shadow: 0 0 20px rgba(167, 139, 250, 0.2);
-        }
-        .section-btn:hover:not(.active) {
-            color: var(--text);
-        }
-
-        /* ========== ПОДЗАГОЛОВОК ========== */
-        .subtitle {
-            text-align: center;
-            color: var(--text-secondary);
-            font-size: 0.9rem;
-            font-weight: 500;
-            min-height: 1.2em;
-            letter-spacing: 0.03em;
-        }
-
-        /* ========== КАРТОЧКИ СЛОГОВ ========== */
-        .syllables-section {
-            display: none;
-            animation: sectionFade 0.5s ease;
-        }
-        .syllables-section.active {
-            display: block;
-        }
-        @keyframes sectionFade {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        .progress-row {
+            font-family: 'PT Sans', sans-serif;
+            font-weight: 600;
+            font-size: 0.95rem;
+            border-radius: 40px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            white-space: nowrap;
             display: flex;
             align-items: center;
-            gap: 1rem;
-            margin-bottom: 1rem;
-            padding: 0 0.5rem;
+            gap: 6px;
+        }
+        .section-switch-btn.active {
+            background: var(--accent);
+            color: #ffffff;
+            box-shadow: 0 4px 12px var(--accent-glow);
+        }
+        .section-switch-btn:hover:not(.active) {
+            color: var(--text);
+            background: var(--bg-card-hover);
+        }
+
+        #sectionSubtitle {
+            color: var(--text-secondary);
+            font-size: 1rem;
+            font-weight: 500;
+            margin-top: 8px;
+            min-height: 1.2em;
+        }
+
+        .content-wrapper {
+            flex: 1;
+            max-width: 900px;
+            width: 100%;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        
+        .tab-section {
+            display: none;
+        }
+        .tab-section.active {
+            display: block;
+            animation: tabEnter 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+        @keyframes tabEnter {
+            from { 
+                opacity: 0; 
+                transform: translateY(15px) scale(0.98); 
+            }
+            to { 
+                opacity: 1; 
+                transform: translateY(0) scale(1); 
+            }
+        }
+
+        .progress-container {
+            max-width: 900px;
+            margin: 8px auto 0;
+            padding: 0 20px;
+            text-align: center;
         }
         .progress-label {
             font-size: 0.8rem;
             color: var(--text-secondary);
-            white-space: nowrap;
-            font-weight: 500;
+            margin-bottom: 4px;
         }
-        .progress-track {
-            flex: 1;
-            height: 4px;
+        .progress-bar {
+            width: 100%;
+            height: 8px;
             background: var(--border);
-            border-radius: 2px;
+            border-radius: 4px;
             overflow: hidden;
+            box-shadow: inset 0 1px 3px rgba(0,0,0,0.2);
         }
         .progress-fill {
             height: 100%;
-            background: linear-gradient(90deg, var(--accent), var(--accent2));
-            border-radius: 2px;
-            transition: width 0.5s ease;
+            background: var(--learned);
             width: 0%;
+            transition: width 0.3s ease;
+            border-radius: 4px;
         }
 
-        .controls-row {
+        .controls {
             display: flex;
-            gap: 0.5rem;
             justify-content: center;
+            gap: 10px;
+            padding: 12px 20px;
             flex-wrap: wrap;
-            margin-bottom: 1.5rem;
         }
-        .control-btn {
-            background: var(--surface);
+        .controls button {
+            background: var(--bg-card);
             border: 1px solid var(--border);
-            color: var(--text-secondary);
+            color: var(--text);
+            border-radius: 50%;
             width: 44px;
             height: 44px;
-            border-radius: 14px;
             cursor: pointer;
-            font-size: 1.1rem;
+            font-size: 1.3rem;
             display: flex;
             align-items: center;
             justify-content: center;
-            transition: all var(--transition);
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
+            transition: var(--transition);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
             position: relative;
         }
-        .control-btn:hover {
-            background: var(--surface-hover);
-            color: var(--text);
-            border-color: rgba(255,255,255,0.2);
-            transform: translateY(-2px);
-            box-shadow: var(--shadow-soft);
-        }
-        .control-btn.active {
-            background: rgba(167, 139, 250, 0.2);
-            border-color: rgba(167, 139, 250, 0.4);
+        .controls button:hover {
+            border-color: var(--accent);
             color: var(--accent);
+            box-shadow: 0 0 12px var(--accent-glow);
+            transform: translateY(-2px);
         }
-        .control-btn[data-tooltip]:hover::after {
+        .controls button.active {
+            background: var(--accent-glow);
+            border-color: var(--accent);
+            color: var(--accent);
+            box-shadow: 0 0 16px var(--accent-glow);
+        }
+        .controls button::after {
             content: attr(data-tooltip);
             position: absolute;
             bottom: calc(100% + 8px);
             left: 50%;
-            transform: translateX(-50%);
-            background: var(--surface);
-            border: 1px solid var(--border);
+            transform: translateX(-50%) translateY(5px);
+            background: var(--bg-card);
             color: var(--text);
-            padding: 0.35rem 0.7rem;
-            border-radius: 8px;
+            padding: 5px 8px;
+            border-radius: 6px;
             font-size: 0.7rem;
             white-space: nowrap;
+            border: 1px solid var(--border);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
             pointer-events: none;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.2s ease, transform 0.25s cubic-bezier(0.4, 0, 0.2, 1), visibility 0.2s;
             z-index: 10;
-            backdrop-filter: blur(10px);
+        }
+        .controls button::before {
+            content: '';
+            position: absolute;
+            bottom: calc(100% + 2px);
+            left: 50%;
+            transform: translateX(-50%) translateY(5px);
+            width: 0;
+            height: 0;
+            border-left: 5px solid transparent;
+            border-right: 5px solid transparent;
+            border-top: 5px solid var(--bg-card);
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.2s ease, transform 0.25s cubic-bezier(0.4, 0, 0.2, 1), visibility 0.2s;
+            z-index: 11;
+        }
+        .controls button:hover::after,
+        .controls button:hover::before {
+            opacity: 1;
+            visibility: visible;
+            transform: translateX(-50%) translateY(0);
         }
 
+        .grid-container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 16px 20px 40px;
+            width: 100%;
+        }
         .syllable-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
-            gap: 0.8rem;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
         }
         .syllable-grid.hide-learned .syllable-card.learned {
             display: none;
         }
+
         .syllable-card {
-            background: var(--surface);
+            background: var(--bg-card);
             border: 1px solid var(--border);
-            border-radius: var(--radius-md);
-            padding: 1.2rem 0.5rem;
+            border-radius: var(--radius);
+            padding: 14px 8px;
             text-align: center;
             cursor: pointer;
-            font-size: 1.2rem;
+            font-size: clamp(1.1rem, 2.2vw, 1.4rem);
             font-weight: 600;
             color: var(--text);
             user-select: none;
             -webkit-tap-highlight-color: transparent;
-            transition: all var(--transition);
+            transition: background var(--transition), border-color var(--transition), box-shadow var(--transition), transform var(--transition), color 0.3s;
             position: relative;
-            font-family: var(--font-sans);
+            font-family: var(--font);
             letter-spacing: 0.04em;
             text-transform: uppercase;
             display: flex;
             align-items: center;
             justify-content: center;
-            min-height: 56px;
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-            animation: cardIn 0.4s ease backwards;
-            animation-delay: calc(var(--i, 0) * 0.015s);
-        }
-        @keyframes cardIn {
-            from { opacity: 0; transform: scale(0.9); }
-            to { opacity: 1; transform: scale(1); }
+            min-height: 60px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
         }
         .syllable-card:hover {
-            background: var(--surface-hover);
-            border-color: rgba(167, 139, 250, 0.5);
-            box-shadow: 0 4px 20px rgba(167, 139, 250, 0.2);
-            transform: translateY(-3px);
+            background: var(--bg-card-hover);
+            border-color: var(--accent);
+            box-shadow: 0 0 14px var(--accent-glow);
+            transform: translateY(-2px);
         }
         .syllable-card.playing {
-            background: rgba(167, 139, 250, 0.15);
             border-color: var(--accent);
-            box-shadow: 0 0 30px rgba(167, 139, 250, 0.3);
+            background: var(--accent-glow);
+            box-shadow: 0 0 14px var(--accent-glow);
         }
         .syllable-card.learned {
-            background: rgba(52, 211, 153, 0.08);
-            border-color: rgba(52, 211, 153, 0.3);
+            background: var(--learned-bg);
+            border-color: var(--learned);
+            box-shadow: 0 0 8px rgba(63, 185, 80, 0.25);
         }
         .syllable-card.learned .syllable-text {
             text-decoration: line-through;
-            opacity: 0.5;
+            opacity: 0.6;
         }
         .learn-dot {
             position: absolute;
-            bottom: 6px;
-            right: 8px;
-            width: 10px;
-            height: 10px;
+            bottom: 5px;
+            right: 7px;
+            width: 14px;
+            height: 14px;
             background: var(--border);
             border-radius: 50%;
             cursor: pointer;
-            transition: all 0.2s;
+            transition: var(--transition);
         }
         .learn-dot:hover {
             transform: scale(1.3);
@@ -399,251 +376,448 @@
         }
         .syllable-card.learned .learn-dot {
             background: var(--learned);
+            box-shadow: 0 0 6px rgba(63, 185, 80, 0.6);
         }
 
-        /* ========== СЕКЦИЯ ГЕРОЕВ ========== */
-        .heroes-section {
-            display: none;
-            animation: sectionFade 0.5s ease;
-        }
-        .heroes-section.active {
-            display: block;
-        }
-        .timeline-wrapper {
-            position: relative;
-            padding-left: 2.5rem;
-            margin-top: 1rem;
-        }
-        .timeline-line {
-            position: absolute;
-            left: 1.1rem;
-            top: 0;
-            bottom: 0;
-            width: 2px;
-            background: var(--border);
-            z-index: 0;
-        }
-        .century-marker {
-            height: 1px;
-            margin: 2.5rem 0 1.5rem;
-            position: relative;
-        }
-        .century-marker::before {
-            content: '';
-            position: absolute;
-            left: -2.1rem;
-            top: 50%;
-            transform: translateY(-50%);
-            width: 12px;
-            height: 12px;
-            background: var(--accent);
+        .scroll-top-btn {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 46px;
+            height: 46px;
             border-radius: 50%;
-            box-shadow: 0 0 20px rgba(167, 139, 250, 0.5);
-        }
-        .hero-card {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-            margin-bottom: 0.9rem;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            color: var(--text);
+            font-size: 1.3rem;
             cursor: pointer;
-            padding: 0.5rem;
-            border-radius: var(--radius-sm);
-            transition: background 0.2s;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            transition: var(--transition);
+            z-index: 1001;
         }
-        .hero-card:hover {
-            background: var(--surface-hover);
+        .scroll-top-btn.visible {
+            display: flex;
         }
-        .hero-avatar {
-            width: 48px;
-            height: 48px;
-            border-radius: 50%;
-            overflow: hidden;
-            flex-shrink: 0;
-            border: 2px solid var(--accent);
-            background: var(--surface);
-            transition: all 0.3s;
-        }
-        .hero-card:hover .hero-avatar {
-            transform: scale(1.1);
-            box-shadow: 0 0 20px rgba(167, 139, 250, 0.4);
-        }
-        .hero-avatar img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-        .hero-info h4 {
-            font-weight: 600;
-            font-size: 1rem;
-        }
-        .hero-info span {
-            font-size: 0.8rem;
-            color: var(--text-secondary);
+        .scroll-top-btn:hover {
+            border-color: var(--accent);
+            color: var(--accent);
         }
 
-        /* ========== ЭКЗАМЕН ========== */
         .exam-overlay {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(12, 15, 20, 0.95);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
+            background: var(--bg);
             z-index: 2000;
             display: none;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            padding: 2rem;
-            gap: 1.5rem;
+            padding: 20px;
+            gap: 20px;
         }
         .exam-overlay.show {
             display: flex;
             animation: fadeIn 0.3s ease;
         }
-        .exam-exit-btn {
-            position: absolute;
-            top: 1.5rem;
-            left: 1.5rem;
-            background: var(--surface);
+        .exam-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            animation: slideDown 0.4s ease;
+        }
+        @keyframes slideDown {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .exam-question {
+            font-size: 1.3rem;
+            font-weight: 700;
+            text-align: center;
+            color: var(--text);
+        }
+        .exam-repeat-btn {
+            background: var(--bg-card);
             border: 1px solid var(--border);
-            color: var(--text-secondary);
-            width: 40px;
-            height: 40px;
+            color: var(--text);
             border-radius: 50%;
+            width: 42px;
+            height: 42px;
             cursor: pointer;
             font-size: 1.2rem;
             display: flex;
             align-items: center;
             justify-content: center;
-            transition: all 0.2s;
+            transition: var(--transition);
         }
-        .exam-exit-btn:hover {
-            border-color: var(--danger);
-            color: var(--danger);
-        }
-        .exam-question {
-            font-family: var(--font-display);
-            font-size: 1.4rem;
-            font-weight: 700;
-            text-align: center;
+        .exam-repeat-btn:hover {
+            border-color: var(--accent);
+            color: var(--accent);
         }
         .exam-options {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
-            gap: 0.7rem;
-            max-width: 480px;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 10px;
+            max-width: 500px;
             width: 100%;
+            animation: scaleIn 0.5s ease;
+        }
+        @keyframes scaleIn {
+            from { opacity: 0; transform: scale(0.8); }
+            to { opacity: 1; transform: scale(1); }
         }
         .exam-option {
-            padding: 0.8rem 0.5rem;
-            background: var(--surface);
+            padding: 12px;
+            background: var(--bg-card);
             border: 1px solid var(--border);
-            border-radius: var(--radius-sm);
+            border-radius: var(--radius);
             cursor: pointer;
             text-align: center;
+            font-size: 1.1rem;
             font-weight: 600;
-            font-size: 1rem;
+            color: var(--text);
             text-transform: uppercase;
-            letter-spacing: 0.03em;
-            transition: all 0.2s;
+            letter-spacing: 0.04em;
+            transition: var(--transition);
         }
         .exam-option:hover {
-            background: var(--surface-hover);
-            border-color: rgba(167,139,250,0.5);
+            border-color: var(--accent);
+            background: var(--bg-card-hover);
         }
         .exam-option.correct {
-            border-color: var(--learned);
-            background: rgba(52,211,153,0.15);
-            color: var(--learned);
+            border-color: #3fb950;
+            background: rgba(63,185,80,0.2);
         }
         .exam-option.wrong {
             border-color: var(--danger);
-            background: rgba(248,113,113,0.15);
-            color: var(--danger);
+            background: rgba(248,81,73,0.2);
         }
         .exam-result {
-            font-size: 2.5rem;
+            font-size: 2rem;
             text-align: center;
-            min-height: 2.5rem;
+            min-height: 2rem;
+            animation: fadeIn 0.3s ease;
         }
-        .exam-repeat-btn, .exam-next-btn {
-            background: var(--surface);
-            border: 1px solid var(--border);
-            color: var(--text-secondary);
-            width: 44px;
-            height: 44px;
-            border-radius: 50%;
-            cursor: pointer;
-            font-size: 1.2rem;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.2s;
-        }
-        .exam-repeat-btn:hover {
-            color: var(--accent);
-            border-color: var(--accent);
-        }
+
         .exam-next-btn {
             display: none;
             background: var(--accent);
-            border-color: var(--accent);
-            color: #fff;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 42px;
+            height: 42px;
+            cursor: pointer;
+            font-size: 1.5rem;
+            align-items: center;
+            justify-content: center;
+            transition: var(--transition);
+            animation: pulse 1.5s infinite;
+            box-shadow: 0 4px 12px var(--accent-glow);
         }
         .exam-next-btn.show {
             display: flex;
         }
+        .exam-next-btn:hover {
+            transform: scale(1.1);
+            box-shadow: 0 6px 18px var(--accent-glow);
+        }
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 var(--accent-glow); }
+            70% { box-shadow: 0 0 0 15px rgba(0,0,0,0); }
+            100% { box-shadow: 0 0 0 0 rgba(0,0,0,0); }
+        }
 
-        /* ========== ВСПЛЫВАЮЩИЕ УВЕДОМЛЕНИЯ ========== */
+        .exam-exit-btn {
+            position: absolute;
+            top: 15px;
+            left: 15px;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            color: var(--text);
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            cursor: pointer;
+            font-size: 1.4rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: var(--transition);
+            z-index: 10;
+        }
+        .exam-exit-btn:hover {
+            border-color: var(--danger);
+            color: var(--danger);
+            box-shadow: 0 0 10px var(--danger-glow);
+        }
+
+        .celebration-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.7);
+            z-index: 3000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+        }
+        .celebration-overlay.show {
+            display: flex;
+            animation: fadeIn 0.3s ease;
+        }
+        .celebration-box {
+            background: var(--bg-card);
+            border-radius: var(--radius);
+            padding: 20px;
+            text-align: center;
+            max-width: 90vw;
+            max-height: 90vh;
+            animation: scaleIn 0.4s ease;
+        }
+        .celebration-box h2 {
+            margin-bottom: 10px;
+            font-size: 1.5rem;
+        }
+        .celebration-box img {
+            max-width: 300px;
+            max-height: 250px;
+            border-radius: 10px;
+        }
+        .celebration-close {
+            margin-top: 15px;
+            padding: 8px 20px;
+            background: var(--accent);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-family: var(--font);
+        }
+
         .toast-container {
             position: fixed;
-            bottom: 2rem;
+            bottom: 24px;
             left: 50%;
             transform: translateX(-50%);
             z-index: 4000;
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 0.5rem;
+            gap: 8px;
             pointer-events: none;
         }
         .toast {
-            background: var(--surface);
+            background: var(--bg-card);
             border: 1px solid var(--border);
-            border-radius: 12px;
-            padding: 0.7rem 1.5rem;
+            border-radius: 8px;
+            padding: 10px 18px;
             font-size: 0.85rem;
             color: var(--text);
-            box-shadow: var(--shadow-soft);
-            backdrop-filter: blur(10px);
-            animation: toastIn 0.3s ease, toastOut 0.3s ease 2.2s forwards;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+            animation: toastIn 0.3s ease, toastOut 0.3s ease 2.5s forwards;
+            pointer-events: auto;
         }
         @keyframes toastIn {
-            from { opacity: 0; transform: translateY(10px) scale(0.95); }
+            from { opacity: 0; transform: translateY(20px) scale(0.95); }
             to { opacity: 1; transform: translateY(0) scale(1); }
         }
         @keyframes toastOut {
             from { opacity: 1; }
-            to { opacity: 0; transform: translateY(5px); }
-        }
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
+            to { opacity: 0; transform: translateY(10px); }
         }
 
-        /* ========== МОДАЛКА ГЕРОЯ ========== */
+        .footer {
+            text-align: center;
+            padding: 16px;
+            color: var(--text-secondary);
+            font-size: 0.7rem;
+            border-top: 1px solid var(--border);
+        }
+    
+        .heroes-timeline {
+            max-width: 800px;
+            margin: 40px auto;
+            padding: 0 20px;
+            position: relative;
+        }
+
+        .timeline-container {
+            position: relative;
+            padding-left: 50px;
+        }
+
+        .timeline-line {
+            position: absolute;
+            left: 35px;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: linear-gradient(to bottom, transparent, var(--accent) 10%, var(--accent) 90%, transparent);
+            z-index: 0;
+        }
+
+        .century-sentinel {
+            height: 1px;
+            margin: 60px 0 40px;
+            position: relative;
+        }
+
+        .century-sentinel::before {
+            content: '';
+            position: absolute;
+            left: -41px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 16px;
+            height: 16px;
+            background: var(--accent);
+            border-radius: 50%;
+            box-shadow: 0 0 15px var(--accent-glow);
+            z-index: 1;
+        }
+
+        .hero-item {
+            position: relative;
+            display: flex;
+            align-items: center;
+            gap: 24px;
+            margin-bottom: 30px;
+            cursor: pointer;
+            padding: 10px;
+            border-radius: var(--radius);
+        }
+
+        .hero-circle {
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            border: 3px solid var(--accent);
+            overflow: hidden;
+            flex-shrink: 0;
+            background: var(--bg-card);
+            box-shadow: 0 0 15px var(--accent-glow);
+            transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.3s, border-color 0.3s;
+            position: relative;
+            z-index: 2;
+        }
+
+        .hero-item:hover .hero-circle {
+            transform: scale(1.4);
+            box-shadow: 0 0 35px var(--accent-glow);
+        }
+
+        .hero-circle img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .hero-info {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .hero-name {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: var(--text);
+        }
+
+        .hero-years {
+            font-size: 0.95rem;
+            color: var(--accent);
+            font-weight: 700;
+            text-shadow: 0 0 10px var(--accent-glow);
+            letter-spacing: 0.03em;
+            display: flex;
+            align-items: baseline;
+            gap: 6px;
+        }
+
+        .hero-age {
+            font-family: 'PT Sans', sans-serif;
+            font-size: 0.8rem;
+            font-weight: 400;
+            color: var(--text-secondary);
+            opacity: 0.7;
+        }
+
+        .soviet-era {
+            background: linear-gradient(180deg, rgba(220, 38, 38, 0.12) 0%, rgba(220, 38, 38, 0.02) 100%);
+            margin: 30px -20px 30px -15px;
+            padding: 40px 20px 40px 15px;
+            position: relative;
+            border-radius: 0 16px 16px 0;
+            border-left: 4px solid #dc2626;
+            box-shadow: 0 0 40px rgba(220, 38, 38, 0.05);
+        }
+        .soviet-era::before {
+            content: '☭';
+            position: absolute;
+            top: 50%;
+            right: 40px;
+            transform: translateY(-50%);
+            font-size: 8rem;
+            font-weight: 900;
+            color: rgba(220, 38, 38, 0.06);
+            pointer-events: none;
+        }
+        .soviet-era::after {
+            content: 'С С С Р';
+            position: absolute;
+            top: 20px;
+            right: 25px;
+            font-size: 1.2rem;
+            font-weight: 800;
+            color: rgba(220, 38, 38, 0.4);
+            letter-spacing: 0.2em;
+            pointer-events: none;
+            text-shadow: 0 0 10px rgba(220, 38, 38, 0.2);
+        }
+
+        .century-popup {
+            position: fixed;
+            bottom: 100px;
+            top: auto;
+            left: 50%;
+            transform: translateX(-50%) translateY(20px);
+            background: var(--bg-card);
+            border: 1px solid var(--accent);
+            color: var(--accent);
+            padding: 12px 32px;
+            border-radius: 50px;
+            font-size: 1.2rem;
+            font-weight: 700;
+            box-shadow: 0 8px 32px var(--accent-glow);
+            z-index: 100;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.4s ease, transform 0.4s ease;
+            backdrop-filter: blur(10px);
+        }
+
+        .century-popup.show {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+        }
+
         .hero-modal {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(12, 15, 20, 0.95);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
+            background: rgba(10, 14, 23, 0.95);
+            backdrop-filter: blur(5px);
             z-index: 5000;
             display: flex;
             align-items: center;
@@ -658,232 +832,269 @@
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            padding: 1rem;
         }
         .hero-modal-close {
             position: absolute;
-            top: 1.5rem;
-            right: 1.5rem;
+            top: 20px;
+            right: 20px;
             background: none;
             border: none;
-            color: var(--text-secondary);
-            font-size: 2.5rem;
+            color: var(--text);
+            font-size: 3rem;
             cursor: pointer;
             z-index: 20;
-            transition: color 0.2s;
-        }
-        .hero-modal-close:hover {
-            color: var(--danger);
         }
         .hero-modal-repeat {
             position: absolute;
-            top: 1.5rem;
-            left: 1.5rem;
-            background: var(--surface);
+            top: 20px;
+            left: 20px;
+            background: var(--bg-card);
             border: 1px solid var(--border);
-            color: var(--text-secondary);
-            width: 48px;
-            height: 48px;
+            color: var(--text);
             border-radius: 50%;
+            width: 56px;
+            height: 56px;
             cursor: pointer;
-            font-size: 1.5rem;
+            font-size: 1.8rem;
             display: flex;
             align-items: center;
             justify-content: center;
-            transition: all 0.2s;
+            transition: var(--transition);
             z-index: 20;
         }
         .hero-modal-repeat:hover {
-            color: var(--accent);
             border-color: var(--accent);
+            color: var(--accent);
+            box-shadow: 0 0 12px var(--accent-glow);
         }
         .hero-modal-portrait {
-            max-width: 85%;
-            max-height: 60vh;
+            max-width: 90%;
+            max-height: 65vh;
             object-fit: contain;
-            border-radius: var(--radius-md);
-            box-shadow: var(--shadow-glow);
+            border-radius: 8px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.6);
         }
         .hero-modal h3 {
-            font-family: var(--font-display);
-            font-size: 1.8rem;
-            margin: 1rem 0;
+            font-size: 2rem;
+            margin: 20px 0;
             color: var(--accent);
         }
         .hero-modal-nav {
             position: absolute;
             top: 50%;
-            left: 1rem;
-            right: 1rem;
             transform: translateY(-50%);
+            left: 0;
+            right: 0;
             display: flex;
             justify-content: space-between;
+            padding: 0 20px;
             z-index: 10;
-            pointer-events: none;
         }
         .hero-modal-nav button {
-            pointer-events: auto;
-            background: var(--surface);
-            border: 1px solid var(--border);
-            color: var(--text-secondary);
-            font-size: 1.8rem;
-            width: 44px;
-            height: 44px;
-            border-radius: 50%;
+            background: rgba(0,0,0,0.4);
+            border: none;
+            color: white;
+            font-size: 3rem;
+            width: 60px;
+            height: 60px;
             cursor: pointer;
-            transition: all 0.2s;
-        }
-        .hero-modal-nav button:hover {
-            background: var(--surface-hover);
-            color: var(--accent);
-        }
-
-        /* ========== АДАПТИВ ========== */
-        @media (max-width: 600px) {
-            .app-container { padding: 1rem; gap: 1.5rem; }
-            .syllable-grid { grid-template-columns: repeat(3, 1fr); gap: 0.5rem; }
-            .syllable-card { font-size: 0.9rem; padding: 0.8rem 0.3rem; min-height: 42px; border-radius: 12px; }
-            .section-btn { padding: 0.5rem 1rem; font-size: 0.75rem; }
-            .hero-avatar { width: 40px; height: 40px; }
-        }
-        @media (max-width: 400px) {
-            .syllable-grid { grid-template-columns: repeat(2, 1fr); }
-        }
-
-        /* ========== КНОПКА НАВЕРХ ========== */
-        .scroll-top {
-            position: fixed;
-            bottom: 1.5rem;
-            right: 1.5rem;
-            width: 42px;
-            height: 42px;
-            border-radius: 50%;
-            background: var(--surface);
-            border: 1px solid var(--border);
-            color: var(--text-secondary);
-            font-size: 1.2rem;
-            cursor: pointer;
-            display: none;
+            display: flex;
             align-items: center;
             justify-content: center;
-            z-index: 1000;
-            backdrop-filter: blur(10px);
-            transition: all 0.2s;
+            transition: background 0.2s;
+            border-radius: 8px;
         }
-        .scroll-top.visible { display: flex; }
-        .scroll-top:hover { color: var(--accent); border-color: var(--accent); }
+        .hero-modal-nav button:hover {
+            background: rgba(0,0,0,0.7);
+        }
 
-        .footer {
-            text-align: center;
-            padding: 1.5rem;
-            color: var(--text-secondary);
-            font-size: 0.7rem;
-            border-top: 1px solid var(--border);
-            margin-top: auto;
-            position: relative;
-            z-index: 1;
+        @media (max-width: 1024px) {
+            .syllable-grid { grid-template-columns: repeat(3, 1fr); gap: 8px; }
+        }
+        
+        @media (max-width: 600px) {
+            .exam-exit-btn { top: auto; bottom: 10px; left: 10px; width: 34px; height: 34px; font-size: 1.1rem; }
+            .syllable-grid { grid-template-columns: repeat(2, 1fr); gap: 5px; }
+            .syllable-card { font-size: 0.95rem; padding: 10px 4px; min-height: 45px; }
+            .learn-dot { width: 10px; height: 10px; bottom: 3px; right: 4px; }
+            .controls { gap: 6px; }
+            .controls button { width: 38px; height: 38px; font-size: 1.1rem; }
+            .theme-toggle { top: 6px; right: 10px; }
+            .theme-toggle button { width: 32px; height: 32px; font-size: 1rem; }
+            .theme-cycle { top: 6px; left: 10px; }
+            .theme-cycle button { width: 32px; height: 32px; }
+            .header { padding: 16px 12px 10px; }
+            
+            /* 1. Надписи на кнопке переключения режимов меньше, чтобы не вылезали */
+            .section-switch-btn {
+                padding: 6px 10px;
+                font-size: 0.7rem;
+                line-height: 1.2;
+            }
+            
+            .hero-modal-nav button { width: 45px; height: 45px; font-size: 2rem; }
+            
+            .timeline-container { padding-left: 40px; }
+            .timeline-line { left: 25px; }
+            .century-sentinel::before { left: -31px; width: 14px; height: 14px; }
+            
+            /* 2. Портреты крупнее */
+            .hero-circle { 
+                width: 85px; 
+                height: 85px; 
+            }
+            
+            /* 3. Элементы ближе друг к другу */
+            .hero-item { 
+                gap: 12px; 
+                margin-bottom: 20px; 
+                padding: 8px;
+            }
+            
+            /* 4. Имена мельче */
+            .hero-name { 
+                font-size: 0.95rem; 
+                line-height: 1.2;
+            }
+            
+            /* 5. Годы жизни ещё мельче */
+            .hero-years { 
+                font-size: 0.75rem; 
+            }
+            .hero-age {
+                font-size: 0.65rem;
+            }
+            
+            /* 6. Всплывающее века очень маленьким */
+            .century-popup {
+                font-size: 0.75rem;
+                padding: 6px 16px;
+                bottom: 80px;
+            }
+            
+            .soviet-era {
+                margin-left: -15px;
+                padding: 30px 15px 30px 15px;
+            }
+            .soviet-era::before {
+                font-size: 5rem;
+                right: 10px;
+            }
+            .soviet-era::after {
+                font-size: 0.9rem;
+                right: 15px;
+                top: 10px;
+            }
         }
     </style>
 </head>
 <body>
 
-    <div class="aurora-bg">
-        <div class="aurora-3"></div>
-    </div>
+    <header class="header">
+        <div class="theme-cycle">
+            <button id="themeCycleBtn" title="Сменить цвет">
+                <span class="color-indicator" id="colorIndicator"></span>
+            </button>
+        </div>
 
-    <div class="app-container">
-        <!-- ШАПКА -->
-        <header class="header">
-            <div class="logo">
-                <div class="logo-icon">📖</div>
-                <span class="logo-text">Грамотиньо</span>
-            </div>
-            <div class="header-actions">
-                <button class="icon-btn" id="themeCycleBtn" title="Сменить акцент">
-                    <span class="color-dot" id="colorDot"></span>
-                </button>
-                <button class="icon-btn" id="themeToggle" title="Тема">🌓</button>
-            </div>
-        </header>
+        <div class="theme-toggle">
+            <button id="themeToggle" data-tooltip="Темно или светло">🌓</button>
+        </div>
+        <h1>Грамотиньо</h1>
 
-        <!-- ПЕРЕКЛЮЧАТЕЛЬ -->
-        <nav class="section-nav">
-            <button class="section-btn active" data-section="syllables">Слоги</button>
-            <button class="section-btn" data-section="heroes">Великие</button>
-        </nav>
+        <div class="section-switch">
+            <button class="section-switch-btn active" data-section="syllables">Учи слоги</button>
+            <button class="section-switch-btn" data-section="heroes">Знай великих</button>
+        </div>
 
-        <p class="subtitle" id="subtitle">Жми на карточку — слушай и запоминай</p>
+        <p id="sectionSubtitle">Жми, слушай, запоминай</p>
+    </header>
 
-        <!-- СЕКЦИЯ СЛОГОВ -->
-        <section class="syllables-section active" id="syllablesSection">
-            <div class="progress-row">
-                <span class="progress-label" id="progressLabel">0 из 0</span>
-                <div class="progress-track">
-                    <div class="progress-fill" id="progressFill"></div>
-                </div>
+    <div class="content-wrapper">
+        <section id="syllablesSection" class="tab-section active">
+            <div class="progress-container">
+                <div class="progress-label" id="progressLabel">Отмечено: 0 из 0</div>
+                <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
             </div>
-            <div class="controls-row">
-                <button class="control-btn active" id="normalBtn" data-tooltip="Все">🅰</button>
-                <button class="control-btn" id="randomBtn" data-tooltip="Случайно">🎲</button>
-                <button class="control-btn" id="hideLearnedBtn" data-tooltip="Скрыть выученные">✂</button>
-                <button class="control-btn" id="clearLearnedBtn" data-tooltip="Очистить">↩</button>
-                <button class="control-btn" id="examBtn" data-tooltip="Викторина">🍓</button>
+
+            <div class="controls">
+                <button id="normalBtn" class="active" data-tooltip="Все">🅰</button>
+                <button id="randomBtn" data-tooltip="Случайно">🎲</button>
+                <button id="hideLearnedBtn" data-tooltip="Скрыть/показать">✂</button>
+                <button id="clearLearnedBtn" data-tooltip="Очистить">↩</button>
+                <button id="examBtn" data-tooltip="Викторина">🍓</button>
             </div>
-            <div class="syllable-grid" id="syllableGrid"></div>
+
+            <div class="grid-container">
+                <div class="syllable-grid" id="syllableGrid"></div>
+            </div>
         </section>
 
-        <!-- СЕКЦИЯ ГЕРОЕВ -->
-        <section class="heroes-section" id="heroesSection">
-            <div class="timeline-wrapper" id="timelineWrapper"></div>
+        <section id="heroesSection" class="tab-section">
+            <div class="heroes-timeline" id="heroesTimeline"></div>
         </section>
     </div>
 
-    <!-- ВСПЛЫВАЮЩИЙ ВЕК -->
-    <div class="century-popup" id="centuryPopup" style="position:fixed;bottom:2rem;left:50%;transform:translateX(-50%) translateY(10px);background:var(--surface);border:1px solid var(--border);color:var(--accent);padding:0.5rem 1.5rem;border-radius:100px;font-size:0.9rem;font-weight:600;z-index:100;opacity:0;pointer-events:none;transition:all 0.3s;backdrop-filter:blur(10px);box-shadow:var(--shadow-soft);"></div>
+    <div class="century-popup" id="centuryPopup"></div>
 
-    <button class="scroll-top" id="scrollTopBtn">↑</button>
+    <button class="scroll-top-btn" id="scrollTopBtn" title="Наверх">↑</button>
 
-    <!-- ЭКЗАМЕН -->
     <div class="exam-overlay" id="examOverlay">
-        <button class="exam-exit-btn" id="examExitBtn">✕</button>
-        <div class="exam-question" id="examQuestion"></div>
-        <div style="display:flex;gap:0.5rem;align-items:center;">
-            <button class="exam-repeat-btn" id="examRepeatBtn">🔊</button>
-            <button class="exam-next-btn" id="examNextBtn">→</button>
+        <button class="exam-exit-btn" id="examExitBtn" title="Выйти">✕</button>
+        <div class="exam-header">
+            <div class="exam-question" id="examQuestion"></div>
+            <button class="exam-repeat-btn" id="examRepeatBtn" title="Повторить">🔊</button>
+            <button class="exam-next-btn" id="examNextBtn" title="Далее">→</button>
         </div>
         <div class="exam-options" id="examOptions"></div>
         <div class="exam-result" id="examResult"></div>
     </div>
 
-    <!-- ПРАЗДНИК -->
-    <div class="celebration-overlay" id="celebrationOverlay" style="position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.5);backdrop-filter:blur(4px);z-index:3000;display:none;align-items:center;justify-content:center;">
-        <div style="background:var(--surface);border-radius:24px;padding:2rem;text-align:center;max-width:90vw;box-shadow:var(--shadow-glow);">
-            <h2 style="font-family:var(--font-display);margin-bottom:1rem;">Умница! 😻</h2>
-            <img id="celebrationGif" src="" alt="Победа" style="max-width:280px;max-height:240px;border-radius:12px;">
-            <button id="celebrationClose" style="margin-top:1rem;padding:0.6rem 2rem;background:var(--accent);color:#fff;border:none;border-radius:10px;cursor:pointer;font-weight:600;">Закрыть</button>
+    <div class="celebration-overlay" id="celebrationOverlay">
+        <div class="celebration-box">
+            <h2>Умница! 😻😻😽😽</h2>
+            <img id="celebrationGif" src="" alt="Победа">
+            <button class="celebration-close" id="celebrationClose">Закрыть</button>
         </div>
     </div>
 
-    <div class="toast-container" id="toastContainer"></div>
+    <footer class="footer">
+        <p>Спасибо за вайбкодинг в тегешечку @vnvax</p>
+    </footer>
 
-    <footer class="footer">Спасибо за вайбкодинг в тегешечку @vnvax</footer>
+    <div class="toast-container" id="toastContainer"></div>
 
     <script>
         (function() {
             const rawItems = [
-                'ЁЖ','ёлка','ЁН','АБ','АВ','АГ','АЖ','АЗ','АК','АЛ','Алла','АМ','АН','Анна','АП','арка','арфа','АС','АТ','АХ','АЧ','АШ',
-                'БА','БАК','БАЯН','БЕ','БИ','БО','БОК','БОР','Боря','БЫ','БЫК','БЭ','БЯ','ВА','Валя','ВЕ','ВЕЕР','ВИ','Витя','Вова','ВОЗ','ВОЛ','ВОЛК','ВУ','ВЫ','ВЭ','ВЮ',
-                'ГА','ГАЗ','Галя','ГЕ','Гена','ГИ','ГО','ГОД','ГЫ','ГЭ','ДА','ДИ','ДОМ','ДУ','ДУБ','ДУШ','ДЫ','ДЫМ','ДЭ','ДЮ','ДЯ',
-                'ЕГ','ЕЖ','ЕЛ','ЕМ','ЕН','ЕР','ЕС','если','ЕТ','ЕФ','ЕХ','ЕЦ','ЕЧ','ЕШ','ЖА','Женя','ЖИ','ЖО','ЖУ','ЖУК','ЖЭ',
-                'ЗА','ЗИ','Зина','ЗО','ЗУ','ЗЫ','ЗЭ','ЗЮ','ЗЯ','ИБ','ИВ','игра','ИЖ','ИК','икра','ИЛ','ИМ','ИН','ИР','ИС','ИТ','ИФ','ИЧ','ИШ',
-                'ЙОД','КА','Катя','КЕ','КИ','КИТ','КОЛ','Коля','КОМ','КОТ','КОФЕ','КРАЙ','КРАН','КУ','КЫ','КЭ','ЛЁ','Лёва','Лёша','ЛАК','ЛЕ','ЛЕВ','Лена','ЛЕС','ЛЕЩ','ЛИ','ЛИФТ','ЛО','ЛОМ','ЛУ','ЛЫ','ЛЫЖИ','ЛЭ','ЛЮ','Люба','Люда','ЛЮК','ЛЯ',
-                'МА','МАК','МЕ','МЕЛ','МЕХ','МЕЧ','МИ','Миша','МО','МОХ','МУ','МУХА','МЫ','МЫЛО','МЫС','МЭ','МЯ','МЯЧ','НЁ','НА','НЕ','Нина','НО','НОЖ','НОС','НУ','НЫ','НЭ','НЯ',
-                'одна','ОЖ','ОКНО','ОЛ','ОМ','ОН','ОП','ОР','ОС','ОФ','ОХ','ОЧ','очки','ОШ','ПА','ПАУК','ПЕРО','Петя','ПИ','ПУ','ПУХ','ПЫ','ПЭ','ПЯ',
-                'РА','РАК','РИ','РИС','РО','Рома','РОТ','РУ','РЫ','РЫБА','РЭ','РЮ','РЯ','СЁ','СА','Саша','СЕ','СИ','СОК','СОМ','СОР','СТУЛ','СУ','СУК','СУП','СЫ','СЫР','СЭ','СЮ','СЯ',
-                'Тёма','ТА','ТАЗ','Таня','ТЕ','ТИ','ТО','Толя','Тома','ТОРТ','ТРОС','ТУ','ТЫ','ТЭ','ТЮ','ТЯ','УБ','УГОЛ','УЖ','УЛ','УМ','УН','УР','урна','УС','УТ','утка','утро','УФ','УХ','УХО','УЧ','УШ','ушко',
-                'ФА','ФЕ','Федя','ФИ','ФО','ФУ','ФЫ','ФЭ','ХА','ХЕ','ХО','ХУ','ХЫ','ХЭ','ЦА','ЦЕ','ЦИ','ЦО','ЦУ','ЦЭ','ЧА','ЧАЙ','ЧЕК','ЧИ','ЧУ','ЧЭ',
-                'ША','ШАГ','ШЕ','ШИ','ШОВ','ШУ','ШЭ','ЩИ','ЩИТ','ЫВ','ЫК','ЫМ','ЫН','ЫС','ЫТ','ЫХ','ЭБ','ЭК','ЭЛ','ЭМ','ЭН','ЭП','ЭР','ЭС','ЭТ','ЭФ','ЭХ','ЭЦ',
-                'юбка','ЮГ','юнга','ЯБ','ЯВ','ЯД','ЯК','ЯЛ','ЯМ','ЯН','ЯП','ЯР','ЯС','ЯТ','ЯХ','яхта','ЯЦ'
+                'ЁЖ', 'ёлка', 'ЁН', 'АБ', 'АВ', 'АГ', 'АЖ', 'АЗ', 'АК', 'АЛ', 'Алла', 'АМ', 'АН', 'Анна', 'АП', 'арка', 'арфа', 'АС', 'АТ', 'АХ', 'АЧ', 'АШ',
+                'БА', 'БАК', 'БАЯН', 'БЕ', 'БИ', 'БО', 'БОК', 'БОР', 'Боря', 'БЫ', 'БЫК', 'БЭ', 'БЯ',
+                'ВА', 'Валя', 'ВЕ', 'ВЕЕР', 'ВИ', 'Витя', 'Вова', 'ВОЗ', 'ВОЛ', 'ВОЛК', 'ВУ', 'ВЫ', 'ВЭ', 'ВЮ',
+                'ГА', 'ГАЗ', 'Галя', 'ГЕ', 'Гена', 'ГИ', 'ГО', 'ГОД', 'ГЫ', 'ГЭ',
+                'ДА', 'ДИ', 'ДОМ', 'ДУ', 'ДУБ', 'ДУШ', 'ДЫ', 'ДЫМ', 'ДЭ', 'ДЮ', 'ДЯ',
+                'ЕГ', 'ЕЖ', 'ЕЛ', 'ЕМ', 'ЕН', 'ЕР', 'ЕС', 'если', 'ЕТ', 'ЕФ', 'ЕХ', 'ЕЦ', 'ЕЧ', 'ЕШ',
+                'ЖА', 'Женя', 'ЖИ', 'ЖО', 'ЖУ', 'ЖУК', 'ЖЭ',
+                'ЗА', 'ЗИ', 'Зина', 'ЗО', 'ЗУ', 'ЗЫ', 'ЗЭ', 'ЗЮ', 'ЗЯ',
+                'ИБ', 'ИВ', 'игра', 'ИЖ', 'ИК', 'икра', 'ИЛ', 'ИМ', 'ИН', 'ИР', 'ИС', 'ИТ', 'ИФ', 'ИЧ', 'ИШ',
+                'ЙОД', 'КА', 'Катя', 'КЕ', 'КИ', 'КИТ', 'КОЛ', 'Коля', 'КОМ', 'КОТ', 'КОФЕ', 'КРАЙ', 'КРАН', 'КУ', 'КЫ', 'КЭ',
+                'ЛЁ', 'Лёва', 'Лёша', 'ЛАК', 'ЛЕ', 'ЛЕВ', 'Лена', 'ЛЕС', 'ЛЕЩ', 'ЛИ', 'ЛИФТ', 'ЛО', 'ЛОМ', 'ЛУ', 'ЛЫ', 'ЛЫЖИ', 'ЛЭ', 'ЛЮ', 'Люба', 'Люда', 'ЛЮК', 'ЛЯ',
+                'МА', 'МАК', 'МЕ', 'МЕЛ', 'МЕХ', 'МЕЧ', 'МИ', 'Миша', 'МО', 'МОХ', 'МУ', 'МУХА', 'МЫ', 'МЫЛО', 'МЫС', 'МЭ', 'МЯ', 'МЯЧ',
+                'НЁ', 'НА', 'НЕ', 'Нина', 'НО', 'НОЖ', 'НОС', 'НУ', 'НЫ', 'НЭ', 'НЯ',
+                'одна', 'ОЖ', 'ОКНО', 'ОЛ', 'ОМ', 'ОН', 'ОП', 'ОР', 'ОС', 'ОФ', 'ОХ', 'ОЧ', 'очки', 'ОШ',
+                'ПА', 'ПАУК', 'ПЕРО', 'Петя', 'ПИ', 'ПУ', 'ПУХ', 'ПЫ', 'ПЭ', 'ПЯ',
+                'РА', 'РАК', 'РИ', 'РИС', 'РО', 'Рома', 'РОТ', 'РУ', 'РЫ', 'РЫБА', 'РЭ', 'РЮ', 'РЯ',
+                'СЁ', 'СА', 'Саша', 'СЕ', 'СИ', 'СОК', 'СОМ', 'СОР', 'СТУЛ', 'СУ', 'СУК', 'СУП', 'СЫ', 'СЫР', 'СЭ', 'СЮ', 'СЯ',
+                'Тёма', 'ТА', 'ТАЗ', 'Таня', 'ТЕ', 'ТИ', 'ТО', 'Толя', 'Тома', 'ТОРТ', 'ТРОС', 'ТУ', 'ТЫ', 'ТЭ', 'ТЮ', 'ТЯ',
+                'УБ', 'УГОЛ', 'УЖ', 'УЛ', 'УМ', 'УН', 'УР', 'урна', 'УС', 'УТ', 'утка', 'утро', 'УФ', 'УХ', 'УХО', 'УЧ', 'УШ', 'ушко',
+                'ФА', 'ФЕ', 'Федя', 'ФИ', 'ФО', 'ФУ', 'ФЫ', 'ФЭ',
+                'ХА', 'ХЕ', 'ХО', 'ХУ', 'ХЫ', 'ХЭ',
+                'ЦА', 'ЦЕ', 'ЦИ', 'ЦО', 'ЦУ', 'ЦЭ',
+                'ЧА', 'ЧАЙ', 'ЧЕК', 'ЧИ', 'ЧУ', 'ЧЭ',
+                'ША', 'ШАГ', 'ШЕ', 'ШИ', 'ШОВ', 'ШУ', 'ШЭ',
+                'ЩИ', 'ЩИТ',
+                'ЫВ', 'ЫК', 'ЫМ', 'ЫН', 'ЫС', 'ЫТ', 'ЫХ',
+                'ЭБ', 'ЭК', 'ЭЛ', 'ЭМ', 'ЭН', 'ЭП', 'ЭР', 'ЭС', 'ЭТ', 'ЭФ', 'ЭХ', 'ЭЦ',
+                'юбка', 'ЮГ', 'юнга', 'ЯБ', 'ЯВ', 'ЯД', 'ЯК', 'ЯЛ', 'ЯМ', 'ЯН', 'ЯП', 'ЯР', 'ЯС', 'ЯТ', 'ЯХ', 'яхта', 'ЯЦ'
             ];
 
             const syllables = rawItems.sort((a, b) => {
@@ -892,12 +1103,11 @@
                 return a.localeCompare(b, 'ru', { sensitivity: 'base' });
             });
 
-            // DOM элементы
             const grid = document.getElementById('syllableGrid');
             const toastContainer = document.getElementById('toastContainer');
             const themeToggle = document.getElementById('themeToggle');
             const themeCycleBtn = document.getElementById('themeCycleBtn');
-            const colorDot = document.getElementById('colorDot');
+            const colorIndicator = document.getElementById('colorIndicator');
             const normalBtn = document.getElementById('normalBtn');
             const randomBtn = document.getElementById('randomBtn');
             const hideLearnedBtn = document.getElementById('hideLearnedBtn');
@@ -916,11 +1126,11 @@
             const celebrationOverlay = document.getElementById('celebrationOverlay');
             const celebrationGif = document.getElementById('celebrationGif');
             const celebrationClose = document.getElementById('celebrationClose');
-            const sectionBtns = document.querySelectorAll('.section-btn');
-            const subtitle = document.getElementById('subtitle');
+            const sectionBtns = document.querySelectorAll('.section-switch-btn');
+            const sectionSubtitle = document.getElementById('sectionSubtitle');
             const syllablesSection = document.getElementById('syllablesSection');
             const heroesSection = document.getElementById('heroesSection');
-            const timelineWrapper = document.getElementById('timelineWrapper');
+            const heroesTimeline = document.getElementById('heroesTimeline');
             const centuryPopup = document.getElementById('centuryPopup');
 
             let currentMode = 'all';
@@ -931,93 +1141,100 @@
             let examScore = 0;
             let currentExamCorrect = '';
             let currentSection = 'syllables';
-            let popupTimeout, popupShowTimeout;
+            let popupTimeout;
+            let popupShowTimeout;
 
-            // ТЕМЫ
-            const themes = [
-                { accent: '#a78bfa', accent2: '#60a5fa', accent3: '#f472b6' },
-                { accent: '#f472b6', accent2: '#fb923c', accent3: '#a78bfa' },
-                { accent: '#34d399', accent2: '#22d3ee', accent3: '#a78bfa' },
-                { accent: '#fbbf24', accent2: '#f472b6', accent3: '#60a5fa' },
-                { accent: '#60a5fa', accent2: '#a78bfa', accent3: '#34d399' }
+            const themeList = [
+                'theme-blue', 'theme-green', 'theme-red', 'theme-orange',
+                'theme-purple', 'theme-pink', 'theme-cyan', 'theme-yellow',
+                'theme-teal', 'theme-indigo'
             ];
-            let themeIndex = 0;
 
-            function applyTheme() {
-                const t = themes[themeIndex];
-                document.documentElement.style.setProperty('--accent', t.accent);
-                document.documentElement.style.setProperty('--accent2', t.accent2);
-                document.documentElement.style.setProperty('--accent3', t.accent3);
-                colorDot.style.background = t.accent;
-                localStorage.setItem('accentIndex', themeIndex);
-            }
-
-            const savedTheme = localStorage.getItem('accentIndex');
-            if (savedTheme !== null) themeIndex = parseInt(savedTheme) % themes.length;
-            applyTheme();
-
-            themeCycleBtn.addEventListener('click', () => {
-                themeIndex = (themeIndex + 1) % themes.length;
-                applyTheme();
-            });
-
-            // ТЁМНАЯ/СВЕТЛАЯ (всегда тёмная, но оставим переключатель для вида)
-            themeToggle.addEventListener('click', () => {
-                // Это просто заглушка — можно добавить светлую тему отдельно
-                showToast('Тёмная тема — единственно верная 😎');
-            });
-
-            // ПЕРЕКЛЮЧЕНИЕ СЕКЦИЙ
-            sectionBtns.forEach(btn => {
-                btn.addEventListener('click', () => {
-                    const section = btn.dataset.section;
-                    if (section === currentSection) return;
-                    currentSection = section;
-                    sectionBtns.forEach(b => b.classList.toggle('active', b.dataset.section === section));
-                    if (section === 'syllables') {
-                        syllablesSection.classList.add('active');
-                        heroesSection.classList.remove('active');
-                        subtitle.textContent = 'Жми на карточку — слушай и запоминай';
-                    } else {
-                        heroesSection.classList.add('active');
-                        syllablesSection.classList.remove('active');
-                        subtitle.textContent = 'Великие личности Отечества';
-                    }
-                });
-            });
-
-            // СКРОЛЛ
-            window.addEventListener('scroll', () => {
-                scrollTopBtn.classList.toggle('visible', window.scrollY > 300);
-            });
-            scrollTopBtn.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
-
-            // ХРАНЕНИЕ ВЫУЧЕННОГО
-            function loadLearned() {
+            function loadLearnedSet() {
                 try { return new Set(JSON.parse(localStorage.getItem('learned_syllables') || '[]')); }
                 catch { return new Set(); }
             }
-            function saveLearned() {
-                localStorage.setItem('learned_syllables', JSON.stringify([...learnedSet]));
+            function saveLearnedSet(set) {
+                localStorage.setItem('learned_syllables', JSON.stringify(Array.from(set)));
             }
-            let learnedSet = loadLearned();
+            let learnedSet = loadLearnedSet();
+
+            function applyTheme(themeClass) {
+                document.body.className = '';
+                document.body.classList.add(themeClass);
+                if (localStorage.getItem('theme') === 'light') {
+                    document.body.classList.add('light-mode');
+                }
+                localStorage.setItem('accentTheme', themeClass);
+                const accent = getComputedStyle(document.body).getPropertyValue('--accent').trim();
+                colorIndicator.style.background = accent;
+            }
+
+            let currentThemeIndex = 0;
+            const savedTheme = localStorage.getItem('accentTheme') || 'theme-blue';
+            currentThemeIndex = themeList.indexOf(savedTheme);
+            if (currentThemeIndex === -1) currentThemeIndex = 0;
+            applyTheme(themeList[currentThemeIndex]);
+
+            if (localStorage.getItem('theme') === 'light') {
+                document.body.classList.add('light-mode');
+            }
+
+            themeToggle.addEventListener('click', () => {
+                document.body.classList.toggle('light-mode');
+                localStorage.setItem('theme', document.body.classList.contains('light-mode') ? 'light' : 'dark');
+            });
+
+            themeCycleBtn.addEventListener('click', () => {
+                currentThemeIndex = (currentThemeIndex + 1) % themeList.length;
+                applyTheme(themeList[currentThemeIndex]);
+            });
+
+            function switchSection(section) {
+                if (section === currentSection) return;
+                currentSection = section;
+                if (section === 'syllables') {
+                    syllablesSection.classList.add('active');
+                    heroesSection.classList.remove('active');
+                    sectionSubtitle.textContent = 'Учим слоги. Жми, слушай, запоминай';
+                } else {
+                    heroesSection.classList.add('active');
+                    syllablesSection.classList.remove('active');
+                    sectionSubtitle.textContent = 'Великие личности Отечества';
+                }
+                sectionBtns.forEach(btn => {
+                    btn.classList.toggle('active', btn.dataset.section === section);
+                });
+            }
+
+            sectionBtns.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    switchSection(btn.dataset.section);
+                });
+            });
+
+            window.addEventListener('scroll', () => {
+                scrollTopBtn.classList.toggle('visible', window.scrollY > 300);
+            });
+            scrollTopBtn.addEventListener('click', () => {
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            });
 
             function updateProgress() {
                 const total = syllables.length;
                 const marked = [...syllables].filter(s => learnedSet.has(s)).length;
                 const percent = total ? Math.round((marked / total) * 100) : 0;
-                progressLabel.textContent = `${marked} из ${total}`;
+                progressLabel.textContent = `Отмечено: ${marked} из ${total}`;
                 progressFill.style.width = percent + '%';
             }
 
             function renderGrid() {
                 grid.innerHTML = '';
                 const items = currentMode === 'random' ? randomItems : syllables;
-                items.forEach((syllable, index) => {
+                items.forEach(syllable => {
                     const card = document.createElement('div');
                     card.className = 'syllable-card';
                     card.dataset.syllable = syllable;
-                    card.style.setProperty('--i', index);
                     card.setAttribute('role', 'button');
                     card.setAttribute('tabindex', '0');
                     const textSpan = document.createElement('span');
@@ -1028,6 +1245,8 @@
                     const dot = document.createElement('div');
                     dot.className = 'learn-dot';
                     dot.title = 'Отметить';
+                    dot.setAttribute('role', 'checkbox');
+                    dot.setAttribute('aria-checked', learnedSet.has(syllable));
                     card.appendChild(dot);
                     if (learnedSet.has(syllable)) card.classList.add('learned');
                     dot.addEventListener('click', (e) => {
@@ -1047,19 +1266,25 @@
             }
 
             function toggleLearned(syllable, card) {
-                if (learnedSet.has(syllable)) learnedSet.delete(syllable);
-                else learnedSet.add(syllable);
-                saveLearned();
+                if (learnedSet.has(syllable)) {
+                    learnedSet.delete(syllable);
+                } else {
+                    learnedSet.add(syllable);
+                }
+                saveLearnedSet(learnedSet);
                 card.classList.toggle('learned', learnedSet.has(syllable));
                 updateProgress();
             }
 
             function playAudio(syllable) {
-                if (currentAudio) { currentAudio.pause(); currentAudio.src = ''; }
+                if (currentAudio) {
+                    currentAudio.pause();
+                    currentAudio.src = '';
+                }
                 const audio = new Audio('audio/' + syllable + '.mp3');
                 audio.volume = 1;
                 currentAudio = audio;
-                audio.addEventListener('ended', () => currentAudio = null);
+                audio.addEventListener('ended', () => { currentAudio = null; });
                 audio.play().catch(() => {});
             }
 
@@ -1077,37 +1302,48 @@
             });
             randomBtn.addEventListener('click', () => {
                 currentMode = 'random';
-                const shuffled = [...syllables].sort(() => Math.random() - 0.5);
-                randomItems = shuffled.slice(0, 10);
+                generateRandomItems();
                 randomBtn.classList.add('active');
                 normalBtn.classList.remove('active');
                 renderGrid();
             });
+            function generateRandomItems() {
+                const shuffled = syllables.slice().sort(() => Math.random() - 0.5);
+                randomItems = shuffled.slice(0, Math.min(10, shuffled.length));
+            }
             hideLearnedBtn.addEventListener('click', () => {
                 hideLearnedBtn.classList.toggle('active');
                 grid.classList.toggle('hide-learned', hideLearnedBtn.classList.contains('active'));
             });
             clearLearnedBtn.addEventListener('click', () => {
                 learnedSet.clear();
-                saveLearned();
+                saveLearnedSet(learnedSet);
                 renderGrid();
-                showToast('Прогресс очищен');
+                showToast('Очищено', 'success');
             });
 
-            // ЭКЗАМЕН
             examBtn.addEventListener('click', startExam);
             function startExam() {
                 examOverlay.classList.add('show');
-                examQuestions = [...syllables].sort(() => Math.random() - 0.5).slice(0, 10);
+                examNextBtn.classList.remove('show');
+                examRepeatBtn.style.display = 'flex';
+                examQuestions = getRandomExamQuestions(10);
                 examIndex = 0;
                 examScore = 0;
-                showNextExam();
+                showNextExamQuestion();
             }
-            function showNextExam() {
+            function getRandomExamQuestions(count) {
+                const shuffled = syllables.slice().sort(() => Math.random() - 0.5);
+                return shuffled.slice(0, Math.min(count, shuffled.length));
+            }
+            function showNextExamQuestion() {
                 if (examIndex >= examQuestions.length) {
                     examOverlay.classList.remove('show');
-                    if (examScore === 10) showCelebration();
-                    else showToast(`Верно ${examScore} из 10`);
+                    if (examScore === 10) {
+                        showCelebration();
+                    } else {
+                        showToast(`Верно ${examScore} из 10`, 'info');
+                    }
                     return;
                 }
                 const correct = examQuestions[examIndex];
@@ -1116,73 +1352,107 @@
                 examResult.textContent = '';
                 examNextBtn.classList.remove('show');
                 examRepeatBtn.style.display = 'flex';
+
                 const variants = new Set([correct]);
-                const pool = syllables.filter(s => s !== correct);
-                while (variants.size < 6 && pool.length > 0) {
-                    const r = pool.splice(Math.floor(Math.random() * pool.length), 1)[0];
-                    variants.add(r);
+                const firstLetter = correct.charAt(0).toUpperCase();
+                const sameLetterPool = syllables.filter(item =>
+                    item !== correct && item.charAt(0).toUpperCase() === firstLetter
+                );
+                const maxSameLetter = Math.min(5, sameLetterPool.length);
+                const shuffledSame = sameLetterPool.sort(() => Math.random() - 0.5).slice(0, maxSameLetter);
+                shuffledSame.forEach(item => variants.add(item));
+                const fallbackPool = syllables.filter(item => !variants.has(item));
+                while (variants.size < 6 && fallbackPool.length > 0) {
+                    const randomItem = fallbackPool[Math.floor(Math.random() * fallbackPool.length)];
+                    variants.add(randomItem);
+                    fallbackPool.splice(fallbackPool.indexOf(randomItem), 1);
                 }
-                const arr = [...variants].sort(() => Math.random() - 0.5);
+                const variantsArray = [...variants].sort(() => Math.random() - 0.5);
+
                 examOptions.innerHTML = '';
-                arr.forEach(v => {
-                    const b = document.createElement('button');
-                    b.className = 'exam-option';
-                    b.textContent = v.toUpperCase();
-                    b.addEventListener('click', () => handleExamAnswer(b, v, correct));
-                    examOptions.appendChild(b);
+                variantsArray.forEach(variant => {
+                    const btn = document.createElement('button');
+                    btn.className = 'exam-option';
+                    btn.textContent = variant.toUpperCase();
+                    btn.addEventListener('click', () => handleExamAnswer(btn, variant, correct));
+                    examOptions.appendChild(btn);
                 });
                 playAudio(correct);
             }
             function handleExamAnswer(btn, selected, correct) {
-                const all = examOptions.querySelectorAll('.exam-option');
-                all.forEach(o => o.disabled = true);
+                const allOptions = examOptions.querySelectorAll('.exam-option');
+                allOptions.forEach(opt => opt.disabled = true);
                 if (selected === correct) {
                     btn.classList.add('correct');
                     examScore++;
                     examResult.textContent = '👍';
                 } else {
                     btn.classList.add('wrong');
-                    all.forEach(o => { if (o.textContent === correct.toUpperCase()) o.classList.add('correct'); });
+                    allOptions.forEach(opt => {
+                        if (opt.textContent === correct.toUpperCase()) opt.classList.add('correct');
+                    });
                     examResult.textContent = '❌';
                 }
                 examRepeatBtn.style.display = 'none';
                 examNextBtn.classList.add('show');
                 examNextBtn.focus();
             }
-            examNextBtn.addEventListener('click', () => { examIndex++; showNextExam(); });
+            examNextBtn.addEventListener('click', () => {
+                examIndex++;
+                showNextExamQuestion();
+            });
             examExitBtn.addEventListener('click', () => {
                 examOverlay.classList.remove('show');
-                if (currentAudio) { currentAudio.pause(); currentAudio.src = ''; currentAudio = null; }
+                if (currentAudio) {
+                    currentAudio.pause();
+                    currentAudio.src = '';
+                    currentAudio = null;
+                }
                 examNextBtn.classList.remove('show');
                 examRepeatBtn.style.display = 'flex';
+                showToast('💔', 'info');
             });
-            examRepeatBtn.addEventListener('click', () => { if (currentExamCorrect) playAudio(currentExamCorrect); });
+            examRepeatBtn.addEventListener('click', () => {
+                if (currentExamCorrect) playAudio(currentExamCorrect);
+            });
 
-            // ПРАЗДНИК
-            const gifs = [
+            const gifUrls = [
                 'https://media.gifs.ru/2158157ec6a1788936055b9e9911600c84c63e85_300.webp',
                 'https://media.gifs.ru/2771cc0c57b56e4c6cfa23d2d9d3f4eb1aab5aaa_300.webp',
                 'https://media.gifs.ru/2d609cd63a3ae5874298b500f9ab4b5871aabd16_300.webp',
                 'https://media.gifs.ru/3f25bc7fbec4825f63f6e619e0bd3c8819d80aa9_300.webp',
-                'https://media.gifs.ru/cbaddb0c4d7bea31ff48e153877a7cec628dcd22_300.webp'
+                'https://media.gifs.ru/cbaddb0c4d7bea31ff48e153877a7cec628dcd22_300.webp',
+                'https://media.gifs.ru/a8e88e80cbecdfc6f34d261a843c82f8f6c2e42b_300.webp',
+                'https://media.gifs.ru/2640e63683ecae76864a3b8cc40cfe569bb188de_300.webp',
+                'https://media.gifs.ru/dea46c4e68cbe967d1044828093869737c0697391d7011fc3094a163248f53ff_300.webp',
+                'https://media.gifs.ru/e6eeccd12fe0d671a5e0f134daafcd7068cef5cf3c99affb72ca341eb9f43157_300.webp',
+                'https://media.gifs.ru/45256be700bbfc9f441b0ea62ed7069989ac7cda44f5ecdf2399deaf60954a58_300.webp',
+                'https://media.gifs.ru/f3e3b39148c45df671a433372b8b3cf4bdc997fa799bf8406d281ef593e97b10_300.webp'
             ];
             function showCelebration() {
-                celebrationGif.src = gifs[Math.floor(Math.random() * gifs.length)];
-                celebrationOverlay.style.display = 'flex';
+                const randomGif = gifUrls[Math.floor(Math.random() * gifUrls.length)];
+                celebrationGif.src = randomGif;
+                celebrationOverlay.classList.add('show');
             }
-            celebrationClose.addEventListener('click', () => celebrationOverlay.style.display = 'none');
-            celebrationOverlay.addEventListener('click', (e) => { if (e.target === celebrationOverlay) celebrationOverlay.style.display = 'none'; });
+            celebrationClose.addEventListener('click', () => {
+                celebrationOverlay.classList.remove('show');
+            });
+            celebrationOverlay.addEventListener('click', (e) => {
+                if (e.target === celebrationOverlay) {
+                    celebrationOverlay.classList.remove('show');
+                }
+            });
 
-            // ТОСТЫ
-            function showToast(msg) {
-                const t = document.createElement('div');
-                t.className = 'toast';
-                t.textContent = msg;
-                toastContainer.appendChild(t);
-                setTimeout(() => t.remove(), 2200);
+            function showToast(message, type = 'info') {
+                const toast = document.createElement('div');
+                toast.className = 'toast';
+                if (type === 'error') toast.classList.add('error');
+                if (type === 'success') toast.classList.add('success');
+                toast.textContent = message;
+                toastContainer.appendChild(toast);
+                setTimeout(() => toast.remove(), 2000);
             }
 
-            // ГЕРОИ
             const heroesData = [
                 { name: "Александров", birthYear: 1905, deathYear: 1994, images: ["Александров.jpg"], audio: "Александров.mp3" },
                 { name: "Белинский", birthYear: 1811, deathYear: 1848, images: ["Белинский.jpg"], audio: "Белинский.mp3" },
@@ -1234,74 +1504,111 @@
                 { name: "Шолохов", birthYear: 1905, deathYear: 1984, images: ["Шолохов.jpg"], audio: "Шолохов.mp3" }
             ];
 
-            function renderTimeline() {
-                if (!timelineWrapper) return;
+            function renderHeroesTimeline() {
+                if (!heroesTimeline) return;
+                
                 const centuries = [
-                    { name: "XVIII век", filter: h => h.overrideCentury === 18 || (!h.overrideCentury && h.deathYear < 1801) },
-                    { name: "XIX век", filter: h => h.overrideCentury === 19 || (!h.overrideCentury && h.deathYear >= 1801 && h.deathYear <= 1921) },
-                    { name: "XX век", filter: h => h.overrideCentury === 20 || (!h.overrideCentury && h.deathYear > 1921) }
+                    { 
+                        name: "XVIII век", 
+                        filter: h => h.overrideCentury === 18 || (!h.overrideCentury && h.deathYear < 1801) 
+                    },
+                    { 
+                        name: "XIX век", 
+                        filter: h => h.overrideCentury === 19 || (!h.overrideCentury && h.deathYear >= 1801 && h.deathYear <= 1921) 
+                    },
+                    { 
+                        name: "XX век", 
+                        filter: h => h.overrideCentury === 20 || (!h.overrideCentury && h.deathYear > 1921) 
+                    }
                 ];
-                let html = '<div class="timeline-wrapper">';
+
+                let html = '<div class="timeline-container">';
                 html += '<div class="timeline-line"></div>';
+
                 centuries.forEach(c => {
-                    const heroes = heroesData.filter(c.filter).sort((a,b) => a.deathYear - b.deathYear);
-                    if (!heroes.length) return;
-                    html += `<div class="century-marker" data-century="${c.name}"></div>`;
-                    let soviet = false;
-                    heroes.forEach(h => {
-                        if (!soviet && h.name === "Ленин") { html += '<div style="border-left:3px solid #ef4444;margin-left:-1.5rem;padding-left:1.5rem;">'; soviet = true; }
-                        const img = `Great Rus/${h.images[0]}`;
-                        const age = h.deathYear - h.birthYear;
+                    const heroes = heroesData.filter(c.filter).sort((a, b) => a.deathYear - b.deathYear);
+                    if (heroes.length === 0) return;
+
+                    html += `<div class="century-sentinel" data-century="${c.name}"></div>`;
+                    
+                    let sovietStarted = false;
+
+                    heroes.forEach(hero => {
+                        if (!sovietStarted && hero.name === "Ленин") {
+                            html += `<div class="soviet-era">`;
+                            sovietStarted = true;
+                        }
+                        
+                        const imagePath = `Great Rus/${hero.images[0]}`;
+                        const age = hero.deathYear - hero.birthYear;
+                        
                         html += `
-                            <div class="hero-card" data-name="${h.name}" data-audio="Great Rus/${h.audio}" data-images='${JSON.stringify(h.images.map(i => "Great Rus/" + i))}'>
-                                <div class="hero-avatar"><img src="${img}" alt="${h.name}" loading="lazy"></div>
-                                <div class="hero-info">
-                                    <h4>${h.name}</h4>
-                                    <span>${h.birthYear} — ${h.deathYear} (${age})</span>
+                            <div class="hero-item" 
+                                 data-name="${hero.name}" 
+                                 data-audio="Great Rus/${hero.audio}" 
+                                 data-images='${JSON.stringify(hero.images.map(img => "Great Rus/" + img))}'>
+                                <div class="hero-circle">
+                                    <img src="${imagePath}" alt="${hero.name}" loading="lazy">
                                 </div>
-                            </div>`;
+                                <div class="hero-info">
+                                    <div class="hero-name">${hero.name}</div>
+                                    <div class="hero-years">${hero.birthYear} — ${hero.deathYear} <span class="hero-age">(${age})</span></div>
+                                </div>
+                            </div>
+                        `;
                     });
-                    if (soviet) html += '</div>';
+                    if (sovietStarted) {
+                        html += `</div>`;
+                    }
                 });
                 html += '</div>';
-                timelineWrapper.innerHTML = html;
 
-                timelineWrapper.querySelectorAll('.hero-card').forEach(card => {
-                    card.addEventListener('click', () => {
-                        openHeroModal(card.dataset.name, JSON.parse(card.dataset.images), card.dataset.audio);
+                heroesTimeline.innerHTML = html;
+
+                heroesTimeline.querySelectorAll('.hero-item').forEach(item => {
+                    item.addEventListener('click', function() {
+                        openHeroModal(this.dataset.name, JSON.parse(this.dataset.images), this.dataset.audio);
                     });
                 });
 
                 const observer = new IntersectionObserver((entries) => {
-                    entries.forEach(e => {
-                        if (e.isIntersecting) {
-                            const c = e.target.dataset.century;
+                    entries.forEach(entry => {
+                        if (entry.isIntersecting) {
+                            const century = entry.target.dataset.century;
+                            
                             clearTimeout(popupShowTimeout);
                             clearTimeout(popupTimeout);
+                            
                             popupShowTimeout = setTimeout(() => {
-                                centuryPopup.textContent = c;
-                                centuryPopup.style.opacity = '1';
-                                centuryPopup.style.transform = 'translateX(-50%) translateY(0)';
+                                centuryPopup.textContent = century;
+                                centuryPopup.classList.add('show');
+                                
                                 popupTimeout = setTimeout(() => {
-                                    centuryPopup.style.opacity = '0';
-                                    centuryPopup.style.transform = 'translateX(-50%) translateY(10px)';
+                                    centuryPopup.classList.remove('show');
                                 }, 2500);
                             }, 800);
+                        } else {
+                            clearTimeout(popupShowTimeout);
                         }
                     });
                 }, { threshold: 0.3 });
-                timelineWrapper.querySelectorAll('.century-marker').forEach(m => observer.observe(m));
+
+                document.querySelectorAll('.century-sentinel').forEach(sentinel => {
+                    observer.observe(sentinel);
+                });
             }
 
             let heroModal = null;
             let heroAudio = new Audio();
-            let currentImages = [];
             let currentImageIndex = 0;
+            let currentImages = [];
 
             function openHeroModal(name, images, audioSrc) {
                 if (heroModal) heroModal.remove();
+
                 currentImages = images;
                 currentImageIndex = 0;
+
                 heroModal = document.createElement('div');
                 heroModal.className = 'hero-modal';
                 heroModal.innerHTML = `
@@ -1314,31 +1621,54 @@
                             <button class="prev-image" style="${images.length <= 1 ? 'display:none;' : ''}">&#10094;</button>
                             <button class="next-image" style="${images.length <= 1 ? 'display:none;' : ''}">&#10095;</button>
                         </div>
-                    </div>`;
+                    </div>
+                `;
                 document.body.appendChild(heroModal);
+
                 playHeroAudio(audioSrc);
-                heroModal.querySelector('.hero-modal-close').addEventListener('click', () => { heroModal.remove(); heroAudio.pause(); });
-                heroModal.addEventListener('click', (e) => { if (e.target === heroModal) { heroModal.remove(); heroAudio.pause(); } });
+
+                heroModal.querySelector('.hero-modal-close').addEventListener('click', () => {
+                    heroModal.remove();
+                    heroAudio.pause();
+                    heroAudio.currentTime = 0;
+                });
+
+                heroModal.addEventListener('click', (e) => {
+                    if (e.target === heroModal) {
+                        heroModal.remove();
+                        heroAudio.pause();
+                        heroAudio.currentTime = 0;
+                    }
+                });
+
                 const prevBtn = heroModal.querySelector('.prev-image');
                 const nextBtn = heroModal.querySelector('.next-image');
-                if (prevBtn) prevBtn.addEventListener('click', () => {
-                    currentImageIndex = (currentImageIndex - 1 + currentImages.length) % currentImages.length;
-                    heroModal.querySelector('.hero-modal-portrait').src = currentImages[currentImageIndex];
+                if (prevBtn) {
+                    prevBtn.addEventListener('click', () => {
+                        currentImageIndex = (currentImageIndex - 1 + currentImages.length) % currentImages.length;
+                        heroModal.querySelector('.hero-modal-portrait').src = currentImages[currentImageIndex];
+                    });
+                }
+                if (nextBtn) {
+                    nextBtn.addEventListener('click', () => {
+                        currentImageIndex = (currentImageIndex + 1) % currentImages.length;
+                        heroModal.querySelector('.hero-modal-portrait').src = currentImages[currentImageIndex];
+                    });
+                }
+
+                heroModal.querySelector('.hero-modal-repeat').addEventListener('click', () => {
+                    playHeroAudio(audioSrc);
                 });
-                if (nextBtn) nextBtn.addEventListener('click', () => {
-                    currentImageIndex = (currentImageIndex + 1) % currentImages.length;
-                    heroModal.querySelector('.hero-modal-portrait').src = currentImages[currentImageIndex];
-                });
-                heroModal.querySelector('.hero-modal-repeat').addEventListener('click', () => playHeroAudio(audioSrc));
-            }
-            function playHeroAudio(src) {
-                heroAudio.src = src;
-                heroAudio.play().catch(() => {});
             }
 
-            // ИНИЦИАЛИЗАЦИЯ
+            function playHeroAudio(src) {
+                heroAudio.src = src;
+                heroAudio.play().catch(e => console.log('Ошибка воспроизведения', e));
+            }
+
+            renderHeroesTimeline();
             renderGrid();
-            renderTimeline();
+   
         })();
     </script>
 </body>
