@@ -2091,7 +2091,7 @@
         })();
     </script>
 
-            <!-- ==================== ЛОГИКА ЧАСОВ + ПЕРЕКЛЮЧЕНИЕ ВИДА ==================== -->
+           <!-- ==================== ЛОГИКА ЧАСОВ + ПЕРЕКЛЮЧЕНИЕ ВИДА ==================== -->
     <script>
     (function () {
         const clockView   = document.getElementById('clockView');
@@ -2100,7 +2100,15 @@
         const minuteScheme= document.getElementById('minuteScheme');
         if (!clockView || !watchView || !schemeView) return;
 
-        // --- Убираем тяжёлый SVG-фильтр тени ремешка (главный источник лагов) ---
+        /* ============================================================
+           ЛЁГКОЕ ОТКЛЮЧЕНИЕ SVG-ФИЛЬТРА (без исчезновения ремешка)
+           ============================================================
+           Сначала снимаем ссылку filter со всех элементов, которые на неё
+           указывают, — и только потом удаляем сам фильтр из <defs>.
+           Иначе Safari считает url(#...) невалидным и скрывает элемент. */
+        document.querySelectorAll('[filter="url(#clk-strapShadow)"]').forEach(el => {
+            el.removeAttribute('filter');
+        });
         const strapFilter = document.getElementById('clk-strapShadow');
         if (strapFilter) strapFilter.remove();
 
@@ -2114,11 +2122,11 @@
         const CX = 200, CY = 260;
         const VIEWBOX_W = 440;
 
-        const MOVE_THRESHOLD   = 5;     // раньше 8 — теперь стрелки «хватаются» быстрее
+        const MOVE_THRESHOLD   = 5;
         const TAP_MIN_DURATION = 400;
         const TAP_MAX_DURATION = 1200;
         const TAP_MAX_MOVE     = 12;
-        const GRAB_RADIUS      = 220;   // берём шире — включая корпус часов
+        const GRAB_RADIUS      = 220;
 
         const AUDIO_DIR = 'clock_audio/';
 
@@ -2257,122 +2265,138 @@
         let currentView = 'watch';
 
         /* ============================================================
-           АУДИО: ГЛОБАЛЬНАЯ РАЗБЛОКИРОВКА ДЛЯ iOS
+           АУДИО (WebAudio — самый надёжный путь для iOS)
            ============================================================ */
-        // Отдельный элемент для «тихого» unlock-сигнала,
-        // чтобы он не мешал воспроизведению клипов времени.
-        const unlockAudio = new Audio();
-        let pageAudioUnlocked = false;
+        let audioCtx = null;
+        const audioBuffers = {};          // filename -> AudioBuffer
+        let playingNodes = [];            // активные источники
+        let playbackGeneration = 0;       // токен для отмены цепочки
+        let preloadStarted = false;
 
-        // Генерируем валидный silent-WAV прямо в JS
-        function makeSilentDataURI() {
-            const sampleRate = 8000;
-            const samples = 400;                      // ~50 мс
-            const buffer = new ArrayBuffer(44 + samples);
-            const view = new DataView(buffer);
-            const w = (off, s) => { for (let i = 0; i < s.length; i++) view.setUint8(off + i, s.charCodeAt(i)); };
-            w(0, 'RIFF');
-            view.setUint32(4, 36 + samples, true);
-            w(8, 'WAVE');
-            w(12, 'fmt ');
-            view.setUint32(16, 16, true);
-            view.setUint16(20, 1, true);              // PCM
-            view.setUint16(22, 1, true);              // mono
-            view.setUint32(24, sampleRate, true);
-            view.setUint32(28, sampleRate, true);
-            view.setUint16(32, 1, true);              // block align
-            view.setUint16(34, 8, true);              // bits per sample
-            w(36, 'data');
-            view.setUint32(40, samples, true);
-            for (let i = 0; i < samples; i++) view.setUint8(44 + i, 128); // тишина
-            const bytes = new Uint8Array(buffer);
-            let bin = '';
-            for (let i = 0; i < bytes.length; i++) bin += String.fromCharCode(bytes[i]);
-            return 'data:audio/wav;base64,' + btoa(bin);
+        function ensureAudioCtx() {
+            if (audioCtx) return audioCtx;
+            const Ctx = window.AudioContext || window.webkitAudioContext;
+            if (!Ctx) return null;
+            try { audioCtx = new Ctx(); } catch (e) { return null; }
+            return audioCtx;
         }
-        const SILENT_DATA_URI = makeSilentDataURI();
 
-        function unlockPageAudio() {
-            if (pageAudioUnlocked) return;
-            pageAudioUnlocked = true;
+        // Разблокировка контекста ВНУТРИ пользовательского жеста.
+        // Играем короткий (1 сэмпл) тихий буфер — это переводит контекст
+        // в состояние 'running'. После этого любые .start() будут работать.
+        function unlockAudio() {
+            const ctx = ensureAudioCtx();
+            if (!ctx) return;
+            if (ctx.state === 'suspended') {
+                ctx.resume().catch(() => {});
+            }
             try {
-                unlockAudio.src = SILENT_DATA_URI;
-                unlockAudio.volume = 0.01;
-                const p = unlockAudio.play();
-                if (p && p.catch) p.catch(() => {});
+                const silent = ctx.createBuffer(1, 1, 22050);
+                const src = ctx.createBufferSource();
+                src.buffer = silent;
+                src.connect(ctx.destination);
+                src.start(0);
             } catch (e) {}
         }
 
-        // Слушаем на самом первом касании/клике ГДЕ УГОДНО на странице,
-        // в capture-фазе — до всех остальных обработчиков.
-        document.addEventListener('touchstart', unlockPageAudio, { passive: true, capture: true });
-        document.addEventListener('mousedown', unlockPageAudio, { capture: true });
+        // Регистрируем разблокировку на самом первом касании/клике ГДЕ УГОДНО.
+        // capture: true — чтобы сработало раньше обработчиков часов.
+        document.addEventListener('touchend',    unlockAudio, { capture: true });
+        document.addEventListener('touchstart',  unlockAudio, { capture: true, passive: true });
+        document.addEventListener('mousedown',   unlockAudio, { capture: true });
+        document.addEventListener('click',       unlockAudio, { capture: true });
 
-        /* ============================================================
-           КЕШ КЛИПОВ И ВОСПРОИЗВЕДЕНИЕ ЦЕПОЧКИ
-           ============================================================ */
-        const audioCache = {};
-        function getClockAudio(name) {
-            if (!audioCache[name]) {
-                const a = new Audio(AUDIO_DIR + name);
-                a.preload = 'auto';
-                try { a.load(); } catch (e) {}
-                audioCache[name] = a;
+        // Загрузка mp3 в AudioBuffer
+        async function loadBuffer(name) {
+            if (audioBuffers[name]) return audioBuffers[name];
+            const ctx = ensureAudioCtx();
+            if (!ctx) return null;
+            try {
+                const resp = await fetch(AUDIO_DIR + name);
+                if (!resp.ok) throw new Error('HTTP ' + resp.status + ' для ' + name);
+                const arr = await resp.arrayBuffer();
+                const buf = await ctx.decodeAudioData(arr);
+                audioBuffers[name] = buf;
+                return buf;
+            } catch (e) {
+                console.warn('Не удалось загрузить ' + name + ':', e);
+                return null;
             }
-            return audioCache[name];
         }
 
-        function preloadCommonClips() {
-            for (let h = 1; h <= 12; h++) getClockAudio(`h_${String(h).padStart(2,'0')}.mp3`);
-            for (let m = 5; m < 60; m += 5) getClockAudio(`m_${String(m).padStart(2,'0')}.mp3`);
-            getClockAudio('rovno.mp3');
+        function preloadAllBuffers() {
+            if (preloadStarted) return;
+            preloadStarted = true;
+            const names = [];
+            for (let h = 1; h <= 12; h++) names.push(`h_${String(h).padStart(2,'0')}.mp3`);
+            for (let m = 1; m <= 59; m++) names.push(`m_${String(m).padStart(2,'0')}.mp3`);
+            names.push('rovno.mp3');
+            (async () => {
+                for (const n of names) {
+                    await loadBuffer(n);
+                }
+                console.log('Аудио часов: загружено ' + Object.keys(audioBuffers).length + ' файлов');
+            })();
         }
 
-        let currentlyPlaying = null;
-        let playbackToken = 0;
+        // Запускаем предзагрузку, но чуть отложенно, чтобы не мешать первому рендеру.
+        if ('requestIdleCallback' in window) {
+            requestIdleCallback(preloadAllBuffers);
+        } else {
+            setTimeout(preloadAllBuffers, 500);
+        }
 
         function stopClockAudio() {
-            playbackToken++;
-            if (currentlyPlaying) {
-                try {
-                    currentlyPlaying.onended = null;
-                    currentlyPlaying.pause();
-                    currentlyPlaying.currentTime = 0;
-                } catch (e) {}
-                currentlyPlaying = null;
+            playbackGeneration++;
+            for (const node of playingNodes) {
+                try { node.stop(); } catch (e) {}
             }
+            playingNodes = [];
         }
 
-        // Вызывается СИНХРОННО из touchend / mouseup.
+        // Вызывается СИНХРОННО из touchend/mouseup.
         function speakTime() {
+            const ctx = ensureAudioCtx();
+            if (!ctx) return;
+            if (ctx.state === 'suspended') {
+                ctx.resume().catch(() => {});
+            }
+
             stopClockAudio();
-            const token = playbackToken;
+            const myGen = playbackGeneration;
 
             const queue = [`h_${String(hour).padStart(2, '0')}.mp3`];
             if (minute === 0) queue.push('rovno.mp3');
             else              queue.push(`m_${String(minute).padStart(2, '0')}.mp3`);
 
             let idx = 0;
+
             function playNext() {
-                if (token !== playbackToken) return;
-                if (idx >= queue.length) { currentlyPlaying = null; return; }
-                const file = queue[idx++];
-                const a = getClockAudio(file);
-                try { a.pause(); a.currentTime = 0; } catch (e) {}
-                currentlyPlaying = a;
-                const onEnd = () => {
-                    a.removeEventListener('ended', onEnd);
-                    playNext();
-                };
-                a.addEventListener('ended', onEnd);
-                const p = a.play();
-                if (p && p.catch) {
-                    p.catch(err => {
-                        console.warn('clock audio play failed:', file, err);
-                        a.removeEventListener('ended', onEnd);
+                if (myGen !== playbackGeneration) return;
+                if (idx >= queue.length) return;
+                const name = queue[idx];
+                const buf  = audioBuffers[name];
+
+                if (!buf) {
+                    // не загружен — грузим и продолжаем
+                    loadBuffer(name).then(() => {
+                        if (myGen !== playbackGeneration) return;
                         playNext();
                     });
+                    return;
                 }
+
+                idx++;
+                const src = ctx.createBufferSource();
+                src.buffer = buf;
+                src.connect(ctx.destination);
+                src.onended = () => {
+                    const i = playingNodes.indexOf(src);
+                    if (i >= 0) playingNodes.splice(i, 1);
+                    playNext();
+                };
+                playingNodes.push(src);
+                try { src.start(0); } catch (e) {}
             }
             playNext();
         }
@@ -2407,8 +2431,6 @@
             hour = h === 0 ? 12 : h;
         }
 
-        // Рендер без rAF: просто меняем атрибуты, браузер сам коалесцирует кадры.
-        // На практике быстрее, чем планировать через requestAnimationFrame.
         function render() {
             const hourDeg   = (hour % 12) * 30 + minute * 0.5;
             const minuteDeg = minute * 6;
@@ -2476,8 +2498,6 @@
             if (!gesture.mode) {
                 if (adx < MOVE_THRESHOLD && ady < MOVE_THRESHOLD) return;
 
-                // Классифицируем как скролл ТОЛЬКО для касаний и только
-                // если вертикаль сильно преобладает. На мыши — всегда драг.
                 if (gesture.source === 'touch' && ady > adx * 2.0) {
                     gesture.mode = 'scroll';
                     return;
@@ -2587,7 +2607,6 @@
 
         window.clockSpeakCancel = stopClockAudio;
 
-        preloadCommonClips();
         render();
         setView('watch');
     })();
