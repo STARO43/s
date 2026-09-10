@@ -2091,7 +2091,7 @@
         })();
     </script>
 
-       <!-- ==================== ЛОГИКА ЧАСОВ + ПЕРЕКЛЮЧЕНИЕ ВИДА ==================== -->
+           <!-- ==================== ЛОГИКА ЧАСОВ + ПЕРЕКЛЮЧЕНИЕ ВИДА ==================== -->
     <script>
     (function () {
         const clockView   = document.getElementById('clockView');
@@ -2110,13 +2110,15 @@
         const CX = 200, CY = 260;
         const VIEWBOX_W = 440;
 
-        const MOVE_THRESHOLD    = 8;    // px до классификации жеста
-        const TAP_MIN_DURATION  = 400;  // мс — минимальная длительность удержания
-        const TAP_MAX_DURATION  = 1200; // мс — максимальная длительность тапа
-        const TAP_MAX_MOVE      = 10;   // px — максимум смещения для тапа
+        const MOVE_THRESHOLD   = 8;
+        const TAP_MIN_DURATION = 400;    // мс удержания для переключения вида
+        const TAP_MAX_DURATION = 1200;
+        const TAP_MAX_MOVE     = 10;
+
+        const AUDIO_DIR = 'clock_audio/';
 
         /* ============================================================
-           СХЕМА-ЦИФЕРБЛАТ МИНУТ (60, 5, 10, ..., 55)
+           СХЕМА-ЦИФЕРБЛАТ МИНУТ
            ============================================================ */
         function buildMinuteScheme() {
             if (!minuteScheme) return;
@@ -2124,21 +2126,15 @@
             const SCX = 100, SCY = 100;
 
             const outer = document.createElementNS(NS, 'circle');
-            outer.setAttribute('cx', SCX);
-            outer.setAttribute('cy', SCY);
-            outer.setAttribute('r', 94);
-            outer.setAttribute('fill', 'none');
-            outer.setAttribute('stroke', 'currentColor');
-            outer.setAttribute('stroke-width', '2');
+            outer.setAttribute('cx', SCX); outer.setAttribute('cy', SCY);
+            outer.setAttribute('r', 94);   outer.setAttribute('fill', 'none');
+            outer.setAttribute('stroke', 'currentColor'); outer.setAttribute('stroke-width', '2');
             minuteScheme.appendChild(outer);
 
             const inner = document.createElementNS(NS, 'circle');
-            inner.setAttribute('cx', SCX);
-            inner.setAttribute('cy', SCY);
-            inner.setAttribute('r', 86);
-            inner.setAttribute('fill', 'none');
-            inner.setAttribute('stroke', 'currentColor');
-            inner.setAttribute('stroke-width', '0.6');
+            inner.setAttribute('cx', SCX); inner.setAttribute('cy', SCY);
+            inner.setAttribute('r', 86);   inner.setAttribute('fill', 'none');
+            inner.setAttribute('stroke', 'currentColor'); inner.setAttribute('stroke-width', '0.6');
             inner.setAttribute('opacity', '0.35');
             minuteScheme.appendChild(inner);
 
@@ -2193,21 +2189,15 @@
         const R_TRACK_OUT = 138;
 
         const cOut = document.createElementNS(NS, 'circle');
-        cOut.setAttribute('cx', CX);
-        cOut.setAttribute('cy', CY);
-        cOut.setAttribute('r', R_TRACK_OUT);
-        cOut.setAttribute('fill', 'none');
-        cOut.setAttribute('stroke', '#1a1a1a');
-        cOut.setAttribute('stroke-width', '0.9');
+        cOut.setAttribute('cx', CX); cOut.setAttribute('cy', CY);
+        cOut.setAttribute('r', R_TRACK_OUT); cOut.setAttribute('fill', 'none');
+        cOut.setAttribute('stroke', '#1a1a1a'); cOut.setAttribute('stroke-width', '0.9');
         ticksGroup.appendChild(cOut);
 
         const cIn = document.createElementNS(NS, 'circle');
-        cIn.setAttribute('cx', CX);
-        cIn.setAttribute('cy', CY);
-        cIn.setAttribute('r', R_TRACK_IN);
-        cIn.setAttribute('fill', 'none');
-        cIn.setAttribute('stroke', '#1a1a1a');
-        cIn.setAttribute('stroke-width', '0.9');
+        cIn.setAttribute('cx', CX); cIn.setAttribute('cy', CY);
+        cIn.setAttribute('r', R_TRACK_IN); cIn.setAttribute('fill', 'none');
+        cIn.setAttribute('stroke', '#1a1a1a'); cIn.setAttribute('stroke-width', '0.9');
         ticksGroup.appendChild(cIn);
 
         for (let i = 0; i < 60; i++) {
@@ -2253,7 +2243,7 @@
         }
 
         /* ============================================================
-           СОСТОЯНИЕ ЧАСОВ
+           СОСТОЯНИЕ
            ============================================================ */
         let hour = 3;
         let minute = 0;
@@ -2261,85 +2251,79 @@
         let currentView = 'watch';
 
         /* ============================================================
-           ОЗВУЧКА (iOS-friendly)
+           ОЗВУЧКА ЧЕРЕЗ ПРЕДЗАПИСАННЫЕ MP3
            ============================================================ */
-        let speechUnlockedOnce = false;
-        let cachedVoice = null;
+        const audioCache = {};
+        let currentPlaybackChain = null;   // { audio, onEnded }
 
-        // На iOS getVoices() сначала пустой и заполняется асинхронно.
-        // Обновляем кеш каждый раз, когда браузер сообщает о новых голосах.
-        function refreshVoice() {
-            if (!('speechSynthesis' in window)) return;
-            try {
-                const voices = speechSynthesis.getVoices() || [];
-                if (!voices.length) return;
-                cachedVoice = voices.find(v =>
-                    v && v.lang && v.lang.toLowerCase().indexOf('ru') === 0
-                ) || null;
-            } catch (e) {}
-        }
-        if ('speechSynthesis' in window) {
-            refreshVoice();
-            speechSynthesis.onvoiceschanged = refreshVoice;
+        function getClockAudio(name) {
+            if (!audioCache[name]) {
+                const a = new Audio(AUDIO_DIR + name);
+                a.preload = 'auto';
+                audioCache[name] = a;
+            }
+            return audioCache[name];
         }
 
-        // Однократная «разблокировка» синтезатора внутри первого жеста.
-        // ВАЖНО: НЕ вызывать speechSynthesis.cancel() сразу после speak —
-        // иначе unlock-фраза отменяется и iOS не разблокирует движок.
-        function unlockSpeech() {
-            if (speechUnlockedOnce) return;
-            if (!('speechSynthesis' in window)) return;
-            speechUnlockedOnce = true;
-            try {
-                const u = new SpeechSynthesisUtterance('раз');
-                u.lang   = 'ru-RU';
-                u.rate   = 3;
-                u.pitch  = 1;
-                u.volume = 0.05;   // почти неслышно, но > 0 — иначе iOS игнорирует
-                if (cachedVoice) u.voice = cachedVoice;
-                speechSynthesis.speak(u);
-            } catch (e) {}
+        // Прогреваем самые частые файлы, чтобы первое нажатие не тормозило
+        function preloadCommonClips() {
+            for (let h = 1; h <= 12; h++) {
+                getClockAudio(`h_${String(h).padStart(2,'0')}.mp3`);
+            }
+            for (let m = 0; m <= 59; m += 5) {
+                if (m > 0) getClockAudio(`m_${String(m).padStart(2,'0')}.mp3`);
+            }
+            getClockAudio('rovno.mp3');
         }
 
-        const HOURS = ['', 'один', 'два', 'три', 'четыре', 'пять', 'шесть',
-                       'семь', 'восемь', 'девять', 'десять', 'одиннадцать', 'двенадцать'];
-
-        function hourForm(h) {
-            if (h === 1) return 'час';
-            if (h >= 2 && h <= 4) return 'часа';
-            return 'часов';
-        }
-        function minuteForm(m) {
-            const t = m % 100, n = m % 10;
-            if (t >= 11 && t <= 14) return 'минут';
-            if (n === 1) return 'минута';
-            if (n >= 2 && n <= 4) return 'минуты';
-            return 'минут';
-        }
-
-        // Вызывается ТОЛЬКО из touchend/pointerup (внутри пользовательского жеста).
-        // Никаких setTimeout — иначе iOS не пропустит.
+        // ВАЖНО: вызывается синхронно внутри touchend/pointerup.
+        // Никаких setTimeout — иначе iOS не даст воспроизвести звук.
         function speakTime() {
-            if (!('speechSynthesis' in window)) return;
-            try {
-                refreshVoice();
+            stopClockAudio();
 
-                const text = minute === 0
-                    ? `${HOURS[hour]} ${hourForm(hour)} ровно`
-                    : `${HOURS[hour]} ${hourForm(hour)} ${minute} ${minuteForm(minute)}`;
+            const queue = [];
+            queue.push(`h_${String(hour).padStart(2, '0')}.mp3`);
+            if (minute === 0) {
+                queue.push('rovno.mp3');
+            } else {
+                queue.push(`m_${String(minute).padStart(2, '0')}.mp3`);
+            }
 
-                const u = new SpeechSynthesisUtterance(text);
-                u.lang   = 'ru-RU';
-                u.rate   = 0.9;
-                u.pitch  = 1;
-                u.volume = 1;
-                if (cachedVoice) u.voice = cachedVoice;
+            let idx = 0;
 
-                // Иногда на iOS очередь залипает в "paused" — пробуем разбудить
-                try { speechSynthesis.resume(); } catch (e) {}
+            function playNext() {
+                if (idx >= queue.length) { currentPlaybackChain = null; return; }
+                const a = getClockAudio(queue[idx]);
+                try {
+                    a.pause();
+                    a.currentTime = 0;
+                } catch (e) {}
+                currentPlaybackChain = { audio: a };
+                const onEnded = () => {
+                    a.removeEventListener('ended', onEnded);
+                    idx++;
+                    playNext();
+                };
+                a.addEventListener('ended', onEnded);
+                a.play().catch(err => {
+                    console.log('Clock audio play error:', err);
+                });
+            }
+            playNext();
+        }
 
-                speechSynthesis.speak(u);
-            } catch (e) {}
+        function stopClockAudio() {
+            for (const key in audioCache) {
+                const a = audioCache[key];
+                if (!a.paused) {
+                    try { a.pause(); a.currentTime = 0; } catch (e) {}
+                }
+            }
+            currentPlaybackChain = null;
+            // На всякий случай глушим и синтезатор, если он ещё что-то произносит
+            if ('speechSynthesis' in window) {
+                try { speechSynthesis.cancel(); } catch (e) {}
+            }
         }
 
         /* ============================================================
@@ -2390,12 +2374,10 @@
         }
 
         function getPoint(e) {
-            if (e.touches && e.touches.length > 0) {
+            if (e.touches && e.touches.length > 0)
                 return { x: e.touches[0].clientX, y: e.touches[0].clientY };
-            }
-            if (e.changedTouches && e.changedTouches.length > 0) {
+            if (e.changedTouches && e.changedTouches.length > 0)
                 return { x: e.changedTouches[0].clientX, y: e.changedTouches[0].clientY };
-            }
             return { x: e.clientX, y: e.clientY };
         }
 
@@ -2429,28 +2411,13 @@
 
         function startGesture(point, source) {
             if (gesture) return;
-
-            // Отменяем предыдущую озвучку — но ТОЛЬКО если она не является
-            // свежей unlock-фразой (её отменять нельзя).
-            if (speechUnlockedOnce && 'speechSynthesis' in window) {
-                try {
-                    if (speechSynthesis.speaking || speechSynthesis.pending) {
-                        speechSynthesis.cancel();
-                    }
-                } catch (e) {}
-            }
-
-            // Разблокировка синтезатора — только один раз за сессию.
-            // Никакого cancel после этой строки!
-            unlockSpeech();
+            // Прерываем воспроизведение, если оно ещё идёт
+            stopClockAudio();
 
             gesture = {
-                startX: point.x,
-                startY: point.y,
+                startX: point.x, startY: point.y,
                 startTime: Date.now(),
-                mode: null,
-                pointer: null,
-                angle: 0,
+                mode: null, pointer: null, angle: 0,
                 source: source
             };
         }
@@ -2459,13 +2426,12 @@
             if (!gesture) return;
             const dx = point.x - gesture.startX;
             const dy = point.y - gesture.startY;
-            const adx = Math.abs(dx);
-            const ady = Math.abs(dy);
+            const adx = Math.abs(dx), ady = Math.abs(dy);
 
             if (!gesture.mode) {
                 if (adx < MOVE_THRESHOLD && ady < MOVE_THRESHOLD) return;
 
-                // Вертикальное движение → отдаём скроллу страницы
+                // Плавный вертикальный скролл — отдаём браузеру
                 if (ady > adx * 1.5) {
                     gesture.mode = 'scroll';
                     return;
@@ -2491,7 +2457,7 @@
                 const ang = angleFromPoint(point);
                 if (gesture.pointer === 'minute') {
                     let delta = ang - gesture.angle;
-                    if (delta > 180) delta -= 360;
+                    if (delta >  180) delta -= 360;
                     if (delta < -180) delta += 360;
                     totalMinutes += delta / 6;
                     applyTotal();
@@ -2515,13 +2481,11 @@
 
             if (wasDrag) {
                 clockView.classList.remove('dragging');
-                // Речь синхронно внутри touchend — iOS это требует.
+                // Речь синхронно из touchend — это важно для iOS.
                 speakTime();
             } else if (!wasScroll && !wasOther && point &&
                        duration >= TAP_MIN_DURATION &&
                        duration <  TAP_MAX_DURATION) {
-                // Удержание длилось достаточно для осознанного «тапа»,
-                // но не превратилось в длинный press.
                 const ddx = Math.abs(point.x - gesture.startX);
                 const ddy = Math.abs(point.y - gesture.startY);
                 if (ddx < TAP_MAX_MOVE && ddy < TAP_MAX_MOVE) {
@@ -2536,13 +2500,11 @@
 
         function cancelGesture() {
             if (!gesture) return;
-            if (gesture.mode === 'drag') {
-                clockView.classList.remove('dragging');
-            }
+            if (gesture.mode === 'drag') clockView.classList.remove('dragging');
             gesture = null;
         }
 
-        /* ---------- Touch events (iOS / Android) ---------- */
+        /* ---------- Touch ---------- */
         clockView.addEventListener('touchstart', (e) => {
             if (e.touches.length !== 1) return;
             startGesture(getPoint(e), 'touch');
@@ -2564,28 +2526,23 @@
             cancelGesture();
         }, { passive: true });
 
-        /* ---------- Mouse events (desktop) ---------- */
+        /* ---------- Mouse ---------- */
         clockView.addEventListener('mousedown', (e) => {
             if (e.button !== 0) return;
             startGesture(getPoint(e), 'mouse');
         });
-
         window.addEventListener('mousemove', (e) => {
             if (!gesture || gesture.source !== 'mouse') return;
             moveGesture(e, getPoint(e));
         });
-
         window.addEventListener('mouseup', (e) => {
             if (!gesture || gesture.source !== 'mouse') return;
             endGesture(getPoint(e));
         });
 
-        window.clockSpeakCancel = function () {
-            if ('speechSynthesis' in window) {
-                try { speechSynthesis.cancel(); } catch (e) {}
-            }
-        };
+        window.clockSpeakCancel = stopClockAudio;
 
+        preloadCommonClips();
         render();
         setView('watch');
     })();
