@@ -2091,7 +2091,7 @@
         })();
     </script>
 
-    <!-- ==================== ЛОГИКА ЧАСОВ + ПЕРЕКЛЮЧЕНИЕ ВИДА ==================== -->
+       <!-- ==================== ЛОГИКА ЧАСОВ + ПЕРЕКЛЮЧЕНИЕ ВИДА ==================== -->
     <script>
     (function () {
         const clockView   = document.getElementById('clockView');
@@ -2110,9 +2110,10 @@
         const CX = 200, CY = 260;
         const VIEWBOX_W = 440;
 
-        const MOVE_THRESHOLD  = 8;    // px до классификации жеста
-        const TAP_MAX_DURATION = 500; // мс — макс. длительность тапа
-        const TAP_MAX_MOVE    = 10;   // px — макс. смещение для тапа
+        const MOVE_THRESHOLD    = 8;    // px до классификации жеста
+        const TAP_MIN_DURATION  = 400;  // мс — минимальная длительность удержания
+        const TAP_MAX_DURATION  = 1200; // мс — максимальная длительность тапа
+        const TAP_MAX_MOVE      = 10;   // px — максимум смещения для тапа
 
         /* ============================================================
            СХЕМА-ЦИФЕРБЛАТ МИНУТ (60, 5, 10, ..., 55)
@@ -2260,33 +2261,44 @@
         let currentView = 'watch';
 
         /* ============================================================
-           РАЗБЛОКИРОВКА И ОЗВУЧКА (iOS)
+           ОЗВУЧКА (iOS-friendly)
            ============================================================ */
-        let speechUnlocked = false;
+        let speechUnlockedOnce = false;
+        let cachedVoice = null;
 
-        function unlockSpeech() {
-            if (speechUnlocked) return;
+        // На iOS getVoices() сначала пустой и заполняется асинхронно.
+        // Обновляем кеш каждый раз, когда браузер сообщает о новых голосах.
+        function refreshVoice() {
             if (!('speechSynthesis' in window)) return;
-            speechUnlocked = true;
             try {
-                // Обязательно непустой текст и ненулевая громкость —
-                // иначе iOS не считает это реальной попыткой речи
-                // и не разблокирует синтезатор.
-                const u = new SpeechSynthesisUtterance('а');
-                u.lang = 'ru-RU';
-                u.rate = 10;
-                u.pitch = 1;
-                u.volume = 0.01;
-                speechSynthesis.speak(u);
+                const voices = speechSynthesis.getVoices() || [];
+                if (!voices.length) return;
+                cachedVoice = voices.find(v =>
+                    v && v.lang && v.lang.toLowerCase().indexOf('ru') === 0
+                ) || null;
             } catch (e) {}
         }
-
-        function pickVoice() {
-            try { speechSynthesis.getVoices(); } catch (e) {}
-        }
         if ('speechSynthesis' in window) {
-            pickVoice();
-            speechSynthesis.onvoiceschanged = pickVoice;
+            refreshVoice();
+            speechSynthesis.onvoiceschanged = refreshVoice;
+        }
+
+        // Однократная «разблокировка» синтезатора внутри первого жеста.
+        // ВАЖНО: НЕ вызывать speechSynthesis.cancel() сразу после speak —
+        // иначе unlock-фраза отменяется и iOS не разблокирует движок.
+        function unlockSpeech() {
+            if (speechUnlockedOnce) return;
+            if (!('speechSynthesis' in window)) return;
+            speechUnlockedOnce = true;
+            try {
+                const u = new SpeechSynthesisUtterance('раз');
+                u.lang   = 'ru-RU';
+                u.rate   = 3;
+                u.pitch  = 1;
+                u.volume = 0.05;   // почти неслышно, но > 0 — иначе iOS игнорирует
+                if (cachedVoice) u.voice = cachedVoice;
+                speechSynthesis.speak(u);
+            } catch (e) {}
         }
 
         const HOURS = ['', 'один', 'два', 'три', 'четыре', 'пять', 'шесть',
@@ -2305,33 +2317,29 @@
             return 'минут';
         }
 
+        // Вызывается ТОЛЬКО из touchend/pointerup (внутри пользовательского жеста).
+        // Никаких setTimeout — иначе iOS не пропустит.
         function speakTime() {
             if (!('speechSynthesis' in window)) return;
             try {
-                speechSynthesis.cancel();
-
-                let voice = null;
-                try {
-                    const voices = speechSynthesis.getVoices() || [];
-                    voice = voices.find(v =>
-                        v && v.lang && v.lang.toLowerCase().indexOf('ru') === 0
-                    ) || null;
-                } catch (err) {}
+                refreshVoice();
 
                 const text = minute === 0
                     ? `${HOURS[hour]} ${hourForm(hour)} ровно`
                     : `${HOURS[hour]} ${hourForm(hour)} ${minute} ${minuteForm(minute)}`;
 
                 const u = new SpeechSynthesisUtterance(text);
-                u.lang  = 'ru-RU';
-                u.rate  = 0.9;
-                u.pitch = 1;
+                u.lang   = 'ru-RU';
+                u.rate   = 0.9;
+                u.pitch  = 1;
                 u.volume = 1;
-                if (voice) u.voice = voice;
+                if (cachedVoice) u.voice = cachedVoice;
 
-                try { speechSynthesis.resume(); } catch (err) {}
+                // Иногда на iOS очередь залипает в "paused" — пробуем разбудить
+                try { speechSynthesis.resume(); } catch (e) {}
+
                 speechSynthesis.speak(u);
-            } catch (err) {}
+            } catch (e) {}
         }
 
         /* ============================================================
@@ -2421,19 +2429,29 @@
 
         function startGesture(point, source) {
             if (gesture) return;
-            // Разблокировка синтезатора внутри пользовательского жеста
-            unlockSpeech();
-            if ('speechSynthesis' in window) {
-                try { speechSynthesis.cancel(); } catch (err) {}
+
+            // Отменяем предыдущую озвучку — но ТОЛЬКО если она не является
+            // свежей unlock-фразой (её отменять нельзя).
+            if (speechUnlockedOnce && 'speechSynthesis' in window) {
+                try {
+                    if (speechSynthesis.speaking || speechSynthesis.pending) {
+                        speechSynthesis.cancel();
+                    }
+                } catch (e) {}
             }
+
+            // Разблокировка синтезатора — только один раз за сессию.
+            // Никакого cancel после этой строки!
+            unlockSpeech();
+
             gesture = {
                 startX: point.x,
                 startY: point.y,
                 startTime: Date.now(),
-                mode: null,       // 'scroll' | 'drag' | 'other' | null
-                pointer: null,    // 'minute' | 'hour'
+                mode: null,
+                pointer: null,
                 angle: 0,
-                source: source    // 'touch' | 'mouse'
+                source: source
             };
         }
 
@@ -2447,13 +2465,12 @@
             if (!gesture.mode) {
                 if (adx < MOVE_THRESHOLD && ady < MOVE_THRESHOLD) return;
 
-                // Преобладает вертикаль → отдаём браузеру скролл
+                // Вертикальное движение → отдаём скроллу страницы
                 if (ady > adx * 1.5) {
                     gesture.mode = 'scroll';
                     return;
                 }
 
-                // Пытаемся начать драг (только по диску часов и только в режиме часов)
                 if (currentView === 'watch' && isPointInsideWatch(point)) {
                     gesture.mode = 'drag';
                     const ang = angleFromPoint(point);
@@ -2491,22 +2508,23 @@
 
         function endGesture(point) {
             if (!gesture) return;
-            const duration = Date.now() - gesture.startTime;
-            const wasDrag = gesture.mode === 'drag';
+            const duration  = Date.now() - gesture.startTime;
+            const wasDrag   = gesture.mode === 'drag';
             const wasScroll = gesture.mode === 'scroll';
-            const wasOther = gesture.mode === 'other';
+            const wasOther  = gesture.mode === 'other';
 
             if (wasDrag) {
                 clockView.classList.remove('dragging');
-                // ВАЖНО: speak вызывается синхронно внутри обработчика touchend —
-                // iOS разрешает речь только в контексте жеста.
+                // Речь синхронно внутри touchend — iOS это требует.
                 speakTime();
-            } else if (!wasScroll && !wasOther && point && duration < TAP_MAX_DURATION) {
+            } else if (!wasScroll && !wasOther && point &&
+                       duration >= TAP_MIN_DURATION &&
+                       duration <  TAP_MAX_DURATION) {
+                // Удержание длилось достаточно для осознанного «тапа»,
+                // но не превратилось в длинный press.
                 const ddx = Math.abs(point.x - gesture.startX);
                 const ddy = Math.abs(point.y - gesture.startY);
                 if (ddx < TAP_MAX_MOVE && ddy < TAP_MAX_MOVE) {
-                    // Тап по диску часов переключает вид.
-                    // Тап по схеме минут — возвращает к часам.
                     if (currentView === 'scheme' || isPointInsideWatch(point)) {
                         toggleView();
                     }
@@ -2532,10 +2550,7 @@
 
         clockView.addEventListener('touchmove', (e) => {
             if (!gesture || gesture.source !== 'touch') return;
-            if (e.touches.length !== 1) {
-                cancelGesture();
-                return;
-            }
+            if (e.touches.length !== 1) { cancelGesture(); return; }
             moveGesture(e, getPoint(e));
         }, { passive: false });
 
