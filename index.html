@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=PT+Sans:wght@400;700&family=PT+Serif:ital,wght@0,400;0,700;1,400;1,700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=PT+Sans:wght@400;700&family=PT+Serif:ital,wght@0,400;0,700;1,400;1,700&family=Old+Standard+TT:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
     <title>Грамотиньо</title>
     <style>
         :root {
@@ -70,32 +70,23 @@
         }
 
         .header {
-            padding: 20px 20px 12px;
+            padding: 18px 20px 10px;
             text-align: center;
             background: linear-gradient(180deg, var(--accent-glow) 0%, transparent 100%);
             border-bottom: 1px solid var(--border);
             position: relative;
         }
-        .theme-toggle {
-            position: absolute;
-            top: 12px;
-            right: 16px;
-        }
-        .theme-cycle {
-            position: absolute;
-            top: 12px;
-            left: 16px;
-        }
+        .theme-toggle { position: absolute; top: 12px; right: 16px; }
+        .theme-cycle  { position: absolute; top: 12px; left: 16px; }
         .theme-toggle button,
         .theme-cycle button {
             background: var(--bg-card);
             border: 1px solid var(--border);
             color: var(--text);
             border-radius: 50%;
-            width: 36px;
-            height: 36px;
+            width: 32px; height: 32px;
             cursor: pointer;
-            font-size: 1.1rem;
+            font-size: 0.95rem;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -109,22 +100,21 @@
             box-shadow: 0 0 10px var(--accent-glow);
         }
         .theme-cycle .color-indicator {
-            width: 18px;
-            height: 18px;
+            width: 15px; height: 15px;
             border-radius: 50%;
             background: var(--accent);
             transition: background 0.3s;
         }
 
         .header h1 {
-            font-size: clamp(1.8rem, 5vw, 2.8rem);
+            font-size: clamp(1.5rem, 4vw, 2.2rem);
             font-weight: 700;
-            letter-spacing: 0.05em;
+            letter-spacing: 0.04em;
             background: linear-gradient(135deg, var(--text) 60%, var(--accent) 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
-            margin: 8px 0 4px;
+            margin: 6px 0 4px;
         }
 
         .section-switch {
@@ -132,30 +122,34 @@
             background: var(--bg-card);
             border: 1px solid var(--border);
             border-radius: 50px;
-            padding: 4px;
-            margin-top: 12px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            padding: 3px;
+            margin-top: 10px;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.12);
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 2px;
         }
         .section-switch-btn {
             background: transparent;
             border: none;
             color: var(--text-secondary);
-            padding: 10px 24px;
+            padding: 7px 14px;
             cursor: pointer;
             font-family: 'PT Sans', sans-serif;
             font-weight: 600;
-            font-size: 0.95rem;
+            font-size: 0.82rem;
+            letter-spacing: 0.02em;
             border-radius: 40px;
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             white-space: nowrap;
             display: flex;
             align-items: center;
-            gap: 6px;
+            gap: 5px;
         }
         .section-switch-btn.active {
             background: var(--accent);
             color: #ffffff;
-            box-shadow: 0 4px 12px var(--accent-glow);
+            box-shadow: 0 3px 10px var(--accent-glow);
         }
         .section-switch-btn:hover:not(.active) {
             color: var(--text);
@@ -164,9 +158,9 @@
 
         #sectionSubtitle {
             color: var(--text-secondary);
-            font-size: 1rem;
+            font-size: 0.88rem;
             font-weight: 500;
-            margin-top: 8px;
+            margin-top: 7px;
             min-height: 1.2em;
         }
 
@@ -177,41 +171,52 @@
             margin: 0 auto;
             padding: 0 20px;
         }
-        
-        .tab-section {
-            display: none;
-        }
+
+        .tab-section { display: none; }
         .tab-section.active {
             display: block;
             animation: tabEnter 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
         }
         @keyframes tabEnter {
-            from { 
-                opacity: 0; 
-                transform: translateY(15px) scale(0.98); 
-            }
-            to { 
-                opacity: 1; 
-                transform: translateY(0) scale(1); 
-            }
+            from { opacity: 0; transform: translateY(15px) scale(0.98); }
+            to   { opacity: 1; transform: translateY(0) scale(1); }
         }
 
         .progress-container {
-            max-width: 900px;
-            margin: 8px auto 0;
-            padding: 0 20px;
+            position: fixed;
+            bottom: 24px;
+            left: 50%;
+            transform: translateX(-50%) translateY(30px);
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+            transition: opacity .35s ease, transform .35s cubic-bezier(0.16, 1, 0.3, 1), visibility .35s;
+            z-index: 900;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 12px 22px 14px;
+            box-shadow: 0 14px 36px rgba(0, 0, 0, 0.55);
+            width: min(340px, calc(100% - 40px));
             text-align: center;
+            backdrop-filter: blur(8px);
+        }
+        .progress-container.show {
+            opacity: 1;
+            visibility: visible;
+            transform: translateX(-50%) translateY(0);
         }
         .progress-label {
-            font-size: 0.8rem;
+            font-size: 0.78rem;
             color: var(--text-secondary);
-            margin-bottom: 4px;
+            margin-bottom: 6px;
+            letter-spacing: 0.02em;
         }
         .progress-bar {
             width: 100%;
-            height: 8px;
+            height: 6px;
             background: var(--border);
-            border-radius: 4px;
+            border-radius: 3px;
             overflow: hidden;
             box-shadow: inset 0 1px 3px rgba(0,0,0,0.2);
         }
@@ -219,8 +224,9 @@
             height: 100%;
             background: var(--learned);
             width: 0%;
-            transition: width 0.3s ease;
-            border-radius: 4px;
+            transition: width 0.35s ease;
+            border-radius: 3px;
+            box-shadow: 0 0 8px rgba(63, 185, 80, 0.5);
         }
 
         .controls {
@@ -235,8 +241,7 @@
             border: 1px solid var(--border);
             color: var(--text);
             border-radius: 50%;
-            width: 44px;
-            height: 44px;
+            width: 44px; height: 44px;
             cursor: pointer;
             font-size: 1.3rem;
             display: flex;
@@ -284,8 +289,7 @@
             bottom: calc(100% + 2px);
             left: 50%;
             transform: translateX(-50%) translateY(5px);
-            width: 0;
-            height: 0;
+            width: 0; height: 0;
             border-left: 5px solid transparent;
             border-right: 5px solid transparent;
             border-top: 5px solid var(--bg-card);
@@ -312,9 +316,7 @@
             grid-template-columns: repeat(4, 1fr);
             gap: 10px;
         }
-        .syllable-grid.hide-learned .syllable-card.learned {
-            display: none;
-        }
+        .syllable-grid.hide-learned .syllable-card.learned { display: none; }
 
         .syllable-card {
             background: var(--bg-card);
@@ -361,10 +363,8 @@
         }
         .learn-dot {
             position: absolute;
-            bottom: 5px;
-            right: 7px;
-            width: 14px;
-            height: 14px;
+            bottom: 5px; right: 7px;
+            width: 14px; height: 14px;
             background: var(--border);
             border-radius: 50%;
             cursor: pointer;
@@ -381,10 +381,8 @@
 
         .scroll-top-btn {
             position: fixed;
-            bottom: 20px;
-            right: 20px;
-            width: 46px;
-            height: 46px;
+            bottom: 20px; right: 20px;
+            width: 46px; height: 46px;
             border-radius: 50%;
             background: var(--bg-card);
             border: 1px solid var(--border);
@@ -398,20 +396,13 @@
             transition: var(--transition);
             z-index: 1001;
         }
-        .scroll-top-btn.visible {
-            display: flex;
-        }
-        .scroll-top-btn:hover {
-            border-color: var(--accent);
-            color: var(--accent);
-        }
+        .scroll-top-btn.visible { display: flex; }
+        .scroll-top-btn:hover { border-color: var(--accent); color: var(--accent); }
 
         .exam-overlay {
             position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
             background: var(--bg);
             z-index: 2000;
             display: none;
@@ -421,10 +412,7 @@
             padding: 20px;
             gap: 20px;
         }
-        .exam-overlay.show {
-            display: flex;
-            animation: fadeIn 0.3s ease;
-        }
+        .exam-overlay.show { display: flex; animation: fadeIn 0.3s ease; }
         .exam-header {
             display: flex;
             align-items: center;
@@ -433,7 +421,11 @@
         }
         @keyframes slideDown {
             from { opacity: 0; transform: translateY(-20px); }
-            to { opacity: 1; transform: translateY(0); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to   { opacity: 1; }
         }
         .exam-question {
             font-size: 1.3rem;
@@ -446,8 +438,7 @@
             border: 1px solid var(--border);
             color: var(--text);
             border-radius: 50%;
-            width: 42px;
-            height: 42px;
+            width: 42px; height: 42px;
             cursor: pointer;
             font-size: 1.2rem;
             display: flex;
@@ -455,10 +446,7 @@
             justify-content: center;
             transition: var(--transition);
         }
-        .exam-repeat-btn:hover {
-            border-color: var(--accent);
-            color: var(--accent);
-        }
+        .exam-repeat-btn:hover { border-color: var(--accent); color: var(--accent); }
         .exam-options {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
@@ -469,7 +457,7 @@
         }
         @keyframes scaleIn {
             from { opacity: 0; transform: scale(0.8); }
-            to { opacity: 1; transform: scale(1); }
+            to   { opacity: 1; transform: scale(1); }
         }
         .exam-option {
             padding: 12px;
@@ -485,33 +473,22 @@
             letter-spacing: 0.04em;
             transition: var(--transition);
         }
-        .exam-option:hover {
-            border-color: var(--accent);
-            background: var(--bg-card-hover);
-        }
-        .exam-option.correct {
-            border-color: #3fb950;
-            background: rgba(63,185,80,0.2);
-        }
-        .exam-option.wrong {
-            border-color: var(--danger);
-            background: rgba(248,81,73,0.2);
-        }
+        .exam-option:hover { border-color: var(--accent); background: var(--bg-card-hover); }
+        .exam-option.correct { border-color: #3fb950; background: rgba(63,185,80,0.2); }
+        .exam-option.wrong   { border-color: var(--danger); background: rgba(248,81,73,0.2); }
         .exam-result {
             font-size: 2rem;
             text-align: center;
             min-height: 2rem;
             animation: fadeIn 0.3s ease;
         }
-
         .exam-next-btn {
             display: none;
             background: var(--accent);
             color: white;
             border: none;
             border-radius: 50%;
-            width: 42px;
-            height: 42px;
+            width: 42px; height: 42px;
             cursor: pointer;
             font-size: 1.5rem;
             align-items: center;
@@ -520,29 +497,21 @@
             animation: pulse 1.5s infinite;
             box-shadow: 0 4px 12px var(--accent-glow);
         }
-        .exam-next-btn.show {
-            display: flex;
-        }
-        .exam-next-btn:hover {
-            transform: scale(1.1);
-            box-shadow: 0 6px 18px var(--accent-glow);
-        }
+        .exam-next-btn.show { display: flex; }
+        .exam-next-btn:hover { transform: scale(1.1); box-shadow: 0 6px 18px var(--accent-glow); }
         @keyframes pulse {
-            0% { box-shadow: 0 0 0 0 var(--accent-glow); }
-            70% { box-shadow: 0 0 0 15px rgba(0,0,0,0); }
+            0%   { box-shadow: 0 0 0 0 var(--accent-glow); }
+            70%  { box-shadow: 0 0 0 15px rgba(0,0,0,0); }
             100% { box-shadow: 0 0 0 0 rgba(0,0,0,0); }
         }
-
         .exam-exit-btn {
             position: absolute;
-            top: 15px;
-            left: 15px;
+            top: 15px; left: 15px;
             background: var(--bg-card);
             border: 1px solid var(--border);
             color: var(--text);
             border-radius: 50%;
-            width: 40px;
-            height: 40px;
+            width: 40px; height: 40px;
             cursor: pointer;
             font-size: 1.4rem;
             display: flex;
@@ -551,28 +520,18 @@
             transition: var(--transition);
             z-index: 10;
         }
-        .exam-exit-btn:hover {
-            border-color: var(--danger);
-            color: var(--danger);
-            box-shadow: 0 0 10px var(--danger-glow);
-        }
-
+        .exam-exit-btn:hover { border-color: var(--danger); color: var(--danger); box-shadow: 0 0 10px var(--danger-glow); }
         .celebration-overlay {
             position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
             background: rgba(0,0,0,0.7);
             z-index: 3000;
             display: none;
             align-items: center;
             justify-content: center;
         }
-        .celebration-overlay.show {
-            display: flex;
-            animation: fadeIn 0.3s ease;
-        }
+        .celebration-overlay.show { display: flex; animation: fadeIn 0.3s ease; }
         .celebration-box {
             background: var(--bg-card);
             border-radius: var(--radius);
@@ -582,15 +541,8 @@
             max-height: 90vh;
             animation: scaleIn 0.4s ease;
         }
-        .celebration-box h2 {
-            margin-bottom: 10px;
-            font-size: 1.5rem;
-        }
-        .celebration-box img {
-            max-width: 300px;
-            max-height: 250px;
-            border-radius: 10px;
-        }
+        .celebration-box h2 { margin-bottom: 10px; font-size: 1.5rem; }
+        .celebration-box img { max-width: 300px; max-height: 250px; border-radius: 10px; }
         .celebration-close {
             margin-top: 15px;
             padding: 8px 20px;
@@ -601,11 +553,9 @@
             cursor: pointer;
             font-family: var(--font);
         }
-
         .toast-container {
             position: fixed;
-            bottom: 24px;
-            left: 50%;
+            bottom: 24px; left: 50%;
             transform: translateX(-50%);
             z-index: 4000;
             display: flex;
@@ -627,13 +577,12 @@
         }
         @keyframes toastIn {
             from { opacity: 0; transform: translateY(20px) scale(0.95); }
-            to { opacity: 1; transform: translateY(0) scale(1); }
+            to   { opacity: 1; transform: translateY(0) scale(1); }
         }
         @keyframes toastOut {
             from { opacity: 1; }
-            to { opacity: 0; transform: translateY(10px); }
+            to   { opacity: 0; transform: translateY(10px); }
         }
-
         .footer {
             text-align: center;
             padding: 16px;
@@ -641,49 +590,29 @@
             font-size: 0.7rem;
             border-top: 1px solid var(--border);
         }
-    
-        .heroes-timeline {
-            max-width: 800px;
-            margin: 40px auto;
-            padding: 0 20px;
-            position: relative;
-        }
 
-        .timeline-container {
-            position: relative;
-            padding-left: 50px;
-        }
-
+        /* ===== Личности ===== */
+        .heroes-timeline { max-width: 800px; margin: 40px auto; padding: 0 20px; position: relative; }
+        .timeline-container { position: relative; padding-left: 50px; }
         .timeline-line {
             position: absolute;
-            left: 35px;
-            top: 0;
-            bottom: 0;
+            left: 35px; top: 0; bottom: 0;
             width: 2px;
             background: linear-gradient(to bottom, transparent, var(--accent) 10%, var(--accent) 90%, transparent);
             z-index: 0;
         }
-
-        .century-sentinel {
-            height: 1px;
-            margin: 60px 0 40px;
-            position: relative;
-        }
-
+        .century-sentinel { height: 1px; margin: 60px 0 40px; position: relative; }
         .century-sentinel::before {
             content: '';
             position: absolute;
-            left: -41px;
-            top: 50%;
+            left: -41px; top: 50%;
             transform: translateY(-50%);
-            width: 16px;
-            height: 16px;
+            width: 16px; height: 16px;
             background: var(--accent);
             border-radius: 50%;
             box-shadow: 0 0 15px var(--accent-glow);
             z-index: 1;
         }
-
         .hero-item {
             position: relative;
             display: flex;
@@ -694,10 +623,8 @@
             padding: 10px;
             border-radius: var(--radius);
         }
-
         .hero-circle {
-            width: 70px;
-            height: 70px;
+            width: 70px; height: 70px;
             border-radius: 50%;
             border: 3px solid var(--accent);
             overflow: hidden;
@@ -708,30 +635,10 @@
             position: relative;
             z-index: 2;
         }
-
-        .hero-item:hover .hero-circle {
-            transform: scale(1.4);
-            box-shadow: 0 0 35px var(--accent-glow);
-        }
-
-        .hero-circle img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-
-        .hero-info {
-            display: flex;
-            flex-direction: column;
-            gap: 4px;
-        }
-
-        .hero-name {
-            font-size: 1.2rem;
-            font-weight: 700;
-            color: var(--text);
-        }
-
+        .hero-item:hover .hero-circle { transform: scale(1.4); box-shadow: 0 0 35px var(--accent-glow); }
+        .hero-circle img { width: 100%; height: 100%; object-fit: cover; }
+        .hero-info { display: flex; flex-direction: column; gap: 4px; }
+        .hero-name { font-size: 1.2rem; font-weight: 700; color: var(--text); }
         .hero-years {
             font-size: 0.95rem;
             color: var(--accent);
@@ -742,7 +649,6 @@
             align-items: baseline;
             gap: 6px;
         }
-
         .hero-age {
             font-family: 'PT Sans', sans-serif;
             font-size: 0.8rem;
@@ -750,7 +656,6 @@
             color: var(--text-secondary);
             opacity: 0.7;
         }
-
         .soviet-era {
             background: linear-gradient(180deg, rgba(220, 38, 38, 0.12) 0%, rgba(220, 38, 38, 0.02) 100%);
             margin: 30px -20px 30px -15px;
@@ -763,8 +668,7 @@
         .soviet-era::before {
             content: '☭';
             position: absolute;
-            top: 50%;
-            right: 40px;
+            top: 50%; right: 40px;
             transform: translateY(-50%);
             font-size: 8rem;
             font-weight: 900;
@@ -774,8 +678,7 @@
         .soviet-era::after {
             content: 'С С С Р';
             position: absolute;
-            top: 20px;
-            right: 25px;
+            top: 20px; right: 25px;
             font-size: 1.2rem;
             font-weight: 800;
             color: rgba(220, 38, 38, 0.4);
@@ -783,11 +686,9 @@
             pointer-events: none;
             text-shadow: 0 0 10px rgba(220, 38, 38, 0.2);
         }
-
         .century-popup {
             position: fixed;
             bottom: 100px;
-            top: auto;
             left: 50%;
             transform: translateX(-50%) translateY(20px);
             background: var(--bg-card);
@@ -804,18 +705,11 @@
             transition: opacity 0.4s ease, transform 0.4s ease;
             backdrop-filter: blur(10px);
         }
-
-        .century-popup.show {
-            opacity: 1;
-            transform: translateX(-50%) translateY(0);
-        }
-
+        .century-popup.show { opacity: 1; transform: translateX(-50%) translateY(0); }
         .hero-modal {
             position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
             background: rgba(10, 14, 23, 0.95);
             backdrop-filter: blur(5px);
             z-index: 5000;
@@ -825,8 +719,7 @@
             animation: fadeIn 0.3s ease;
         }
         .hero-modal-content {
-            width: 100%;
-            height: 100%;
+            width: 100%; height: 100%;
             position: relative;
             display: flex;
             flex-direction: column;
@@ -835,8 +728,7 @@
         }
         .hero-modal-close {
             position: absolute;
-            top: 20px;
-            right: 20px;
+            top: 20px; right: 20px;
             background: none;
             border: none;
             color: var(--text);
@@ -846,14 +738,12 @@
         }
         .hero-modal-repeat {
             position: absolute;
-            top: 20px;
-            left: 20px;
+            top: 20px; left: 20px;
             background: var(--bg-card);
             border: 1px solid var(--border);
             color: var(--text);
             border-radius: 50%;
-            width: 56px;
-            height: 56px;
+            width: 56px; height: 56px;
             cursor: pointer;
             font-size: 1.8rem;
             display: flex;
@@ -862,11 +752,7 @@
             transition: var(--transition);
             z-index: 20;
         }
-        .hero-modal-repeat:hover {
-            border-color: var(--accent);
-            color: var(--accent);
-            box-shadow: 0 0 12px var(--accent-glow);
-        }
+        .hero-modal-repeat:hover { border-color: var(--accent); color: var(--accent); box-shadow: 0 0 12px var(--accent-glow); }
         .hero-modal-portrait {
             max-width: 90%;
             max-height: 65vh;
@@ -874,17 +760,12 @@
             border-radius: 8px;
             box-shadow: 0 10px 40px rgba(0,0,0,0.6);
         }
-        .hero-modal h3 {
-            font-size: 2rem;
-            margin: 20px 0;
-            color: var(--accent);
-        }
+        .hero-modal h3 { font-size: 2rem; margin: 20px 0; color: var(--accent); }
         .hero-modal-nav {
             position: absolute;
             top: 50%;
             transform: translateY(-50%);
-            left: 0;
-            right: 0;
+            left: 0; right: 0;
             display: flex;
             justify-content: space-between;
             padding: 0 20px;
@@ -895,8 +776,7 @@
             border: none;
             color: white;
             font-size: 3rem;
-            width: 60px;
-            height: 60px;
+            width: 60px; height: 60px;
             cursor: pointer;
             display: flex;
             align-items: center;
@@ -904,14 +784,65 @@
             transition: background 0.2s;
             border-radius: 8px;
         }
-        .hero-modal-nav button:hover {
-            background: rgba(0,0,0,0.7);
+        .hero-modal-nav button:hover { background: rgba(0,0,0,0.7); }
+
+        /* ===== Часы ===== */
+        .clock-wrapper {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 14px;
+            padding: 24px 10px 40px;
+        }
+
+        /* Обёртка с тенью — тень на HTML-элементе, не на SVG, чтобы не ломать z-order внутри */
+        .watch-shadow {
+            display: inline-block;
+            filter: drop-shadow(0 22px 28px rgba(0, 0, 0, 0.5));
+            line-height: 0;
+        }
+
+        .watch-container {
+            width: min(400px, 92vw);
+            aspect-ratio: 440 / 520;
+            position: relative;
+            cursor: grab;
+            touch-action: none;
+            user-select: none;
+            -webkit-user-select: none;
+            -webkit-tap-highlight-color: transparent;
+            display: block;
+        }
+        .watch-container:active,
+        .watch-container.dragging { cursor: grabbing; }
+        .watch-container svg {
+            width: 100%; height: 100%;
+            display: block;
+            overflow: visible;
+            /* ВАЖНО: здесь НЕТ никаких filter — они ломают внутренний порядок */
+        }
+
+        .digital-24 {
+            display: inline-block;
+            font-family: 'Courier New', Consolas, monospace;
+            font-size: clamp(22px, 3.6vh, 34px);
+            font-weight: 700;
+            color: #e8d9a8;
+            letter-spacing: 5px;
+            padding: 10px 30px 10px 34px;
+            background: rgba(0, 0, 0, 0.55);
+            border: 1px solid rgba(232, 217, 168, 0.35);
+            border-radius: 10px;
+            box-shadow: inset 0 0 20px rgba(232, 217, 168, 0.08), 0 4px 16px rgba(0, 0, 0, 0.5);
+            text-shadow: 0 0 10px rgba(232, 217, 168, 0.45);
+            font-variant-numeric: tabular-nums;
+            text-align: center;
         }
 
         @media (max-width: 1024px) {
             .syllable-grid { grid-template-columns: repeat(3, 1fr); gap: 8px; }
         }
-        
+
         @media (max-width: 600px) {
             .exam-exit-btn { top: auto; bottom: 10px; left: 10px; width: 34px; height: 34px; font-size: 1.1rem; }
             .syllable-grid { grid-template-columns: repeat(2, 1fr); gap: 5px; }
@@ -920,71 +851,29 @@
             .controls { gap: 6px; }
             .controls button { width: 38px; height: 38px; font-size: 1.1rem; }
             .theme-toggle { top: 6px; right: 10px; }
-            .theme-toggle button { width: 32px; height: 32px; font-size: 1rem; }
+            .theme-toggle button { width: 28px; height: 28px; font-size: 0.85rem; }
             .theme-cycle { top: 6px; left: 10px; }
-            .theme-cycle button { width: 32px; height: 32px; }
-            .header { padding: 16px 12px 10px; }
-            
-            /* 1. Надписи на кнопке переключения режимов меньше, чтобы не вылезали */
-            .section-switch-btn {
-                padding: 6px 10px;
-                font-size: 0.7rem;
-                line-height: 1.2;
-            }
-            
+            .theme-cycle button { width: 28px; height: 28px; }
+            .theme-cycle .color-indicator { width: 13px; height: 13px; }
+            .header { padding: 14px 12px 8px; }
+            .section-switch-btn { padding: 5px 9px; font-size: 0.68rem; line-height: 1.2; }
+            #sectionSubtitle { font-size: 0.78rem; }
             .hero-modal-nav button { width: 45px; height: 45px; font-size: 2rem; }
-            
             .timeline-container { padding-left: 40px; }
             .timeline-line { left: 25px; }
             .century-sentinel::before { left: -31px; width: 14px; height: 14px; }
-            
-            /* 2. Портреты крупнее */
-            .hero-circle { 
-                width: 85px; 
-                height: 85px; 
-            }
-            
-            /* 3. Элементы ближе друг к другу */
-            .hero-item { 
-                gap: 12px; 
-                margin-bottom: 20px; 
-                padding: 8px;
-            }
-            
-            /* 4. Имена мельче */
-            .hero-name { 
-                font-size: 0.95rem; 
-                line-height: 1.2;
-            }
-            
-            /* 5. Годы жизни ещё мельче */
-            .hero-years { 
-                font-size: 0.75rem; 
-            }
-            .hero-age {
-                font-size: 0.65rem;
-            }
-            
-            /* 6. Всплывающее века очень маленьким */
-            .century-popup {
-                font-size: 0.75rem;
-                padding: 6px 16px;
-                bottom: 80px;
-            }
-            
-            .soviet-era {
-                margin-left: -15px;
-                padding: 30px 15px 30px 15px;
-            }
-            .soviet-era::before {
-                font-size: 5rem;
-                right: 10px;
-            }
-            .soviet-era::after {
-                font-size: 0.9rem;
-                right: 15px;
-                top: 10px;
-            }
+            .hero-circle { width: 85px; height: 85px; }
+            .hero-item { gap: 12px; margin-bottom: 20px; padding: 8px; }
+            .hero-name { font-size: 0.95rem; line-height: 1.2; }
+            .hero-years { font-size: 0.75rem; }
+            .hero-age { font-size: 0.65rem; }
+            .century-popup { font-size: 0.75rem; padding: 6px 16px; bottom: 80px; }
+            .soviet-era { margin-left: -15px; padding: 30px 15px 30px 15px; }
+            .soviet-era::before { font-size: 5rem; right: 10px; }
+            .soviet-era::after { font-size: 0.9rem; right: 15px; top: 10px; }
+            .watch-container { width: min(340px, 94vw); }
+            .clock-wrapper { padding: 16px 4px 30px; gap: 12px; }
+            .progress-container { bottom: 16px; padding: 10px 18px 12px; }
         }
     </style>
 </head>
@@ -1004,6 +893,7 @@
 
         <div class="section-switch">
             <button class="section-switch-btn active" data-section="syllables">Учи слоги</button>
+            <button class="section-switch-btn" data-section="clock">Определяй время</button>
             <button class="section-switch-btn" data-section="heroes">Знай великих</button>
         </div>
 
@@ -1012,11 +902,6 @@
 
     <div class="content-wrapper">
         <section id="syllablesSection" class="tab-section active">
-            <div class="progress-container">
-                <div class="progress-label" id="progressLabel">Отмечено: 0 из 0</div>
-                <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
-            </div>
-
             <div class="controls">
                 <button id="normalBtn" class="active" data-tooltip="Все">🅰</button>
                 <button id="randomBtn" data-tooltip="Случайно">🎲</button>
@@ -1030,9 +915,212 @@
             </div>
         </section>
 
+        <section id="clockSection" class="tab-section">
+            <div class="clock-wrapper">
+                <div class="watch-shadow">
+                    <div class="watch-container" id="clockContainer">
+                        <svg viewBox="-20 0 440 520" xmlns="http://www.w3.org/2000/svg">
+                            <defs>
+                                <radialGradient id="clk-caseGrad" cx="0.35" cy="0.28" r="0.9">
+                                    <stop offset="0"    stop-color="#f5f5f5"/>
+                                    <stop offset="0.15" stop-color="#d8d8d8"/>
+                                    <stop offset="0.4"  stop-color="#a8a8a8"/>
+                                    <stop offset="0.7"  stop-color="#787878"/>
+                                    <stop offset="0.9"  stop-color="#585858"/>
+                                    <stop offset="1"    stop-color="#3a3a3a"/>
+                                </radialGradient>
+
+                                <linearGradient id="clk-caseShine" x1="0.15" y1="0" x2="0.85" y2="1">
+                                    <stop offset="0"    stop-color="#ffffff" stop-opacity="0.5"/>
+                                    <stop offset="0.25" stop-color="#ffffff" stop-opacity="0.1"/>
+                                    <stop offset="0.5"  stop-color="#ffffff" stop-opacity="0"/>
+                                    <stop offset="0.75" stop-color="#000000" stop-opacity="0.05"/>
+                                    <stop offset="1"    stop-color="#000000" stop-opacity="0.3"/>
+                                </linearGradient>
+
+                                <linearGradient id="clk-bezelGrad" x1="0" y1="0" x2="0.25" y2="1">
+                                    <stop offset="0"    stop-color="#ffffff"/>
+                                    <stop offset="0.1"  stop-color="#e8e8e8"/>
+                                    <stop offset="0.25" stop-color="#b0b0b0"/>
+                                    <stop offset="0.4"  stop-color="#e0e0e0"/>
+                                    <stop offset="0.55" stop-color="#888888"/>
+                                    <stop offset="0.75" stop-color="#c0c0c0"/>
+                                    <stop offset="0.9"  stop-color="#606060"/>
+                                    <stop offset="1"    stop-color="#404040"/>
+                                </linearGradient>
+
+                                <linearGradient id="clk-bezelHighlight" x1="0.2" y1="0" x2="0.8" y2="1">
+                                    <stop offset="0"   stop-color="#ffffff" stop-opacity="0.65"/>
+                                    <stop offset="0.3" stop-color="#ffffff" stop-opacity="0"/>
+                                    <stop offset="0.7" stop-color="#ffffff" stop-opacity="0"/>
+                                    <stop offset="1"   stop-color="#ffffff" stop-opacity="0.25"/>
+                                </linearGradient>
+
+                                <radialGradient id="clk-dialGrad" cx="0.45" cy="0.38" r="0.78">
+                                    <stop offset="0"    stop-color="#fefdf8"/>
+                                    <stop offset="0.55" stop-color="#f8f2e2"/>
+                                    <stop offset="1"    stop-color="#e9dec3"/>
+                                </radialGradient>
+
+                                <radialGradient id="clk-dialVignette" cx="0.5" cy="0.5" r="0.5">
+                                    <stop offset="0.6"  stop-color="#000000" stop-opacity="0"/>
+                                    <stop offset="0.88" stop-color="#000000" stop-opacity="0.06"/>
+                                    <stop offset="1"    stop-color="#000000" stop-opacity="0.2"/>
+                                </radialGradient>
+
+                                <linearGradient id="clk-crystalGrad" x1="0" y1="0" x2="0.6" y2="0.6">
+                                    <stop offset="0"    stop-color="#ffffff" stop-opacity="0.4"/>
+                                    <stop offset="0.2"  stop-color="#ffffff" stop-opacity="0"/>
+                                    <stop offset="0.5"  stop-color="#ffffff" stop-opacity="0"/>
+                                    <stop offset="0.85" stop-color="#ffffff" stop-opacity="0"/>
+                                    <stop offset="1"    stop-color="#ffffff" stop-opacity="0.15"/>
+                                </linearGradient>
+
+                                <linearGradient id="clk-handGrad" x1="0" y1="0" x2="1" y2="0">
+                                    <stop offset="0"   stop-color="#4a4a4a"/>
+                                    <stop offset="0.5" stop-color="#0d0d0d"/>
+                                    <stop offset="1"   stop-color="#4a4a4a"/>
+                                </linearGradient>
+
+                                <linearGradient id="clk-strapGrad" x1="0" y1="0" x2="1" y2="0">
+                                    <stop offset="0"    stop-color="#2a1508"/>
+                                    <stop offset="0.18" stop-color="#4a2410"/>
+                                    <stop offset="0.5"  stop-color="#6b3a18"/>
+                                    <stop offset="0.82" stop-color="#4a2410"/>
+                                    <stop offset="1"    stop-color="#2a1508"/>
+                                </linearGradient>
+
+                                <linearGradient id="clk-strapShine" x1="0" y1="0" x2="1" y2="0">
+                                    <stop offset="0"    stop-color="#ffffff" stop-opacity="0"/>
+                                    <stop offset="0.45" stop-color="#ffffff" stop-opacity="0.16"/>
+                                    <stop offset="0.55" stop-color="#ffffff" stop-opacity="0.16"/>
+                                    <stop offset="1"    stop-color="#ffffff" stop-opacity="0"/>
+                                </linearGradient>
+
+                                <filter id="clk-strapShadow" x="-30%" y="-30%" width="160%" height="160%">
+                                    <feGaussianBlur in="SourceAlpha" stdDeviation="3"/>
+                                    <feOffset dx="0" dy="3"/>
+                                    <feComponentTransfer><feFuncA type="linear" slope="0.5"/></feComponentTransfer>
+                                    <feMerge>
+                                        <feMergeNode/>
+                                        <feMergeNode in="SourceGraphic"/>
+                                    </feMerge>
+                                </filter>
+                            </defs>
+
+                            <!-- ============ СЛОЙ 1: Ремешок и корпус ============ -->
+
+                            <!-- верхний ремешок -->
+                            <g filter="url(#clk-strapShadow)">
+                                <path d="M 138 -10 L 262 -10 L 272 105 L 128 105 Z"
+                                      fill="url(#clk-strapGrad)"/>
+                                <path d="M 138 -10 L 148 -10 L 138 105 L 128 105 Z"
+                                      fill="rgba(0,0,0,0.3)"/>
+                                <path d="M 252 -10 L 262 -10 L 272 105 L 262 105 Z"
+                                      fill="rgba(0,0,0,0.3)"/>
+                                <path d="M 170 -10 L 230 -10 L 235 105 L 165 105 Z"
+                                      fill="url(#clk-strapShine)"/>
+                                <line x1="155" y1="-8" x2="146" y2="103"
+                                      stroke="#c9a070" stroke-width="0.8"
+                                      stroke-dasharray="3,4" opacity="0.55"/>
+                                <line x1="245" y1="-8" x2="254" y2="103"
+                                      stroke="#c9a070" stroke-width="0.8"
+                                      stroke-dasharray="3,4" opacity="0.55"/>
+                            </g>
+
+                            <!-- нижний ремешок -->
+                            <g filter="url(#clk-strapShadow)">
+                                <path d="M 128 415 L 272 415 L 262 530 L 138 530 Z"
+                                      fill="url(#clk-strapGrad)"/>
+                                <path d="M 128 415 L 138 415 L 148 530 L 138 530 Z"
+                                      fill="rgba(0,0,0,0.3)"/>
+                                <path d="M 262 415 L 272 415 L 262 530 L 252 530 Z"
+                                      fill="rgba(0,0,0,0.3)"/>
+                                <path d="M 165 415 L 235 415 L 230 530 L 170 530 Z"
+                                      fill="url(#clk-strapShine)"/>
+                                <line x1="146" y1="417" x2="155" y2="528"
+                                      stroke="#c9a070" stroke-width="0.8"
+                                      stroke-dasharray="3,4" opacity="0.55"/>
+                                <line x1="254" y1="417" x2="245" y2="528"
+                                      stroke="#c9a070" stroke-width="0.8"
+                                      stroke-dasharray="3,4" opacity="0.55"/>
+                            </g>
+
+                            <!-- ушки -->
+                            <rect x="122" y="76" width="156" height="38" rx="13" fill="url(#clk-caseGrad)"/>
+                            <rect x="122" y="406" width="156" height="38" rx="13" fill="url(#clk-caseGrad)"/>
+
+                            <!-- заводная головка -->
+                            <rect x="362" y="248" width="22" height="24" rx="4" fill="url(#clk-caseGrad)"/>
+                            <rect x="364" y="251" width="18" height="18" rx="3" fill="url(#clk-bezelGrad)"/>
+                            <line x1="367" y1="254" x2="367" y2="266" stroke="#505050" stroke-width="0.5"/>
+                            <line x1="370" y1="254" x2="370" y2="266" stroke="#505050" stroke-width="0.5"/>
+                            <line x1="373" y1="254" x2="373" y2="266" stroke="#505050" stroke-width="0.5"/>
+                            <line x1="376" y1="254" x2="376" y2="266" stroke="#505050" stroke-width="0.5"/>
+                            <line x1="379" y1="254" x2="379" y2="266" stroke="#505050" stroke-width="0.5"/>
+
+                            <circle cx="200" cy="260" r="170" fill="url(#clk-caseGrad)"/>
+                            <circle cx="200" cy="260" r="170" fill="url(#clk-caseShine)"/>
+                            <circle cx="200" cy="260" r="159" fill="none" stroke="#2a2a2a" stroke-width="1.2" opacity="0.85"/>
+                            <circle cx="200" cy="260" r="158" fill="url(#clk-bezelGrad)"/>
+                            <circle cx="200" cy="260" r="158" fill="url(#clk-bezelHighlight)"/>
+                            <circle cx="200" cy="260" r="156" fill="none" stroke="#808080" stroke-width="0.4" opacity="0.5"/>
+                            <circle cx="200" cy="260" r="154" fill="none" stroke="#a0a0a0" stroke-width="0.4" opacity="0.4"/>
+                            <circle cx="200" cy="260" r="152" fill="none" stroke="#707070" stroke-width="0.4" opacity="0.4"/>
+                            <circle cx="200" cy="260" r="151" fill="#1a1a1a"/>
+                            <circle cx="200" cy="260" r="147" fill="url(#clk-dialGrad)"/>
+                            <circle cx="200" cy="260" r="147" fill="url(#clk-dialVignette)"/>
+
+                            <!-- ============ СЛОЙ 2: Риски и цифры (заполняются из JS) ============ -->
+                            <g id="clk-ticksGroup"></g>
+                            <g id="clk-numbersGroup"></g>
+
+                            <!-- ============ СЛОЙ 3: Надписи ============ -->
+                            <text x="200" y="210" text-anchor="middle"
+                                  font-family="'Old Standard TT', Georgia, 'Times New Roman', serif"
+                                  font-size="12" font-weight="700" letter-spacing="2.8"
+                                  fill="#1a1a1a" pointer-events="none">ПОБЕДА</text>
+
+                            <text x="200" y="315" text-anchor="middle"
+                                  font-family="'Old Standard TT', Georgia, 'Times New Roman', serif"
+                                  font-size="6.5" font-weight="700" letter-spacing="3"
+                                  fill="#3a3a3a" pointer-events="none">СДЕЛАНО В СССР</text>
+
+                            <!-- ============ СЛОЙ 4: Блик стекла ============ -->
+                            <circle cx="200" cy="260" r="147" fill="url(#clk-crystalGrad)" pointer-events="none"/>
+
+                            <!-- ============ СЛОЙ 5: СТРЕЛКИ — АБСОЛЮТНО ПОСЛЕДНИЙ СЛОЙ ============ -->
+                            <g id="clk-hands">
+                                <g id="clk-hourHand">
+                                    <path d="M 200 165 L 206 220 L 205 250 L 200 270 L 195 250 L 194 220 Z"
+                                          fill="url(#clk-handGrad)"/>
+                                </g>
+                                <g id="clk-minuteHand">
+                                    <path d="M 200 115 L 204 200 L 203 250 L 200 272 L 197 250 L 196 200 Z"
+                                          fill="url(#clk-handGrad)"/>
+                                </g>
+                            </g>
+
+                            <!-- ось — поверх всего -->
+                            <circle cx="200" cy="260" r="8" fill="url(#clk-caseGrad)"/>
+                            <circle cx="200" cy="260" r="5" fill="url(#clk-bezelGrad)"/>
+                            <circle cx="200" cy="260" r="2.5" fill="#1a1a1a"/>
+                        </svg>
+                    </div>
+                </div>
+
+                <div class="digital-24" id="clockDigital24">03:00</div>
+            </div>
+        </section>
+
         <section id="heroesSection" class="tab-section">
             <div class="heroes-timeline" id="heroesTimeline"></div>
         </section>
+    </div>
+
+    <div class="progress-container" id="progressContainer">
+        <div class="progress-label" id="progressLabel">Отмечено: 0 из 0</div>
+        <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
     </div>
 
     <div class="century-popup" id="centuryPopup"></div>
@@ -1113,6 +1201,7 @@
             const hideLearnedBtn = document.getElementById('hideLearnedBtn');
             const clearLearnedBtn = document.getElementById('clearLearnedBtn');
             const examBtn = document.getElementById('examBtn');
+            const progressContainer = document.getElementById('progressContainer');
             const progressLabel = document.getElementById('progressLabel');
             const progressFill = document.getElementById('progressFill');
             const scrollTopBtn = document.getElementById('scrollTopBtn');
@@ -1129,6 +1218,7 @@
             const sectionBtns = document.querySelectorAll('.section-switch-btn');
             const sectionSubtitle = document.getElementById('sectionSubtitle');
             const syllablesSection = document.getElementById('syllablesSection');
+            const clockSection = document.getElementById('clockSection');
             const heroesSection = document.getElementById('heroesSection');
             const heroesTimeline = document.getElementById('heroesTimeline');
             const centuryPopup = document.getElementById('centuryPopup');
@@ -1143,6 +1233,7 @@
             let currentSection = 'syllables';
             let popupTimeout;
             let popupShowTimeout;
+            let progressTimer = null;
 
             const themeList = [
                 'theme-blue', 'theme-green', 'theme-red', 'theme-orange',
@@ -1190,21 +1281,28 @@
                 applyTheme(themeList[currentThemeIndex]);
             });
 
+            const subtitles = {
+                syllables: 'Жми, слушай, запоминай',
+                clock: 'Время — объективная реальность',
+                heroes: 'Великие личности Отечества'
+            };
+
             function switchSection(section) {
                 if (section === currentSection) return;
                 currentSection = section;
-                if (section === 'syllables') {
-                    syllablesSection.classList.add('active');
-                    heroesSection.classList.remove('active');
-                    sectionSubtitle.textContent = 'Учим слоги. Жми, слушай, запоминай';
-                } else {
-                    heroesSection.classList.add('active');
-                    syllablesSection.classList.remove('active');
-                    sectionSubtitle.textContent = 'Великие личности Отечества';
-                }
+                syllablesSection.classList.toggle('active', section === 'syllables');
+                clockSection.classList.toggle('active', section === 'clock');
+                heroesSection.classList.toggle('active', section === 'heroes');
+                sectionSubtitle.textContent = subtitles[section] || '';
                 sectionBtns.forEach(btn => {
                     btn.classList.toggle('active', btn.dataset.section === section);
                 });
+                if (section !== 'clock' && window.clockSpeakCancel) {
+                    window.clockSpeakCancel();
+                }
+                if (section !== 'syllables') {
+                    progressContainer.classList.remove('show');
+                }
             }
 
             sectionBtns.forEach(btn => {
@@ -1220,12 +1318,21 @@
                 window.scrollTo({ top: 0, behavior: 'smooth' });
             });
 
-            function updateProgress() {
+            function refreshProgressData() {
                 const total = syllables.length;
                 const marked = [...syllables].filter(s => learnedSet.has(s)).length;
                 const percent = total ? Math.round((marked / total) * 100) : 0;
                 progressLabel.textContent = `Отмечено: ${marked} из ${total}`;
                 progressFill.style.width = percent + '%';
+            }
+
+            function flashProgress() {
+                refreshProgressData();
+                progressContainer.classList.add('show');
+                clearTimeout(progressTimer);
+                progressTimer = setTimeout(() => {
+                    progressContainer.classList.remove('show');
+                }, 2400);
             }
 
             function renderGrid() {
@@ -1262,7 +1369,7 @@
                     });
                     grid.appendChild(card);
                 });
-                updateProgress();
+                refreshProgressData();
             }
 
             function toggleLearned(syllable, card) {
@@ -1273,7 +1380,7 @@
                 }
                 saveLearnedSet(learnedSet);
                 card.classList.toggle('learned', learnedSet.has(syllable));
-                updateProgress();
+                flashProgress();
             }
 
             function playAudio(syllable) {
@@ -1319,6 +1426,7 @@
                 learnedSet.clear();
                 saveLearnedSet(learnedSet);
                 renderGrid();
+                flashProgress();
                 showToast('Очищено', 'success');
             });
 
@@ -1506,20 +1614,11 @@
 
             function renderHeroesTimeline() {
                 if (!heroesTimeline) return;
-                
+
                 const centuries = [
-                    { 
-                        name: "XVIII век", 
-                        filter: h => h.overrideCentury === 18 || (!h.overrideCentury && h.deathYear < 1801) 
-                    },
-                    { 
-                        name: "XIX век", 
-                        filter: h => h.overrideCentury === 19 || (!h.overrideCentury && h.deathYear >= 1801 && h.deathYear <= 1921) 
-                    },
-                    { 
-                        name: "XX век", 
-                        filter: h => h.overrideCentury === 20 || (!h.overrideCentury && h.deathYear > 1921) 
-                    }
+                    { name: "XVIII век", filter: h => h.overrideCentury === 18 || (!h.overrideCentury && h.deathYear < 1801) },
+                    { name: "XIX век",   filter: h => h.overrideCentury === 19 || (!h.overrideCentury && h.deathYear >= 1801 && h.deathYear <= 1921) },
+                    { name: "XX век",    filter: h => h.overrideCentury === 20 || (!h.overrideCentury && h.deathYear > 1921) }
                 ];
 
                 let html = '<div class="timeline-container">';
@@ -1530,7 +1629,7 @@
                     if (heroes.length === 0) return;
 
                     html += `<div class="century-sentinel" data-century="${c.name}"></div>`;
-                    
+
                     let sovietStarted = false;
 
                     heroes.forEach(hero => {
@@ -1538,10 +1637,10 @@
                             html += `<div class="soviet-era">`;
                             sovietStarted = true;
                         }
-                        
+
                         const imagePath = `Great Rus/${hero.images[0]}`;
                         const age = hero.deathYear - hero.birthYear;
-                        
+
                         html += `
                             <div class="hero-item" 
                                  data-name="${hero.name}" 
@@ -1575,14 +1674,11 @@
                     entries.forEach(entry => {
                         if (entry.isIntersecting) {
                             const century = entry.target.dataset.century;
-                            
                             clearTimeout(popupShowTimeout);
                             clearTimeout(popupTimeout);
-                            
                             popupShowTimeout = setTimeout(() => {
                                 centuryPopup.textContent = century;
                                 centuryPopup.classList.add('show');
-                                
                                 popupTimeout = setTimeout(() => {
                                     centuryPopup.classList.remove('show');
                                 }, 2500);
@@ -1668,8 +1764,251 @@
 
             renderHeroesTimeline();
             renderGrid();
-   
+
         })();
+    </script>
+
+    <!-- ==================== ЛОГИКА ЧАСОВ ==================== -->
+    <script>
+    (function () {
+        const container = document.getElementById('clockContainer');
+        if (!container) return;
+
+        const hourHandEl   = document.getElementById('clk-hourHand');
+        const minuteHandEl = document.getElementById('clk-minuteHand');
+        const ticksGroup   = document.getElementById('clk-ticksGroup');
+        const numbersGroup = document.getElementById('clk-numbersGroup');
+        const digital24El  = document.getElementById('clockDigital24');
+
+        const CX = 200, CY = 260;
+        const VIEWBOX_W = 440;
+
+        /* ===== Железная дорога ===== */
+        const R_TRACK_IN  = 131;
+        const R_TRACK_OUT = 138;
+
+        const cOut = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+        cOut.setAttribute('cx', CX);
+        cOut.setAttribute('cy', CY);
+        cOut.setAttribute('r', R_TRACK_OUT);
+        cOut.setAttribute('fill', 'none');
+        cOut.setAttribute('stroke', '#1a1a1a');
+        cOut.setAttribute('stroke-width', '0.9');
+        ticksGroup.appendChild(cOut);
+
+        const cIn = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+        cIn.setAttribute('cx', CX);
+        cIn.setAttribute('cy', CY);
+        cIn.setAttribute('r', R_TRACK_IN);
+        cIn.setAttribute('fill', 'none');
+        cIn.setAttribute('stroke', '#1a1a1a');
+        cIn.setAttribute('stroke-width', '0.9');
+        ticksGroup.appendChild(cIn);
+
+        for (let i = 0; i < 60; i++) {
+            const a = (i * 6 - 90) * Math.PI / 180;
+            const isBig = i % 5 === 0;
+            const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+
+            if (isBig) {
+                const rOut = R_TRACK_OUT + 4;
+                const rIn  = R_TRACK_IN  - 3;
+                line.setAttribute('x1', CX + rIn  * Math.cos(a));
+                line.setAttribute('y1', CY + rIn  * Math.sin(a));
+                line.setAttribute('x2', CX + rOut * Math.cos(a));
+                line.setAttribute('y2', CY + rOut * Math.sin(a));
+                line.setAttribute('stroke', '#1a1a1a');
+                line.setAttribute('stroke-width', '1.6');
+            } else {
+                line.setAttribute('x1', CX + R_TRACK_IN  * Math.cos(a));
+                line.setAttribute('y1', CY + R_TRACK_IN  * Math.sin(a));
+                line.setAttribute('x2', CX + R_TRACK_OUT * Math.cos(a));
+                line.setAttribute('y2', CY + R_TRACK_OUT * Math.sin(a));
+                line.setAttribute('stroke', '#1a1a1a');
+                line.setAttribute('stroke-width', '0.55');
+            }
+            line.setAttribute('stroke-linecap', 'round');
+            ticksGroup.appendChild(line);
+        }
+
+        /* ===== Цифры: ближе к краю (R_NUM = 120), шрифт Old Standard TT ===== */
+        const R_NUM = 110;
+        for (let i = 1; i <= 12; i++) {
+            const a = (i * 30 - 90) * Math.PI / 180;
+            const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+            text.setAttribute('x', CX + R_NUM * Math.cos(a));
+            text.setAttribute('y', CY + R_NUM * Math.sin(a));
+            text.setAttribute('text-anchor', 'middle');
+            text.setAttribute('dominant-baseline', 'central');
+            text.setAttribute('font-family', "'Old Standard TT', 'Playfair Display', Georgia, 'Times New Roman', serif");
+            text.setAttribute('font-size', '26');
+            text.setAttribute('font-weight', '700');
+            text.setAttribute('fill', i === 12 ? '#b81e1e' : '#1a1a1a');
+            text.textContent = i;
+            numbersGroup.appendChild(text);
+        }
+
+        /* ===== Состояние ===== */
+        let hour = 3;
+        let minute = 0;
+        let totalMinutes = (hour % 12) * 60 + minute;
+        let dragging = null;
+        let prevAngle = null;
+
+        function applyTotal() {
+            const rounded = Math.round(totalMinutes);
+            minute = ((rounded % 60) + 60) % 60;
+            let h = Math.floor(rounded / 60) % 12;
+            h = ((h % 12) + 12) % 12;
+            hour = h === 0 ? 12 : h;
+        }
+
+        function render() {
+            const hourDeg   = (hour % 12) * 30 + minute * 0.5;
+            const minuteDeg = minute * 6;
+            hourHandEl  .setAttribute('transform', `rotate(${hourDeg} ${CX} ${CY})`);
+            minuteHandEl.setAttribute('transform', `rotate(${minuteDeg} ${CX} ${CY})`);
+
+            const hh = String(hour).padStart(2, '0');
+            const mm = String(minute).padStart(2, '0');
+            digital24El.textContent = `${hh}:${mm}`;
+        }
+
+        function angleFromEvent(e) {
+            const rect  = container.getBoundingClientRect();
+            const scale = rect.width / VIEWBOX_W;
+            const cx = rect.left + CX * scale;
+            const cy = rect.top  + CY * scale;
+            let a = Math.atan2(e.clientY - cy, e.clientX - cx) * 180 / Math.PI + 90;
+            return (a % 360 + 360) % 360;
+        }
+
+        function angleDiff(a, b) {
+            const d = Math.abs(a - b) % 360;
+            return d > 180 ? 360 - d : d;
+        }
+
+        function isInsideWatch(e) {
+            const rect  = container.getBoundingClientRect();
+            const scale = rect.width / VIEWBOX_W;
+            const cx = rect.left + CX * scale;
+            const cy = rect.top  + CY * scale;
+            const dist = Math.hypot(e.clientX - cx, e.clientY - cy);
+            return dist <= 170 * scale;
+        }
+
+        container.addEventListener('pointerdown', e => {
+            if (!isInsideWatch(e)) return;
+            e.preventDefault();
+            if (speakTimer) { clearTimeout(speakTimer); speakTimer = null; }
+            if ('speechSynthesis' in window) speechSynthesis.cancel();
+
+            const ang = angleFromEvent(e);
+            const hourAng = ((hour % 12) * 30 + minute * 0.5 + 360) % 360;
+            const minAng  = (minute * 6 + 360) % 360;
+
+            dragging  = angleDiff(ang, minAng) <= angleDiff(ang, hourAng) ? 'minute' : 'hour';
+            prevAngle = ang;
+
+            container.setPointerCapture(e.pointerId);
+            container.classList.add('dragging');
+        });
+
+        container.addEventListener('pointermove', e => {
+            if (!dragging) return;
+            e.preventDefault();
+            const ang = angleFromEvent(e);
+
+            if (dragging === 'minute') {
+                let delta = ang - prevAngle;
+                if (delta >  180) delta -= 360;
+                if (delta < -180) delta += 360;
+                totalMinutes += delta / 6;
+                applyTotal();
+            } else {
+                let h = (ang - minute * 0.5) / 30;
+                h = ((Math.round(h) % 12) + 12) % 12;
+                hour = h === 0 ? 12 : h;
+                totalMinutes = (hour % 12) * 60 + minute;
+            }
+
+            prevAngle = ang;
+            render();
+        });
+
+        function endDrag(e) {
+            if (!dragging) return;
+            dragging  = null;
+            prevAngle = null;
+            container.classList.remove('dragging');
+            if (container.hasPointerCapture(e.pointerId)) {
+                container.releasePointerCapture(e.pointerId);
+            }
+            scheduleSpeak();
+        }
+        container.addEventListener('pointerup',     endDrag);
+        container.addEventListener('pointercancel', endDrag);
+
+        /* ===== Озвучка ===== */
+        const HOURS = ['', 'один', 'два', 'три', 'четыре', 'пять', 'шесть',
+                       'семь', 'восемь', 'девять', 'десять', 'одиннадцать', 'двенадцать'];
+
+        function hourForm(h) {
+            if (h === 1) return 'час';
+            if (h >= 2 && h <= 4) return 'часа';
+            return 'часов';
+        }
+        function minuteForm(m) {
+            const t = m % 100, n = m % 10;
+            if (t >= 11 && t <= 14) return 'минут';
+            if (n === 1) return 'минута';
+            if (n >= 2 && n <= 4) return 'минуты';
+            return 'минут';
+        }
+
+        let ruVoice = null;
+        function pickVoice() {
+            const v = speechSynthesis.getVoices();
+            ruVoice = v.find(x => x.lang && x.lang.toLowerCase().startsWith('ru')) || null;
+        }
+        if ('speechSynthesis' in window) {
+            pickVoice();
+            speechSynthesis.onvoiceschanged = pickVoice;
+        }
+
+        let speakTimer = null;
+
+        function speakTime() {
+            if (!('speechSynthesis' in window)) return;
+            speechSynthesis.cancel();
+
+            const text = minute === 0
+                ? `${HOURS[hour]} ${hourForm(hour)} ровно`
+                : `${HOURS[hour]} ${hourForm(hour)} ${minute} ${minuteForm(minute)}`;
+
+            const u = new SpeechSynthesisUtterance(text);
+            u.lang  = 'ru-RU';
+            u.rate  = 0.9;
+            u.pitch = 1;
+            if (ruVoice) u.voice = ruVoice;
+            speechSynthesis.speak(u);
+        }
+
+        function scheduleSpeak() {
+            if (speakTimer) clearTimeout(speakTimer);
+            speakTimer = setTimeout(() => {
+                speakTimer = null;
+                speakTime();
+            }, 2000);
+        }
+
+        window.clockSpeakCancel = function () {
+            if (speakTimer) { clearTimeout(speakTimer); speakTimer = null; }
+            if ('speechSynthesis' in window) speechSynthesis.cancel();
+        };
+
+        render();
+    })();
     </script>
 </body>
 </html>
