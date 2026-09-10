@@ -6,163 +6,224 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=PT+Sans:wght@400;700&family=PT+Serif:ital,wght@0,400;0,700;1,400;1,700&family=Old+Standard+TT:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Old+Standard+TT:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
     <title>Грамотиньо</title>
     <style>
         :root {
-            --bg: #0a0e17;
-            --bg-card: #111827;
-            --bg-card-hover: #1a2433;
-            --border: #2a3443;
-            --text: #e6edf3;
-            --text-secondary: #8b9bb0;
-            --accent: #4da3ff;
-            --accent-glow: rgba(77, 163, 255, 0.25);
-            --learned: #3fb950;
-            --learned-bg: rgba(63, 185, 80, 0.2);
-            --danger: #f85149;
-            --danger-glow: rgba(248, 81, 73, 0.2);
-            --radius: 12px;
-            --transition: 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-            --font: 'PT Serif', serif;
+            --bg: #0d0d0d;
+            --bg-card: #0d0d0d;
+            --bg-card-hover: #1a1a1a;
+            --border: #ffffff;
+            --text: #ffffff;
+            --text-secondary: #8a8a8a;
+            --accent: #e30613;
+            --learned-bg: #1c1c1c;
+            --learned-fg: #6a6a6a;
+            --radius: 0px;
+            --transition: 0.15s linear;
+            --font: 'Helvetica Neue', Helvetica, Arial, 'Liberation Sans', sans-serif;
+            --mono: 'Courier New', Courier, monospace;
         }
 
         body.light-mode {
-            --bg: #f5f7fa;
+            --bg: #ffffff;
             --bg-card: #ffffff;
-            --bg-card-hover: #eef1f5;
-            --border: #d1d9e2;
-            --text: #1a1f2e;
-            --text-secondary: #4b5a6b;
-            --accent: #1d7be0;
-            --accent-glow: rgba(29, 123, 224, 0.15);
-            --learned: #2e9e4f;
-            --learned-bg: rgba(46, 158, 79, 0.15);
-            --danger: #d9382e;
-            --danger-glow: rgba(217, 56, 46, 0.15);
+            --bg-card-hover: #f0f0f0;
+            --border: #000000;
+            --text: #000000;
+            --text-secondary: #767676;
+            --learned-bg: #e4e4e4;
+            --learned-fg: #9a9a9a;
         }
 
-        body.theme-blue   { --accent: #4da3ff; --accent-glow: rgba(77, 163, 255, 0.25); --learned: #3fb950; --learned-bg: rgba(63, 185, 80, 0.2); }
-        body.theme-green  { --accent: #4ade80; --accent-glow: rgba(74, 222, 128, 0.25); --learned: #38bdf8; --learned-bg: rgba(56, 189, 248, 0.2); }
-        body.theme-red    { --accent: #f87171; --accent-glow: rgba(248, 113, 113, 0.25); --learned: #a78bfa; --learned-bg: rgba(167, 139, 250, 0.2); }
-        body.theme-orange { --accent: #fb923c; --accent-glow: rgba(251, 146, 60, 0.25); --learned: #fbbf24; --learned-bg: rgba(251, 191, 36, 0.2); }
-        body.theme-purple { --accent: #c084fc; --accent-glow: rgba(192, 132, 252, 0.25); --learned: #60a5fa; --learned-bg: rgba(96, 165, 250, 0.2); }
-        body.theme-pink   { --accent: #f472b6; --accent-glow: rgba(244, 114, 182, 0.25); --learned: #34d399; --learned-bg: rgba(52, 211, 153, 0.2); }
-        body.theme-cyan   { --accent: #22d3ee; --accent-glow: rgba(34, 211, 238, 0.25); --learned: #a3e635; --learned-bg: rgba(163, 230, 53, 0.2); }
-        body.theme-yellow { --accent: #facc15; --accent-glow: rgba(250, 204, 21, 0.25); --learned: #10b981; --learned-bg: rgba(16, 185, 129, 0.2); }
-        body.theme-teal   { --accent: #2dd4bf; --accent-glow: rgba(45, 212, 191, 0.25); --learned: #f59e0b; --learned-bg: rgba(245, 158, 11, 0.2); }
-        body.theme-indigo { --accent: #818cf8; --accent-glow: rgba(129, 140, 248, 0.25); --learned: #f472b6; --learned-bg: rgba(244, 114, 182, 0.2); }
+        body.theme-blue   { --accent: #0033ff; }
+        body.theme-green  { --accent: #00a300; }
+        body.theme-red    { --accent: #e30613; }
+        body.theme-orange { --accent: #ff6a00; }
+        body.theme-purple { --accent: #7b00ff; }
+        body.theme-pink   { --accent: #ff0080; }
+        body.theme-cyan   { --accent: #00b3c7; }
+        body.theme-yellow { --accent: #ffc700; }
+        body.theme-teal   { --accent: #009688; }
+        body.theme-indigo { --accent: #3f51b5; }
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        html { -webkit-text-size-adjust: 100%; }
 
         body {
             background: var(--bg);
             color: var(--text);
             font-family: var(--font);
+            font-size: 16px;
             min-height: 100vh;
-            line-height: 1.4;
+            line-height: 1.35;
             -webkit-font-smoothing: antialiased;
             display: flex;
             flex-direction: column;
-            transition: background 0.3s, color 0.3s;
-            background-image: radial-gradient(circle at 20% 20%, var(--accent-glow) 0%, transparent 50%),
-                              radial-gradient(circle at 80% 80%, var(--accent-glow) 0%, transparent 50%);
+            transition: background 0.2s linear, color 0.2s linear;
         }
 
+        /* ================= ШАПКА ================= */
+
         .header {
-            padding: 18px 20px 10px;
+            padding: 22px 20px 0;
             text-align: center;
-            background: linear-gradient(180deg, var(--accent-glow) 0%, transparent 100%);
-            border-bottom: 1px solid var(--border);
+            border-bottom: 3px solid var(--border);
             position: relative;
+            background: var(--bg);
         }
-        .theme-toggle { position: absolute; top: 12px; right: 16px; }
-        .theme-cycle  { position: absolute; top: 12px; left: 16px; }
+
+        .theme-toggle,
+        .theme-cycle { position: absolute; top: 18px; }
+
+        .theme-toggle { right: 20px; }
+        .theme-cycle  { left: 20px; }
+
         .theme-toggle button,
         .theme-cycle button {
-            background: var(--bg-card);
-            border: 1px solid var(--border);
+            background: var(--bg);
+            border: 2px solid var(--border);
             color: var(--text);
-            border-radius: 50%;
-            width: 32px; height: 32px;
+            border-radius: 0;
+            width: 38px;
+            height: 38px;
             cursor: pointer;
-            font-size: 0.95rem;
+            font-size: 1rem;
             display: flex;
             align-items: center;
             justify-content: center;
             transition: var(--transition);
-            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
         }
+
         .theme-toggle button:hover,
         .theme-cycle button:hover {
-            border-color: var(--accent);
-            color: var(--accent);
-            box-shadow: 0 0 10px var(--accent-glow);
+            background: var(--text);
+            color: var(--bg);
         }
+
         .theme-cycle .color-indicator {
-            width: 15px; height: 15px;
-            border-radius: 50%;
+            width: 16px;
+            height: 16px;
+            border-radius: 0;
             background: var(--accent);
-            transition: background 0.3s;
+            transition: background 0.2s linear;
+        }
+
+        .theme-toggle .theme-ball {
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background: #ffd400;
+            transition: background 0.2s linear;
+        }
+        body.light-mode .theme-toggle .theme-ball {
+            background: #000000;
         }
 
         .header h1 {
-            font-size: clamp(1.5rem, 4vw, 2.2rem);
-            font-weight: 700;
-            letter-spacing: 0.04em;
-            background: linear-gradient(135deg, var(--text) 60%, var(--accent) 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            margin: 6px 0 4px;
+            font-size: clamp(2.2rem, 8.5vw, 4.6rem);
+            font-weight: 800;
+            letter-spacing: 0.015em;
+            text-transform: uppercase;
+            line-height: 0.92;
+            color: var(--text);
+            margin: 30px 0 14px;
         }
+
+        .header h1::after {
+            content: '.';
+            color: var(--accent);
+        }
+
+        /* ================= ПЕРЕКЛЮЧАТЕЛЬ РАЗДЕЛОВ ================= */
 
         .section-switch {
-            display: inline-flex;
-            background: var(--bg-card);
-            border: 1px solid var(--border);
-            border-radius: 50px;
-            padding: 3px;
-            margin-top: 10px;
-            box-shadow: 0 3px 10px rgba(0,0,0,0.12);
-            flex-wrap: wrap;
-            justify-content: center;
-            gap: 2px;
-        }
-        .section-switch-btn {
-            background: transparent;
-            border: none;
-            color: var(--text-secondary);
-            padding: 7px 14px;
-            cursor: pointer;
-            font-family: 'PT Sans', sans-serif;
-            font-weight: 600;
-            font-size: 0.82rem;
-            letter-spacing: 0.02em;
-            border-radius: 40px;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            white-space: nowrap;
             display: flex;
-            align-items: center;
-            gap: 5px;
-        }
-        .section-switch-btn.active {
-            background: var(--accent);
-            color: #ffffff;
-            box-shadow: 0 3px 10px var(--accent-glow);
-        }
-        .section-switch-btn:hover:not(.active) {
-            color: var(--text);
-            background: var(--bg-card-hover);
+            margin: 0 -20px;
+            border-top: 2px solid var(--border);
+            background: var(--bg);
         }
 
-        #sectionSubtitle {
+        .section-switch-btn {
+            flex: 1 1 0;
+            background: transparent;
+            border: none;
+            border-right: 2px solid var(--border);
             color: var(--text-secondary);
-            font-size: 0.88rem;
-            font-weight: 500;
-            margin-top: 7px;
-            min-height: 1.2em;
+            padding: 15px 8px;
+            cursor: pointer;
+            font-family: var(--font);
+            font-weight: 700;
+            font-size: 0.78rem;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            transition: var(--transition);
+            white-space: nowrap;
         }
+
+        .section-switch-btn:last-child { border-right: none; }
+
+        .section-switch-btn.active {
+            background: var(--text);
+            color: var(--bg);
+        }
+
+        .section-switch-btn:hover:not(.active) {
+            background: var(--bg-card-hover);
+            color: var(--text);
+        }
+
+        /* ================= ПОДПИСИ ПОД КНОПКАМИ ================= */
+
+        .section-subtitles {
+            display: flex;
+            margin: 0 -20px;
+            background: var(--bg);
+        }
+
+        .section-subtitle {
+            flex: 1 1 0;
+            border-right: 2px solid var(--border);
+            padding: 12px 10px;
+            text-align: center;
+            font-size: 0.6rem;
+            font-weight: 700;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            color: var(--text);
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.2s linear, visibility 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 3.2em;
+            line-height: 1.35;
+        }
+
+        .section-subtitle:last-child { border-right: none; }
+
+        .section-subtitle.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .digital-clock-inline {
+            font-family: var(--mono);
+            font-size: 1.05rem;
+            font-weight: 700;
+            letter-spacing: 0.16em;
+            color: var(--text);
+            background: transparent;
+            border: none;
+            padding: 0;
+            text-transform: none;
+            line-height: 1;
+            font-variant-numeric: tabular-nums;
+        }
+
+        /* ================= КОНТЕНТ ================= */
 
         .content-wrapper {
             flex: 1;
@@ -173,231 +234,255 @@
         }
 
         .tab-section { display: none; }
-        .tab-section.active {
-            display: block;
-            animation: tabEnter 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-        }
+        .tab-section.active { display: block; animation: tabEnter 0.25s linear forwards; }
+
         @keyframes tabEnter {
-            from { opacity: 0; transform: translateY(15px) scale(0.98); }
-            to   { opacity: 1; transform: translateY(0) scale(1); }
+            from { opacity: 0; }
+            to   { opacity: 1; }
         }
+
+        /* ================= ПРОГРЕСС ================= */
 
         .progress-container {
             position: fixed;
-            bottom: 24px;
-            left: 50%;
-            transform: translateX(-50%) translateY(30px);
-            opacity: 0;
-            visibility: hidden;
-            pointer-events: none;
-            transition: opacity .35s ease, transform .35s cubic-bezier(0.16, 1, 0.3, 1), visibility .35s;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: var(--text);
+            color: var(--bg);
+            padding: 16px 20px 18px;
             z-index: 900;
-            background: var(--bg-card);
-            border: 1px solid var(--border);
-            border-radius: 14px;
-            padding: 12px 22px 14px;
-            box-shadow: 0 14px 36px rgba(0, 0, 0, 0.55);
-            width: min(340px, calc(100% - 40px));
-            text-align: center;
-            backdrop-filter: blur(8px);
+            transform: translateY(101%);
+            transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            border-top: 4px solid var(--accent);
+            pointer-events: none;
         }
+
         .progress-container.show {
-            opacity: 1;
-            visibility: visible;
-            transform: translateX(-50%) translateY(0);
+            transform: translateY(0);
+            pointer-events: auto;
         }
+
         .progress-label {
-            font-size: 0.78rem;
-            color: var(--text-secondary);
-            margin-bottom: 6px;
-            letter-spacing: 0.02em;
+            font-size: 0.7rem;
+            font-weight: 700;
+            letter-spacing: 0.14em;
+            text-transform: uppercase;
+            margin-bottom: 10px;
+            text-align: left;
         }
+
         .progress-bar {
             width: 100%;
-            height: 6px;
-            background: var(--border);
-            border-radius: 3px;
+            height: 10px;
+            background: rgba(128, 128, 128, 0.35);
+            border-radius: 0;
             overflow: hidden;
-            box-shadow: inset 0 1px 3px rgba(0,0,0,0.2);
         }
+
         .progress-fill {
             height: 100%;
-            background: var(--learned);
+            background: var(--accent);
             width: 0%;
-            transition: width 0.35s ease;
-            border-radius: 3px;
-            box-shadow: 0 0 8px rgba(63, 185, 80, 0.5);
+            border-radius: 0;
+            transition: width 0.3s linear;
         }
+
+        /* ================= КНОПКИ УПРАВЛЕНИЯ ================= */
 
         .controls {
             display: flex;
             justify-content: center;
-            gap: 10px;
-            padding: 12px 20px;
+            gap: 0;
+            padding: 24px 20px 20px;
             flex-wrap: wrap;
         }
+
         .controls button {
-            background: var(--bg-card);
-            border: 1px solid var(--border);
+            background: var(--bg);
+            border: 2px solid var(--border);
             color: var(--text);
-            border-radius: 50%;
-            width: 44px; height: 44px;
+            border-radius: 0;
+            width: 50px;
+            height: 50px;
             cursor: pointer;
-            font-size: 1.3rem;
+            font-size: 1.35rem;
+            font-weight: 700;
+            line-height: 1;
             display: flex;
             align-items: center;
             justify-content: center;
             transition: var(--transition);
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
             position: relative;
+            margin-left: -2px;
+            font-family: var(--font);
         }
+
+        .controls button:first-child { margin-left: 0; }
+
         .controls button:hover {
-            border-color: var(--accent);
-            color: var(--accent);
-            box-shadow: 0 0 12px var(--accent-glow);
-            transform: translateY(-2px);
+            background: var(--text);
+            color: var(--bg);
+            z-index: 3;
         }
+
         .controls button.active {
-            background: var(--accent-glow);
+            background: var(--accent);
             border-color: var(--accent);
-            color: var(--accent);
-            box-shadow: 0 0 16px var(--accent-glow);
+            color: #ffffff;
+            z-index: 2;
         }
+
+        .controls button.active:hover {
+            background: var(--accent);
+            color: #ffffff;
+        }
+
         .controls button::after {
             content: attr(data-tooltip);
             position: absolute;
-            bottom: calc(100% + 8px);
+            bottom: calc(100% + 10px);
             left: 50%;
-            transform: translateX(-50%) translateY(5px);
-            background: var(--bg-card);
-            color: var(--text);
-            padding: 5px 8px;
-            border-radius: 6px;
-            font-size: 0.7rem;
+            transform: translateX(-50%) translateY(6px);
+            background: var(--text);
+            color: var(--bg);
+            padding: 7px 11px;
+            border-radius: 0;
+            font-family: var(--font);
+            font-size: 0.65rem;
+            font-weight: 700;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
             white-space: nowrap;
-            border: 1px solid var(--border);
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+            border: none;
             pointer-events: none;
             opacity: 0;
             visibility: hidden;
-            transition: opacity 0.2s ease, transform 0.25s cubic-bezier(0.4, 0, 0.2, 1), visibility 0.2s;
+            transition: opacity 0.15s linear, transform 0.15s linear, visibility 0.15s;
             z-index: 10;
         }
-        .controls button::before {
-            content: '';
-            position: absolute;
-            bottom: calc(100% + 2px);
-            left: 50%;
-            transform: translateX(-50%) translateY(5px);
-            width: 0; height: 0;
-            border-left: 5px solid transparent;
-            border-right: 5px solid transparent;
-            border-top: 5px solid var(--bg-card);
-            opacity: 0;
-            visibility: hidden;
-            transition: opacity 0.2s ease, transform 0.25s cubic-bezier(0.4, 0, 0.2, 1), visibility 0.2s;
-            z-index: 11;
-        }
-        .controls button:hover::after,
-        .controls button:hover::before {
+
+        .controls button:hover::after {
             opacity: 1;
             visibility: visible;
             transform: translateX(-50%) translateY(0);
         }
 
+        /* ================= СЕТКА СЛОГОВ ================= */
+
         .grid-container {
             max-width: 900px;
             margin: 0 auto;
-            padding: 16px 20px 40px;
+            padding: 0 20px 60px;
             width: 100%;
         }
+
         .syllable-grid {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
-            gap: 10px;
+            gap: 0;
+            border-top: 2px solid var(--border);
+            border-left: 2px solid var(--border);
         }
+
         .syllable-grid.hide-learned .syllable-card.learned { display: none; }
 
         .syllable-card {
-            background: var(--bg-card);
-            border: 1px solid var(--border);
-            border-radius: var(--radius);
-            padding: 14px 8px;
+            background: var(--bg);
+            border-right: 2px solid var(--border);
+            border-bottom: 2px solid var(--border);
+            border-radius: 0;
+            padding: 18px 8px;
             text-align: center;
             cursor: pointer;
-            font-size: clamp(1.1rem, 2.2vw, 1.4rem);
-            font-weight: 600;
+            font-size: clamp(0.9rem, 1.7vw, 1.05rem);
+            font-weight: 700;
             color: var(--text);
             user-select: none;
             -webkit-tap-highlight-color: transparent;
-            transition: background var(--transition), border-color var(--transition), box-shadow var(--transition), transform var(--transition), color 0.3s;
+            transition: background 0.12s linear, color 0.12s linear;
             position: relative;
             font-family: var(--font);
-            letter-spacing: 0.04em;
+            letter-spacing: 0.02em;
             text-transform: uppercase;
             display: flex;
             align-items: center;
             justify-content: center;
-            min-height: 60px;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+            min-height: 68px;
         }
-        .syllable-card:hover {
-            background: var(--bg-card-hover);
-            border-color: var(--accent);
-            box-shadow: 0 0 14px var(--accent-glow);
-            transform: translateY(-2px);
+
+        .syllable-card:not(.learned):hover {
+            background: var(--text);
+            color: var(--bg);
         }
+
         .syllable-card.playing {
-            border-color: var(--accent);
-            background: var(--accent-glow);
-            box-shadow: 0 0 14px var(--accent-glow);
+            background: var(--accent);
+            color: #ffffff;
         }
+
         .syllable-card.learned {
             background: var(--learned-bg);
-            border-color: var(--learned);
-            box-shadow: 0 0 8px rgba(63, 185, 80, 0.25);
+            color: var(--learned-fg);
         }
+
         .syllable-card.learned .syllable-text {
             text-decoration: line-through;
-            opacity: 0.6;
+            opacity: 0.55;
         }
+
         .learn-dot {
             position: absolute;
-            bottom: 5px; right: 7px;
-            width: 14px; height: 14px;
-            background: var(--border);
-            border-radius: 50%;
+            bottom: 6px;
+            right: 6px;
+            width: 13px;
+            height: 13px;
+            background: transparent;
+            border: 2px solid var(--border);
+            border-radius: 0;
             cursor: pointer;
             transition: var(--transition);
+            opacity: 0.3;
         }
-        .learn-dot:hover {
-            transform: scale(1.3);
-            background: var(--text-secondary);
+
+        .syllable-card:not(.learned):hover .learn-dot {
+            border-color: var(--bg);
+            opacity: 1;
         }
+
+        .learn-dot:hover { opacity: 1; }
+
         .syllable-card.learned .learn-dot {
-            background: var(--learned);
-            box-shadow: 0 0 6px rgba(63, 185, 80, 0.6);
+            background: var(--accent);
+            border-color: var(--accent);
+            opacity: 1;
         }
+
+        /* ================= КНОПКА НАВЕРХ ================= */
 
         .scroll-top-btn {
             position: fixed;
-            bottom: 20px; right: 20px;
-            width: 46px; height: 46px;
-            border-radius: 50%;
-            background: var(--bg-card);
-            border: 1px solid var(--border);
+            bottom: 20px;
+            right: 20px;
+            width: 48px;
+            height: 48px;
+            border-radius: 0;
+            background: var(--bg);
+            border: 2px solid var(--border);
             color: var(--text);
             font-size: 1.3rem;
             cursor: pointer;
             display: none;
             align-items: center;
             justify-content: center;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
             transition: var(--transition);
             z-index: 1001;
         }
+
         .scroll-top-btn.visible { display: flex; }
-        .scroll-top-btn:hover { border-color: var(--accent); color: var(--accent); }
+        .scroll-top-btn:hover { background: var(--text); color: var(--bg); }
+
+        /* ================= ЭКЗАМЕН ================= */
 
         .exam-overlay {
             position: fixed;
@@ -410,152 +495,197 @@
             align-items: center;
             justify-content: center;
             padding: 20px;
-            gap: 20px;
+            gap: 34px;
         }
-        .exam-overlay.show { display: flex; animation: fadeIn 0.3s ease; }
+
+        .exam-overlay.show { display: flex; }
+
         .exam-header {
             display: flex;
             align-items: center;
-            gap: 15px;
-            animation: slideDown 0.4s ease;
+            gap: 16px;
         }
-        @keyframes slideDown {
-            from { opacity: 0; transform: translateY(-20px); }
-            to   { opacity: 1; transform: translateY(0); }
-        }
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to   { opacity: 1; }
-        }
+
         .exam-question {
-            font-size: 1.3rem;
+            font-size: 0.75rem;
             font-weight: 700;
-            text-align: center;
-            color: var(--text);
+            letter-spacing: 0.18em;
+            text-transform: uppercase;
+            color: var(--text-secondary);
         }
-        .exam-repeat-btn {
-            background: var(--bg-card);
-            border: 1px solid var(--border);
+
+        .exam-repeat-btn,
+        .exam-next-btn {
+            background: var(--bg);
+            border: 2px solid var(--border);
             color: var(--text);
-            border-radius: 50%;
-            width: 42px; height: 42px;
+            border-radius: 0;
+            width: 46px;
+            height: 46px;
             cursor: pointer;
-            font-size: 1.2rem;
+            font-size: 1.1rem;
             display: flex;
             align-items: center;
             justify-content: center;
             transition: var(--transition);
         }
-        .exam-repeat-btn:hover { border-color: var(--accent); color: var(--accent); }
+
+        .exam-repeat-btn:hover {
+            background: var(--text);
+            color: var(--bg);
+        }
+
+        .exam-next-btn {
+            display: none;
+            background: var(--accent);
+            border-color: var(--accent);
+            color: #ffffff;
+            font-size: 1.4rem;
+        }
+
+        .exam-next-btn.show { display: flex; }
+        .exam-next-btn:hover { opacity: 0.8; }
+
         .exam-options {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
             gap: 10px;
-            max-width: 500px;
+            max-width: 620px;
             width: 100%;
-            animation: scaleIn 0.5s ease;
         }
-        @keyframes scaleIn {
-            from { opacity: 0; transform: scale(0.8); }
-            to   { opacity: 1; transform: scale(1); }
-        }
+
         .exam-option {
-            padding: 12px;
-            background: var(--bg-card);
-            border: 1px solid var(--border);
-            border-radius: var(--radius);
+            padding: 20px 12px;
+            background: var(--bg);
+            border: 2px solid var(--border);
+            border-radius: 0;
             cursor: pointer;
             text-align: center;
-            font-size: 1.1rem;
-            font-weight: 600;
+            font-family: var(--font);
+            font-size: 1rem;
+            font-weight: 700;
             color: var(--text);
             text-transform: uppercase;
             letter-spacing: 0.04em;
             transition: var(--transition);
         }
-        .exam-option:hover { border-color: var(--accent); background: var(--bg-card-hover); }
-        .exam-option.correct { border-color: #3fb950; background: rgba(63,185,80,0.2); }
-        .exam-option.wrong   { border-color: var(--danger); background: rgba(248,81,73,0.2); }
-        .exam-result {
-            font-size: 2rem;
-            text-align: center;
-            min-height: 2rem;
-            animation: fadeIn 0.3s ease;
+
+        .exam-option:hover:not(:disabled) {
+            background: var(--text);
+            color: var(--bg);
         }
-        .exam-next-btn {
-            display: none;
+
+        .exam-option.correct {
+            background: #00a300;
+            border-color: #00a300;
+            color: #ffffff;
+        }
+
+        .exam-option.wrong {
             background: var(--accent);
-            color: white;
-            border: none;
-            border-radius: 50%;
-            width: 42px; height: 42px;
-            cursor: pointer;
-            font-size: 1.5rem;
-            align-items: center;
-            justify-content: center;
-            transition: var(--transition);
-            animation: pulse 1.5s infinite;
-            box-shadow: 0 4px 12px var(--accent-glow);
+            border-color: var(--accent);
+            color: #ffffff;
         }
-        .exam-next-btn.show { display: flex; }
-        .exam-next-btn:hover { transform: scale(1.1); box-shadow: 0 6px 18px var(--accent-glow); }
-        @keyframes pulse {
-            0%   { box-shadow: 0 0 0 0 var(--accent-glow); }
-            70%  { box-shadow: 0 0 0 15px rgba(0,0,0,0); }
-            100% { box-shadow: 0 0 0 0 rgba(0,0,0,0); }
+
+        .exam-result {
+            font-size: 2.4rem;
+            text-align: center;
+            min-height: 2.4rem;
+            line-height: 1;
         }
+
         .exam-exit-btn {
             position: absolute;
-            top: 15px; left: 15px;
-            background: var(--bg-card);
-            border: 1px solid var(--border);
+            top: 20px;
+            left: 20px;
+            background: var(--bg);
+            border: 2px solid var(--border);
             color: var(--text);
-            border-radius: 50%;
-            width: 40px; height: 40px;
+            border-radius: 0;
+            width: 46px;
+            height: 46px;
             cursor: pointer;
-            font-size: 1.4rem;
+            font-size: 1.3rem;
             display: flex;
             align-items: center;
             justify-content: center;
             transition: var(--transition);
             z-index: 10;
         }
-        .exam-exit-btn:hover { border-color: var(--danger); color: var(--danger); box-shadow: 0 0 10px var(--danger-glow); }
+
+        .exam-exit-btn:hover {
+            background: var(--text);
+            color: var(--bg);
+        }
+
+        /* ================= ПОЗДРАВЛЕНИЕ ================= */
+
         .celebration-overlay {
             position: fixed;
             top: 0; left: 0;
             width: 100%; height: 100%;
-            background: rgba(0,0,0,0.7);
+            background: rgba(0, 0, 0, 0.88);
             z-index: 3000;
             display: none;
             align-items: center;
             justify-content: center;
         }
-        .celebration-overlay.show { display: flex; animation: fadeIn 0.3s ease; }
+
+        .celebration-overlay.show { display: flex; }
+
         .celebration-box {
-            background: var(--bg-card);
-            border-radius: var(--radius);
-            padding: 20px;
+            background: var(--bg);
+            border: 3px solid var(--border);
+            border-radius: 0;
+            padding: 28px;
             text-align: center;
             max-width: 90vw;
             max-height: 90vh;
-            animation: scaleIn 0.4s ease;
         }
-        .celebration-box h2 { margin-bottom: 10px; font-size: 1.5rem; }
-        .celebration-box img { max-width: 300px; max-height: 250px; border-radius: 10px; }
+
+        .celebration-box h2 {
+            margin-bottom: 18px;
+            font-size: 1.4rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+        }
+
+        .celebration-box img {
+            max-width: 300px;
+            max-height: 250px;
+            border-radius: 0;
+            border: 2px solid var(--border);
+        }
+
         .celebration-close {
-            margin-top: 15px;
-            padding: 8px 20px;
-            background: var(--accent);
-            color: white;
-            border: none;
-            border-radius: 6px;
+            margin-top: 20px;
+            padding: 12px 34px;
+            background: var(--text);
+            color: var(--bg);
+            border: 2px solid var(--text);
+            border-radius: 0;
             cursor: pointer;
             font-family: var(--font);
+            font-weight: 700;
+            font-size: 0.78rem;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            transition: var(--transition);
         }
+
+        .celebration-close:hover {
+            background: var(--accent);
+            border-color: var(--accent);
+            color: #ffffff;
+        }
+
+        /* ================= ТОСТЫ ================= */
+
         .toast-container {
             position: fixed;
-            bottom: 24px; left: 50%;
+            bottom: 24px;
+            left: 50%;
             transform: translateX(-50%);
             z-index: 4000;
             display: flex;
@@ -564,320 +694,512 @@
             gap: 8px;
             pointer-events: none;
         }
+
         .toast {
-            background: var(--bg-card);
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            padding: 10px 18px;
-            font-size: 0.85rem;
-            color: var(--text);
-            box-shadow: 0 8px 32px rgba(0,0,0,0.5);
-            animation: toastIn 0.3s ease, toastOut 0.3s ease 2.5s forwards;
+            background: var(--text);
+            color: var(--bg);
+            border: none;
+            border-radius: 0;
+            padding: 13px 22px;
+            font-family: var(--font);
+            font-size: 0.72rem;
+            font-weight: 700;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            animation: toastIn 0.2s linear, toastOut 0.2s linear 2.5s forwards;
             pointer-events: auto;
         }
+
         @keyframes toastIn {
-            from { opacity: 0; transform: translateY(20px) scale(0.95); }
-            to   { opacity: 1; transform: translateY(0) scale(1); }
-        }
-        @keyframes toastOut {
-            from { opacity: 1; }
-            to   { opacity: 0; transform: translateY(10px); }
-        }
-        .footer {
-            text-align: center;
-            padding: 16px;
-            color: var(--text-secondary);
-            font-size: 0.7rem;
-            border-top: 1px solid var(--border);
+            from { opacity: 0; transform: translateY(14px); }
+            to   { opacity: 1; transform: translateY(0); }
         }
 
-        /* ===== Личности ===== */
-        .heroes-timeline { max-width: 800px; margin: 40px auto; padding: 0 20px; position: relative; }
-        .timeline-container { position: relative; padding-left: 50px; }
+        @keyframes toastOut {
+            from { opacity: 1; }
+            to   { opacity: 0; }
+        }
+
+        /* ================= ПОДВАЛ ================= */
+
+        .footer {
+            text-align: center;
+            padding: 22px 20px;
+            color: var(--text-secondary);
+            font-size: 0.62rem;
+            font-weight: 700;
+            letter-spacing: 0.14em;
+            text-transform: uppercase;
+            border-top: 3px solid var(--border);
+        }
+
+        /* ============================================================
+           ЛИЧНОСТИ
+           ============================================================ */
+
+        .heroes-timeline {
+            max-width: 800px;
+            margin: 40px auto;
+            padding: 0 20px;
+            position: relative;
+        }
+
+        .timeline-container {
+            position: relative;
+            padding-left: 60px;
+        }
+
         .timeline-line {
             position: absolute;
-            left: 35px; top: 0; bottom: 0;
+            left: 30px;
+            top: 0;
+            bottom: 0;
             width: 2px;
-            background: linear-gradient(to bottom, transparent, var(--accent) 10%, var(--accent) 90%, transparent);
+            background: var(--border);
             z-index: 0;
         }
-        .century-sentinel { height: 1px; margin: 60px 0 40px; position: relative; }
+
+        .century-sentinel {
+            height: 1px;
+            margin: 60px 0 40px;
+            position: relative;
+        }
+
+        .century-sentinel:first-child { margin-top: 0; }
+
         .century-sentinel::before {
             content: '';
             position: absolute;
-            left: -41px; top: 50%;
+            left: -37px;
+            top: 50%;
             transform: translateY(-50%);
-            width: 16px; height: 16px;
+            width: 16px;
+            height: 16px;
             background: var(--accent);
-            border-radius: 50%;
-            box-shadow: 0 0 15px var(--accent-glow);
+            border-radius: 0;
             z-index: 1;
         }
+
         .hero-item {
             position: relative;
             display: flex;
             align-items: center;
-            gap: 24px;
-            margin-bottom: 30px;
+            gap: 22px;
+            margin-bottom: 26px;
             cursor: pointer;
-            padding: 10px;
-            border-radius: var(--radius);
+            padding: 0;
+            border-radius: 0;
         }
+
         .hero-circle {
-            width: 70px; height: 70px;
-            border-radius: 50%;
-            border: 3px solid var(--accent);
+            width: 82px;
+            height: 82px;
+            border-radius: 0;
+            border: 2px solid var(--border);
             overflow: hidden;
             flex-shrink: 0;
             background: var(--bg-card);
-            box-shadow: 0 0 15px var(--accent-glow);
-            transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.3s, border-color 0.3s;
+            transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1),
+                        border-color 0.2s linear,
+                        box-shadow 0.3s linear;
+            position: relative;
+            z-index: 1;
+            transform-origin: center center;
+        }
+
+        .hero-item:hover .hero-circle {
+            transform: scale(1.45);
+            border-color: var(--accent);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+            z-index: 5;
+        }
+
+        .hero-circle img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            filter: grayscale(1) contrast(1.1);
+            transition: filter 0.3s linear;
+        }
+
+        .hero-item:hover .hero-circle img {
+            filter: grayscale(0) contrast(1);
+        }
+
+        .hero-info {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
             position: relative;
             z-index: 2;
         }
-        .hero-item:hover .hero-circle { transform: scale(1.4); box-shadow: 0 0 35px var(--accent-glow); }
-        .hero-circle img { width: 100%; height: 100%; object-fit: cover; }
-        .hero-info { display: flex; flex-direction: column; gap: 4px; }
-        .hero-name { font-size: 1.2rem; font-weight: 700; color: var(--text); }
+
+        .hero-name {
+            font-size: 1.15rem;
+            font-weight: 800;
+            color: var(--text);
+            text-transform: uppercase;
+            letter-spacing: -0.01em;
+        }
+
         .hero-years {
-            font-size: 0.95rem;
+            font-size: 0.78rem;
             color: var(--accent);
             font-weight: 700;
-            text-shadow: 0 0 10px var(--accent-glow);
-            letter-spacing: 0.03em;
+            letter-spacing: 0.08em;
             display: flex;
             align-items: baseline;
-            gap: 6px;
+            gap: 8px;
         }
+
         .hero-age {
-            font-family: 'PT Sans', sans-serif;
-            font-size: 0.8rem;
+            font-size: 0.7rem;
             font-weight: 400;
             color: var(--text-secondary);
-            opacity: 0.7;
+            letter-spacing: 0.04em;
         }
+
         .soviet-era {
-            background: linear-gradient(180deg, rgba(220, 38, 38, 0.12) 0%, rgba(220, 38, 38, 0.02) 100%);
-            margin: 30px -20px 30px -15px;
-            padding: 40px 20px 40px 15px;
+            background: rgba(227, 6, 19, 0.07);
+            margin: 40px 0 40px -60px;
+            padding: 44px 30px 44px 60px;
             position: relative;
-            border-radius: 0 16px 16px 0;
-            border-left: 4px solid #dc2626;
-            box-shadow: 0 0 40px rgba(220, 38, 38, 0.05);
+            border-left: 6px solid #e30613;
+            border-radius: 0;
         }
+
+        body.light-mode .soviet-era { background: rgba(227, 6, 19, 0.05); }
+
         .soviet-era::before {
             content: '☭';
             position: absolute;
-            top: 50%; right: 40px;
+            top: 50%;
+            right: 40px;
             transform: translateY(-50%);
-            font-size: 8rem;
+            font-size: 7rem;
             font-weight: 900;
-            color: rgba(220, 38, 38, 0.06);
+            color: rgba(227, 6, 19, 0.09);
             pointer-events: none;
+            line-height: 1;
         }
+
         .soviet-era::after {
-            content: 'С С С Р';
+            content: 'СССР';
             position: absolute;
-            top: 20px; right: 25px;
-            font-size: 1.2rem;
+            top: 18px;
+            right: 24px;
+            font-size: 0.8rem;
             font-weight: 800;
-            color: rgba(220, 38, 38, 0.4);
-            letter-spacing: 0.2em;
+            color: #e30613;
+            letter-spacing: 0.3em;
             pointer-events: none;
-            text-shadow: 0 0 10px rgba(220, 38, 38, 0.2);
         }
+
         .century-popup {
             position: fixed;
-            bottom: 100px;
+            bottom: 40px;
             left: 50%;
-            transform: translateX(-50%) translateY(20px);
-            background: var(--bg-card);
-            border: 1px solid var(--accent);
-            color: var(--accent);
-            padding: 12px 32px;
-            border-radius: 50px;
-            font-size: 1.2rem;
-            font-weight: 700;
-            box-shadow: 0 8px 32px var(--accent-glow);
+            transform: translateX(-50%) translateY(16px);
+            background: var(--text);
+            color: var(--bg);
+            border: none;
+            padding: 15px 34px;
+            border-radius: 0;
+            font-family: var(--font);
+            font-size: 0.85rem;
+            font-weight: 800;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
             z-index: 100;
             opacity: 0;
             pointer-events: none;
-            transition: opacity 0.4s ease, transform 0.4s ease;
-            backdrop-filter: blur(10px);
+            transition: opacity 0.35s ease, transform 0.35s ease;
         }
-        .century-popup.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+        .century-popup.show {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+        }
+
         .hero-modal {
             position: fixed;
             top: 0; left: 0;
             width: 100%; height: 100%;
-            background: rgba(10, 14, 23, 0.95);
-            backdrop-filter: blur(5px);
+            background: var(--bg);
             z-index: 5000;
             display: flex;
             align-items: center;
             justify-content: center;
-            animation: fadeIn 0.3s ease;
+            animation: tabEnter 0.2s linear;
         }
+
         .hero-modal-content {
-            width: 100%; height: 100%;
+            width: 100%;
+            height: 100%;
             position: relative;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
+            padding: 20px;
         }
+
         .hero-modal-close {
             position: absolute;
-            top: 20px; right: 20px;
-            background: none;
-            border: none;
+            top: 20px;
+            right: 20px;
+            background: var(--bg);
+            border: 2px solid var(--border);
             color: var(--text);
-            font-size: 3rem;
+            font-size: 1.6rem;
+            width: 48px;
+            height: 48px;
             cursor: pointer;
             z-index: 20;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: var(--transition);
+            font-family: var(--font);
+            line-height: 1;
         }
+
+        .hero-modal-close:hover {
+            background: var(--text);
+            color: var(--bg);
+        }
+
         .hero-modal-repeat {
             position: absolute;
-            top: 20px; left: 20px;
-            background: var(--bg-card);
-            border: 1px solid var(--border);
+            top: 20px;
+            left: 20px;
+            background: var(--bg);
+            border: 2px solid var(--border);
             color: var(--text);
-            border-radius: 50%;
-            width: 56px; height: 56px;
+            border-radius: 0;
+            width: 48px;
+            height: 48px;
             cursor: pointer;
-            font-size: 1.8rem;
+            font-size: 1.2rem;
             display: flex;
             align-items: center;
             justify-content: center;
             transition: var(--transition);
             z-index: 20;
         }
-        .hero-modal-repeat:hover { border-color: var(--accent); color: var(--accent); box-shadow: 0 0 12px var(--accent-glow); }
-        .hero-modal-portrait {
-            max-width: 90%;
-            max-height: 65vh;
-            object-fit: contain;
-            border-radius: 8px;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.6);
+
+        .hero-modal-repeat:hover {
+            background: var(--text);
+            color: var(--bg);
         }
-        .hero-modal h3 { font-size: 2rem; margin: 20px 0; color: var(--accent); }
+
+        .hero-modal-portrait {
+            max-width: 88%;
+            max-height: 62vh;
+            object-fit: contain;
+            border-radius: 0;
+            border: 3px solid var(--border);
+        }
+
+        .hero-modal h3 {
+            font-size: clamp(1.4rem, 5vw, 2.4rem);
+            margin: 24px 0 0;
+            color: var(--text);
+            text-transform: uppercase;
+            font-weight: 800;
+            letter-spacing: -0.02em;
+            text-align: center;
+        }
+
         .hero-modal-nav {
             position: absolute;
             top: 50%;
             transform: translateY(-50%);
-            left: 0; right: 0;
+            left: 0;
+            right: 0;
             display: flex;
             justify-content: space-between;
             padding: 0 20px;
             z-index: 10;
         }
+
         .hero-modal-nav button {
-            background: rgba(0,0,0,0.4);
-            border: none;
-            color: white;
-            font-size: 3rem;
-            width: 60px; height: 60px;
+            background: var(--bg);
+            border: 2px solid var(--border);
+            color: var(--text);
+            font-size: 1.6rem;
+            width: 52px;
+            height: 52px;
             cursor: pointer;
             display: flex;
             align-items: center;
             justify-content: center;
-            transition: background 0.2s;
-            border-radius: 8px;
+            transition: var(--transition);
+            border-radius: 0;
+            font-family: var(--font);
         }
-        .hero-modal-nav button:hover { background: rgba(0,0,0,0.7); }
 
-        /* ===== Часы ===== */
+        .hero-modal-nav button:hover {
+            background: var(--text);
+            color: var(--bg);
+        }
+
+        /* ============================================================
+           ЧАСЫ — часы и схема в одном блоке, переключаются кликом
+           ============================================================ */
+
         .clock-wrapper {
+            padding: 50px 0 80px;
+            width: 100%;
             display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 14px;
-            padding: 24px 10px 40px;
+            justify-content: center;
         }
 
-        /* Обёртка с тенью — тень на HTML-элементе, не на SVG, чтобы не ломать z-order внутри */
-        .watch-shadow {
-            display: inline-block;
-            filter: drop-shadow(0 22px 28px rgba(0, 0, 0, 0.5));
-            line-height: 0;
+        .clock-stack {
+            width: min(400px, 88vw);
+            margin: 0 auto;
         }
 
-        .watch-container {
-            width: min(400px, 92vw);
+        .clock-view {
+            width: 100%;
             aspect-ratio: 440 / 520;
             position: relative;
-            cursor: grab;
+            cursor: pointer;
             touch-action: none;
             user-select: none;
             -webkit-user-select: none;
             -webkit-tap-highlight-color: transparent;
+            filter: drop-shadow(0 18px 22px rgba(0, 0, 0, 0.35));
+        }
+
+        body.light-mode .clock-view {
+            filter: drop-shadow(0 18px 22px rgba(0, 0, 0, 0.18));
+        }
+
+        .clock-view.view-watch { cursor: grab; }
+        .clock-view.view-watch.dragging { cursor: grabbing; }
+        .clock-view.view-scheme { cursor: pointer; }
+
+        .watch-container {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
             display: block;
         }
-        .watch-container:active,
-        .watch-container.dragging { cursor: grabbing; }
+
         .watch-container svg {
-            width: 100%; height: 100%;
+            width: 100%;
+            height: 100%;
             display: block;
             overflow: visible;
-            /* ВАЖНО: здесь НЕТ никаких filter — они ломают внутренний порядок */
         }
 
-        .digital-24 {
-            display: inline-block;
-            font-family: 'Courier New', Consolas, monospace;
-            font-size: clamp(22px, 3.6vh, 34px);
-            font-weight: 700;
-            color: #e8d9a8;
-            letter-spacing: 5px;
-            padding: 10px 30px 10px 34px;
-            background: rgba(0, 0, 0, 0.55);
-            border: 1px solid rgba(232, 217, 168, 0.35);
-            border-radius: 10px;
-            box-shadow: inset 0 0 20px rgba(232, 217, 168, 0.08), 0 4px 16px rgba(0, 0, 0, 0.5);
-            text-shadow: 0 0 10px rgba(232, 217, 168, 0.45);
-            font-variant-numeric: tabular-nums;
-            text-align: center;
+        .scheme-view {
+            position: absolute;
+            inset: 0;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            color: var(--text);
         }
+
+        .scheme-view.active { display: flex; }
+
+        .scheme-view svg {
+            width: 100%;
+            height: auto;
+            max-height: 100%;
+            display: block;
+            overflow: visible;
+        }
+
+        .clock-view .watch-container.hidden { display: none; }
+
+        /* ============================================================
+           АДАПТИВ
+           ============================================================ */
 
         @media (max-width: 1024px) {
-            .syllable-grid { grid-template-columns: repeat(3, 1fr); gap: 8px; }
+            .syllable-grid { grid-template-columns: repeat(3, 1fr); }
         }
 
-        @media (max-width: 600px) {
-            .exam-exit-btn { top: auto; bottom: 10px; left: 10px; width: 34px; height: 34px; font-size: 1.1rem; }
-            .syllable-grid { grid-template-columns: repeat(2, 1fr); gap: 5px; }
-            .syllable-card { font-size: 0.95rem; padding: 10px 4px; min-height: 45px; }
-            .learn-dot { width: 10px; height: 10px; bottom: 3px; right: 4px; }
-            .controls { gap: 6px; }
-            .controls button { width: 38px; height: 38px; font-size: 1.1rem; }
-            .theme-toggle { top: 6px; right: 10px; }
-            .theme-toggle button { width: 28px; height: 28px; font-size: 0.85rem; }
-            .theme-cycle { top: 6px; left: 10px; }
-            .theme-cycle button { width: 28px; height: 28px; }
+        @media (max-width: 640px) {
+            .header { padding: 16px 14px 0; }
+            .header h1 { margin: 34px 0 10px; letter-spacing: 0.01em; }
+
+            .theme-toggle { top: 12px; right: 14px; }
+            .theme-cycle  { top: 12px; left: 14px; }
+            .theme-toggle button,
+            .theme-cycle button { width: 32px; height: 32px; font-size: 0.85rem; }
             .theme-cycle .color-indicator { width: 13px; height: 13px; }
-            .header { padding: 14px 12px 8px; }
-            .section-switch-btn { padding: 5px 9px; font-size: 0.68rem; line-height: 1.2; }
-            #sectionSubtitle { font-size: 0.78rem; }
-            .hero-modal-nav button { width: 45px; height: 45px; font-size: 2rem; }
-            .timeline-container { padding-left: 40px; }
-            .timeline-line { left: 25px; }
-            .century-sentinel::before { left: -31px; width: 14px; height: 14px; }
-            .hero-circle { width: 85px; height: 85px; }
-            .hero-item { gap: 12px; margin-bottom: 20px; padding: 8px; }
-            .hero-name { font-size: 0.95rem; line-height: 1.2; }
-            .hero-years { font-size: 0.75rem; }
-            .hero-age { font-size: 0.65rem; }
-            .century-popup { font-size: 0.75rem; padding: 6px 16px; bottom: 80px; }
-            .soviet-era { margin-left: -15px; padding: 30px 15px 30px 15px; }
-            .soviet-era::before { font-size: 5rem; right: 10px; }
-            .soviet-era::after { font-size: 0.9rem; right: 15px; top: 10px; }
-            .watch-container { width: min(340px, 94vw); }
-            .clock-wrapper { padding: 16px 4px 30px; gap: 12px; }
-            .progress-container { bottom: 16px; padding: 10px 18px 12px; }
+            .theme-toggle .theme-ball { width: 13px; height: 13px; }
+
+            .section-switch { margin: 0 -14px; }
+            .section-switch-btn {
+                font-size: 0.6rem;
+                padding: 13px 4px;
+                letter-spacing: 0.04em;
+                white-space: normal;
+            }
+
+            .section-subtitles { margin: 0 -14px; }
+            .section-subtitle {
+                font-size: 0.52rem;
+                padding: 10px 4px;
+                letter-spacing: 0.08em;
+                min-height: 3.2em;
+            }
+
+            .digital-clock-inline { font-size: 0.9rem; letter-spacing: 0.1em; }
+
+            .content-wrapper { padding: 0 14px; }
+            .grid-container { padding: 0 14px 50px; }
+
+            .syllable-grid { grid-template-columns: repeat(2, 1fr); }
+            .syllable-card {
+                font-size: 0.82rem;
+                min-height: 54px;
+                padding: 12px 4px;
+            }
+            .learn-dot { width: 10px; height: 10px; bottom: 4px; right: 4px; border-width: 1px; }
+
+            .controls { padding: 18px 14px 14px; }
+            .controls button { width: 42px; height: 42px; font-size: 1.15rem; }
+            .controls button::after { display: none; }
+
+            .exam-exit-btn { top: auto; bottom: 14px; left: 14px; width: 40px; height: 40px; font-size: 1.1rem; }
+            .exam-options { grid-template-columns: repeat(2, 1fr); gap: 8px; }
+            .exam-option { padding: 16px 8px; font-size: 0.9rem; }
+
+            .heroes-timeline { padding: 0 14px; }
+            .timeline-container { padding-left: 46px; }
+            .timeline-line { left: 22px; }
+            .century-sentinel::before { left: -29px; width: 14px; height: 14px; }
+            .hero-circle { width: 64px; height: 64px; }
+            .hero-item { gap: 14px; margin-bottom: 20px; }
+            .hero-name { font-size: 0.9rem; }
+            .hero-years { font-size: 0.68rem; }
+            .hero-age { font-size: 0.6rem; }
+            .hero-item:hover .hero-circle { transform: scale(1.25); }
+
+            .soviet-era { margin-left: -46px; padding: 30px 16px 30px 46px; }
+            .soviet-era::before { font-size: 4.5rem; right: 8px; }
+            .soviet-era::after { font-size: 0.6rem; right: 12px; top: 12px; letter-spacing: 0.2em; }
+
+            .century-popup { font-size: 0.65rem; padding: 11px 22px; bottom: 24px; letter-spacing: 0.14em; }
+
+            .hero-modal-nav button { width: 44px; height: 44px; font-size: 1.3rem; }
+            .hero-modal-portrait { max-height: 52vh; }
+
+            .clock-wrapper { padding: 30px 0 60px; }
+            .clock-stack { width: min(340px, 94vw); }
+
+            .progress-container { padding: 12px 14px 14px; }
         }
     </style>
 </head>
-<body>
+<body class="theme-blue light-mode">
 
     <header class="header">
         <div class="theme-cycle">
@@ -887,27 +1209,35 @@
         </div>
 
         <div class="theme-toggle">
-            <button id="themeToggle" data-tooltip="Темно или светло">🌓</button>
+            <button id="themeToggle" title="Сменить тему">
+                <span class="theme-ball" id="themeBall"></span>
+            </button>
         </div>
         <h1>Грамотиньо</h1>
 
         <div class="section-switch">
             <button class="section-switch-btn active" data-section="syllables">Учи слоги</button>
-            <button class="section-switch-btn" data-section="clock">Определяй время</button>
-            <button class="section-switch-btn" data-section="heroes">Знай великих</button>
+            <button class="section-switch-btn" data-section="clock">Знай время</button>
+            <button class="section-switch-btn" data-section="heroes">Чти великих</button>
         </div>
 
-        <p id="sectionSubtitle">Жми, слушай, запоминай</p>
+        <div class="section-subtitles">
+            <div class="section-subtitle active" data-section="syllables">Жми, слушай, запоминай</div>
+            <div class="section-subtitle" data-section="clock">
+                <span class="digital-clock-inline" id="clockDigital24">03:00</span>
+            </div>
+            <div class="section-subtitle" data-section="heroes">Великие личности Отечества</div>
+        </div>
     </header>
 
     <div class="content-wrapper">
         <section id="syllablesSection" class="tab-section active">
             <div class="controls">
-                <button id="normalBtn" class="active" data-tooltip="Все">🅰</button>
-                <button id="randomBtn" data-tooltip="Случайно">🎲</button>
-                <button id="hideLearnedBtn" data-tooltip="Скрыть/показать">✂</button>
-                <button id="clearLearnedBtn" data-tooltip="Очистить">↩</button>
-                <button id="examBtn" data-tooltip="Викторина">🍓</button>
+                <button id="normalBtn" class="active" data-tooltip="Все">≡</button>
+                <button id="randomBtn" data-tooltip="Случайно">⟳</button>
+                <button id="hideLearnedBtn" data-tooltip="Скрыть/показать">◑</button>
+                <button id="clearLearnedBtn" data-tooltip="Очистить">×</button>
+                <button id="examBtn" data-tooltip="Викторина">?</button>
             </div>
 
             <div class="grid-container">
@@ -917,199 +1247,194 @@
 
         <section id="clockSection" class="tab-section">
             <div class="clock-wrapper">
-                <div class="watch-shadow">
-                    <div class="watch-container" id="clockContainer">
-                        <svg viewBox="-20 0 440 520" xmlns="http://www.w3.org/2000/svg">
-                            <defs>
-                                <radialGradient id="clk-caseGrad" cx="0.35" cy="0.28" r="0.9">
-                                    <stop offset="0"    stop-color="#f5f5f5"/>
-                                    <stop offset="0.15" stop-color="#d8d8d8"/>
-                                    <stop offset="0.4"  stop-color="#a8a8a8"/>
-                                    <stop offset="0.7"  stop-color="#787878"/>
-                                    <stop offset="0.9"  stop-color="#585858"/>
-                                    <stop offset="1"    stop-color="#3a3a3a"/>
-                                </radialGradient>
+                <div class="clock-stack">
+                    <div class="clock-view view-watch" id="clockView">
+                        <!-- Настоящие часы -->
+                        <div class="watch-container" id="watchView">
+                            <svg viewBox="-20 0 440 520" xmlns="http://www.w3.org/2000/svg">
+                                <defs>
+                                    <radialGradient id="clk-caseGrad" cx="0.35" cy="0.28" r="0.9">
+                                        <stop offset="0"    stop-color="#f5f5f5"/>
+                                        <stop offset="0.15" stop-color="#d8d8d8"/>
+                                        <stop offset="0.4"  stop-color="#a8a8a8"/>
+                                        <stop offset="0.7"  stop-color="#787878"/>
+                                        <stop offset="0.9"  stop-color="#585858"/>
+                                        <stop offset="1"    stop-color="#3a3a3a"/>
+                                    </radialGradient>
 
-                                <linearGradient id="clk-caseShine" x1="0.15" y1="0" x2="0.85" y2="1">
-                                    <stop offset="0"    stop-color="#ffffff" stop-opacity="0.5"/>
-                                    <stop offset="0.25" stop-color="#ffffff" stop-opacity="0.1"/>
-                                    <stop offset="0.5"  stop-color="#ffffff" stop-opacity="0"/>
-                                    <stop offset="0.75" stop-color="#000000" stop-opacity="0.05"/>
-                                    <stop offset="1"    stop-color="#000000" stop-opacity="0.3"/>
-                                </linearGradient>
+                                    <linearGradient id="clk-caseShine" x1="0.15" y1="0" x2="0.85" y2="1">
+                                        <stop offset="0"    stop-color="#ffffff" stop-opacity="0.5"/>
+                                        <stop offset="0.25" stop-color="#ffffff" stop-opacity="0.1"/>
+                                        <stop offset="0.5"  stop-color="#ffffff" stop-opacity="0"/>
+                                        <stop offset="0.75" stop-color="#000000" stop-opacity="0.05"/>
+                                        <stop offset="1"    stop-color="#000000" stop-opacity="0.3"/>
+                                    </linearGradient>
 
-                                <linearGradient id="clk-bezelGrad" x1="0" y1="0" x2="0.25" y2="1">
-                                    <stop offset="0"    stop-color="#ffffff"/>
-                                    <stop offset="0.1"  stop-color="#e8e8e8"/>
-                                    <stop offset="0.25" stop-color="#b0b0b0"/>
-                                    <stop offset="0.4"  stop-color="#e0e0e0"/>
-                                    <stop offset="0.55" stop-color="#888888"/>
-                                    <stop offset="0.75" stop-color="#c0c0c0"/>
-                                    <stop offset="0.9"  stop-color="#606060"/>
-                                    <stop offset="1"    stop-color="#404040"/>
-                                </linearGradient>
+                                    <linearGradient id="clk-bezelGrad" x1="0" y1="0" x2="0.25" y2="1">
+                                        <stop offset="0"    stop-color="#ffffff"/>
+                                        <stop offset="0.1"  stop-color="#e8e8e8"/>
+                                        <stop offset="0.25" stop-color="#b0b0b0"/>
+                                        <stop offset="0.4"  stop-color="#e0e0e0"/>
+                                        <stop offset="0.55" stop-color="#888888"/>
+                                        <stop offset="0.75" stop-color="#c0c0c0"/>
+                                        <stop offset="0.9"  stop-color="#606060"/>
+                                        <stop offset="1"    stop-color="#404040"/>
+                                    </linearGradient>
 
-                                <linearGradient id="clk-bezelHighlight" x1="0.2" y1="0" x2="0.8" y2="1">
-                                    <stop offset="0"   stop-color="#ffffff" stop-opacity="0.65"/>
-                                    <stop offset="0.3" stop-color="#ffffff" stop-opacity="0"/>
-                                    <stop offset="0.7" stop-color="#ffffff" stop-opacity="0"/>
-                                    <stop offset="1"   stop-color="#ffffff" stop-opacity="0.25"/>
-                                </linearGradient>
+                                    <linearGradient id="clk-bezelHighlight" x1="0.2" y1="0" x2="0.8" y2="1">
+                                        <stop offset="0"   stop-color="#ffffff" stop-opacity="0.65"/>
+                                        <stop offset="0.3" stop-color="#ffffff" stop-opacity="0"/>
+                                        <stop offset="0.7" stop-color="#ffffff" stop-opacity="0"/>
+                                        <stop offset="1"   stop-color="#ffffff" stop-opacity="0.25"/>
+                                    </linearGradient>
 
-                                <radialGradient id="clk-dialGrad" cx="0.45" cy="0.38" r="0.78">
-                                    <stop offset="0"    stop-color="#fefdf8"/>
-                                    <stop offset="0.55" stop-color="#f8f2e2"/>
-                                    <stop offset="1"    stop-color="#e9dec3"/>
-                                </radialGradient>
+                                    <radialGradient id="clk-dialGrad" cx="0.45" cy="0.38" r="0.78">
+                                        <stop offset="0"    stop-color="#fefdf8"/>
+                                        <stop offset="0.55" stop-color="#f8f2e2"/>
+                                        <stop offset="1"    stop-color="#e9dec3"/>
+                                    </radialGradient>
 
-                                <radialGradient id="clk-dialVignette" cx="0.5" cy="0.5" r="0.5">
-                                    <stop offset="0.6"  stop-color="#000000" stop-opacity="0"/>
-                                    <stop offset="0.88" stop-color="#000000" stop-opacity="0.06"/>
-                                    <stop offset="1"    stop-color="#000000" stop-opacity="0.2"/>
-                                </radialGradient>
+                                    <radialGradient id="clk-dialVignette" cx="0.5" cy="0.5" r="0.5">
+                                        <stop offset="0.6"  stop-color="#000000" stop-opacity="0"/>
+                                        <stop offset="0.88" stop-color="#000000" stop-opacity="0.06"/>
+                                        <stop offset="1"    stop-color="#000000" stop-opacity="0.2"/>
+                                    </radialGradient>
 
-                                <linearGradient id="clk-crystalGrad" x1="0" y1="0" x2="0.6" y2="0.6">
-                                    <stop offset="0"    stop-color="#ffffff" stop-opacity="0.4"/>
-                                    <stop offset="0.2"  stop-color="#ffffff" stop-opacity="0"/>
-                                    <stop offset="0.5"  stop-color="#ffffff" stop-opacity="0"/>
-                                    <stop offset="0.85" stop-color="#ffffff" stop-opacity="0"/>
-                                    <stop offset="1"    stop-color="#ffffff" stop-opacity="0.15"/>
-                                </linearGradient>
+                                    <linearGradient id="clk-crystalGrad" x1="0" y1="0" x2="0.6" y2="0.6">
+                                        <stop offset="0"    stop-color="#ffffff" stop-opacity="0.4"/>
+                                        <stop offset="0.2"  stop-color="#ffffff" stop-opacity="0"/>
+                                        <stop offset="0.5"  stop-color="#ffffff" stop-opacity="0"/>
+                                        <stop offset="0.85" stop-color="#ffffff" stop-opacity="0"/>
+                                        <stop offset="1"    stop-color="#ffffff" stop-opacity="0.15"/>
+                                    </linearGradient>
 
-                                <linearGradient id="clk-handGrad" x1="0" y1="0" x2="1" y2="0">
-                                    <stop offset="0"   stop-color="#4a4a4a"/>
-                                    <stop offset="0.5" stop-color="#0d0d0d"/>
-                                    <stop offset="1"   stop-color="#4a4a4a"/>
-                                </linearGradient>
+                                    <linearGradient id="clk-handGrad" x1="0" y1="0" x2="1" y2="0">
+                                        <stop offset="0"   stop-color="#4a4a4a"/>
+                                        <stop offset="0.5" stop-color="#0d0d0d"/>
+                                        <stop offset="1"   stop-color="#4a4a4a"/>
+                                    </linearGradient>
 
-                                <linearGradient id="clk-strapGrad" x1="0" y1="0" x2="1" y2="0">
-                                    <stop offset="0"    stop-color="#2a1508"/>
-                                    <stop offset="0.18" stop-color="#4a2410"/>
-                                    <stop offset="0.5"  stop-color="#6b3a18"/>
-                                    <stop offset="0.82" stop-color="#4a2410"/>
-                                    <stop offset="1"    stop-color="#2a1508"/>
-                                </linearGradient>
+                                    <linearGradient id="clk-strapGrad" x1="0" y1="0" x2="1" y2="0">
+                                        <stop offset="0"    stop-color="#2a1508"/>
+                                        <stop offset="0.18" stop-color="#4a2410"/>
+                                        <stop offset="0.5"  stop-color="#6b3a18"/>
+                                        <stop offset="0.82" stop-color="#4a2410"/>
+                                        <stop offset="1"    stop-color="#2a1508"/>
+                                    </linearGradient>
 
-                                <linearGradient id="clk-strapShine" x1="0" y1="0" x2="1" y2="0">
-                                    <stop offset="0"    stop-color="#ffffff" stop-opacity="0"/>
-                                    <stop offset="0.45" stop-color="#ffffff" stop-opacity="0.16"/>
-                                    <stop offset="0.55" stop-color="#ffffff" stop-opacity="0.16"/>
-                                    <stop offset="1"    stop-color="#ffffff" stop-opacity="0"/>
-                                </linearGradient>
+                                    <linearGradient id="clk-strapShine" x1="0" y1="0" x2="1" y2="0">
+                                        <stop offset="0"    stop-color="#ffffff" stop-opacity="0"/>
+                                        <stop offset="0.45" stop-color="#ffffff" stop-opacity="0.16"/>
+                                        <stop offset="0.55" stop-color="#ffffff" stop-opacity="0.16"/>
+                                        <stop offset="1"    stop-color="#ffffff" stop-opacity="0"/>
+                                    </linearGradient>
 
-                                <filter id="clk-strapShadow" x="-30%" y="-30%" width="160%" height="160%">
-                                    <feGaussianBlur in="SourceAlpha" stdDeviation="3"/>
-                                    <feOffset dx="0" dy="3"/>
-                                    <feComponentTransfer><feFuncA type="linear" slope="0.5"/></feComponentTransfer>
-                                    <feMerge>
-                                        <feMergeNode/>
-                                        <feMergeNode in="SourceGraphic"/>
-                                    </feMerge>
-                                </filter>
-                            </defs>
+                                    <filter id="clk-strapShadow" x="-30%" y="-30%" width="160%" height="160%">
+                                        <feGaussianBlur in="SourceAlpha" stdDeviation="3"/>
+                                        <feOffset dx="0" dy="3"/>
+                                        <feComponentTransfer><feFuncA type="linear" slope="0.5"/></feComponentTransfer>
+                                        <feMerge>
+                                            <feMergeNode/>
+                                            <feMergeNode in="SourceGraphic"/>
+                                        </feMerge>
+                                    </filter>
+                                </defs>
 
-                            <!-- ============ СЛОЙ 1: Ремешок и корпус ============ -->
-
-                            <!-- верхний ремешок -->
-                            <g filter="url(#clk-strapShadow)">
-                                <path d="M 138 -10 L 262 -10 L 272 105 L 128 105 Z"
-                                      fill="url(#clk-strapGrad)"/>
-                                <path d="M 138 -10 L 148 -10 L 138 105 L 128 105 Z"
-                                      fill="rgba(0,0,0,0.3)"/>
-                                <path d="M 252 -10 L 262 -10 L 272 105 L 262 105 Z"
-                                      fill="rgba(0,0,0,0.3)"/>
-                                <path d="M 170 -10 L 230 -10 L 235 105 L 165 105 Z"
-                                      fill="url(#clk-strapShine)"/>
-                                <line x1="155" y1="-8" x2="146" y2="103"
-                                      stroke="#c9a070" stroke-width="0.8"
-                                      stroke-dasharray="3,4" opacity="0.55"/>
-                                <line x1="245" y1="-8" x2="254" y2="103"
-                                      stroke="#c9a070" stroke-width="0.8"
-                                      stroke-dasharray="3,4" opacity="0.55"/>
-                            </g>
-
-                            <!-- нижний ремешок -->
-                            <g filter="url(#clk-strapShadow)">
-                                <path d="M 128 415 L 272 415 L 262 530 L 138 530 Z"
-                                      fill="url(#clk-strapGrad)"/>
-                                <path d="M 128 415 L 138 415 L 148 530 L 138 530 Z"
-                                      fill="rgba(0,0,0,0.3)"/>
-                                <path d="M 262 415 L 272 415 L 262 530 L 252 530 Z"
-                                      fill="rgba(0,0,0,0.3)"/>
-                                <path d="M 165 415 L 235 415 L 230 530 L 170 530 Z"
-                                      fill="url(#clk-strapShine)"/>
-                                <line x1="146" y1="417" x2="155" y2="528"
-                                      stroke="#c9a070" stroke-width="0.8"
-                                      stroke-dasharray="3,4" opacity="0.55"/>
-                                <line x1="254" y1="417" x2="245" y2="528"
-                                      stroke="#c9a070" stroke-width="0.8"
-                                      stroke-dasharray="3,4" opacity="0.55"/>
-                            </g>
-
-                            <!-- ушки -->
-                            <rect x="122" y="76" width="156" height="38" rx="13" fill="url(#clk-caseGrad)"/>
-                            <rect x="122" y="406" width="156" height="38" rx="13" fill="url(#clk-caseGrad)"/>
-
-                            <!-- заводная головка -->
-                            <rect x="362" y="248" width="22" height="24" rx="4" fill="url(#clk-caseGrad)"/>
-                            <rect x="364" y="251" width="18" height="18" rx="3" fill="url(#clk-bezelGrad)"/>
-                            <line x1="367" y1="254" x2="367" y2="266" stroke="#505050" stroke-width="0.5"/>
-                            <line x1="370" y1="254" x2="370" y2="266" stroke="#505050" stroke-width="0.5"/>
-                            <line x1="373" y1="254" x2="373" y2="266" stroke="#505050" stroke-width="0.5"/>
-                            <line x1="376" y1="254" x2="376" y2="266" stroke="#505050" stroke-width="0.5"/>
-                            <line x1="379" y1="254" x2="379" y2="266" stroke="#505050" stroke-width="0.5"/>
-
-                            <circle cx="200" cy="260" r="170" fill="url(#clk-caseGrad)"/>
-                            <circle cx="200" cy="260" r="170" fill="url(#clk-caseShine)"/>
-                            <circle cx="200" cy="260" r="159" fill="none" stroke="#2a2a2a" stroke-width="1.2" opacity="0.85"/>
-                            <circle cx="200" cy="260" r="158" fill="url(#clk-bezelGrad)"/>
-                            <circle cx="200" cy="260" r="158" fill="url(#clk-bezelHighlight)"/>
-                            <circle cx="200" cy="260" r="156" fill="none" stroke="#808080" stroke-width="0.4" opacity="0.5"/>
-                            <circle cx="200" cy="260" r="154" fill="none" stroke="#a0a0a0" stroke-width="0.4" opacity="0.4"/>
-                            <circle cx="200" cy="260" r="152" fill="none" stroke="#707070" stroke-width="0.4" opacity="0.4"/>
-                            <circle cx="200" cy="260" r="151" fill="#1a1a1a"/>
-                            <circle cx="200" cy="260" r="147" fill="url(#clk-dialGrad)"/>
-                            <circle cx="200" cy="260" r="147" fill="url(#clk-dialVignette)"/>
-
-                            <!-- ============ СЛОЙ 2: Риски и цифры (заполняются из JS) ============ -->
-                            <g id="clk-ticksGroup"></g>
-                            <g id="clk-numbersGroup"></g>
-
-                            <!-- ============ СЛОЙ 3: Надписи ============ -->
-                            <text x="200" y="210" text-anchor="middle"
-                                  font-family="'Old Standard TT', Georgia, 'Times New Roman', serif"
-                                  font-size="12" font-weight="700" letter-spacing="2.8"
-                                  fill="#1a1a1a" pointer-events="none">ПОБЕДА</text>
-
-                            <text x="200" y="315" text-anchor="middle"
-                                  font-family="'Old Standard TT', Georgia, 'Times New Roman', serif"
-                                  font-size="6.5" font-weight="700" letter-spacing="3"
-                                  fill="#3a3a3a" pointer-events="none">СДЕЛАНО В СССР</text>
-
-                            <!-- ============ СЛОЙ 4: Блик стекла ============ -->
-                            <circle cx="200" cy="260" r="147" fill="url(#clk-crystalGrad)" pointer-events="none"/>
-
-                            <!-- ============ СЛОЙ 5: СТРЕЛКИ — АБСОЛЮТНО ПОСЛЕДНИЙ СЛОЙ ============ -->
-                            <g id="clk-hands">
-                                <g id="clk-hourHand">
-                                    <path d="M 200 165 L 206 220 L 205 250 L 200 270 L 195 250 L 194 220 Z"
-                                          fill="url(#clk-handGrad)"/>
+                                <g filter="url(#clk-strapShadow)">
+                                    <path d="M 138 -10 L 262 -10 L 272 105 L 128 105 Z"
+                                          fill="url(#clk-strapGrad)"/>
+                                    <path d="M 138 -10 L 148 -10 L 138 105 L 128 105 Z"
+                                          fill="rgba(0,0,0,0.3)"/>
+                                    <path d="M 252 -10 L 262 -10 L 272 105 L 262 105 Z"
+                                          fill="rgba(0,0,0,0.3)"/>
+                                    <path d="M 170 -10 L 230 -10 L 235 105 L 165 105 Z"
+                                          fill="url(#clk-strapShine)"/>
+                                    <line x1="155" y1="-8" x2="146" y2="103"
+                                          stroke="#c9a070" stroke-width="0.8"
+                                          stroke-dasharray="3,4" opacity="0.55"/>
+                                    <line x1="245" y1="-8" x2="254" y2="103"
+                                          stroke="#c9a070" stroke-width="0.8"
+                                          stroke-dasharray="3,4" opacity="0.55"/>
                                 </g>
-                                <g id="clk-minuteHand">
-                                    <path d="M 200 115 L 204 200 L 203 250 L 200 272 L 197 250 L 196 200 Z"
-                                          fill="url(#clk-handGrad)"/>
-                                </g>
-                            </g>
 
-                            <!-- ось — поверх всего -->
-                            <circle cx="200" cy="260" r="8" fill="url(#clk-caseGrad)"/>
-                            <circle cx="200" cy="260" r="5" fill="url(#clk-bezelGrad)"/>
-                            <circle cx="200" cy="260" r="2.5" fill="#1a1a1a"/>
-                        </svg>
+                                <g filter="url(#clk-strapShadow)">
+                                    <path d="M 128 415 L 272 415 L 262 530 L 138 530 Z"
+                                          fill="url(#clk-strapGrad)"/>
+                                    <path d="M 128 415 L 138 415 L 148 530 L 138 530 Z"
+                                          fill="rgba(0,0,0,0.3)"/>
+                                    <path d="M 262 415 L 272 415 L 262 530 L 252 530 Z"
+                                          fill="rgba(0,0,0,0.3)"/>
+                                    <path d="M 165 415 L 235 415 L 230 530 L 170 530 Z"
+                                          fill="url(#clk-strapShine)"/>
+                                    <line x1="146" y1="417" x2="155" y2="528"
+                                          stroke="#c9a070" stroke-width="0.8"
+                                          stroke-dasharray="3,4" opacity="0.55"/>
+                                    <line x1="254" y1="417" x2="245" y2="528"
+                                          stroke="#c9a070" stroke-width="0.8"
+                                          stroke-dasharray="3,4" opacity="0.55"/>
+                                </g>
+
+                                <rect x="122" y="76" width="156" height="38" rx="13" fill="url(#clk-caseGrad)"/>
+                                <rect x="122" y="406" width="156" height="38" rx="13" fill="url(#clk-caseGrad)"/>
+
+                                <rect x="362" y="248" width="22" height="24" rx="4" fill="url(#clk-caseGrad)"/>
+                                <rect x="364" y="251" width="18" height="18" rx="3" fill="url(#clk-bezelGrad)"/>
+                                <line x1="367" y1="254" x2="367" y2="266" stroke="#505050" stroke-width="0.5"/>
+                                <line x1="370" y1="254" x2="370" y2="266" stroke="#505050" stroke-width="0.5"/>
+                                <line x1="373" y1="254" x2="373" y2="266" stroke="#505050" stroke-width="0.5"/>
+                                <line x1="376" y1="254" x2="376" y2="266" stroke="#505050" stroke-width="0.5"/>
+                                <line x1="379" y1="254" x2="379" y2="266" stroke="#505050" stroke-width="0.5"/>
+
+                                <circle cx="200" cy="260" r="170" fill="url(#clk-caseGrad)"/>
+                                <circle cx="200" cy="260" r="170" fill="url(#clk-caseShine)"/>
+                                <circle cx="200" cy="260" r="159" fill="none" stroke="#2a2a2a" stroke-width="1.2" opacity="0.85"/>
+                                <circle cx="200" cy="260" r="158" fill="url(#clk-bezelGrad)"/>
+                                <circle cx="200" cy="260" r="158" fill="url(#clk-bezelHighlight)"/>
+                                <circle cx="200" cy="260" r="156" fill="none" stroke="#808080" stroke-width="0.4" opacity="0.5"/>
+                                <circle cx="200" cy="260" r="154" fill="none" stroke="#a0a0a0" stroke-width="0.4" opacity="0.4"/>
+                                <circle cx="200" cy="260" r="152" fill="none" stroke="#707070" stroke-width="0.4" opacity="0.4"/>
+                                <circle cx="200" cy="260" r="151" fill="#1a1a1a"/>
+                                <circle cx="200" cy="260" r="147" fill="url(#clk-dialGrad)"/>
+                                <circle cx="200" cy="260" r="147" fill="url(#clk-dialVignette)"/>
+
+                                <g id="clk-ticksGroup"></g>
+                                <g id="clk-numbersGroup"></g>
+
+                                <text x="200" y="210" text-anchor="middle"
+                                      font-family="'Old Standard TT', Georgia, 'Times New Roman', serif"
+                                      font-size="12" font-weight="700" letter-spacing="2.8"
+                                      fill="#1a1a1a" pointer-events="none">ПОБЕДА</text>
+
+                                <text x="200" y="315" text-anchor="middle"
+                                      font-family="'Old Standard TT', Georgia, 'Times New Roman', serif"
+                                      font-size="6.5" font-weight="700" letter-spacing="3"
+                                      fill="#3a3a3a" pointer-events="none">СДЕЛАНО В СССР</text>
+
+                                <circle cx="200" cy="260" r="147" fill="url(#clk-crystalGrad)" pointer-events="none"/>
+
+                                <g id="clk-hands">
+                                    <g id="clk-hourHand">
+                                        <path d="M 200 165 L 206 220 L 205 250 L 200 270 L 195 250 L 194 220 Z"
+                                              fill="url(#clk-handGrad)"/>
+                                    </g>
+                                    <g id="clk-minuteHand">
+                                        <path d="M 200 115 L 204 200 L 203 250 L 200 272 L 197 250 L 196 200 Z"
+                                              fill="url(#clk-handGrad)"/>
+                                    </g>
+                                </g>
+
+                                <circle cx="200" cy="260" r="8" fill="url(#clk-caseGrad)"/>
+                                <circle cx="200" cy="260" r="5" fill="url(#clk-bezelGrad)"/>
+                                <circle cx="200" cy="260" r="2.5" fill="#1a1a1a"/>
+                            </svg>
+                        </div>
+
+                        <!-- Схема минут (показывается вместо часов) -->
+                        <div class="scheme-view" id="schemeView">
+                            <svg viewBox="0 0 200 200" id="minuteScheme" aria-hidden="true"></svg>
+                        </div>
                     </div>
                 </div>
-
-                <div class="digital-24" id="clockDigital24">03:00</div>
             </div>
         </section>
 
@@ -1216,7 +1541,7 @@
             const celebrationGif = document.getElementById('celebrationGif');
             const celebrationClose = document.getElementById('celebrationClose');
             const sectionBtns = document.querySelectorAll('.section-switch-btn');
-            const sectionSubtitle = document.getElementById('sectionSubtitle');
+            const sectionSubtitleEls = document.querySelectorAll('.section-subtitle');
             const syllablesSection = document.getElementById('syllablesSection');
             const clockSection = document.getElementById('clockSection');
             const heroesSection = document.getElementById('heroesSection');
@@ -1231,8 +1556,7 @@
             let examScore = 0;
             let currentExamCorrect = '';
             let currentSection = 'syllables';
-            let popupTimeout;
-            let popupShowTimeout;
+            let popupHideTimer = null;
             let progressTimer = null;
 
             const themeList = [
@@ -1253,7 +1577,7 @@
             function applyTheme(themeClass) {
                 document.body.className = '';
                 document.body.classList.add(themeClass);
-                if (localStorage.getItem('theme') === 'light') {
+                if (localStorage.getItem('theme') !== 'dark') {
                     document.body.classList.add('light-mode');
                 }
                 localStorage.setItem('accentTheme', themeClass);
@@ -1267,7 +1591,7 @@
             if (currentThemeIndex === -1) currentThemeIndex = 0;
             applyTheme(themeList[currentThemeIndex]);
 
-            if (localStorage.getItem('theme') === 'light') {
+            if (localStorage.getItem('theme') !== 'dark') {
                 document.body.classList.add('light-mode');
             }
 
@@ -1281,21 +1605,17 @@
                 applyTheme(themeList[currentThemeIndex]);
             });
 
-            const subtitles = {
-                syllables: 'Жми, слушай, запоминай',
-                clock: 'Время — объективная реальность',
-                heroes: 'Великие личности Отечества'
-            };
-
             function switchSection(section) {
                 if (section === currentSection) return;
                 currentSection = section;
                 syllablesSection.classList.toggle('active', section === 'syllables');
                 clockSection.classList.toggle('active', section === 'clock');
                 heroesSection.classList.toggle('active', section === 'heroes');
-                sectionSubtitle.textContent = subtitles[section] || '';
                 sectionBtns.forEach(btn => {
                     btn.classList.toggle('active', btn.dataset.section === section);
+                });
+                sectionSubtitleEls.forEach(el => {
+                    el.classList.toggle('active', el.dataset.section === section);
                 });
                 if (section !== 'clock' && window.clockSpeakCancel) {
                     window.clockSpeakCancel();
@@ -1670,27 +1990,25 @@
                     });
                 });
 
-                const observer = new IntersectionObserver((entries) => {
+                const centuryObserver = new IntersectionObserver((entries) => {
                     entries.forEach(entry => {
                         if (entry.isIntersecting) {
-                            const century = entry.target.dataset.century;
-                            clearTimeout(popupShowTimeout);
-                            clearTimeout(popupTimeout);
-                            popupShowTimeout = setTimeout(() => {
-                                centuryPopup.textContent = century;
-                                centuryPopup.classList.add('show');
-                                popupTimeout = setTimeout(() => {
-                                    centuryPopup.classList.remove('show');
-                                }, 2500);
-                            }, 800);
-                        } else {
-                            clearTimeout(popupShowTimeout);
+                            const text = entry.target.dataset.century;
+                            centuryPopup.textContent = text;
+                            centuryPopup.classList.add('show');
+                            clearTimeout(popupHideTimer);
+                            popupHideTimer = setTimeout(() => {
+                                centuryPopup.classList.remove('show');
+                            }, 2200);
                         }
                     });
-                }, { threshold: 0.3 });
+                }, {
+                    threshold: 0,
+                    rootMargin: '-15% 0px -75% 0px'
+                });
 
-                document.querySelectorAll('.century-sentinel').forEach(sentinel => {
-                    observer.observe(sentinel);
+                heroesTimeline.querySelectorAll('.century-sentinel').forEach(sentinel => {
+                    centuryObserver.observe(sentinel);
                 });
             }
 
@@ -1768,11 +2086,14 @@
         })();
     </script>
 
-    <!-- ==================== ЛОГИКА ЧАСОВ ==================== -->
+    <!-- ==================== ЛОГИКА ЧАСОВ + ПЕРЕКЛЮЧЕНИЕ ВИДА ==================== -->
     <script>
     (function () {
-        const container = document.getElementById('clockContainer');
-        if (!container) return;
+        const clockView   = document.getElementById('clockView');
+        const watchView   = document.getElementById('watchView');
+        const schemeView  = document.getElementById('schemeView');
+        const minuteScheme= document.getElementById('minuteScheme');
+        if (!clockView || !watchView || !schemeView) return;
 
         const hourHandEl   = document.getElementById('clk-hourHand');
         const minuteHandEl = document.getElementById('clk-minuteHand');
@@ -1780,14 +2101,93 @@
         const numbersGroup = document.getElementById('clk-numbersGroup');
         const digital24El  = document.getElementById('clockDigital24');
 
+        const NS = 'http://www.w3.org/2000/svg';
         const CX = 200, CY = 260;
         const VIEWBOX_W = 440;
 
-        /* ===== Железная дорога ===== */
+        /* ============================================================
+           СХЕМА-ЦИФЕРБЛАТ МИНУТ (60, 5, 10, ..., 55)
+           ============================================================ */
+        function buildMinuteScheme() {
+            if (!minuteScheme) return;
+            minuteScheme.innerHTML = '';
+
+            const SCX = 100, SCY = 100;
+
+            const outer = document.createElementNS(NS, 'circle');
+            outer.setAttribute('cx', SCX);
+            outer.setAttribute('cy', SCY);
+            outer.setAttribute('r', 94);
+            outer.setAttribute('fill', 'none');
+            outer.setAttribute('stroke', 'currentColor');
+            outer.setAttribute('stroke-width', '2');
+            minuteScheme.appendChild(outer);
+
+            const inner = document.createElementNS(NS, 'circle');
+            inner.setAttribute('cx', SCX);
+            inner.setAttribute('cy', SCY);
+            inner.setAttribute('r', 86);
+            inner.setAttribute('fill', 'none');
+            inner.setAttribute('stroke', 'currentColor');
+            inner.setAttribute('stroke-width', '0.6');
+            inner.setAttribute('opacity', '0.35');
+            minuteScheme.appendChild(inner);
+
+            // 12 крупных рисок
+            for (let i = 0; i < 12; i++) {
+                const a = (i * 30 - 90) * Math.PI / 180;
+                const line = document.createElementNS(NS, 'line');
+                line.setAttribute('x1', SCX + 82 * Math.cos(a));
+                line.setAttribute('y1', SCY + 82 * Math.sin(a));
+                line.setAttribute('x2', SCX + 92 * Math.cos(a));
+                line.setAttribute('y2', SCY + 92 * Math.sin(a));
+                line.setAttribute('stroke', 'currentColor');
+                line.setAttribute('stroke-width', '2');
+                line.setAttribute('stroke-linecap', 'round');
+                minuteScheme.appendChild(line);
+            }
+
+            // 60 мелких рисок
+            for (let i = 0; i < 60; i++) {
+                if (i % 5 === 0) continue;
+                const a = (i * 6 - 90) * Math.PI / 180;
+                const line = document.createElementNS(NS, 'line');
+                line.setAttribute('x1', SCX + 88 * Math.cos(a));
+                line.setAttribute('y1', SCY + 88 * Math.sin(a));
+                line.setAttribute('x2', SCX + 92 * Math.cos(a));
+                line.setAttribute('y2', SCY + 92 * Math.sin(a));
+                line.setAttribute('stroke', 'currentColor');
+                line.setAttribute('stroke-width', '0.7');
+                line.setAttribute('opacity', '0.4');
+                minuteScheme.appendChild(line);
+            }
+
+            // Числа минут: 60, 5, 10, ..., 55
+            for (let i = 0; i < 12; i++) {
+                const a = (i * 30 - 90) * Math.PI / 180;
+                const val = i === 0 ? 60 : i * 5;
+
+                const text = document.createElementNS(NS, 'text');
+                text.setAttribute('x', SCX + 62 * Math.cos(a));
+                text.setAttribute('y', SCY + 62 * Math.sin(a));
+                text.setAttribute('text-anchor', 'middle');
+                text.setAttribute('dominant-baseline', 'central');
+                text.setAttribute('font-family', "'Helvetica Neue', Helvetica, Arial, sans-serif");
+                text.setAttribute('font-size', '22');
+                text.setAttribute('font-weight', '800');
+                text.setAttribute('letter-spacing', '-0.03em');
+                text.setAttribute('fill', 'currentColor');
+                text.textContent = val;
+                minuteScheme.appendChild(text);
+            }
+        }
+        buildMinuteScheme();
+
+        /* ===== Железная дорога и цифры настоящих часов ===== */
         const R_TRACK_IN  = 131;
         const R_TRACK_OUT = 138;
 
-        const cOut = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+        const cOut = document.createElementNS(NS, 'circle');
         cOut.setAttribute('cx', CX);
         cOut.setAttribute('cy', CY);
         cOut.setAttribute('r', R_TRACK_OUT);
@@ -1796,7 +2196,7 @@
         cOut.setAttribute('stroke-width', '0.9');
         ticksGroup.appendChild(cOut);
 
-        const cIn = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+        const cIn = document.createElementNS(NS, 'circle');
         cIn.setAttribute('cx', CX);
         cIn.setAttribute('cy', CY);
         cIn.setAttribute('r', R_TRACK_IN);
@@ -1808,7 +2208,7 @@
         for (let i = 0; i < 60; i++) {
             const a = (i * 6 - 90) * Math.PI / 180;
             const isBig = i % 5 === 0;
-            const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+            const line = document.createElementNS(NS, 'line');
 
             if (isBig) {
                 const rOut = R_TRACK_OUT + 4;
@@ -1831,11 +2231,10 @@
             ticksGroup.appendChild(line);
         }
 
-        /* ===== Цифры: ближе к краю (R_NUM = 120), шрифт Old Standard TT ===== */
         const R_NUM = 110;
         for (let i = 1; i <= 12; i++) {
             const a = (i * 30 - 90) * Math.PI / 180;
-            const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+            const text = document.createElementNS(NS, 'text');
             text.setAttribute('x', CX + R_NUM * Math.cos(a));
             text.setAttribute('y', CY + R_NUM * Math.sin(a));
             text.setAttribute('text-anchor', 'middle');
@@ -1848,12 +2247,40 @@
             numbersGroup.appendChild(text);
         }
 
-        /* ===== Состояние ===== */
+        /* ============================================================
+           СОСТОЯНИЕ ЧАСОВ + ПЕРЕКЛЮЧЕНИЕ ВИДА
+           ============================================================ */
         let hour = 3;
         let minute = 0;
         let totalMinutes = (hour % 12) * 60 + minute;
         let dragging = null;
         let prevAngle = null;
+
+        // Отслеживание клика vs драга
+        let clickStartTime = 0;
+        let clickStartX = 0;
+        let clickStartY = 0;
+        let wasDrag = false;
+        let currentView = 'watch';
+
+        function setView(view) {
+            currentView = view;
+            if (view === 'watch') {
+                watchView.classList.remove('hidden');
+                schemeView.classList.remove('active');
+                clockView.classList.remove('view-scheme');
+                clockView.classList.add('view-watch');
+            } else {
+                watchView.classList.add('hidden');
+                schemeView.classList.add('active');
+                clockView.classList.remove('view-watch');
+                clockView.classList.add('view-scheme');
+            }
+        }
+
+        function toggleView() {
+            setView(currentView === 'watch' ? 'scheme' : 'watch');
+        }
 
         function applyTotal() {
             const rounded = Math.round(totalMinutes);
@@ -1875,7 +2302,7 @@
         }
 
         function angleFromEvent(e) {
-            const rect  = container.getBoundingClientRect();
+            const rect  = clockView.getBoundingClientRect();
             const scale = rect.width / VIEWBOX_W;
             const cx = rect.left + CX * scale;
             const cy = rect.top  + CY * scale;
@@ -1889,7 +2316,7 @@
         }
 
         function isInsideWatch(e) {
-            const rect  = container.getBoundingClientRect();
+            const rect  = clockView.getBoundingClientRect();
             const scale = rect.width / VIEWBOX_W;
             const cx = rect.left + CX * scale;
             const cy = rect.top  + CY * scale;
@@ -1897,8 +2324,16 @@
             return dist <= 170 * scale;
         }
 
-        container.addEventListener('pointerdown', e => {
+        clockView.addEventListener('pointerdown', e => {
+            clickStartTime = Date.now();
+            clickStartX = e.clientX;
+            clickStartY = e.clientY;
+            wasDrag = false;
+
+            // Драг работает только в режиме часов
+            if (currentView !== 'watch') return;
             if (!isInsideWatch(e)) return;
+
             e.preventDefault();
             if (speakTimer) { clearTimeout(speakTimer); speakTimer = null; }
             if ('speechSynthesis' in window) speechSynthesis.cancel();
@@ -1910,11 +2345,17 @@
             dragging  = angleDiff(ang, minAng) <= angleDiff(ang, hourAng) ? 'minute' : 'hour';
             prevAngle = ang;
 
-            container.setPointerCapture(e.pointerId);
-            container.classList.add('dragging');
+            clockView.setPointerCapture(e.pointerId);
+            clockView.classList.add('dragging');
         });
 
-        container.addEventListener('pointermove', e => {
+        clockView.addEventListener('pointermove', e => {
+            // Определение драга по смещению
+            if (Math.abs(e.clientX - clickStartX) > 6 ||
+                Math.abs(e.clientY - clickStartY) > 6) {
+                wasDrag = true;
+            }
+
             if (!dragging) return;
             e.preventDefault();
             const ang = angleFromEvent(e);
@@ -1937,17 +2378,35 @@
         });
 
         function endDrag(e) {
-            if (!dragging) return;
-            dragging  = null;
-            prevAngle = null;
-            container.classList.remove('dragging');
-            if (container.hasPointerCapture(e.pointerId)) {
-                container.releasePointerCapture(e.pointerId);
+            const wasDragging = !!dragging;
+            if (dragging) {
+                dragging  = null;
+                prevAngle = null;
+                clockView.classList.remove('dragging');
+                if (clockView.hasPointerCapture(e.pointerId)) {
+                    clockView.releasePointerCapture(e.pointerId);
+                }
+                scheduleSpeak();
             }
-            scheduleSpeak();
+
+            // Проверка на «чистый клик» — не драг и не слишком долго
+            const duration = Date.now() - clickStartTime;
+            if (!wasDrag && !wasDragging && duration < 400) {
+                toggleView();
+            }
         }
-        container.addEventListener('pointerup',     endDrag);
-        container.addEventListener('pointercancel', endDrag);
+        clockView.addEventListener('pointerup',     endDrag);
+        clockView.addEventListener('pointercancel', (e) => {
+            // при отмене — не переключаем
+            if (dragging) {
+                dragging  = null;
+                prevAngle = null;
+                clockView.classList.remove('dragging');
+                if (clockView.hasPointerCapture(e.pointerId)) {
+                    clockView.releasePointerCapture(e.pointerId);
+                }
+            }
+        });
 
         /* ===== Озвучка ===== */
         const HOURS = ['', 'один', 'два', 'три', 'четыре', 'пять', 'шесть',
@@ -2008,6 +2467,7 @@
         };
 
         render();
+        setView('watch');
     })();
     </script>
 </body>
