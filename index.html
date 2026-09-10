@@ -63,6 +63,7 @@
             display: flex;
             flex-direction: column;
             transition: background 0.2s linear, color 0.2s linear;
+            overscroll-behavior-x: none;
         }
 
         /* ================= ШАПКА ================= */
@@ -1046,7 +1047,7 @@
         }
 
         /* ============================================================
-           ЧАСЫ — часы и схема в одном блоке, переключаются кликом
+           ЧАСЫ
            ============================================================ */
 
         .clock-wrapper {
@@ -1066,13 +1067,14 @@
             aspect-ratio: 440 / 520;
             position: relative;
             cursor: pointer;
-            touch-action: none;
+            /* pan-y — разрешаем вертикальный скролл страницы через область часов,
+               перехватываем только горизонтальные/круговые жесты под перетаскивание стрелок */
+            touch-action: pan-y;
             user-select: none;
             -webkit-user-select: none;
             -webkit-tap-highlight-color: transparent;
             -webkit-touch-callout: none;
             -webkit-user-drag: none;
-            /* Фильтр удалён — на iOS он тормозил анимацию */
             transform: translateZ(0);
         }
 
@@ -1095,7 +1097,6 @@
             overflow: visible;
         }
 
-        /* Ручки часов — оптимизация для iOS */
         #clk-hourHand,
         #clk-minuteHand {
             will-change: transform;
@@ -1255,7 +1256,6 @@
             <div class="clock-wrapper">
                 <div class="clock-stack">
                     <div class="clock-view view-watch" id="clockView">
-                        <!-- Настоящие часы -->
                         <div class="watch-container" id="watchView">
                             <svg viewBox="-20 0 440 520" xmlns="http://www.w3.org/2000/svg">
                                 <defs>
@@ -1435,7 +1435,6 @@
                             </svg>
                         </div>
 
-                        <!-- Схема минут (показывается вместо часов) -->
                         <div class="scheme-view" id="schemeView">
                             <svg viewBox="0 0 200 200" id="minuteScheme" aria-hidden="true"></svg>
                         </div>
@@ -2110,9 +2109,10 @@
         const NS = 'http://www.w3.org/2000/svg';
         const CX = 200, CY = 260;
         const VIEWBOX_W = 440;
-        const DRAG_THRESHOLD = 8;       // px смещения до старта драга
-        const TAP_MAX_DURATION = 500;   // мс — максимальная длительность тапа
-        const SPEAK_DELAY = 700;        // мс задержки до озвучки после отпускания
+
+        const MOVE_THRESHOLD  = 8;    // px до классификации жеста
+        const TAP_MAX_DURATION = 500; // мс — макс. длительность тапа
+        const TAP_MAX_MOVE    = 10;   // px — макс. смещение для тапа
 
         /* ============================================================
            СХЕМА-ЦИФЕРБЛАТ МИНУТ (60, 5, 10, ..., 55)
@@ -2252,40 +2252,35 @@
         }
 
         /* ============================================================
-           СОСТОЯНИЕ ЧАСОВ + ПЕРЕКЛЮЧЕНИЕ ВИДА
+           СОСТОЯНИЕ ЧАСОВ
            ============================================================ */
         let hour = 3;
         let minute = 0;
         let totalMinutes = (hour % 12) * 60 + minute;
         let currentView = 'watch';
 
-        // Отслеживание жеста: возможный драг -> реальный драг
-        let potentialDrag = null;    // 'minute' | 'hour' | null
-        let dragging = null;         // 'minute' | 'hour' | null
-        let pointerStart = null;     // {x, y, time, angle}
-        let activePointerId = null;
-        let pendingSpeakTimer = null;
-
-        // === iOS: разблокировка speechSynthesis на первом касании ===
+        /* ============================================================
+           РАЗБЛОКИРОВКА И ОЗВУЧКА (iOS)
+           ============================================================ */
         let speechUnlocked = false;
+
         function unlockSpeech() {
             if (speechUnlocked) return;
             if (!('speechSynthesis' in window)) return;
             speechUnlocked = true;
             try {
-                // Пустая короткая фраза запускает синтезатор внутри жеста.
-                const u = new SpeechSynthesisUtterance(' ');
-                u.volume = 0;
+                // Обязательно непустой текст и ненулевая громкость —
+                // иначе iOS не считает это реальной попыткой речи
+                // и не разблокирует синтезатор.
+                const u = new SpeechSynthesisUtterance('а');
+                u.lang = 'ru-RU';
                 u.rate = 10;
                 u.pitch = 1;
-                u.lang = 'ru-RU';
+                u.volume = 0.01;
                 speechSynthesis.speak(u);
-                // Прогреваем список голосов
-                speechSynthesis.getVoices();
             } catch (e) {}
         }
 
-        // Прогрев голосов (iOS возвращает пусто до первого вызова)
         function pickVoice() {
             try { speechSynthesis.getVoices(); } catch (e) {}
         }
@@ -2294,6 +2289,54 @@
             speechSynthesis.onvoiceschanged = pickVoice;
         }
 
+        const HOURS = ['', 'один', 'два', 'три', 'четыре', 'пять', 'шесть',
+                       'семь', 'восемь', 'девять', 'десять', 'одиннадцать', 'двенадцать'];
+
+        function hourForm(h) {
+            if (h === 1) return 'час';
+            if (h >= 2 && h <= 4) return 'часа';
+            return 'часов';
+        }
+        function minuteForm(m) {
+            const t = m % 100, n = m % 10;
+            if (t >= 11 && t <= 14) return 'минут';
+            if (n === 1) return 'минута';
+            if (n >= 2 && n <= 4) return 'минуты';
+            return 'минут';
+        }
+
+        function speakTime() {
+            if (!('speechSynthesis' in window)) return;
+            try {
+                speechSynthesis.cancel();
+
+                let voice = null;
+                try {
+                    const voices = speechSynthesis.getVoices() || [];
+                    voice = voices.find(v =>
+                        v && v.lang && v.lang.toLowerCase().indexOf('ru') === 0
+                    ) || null;
+                } catch (err) {}
+
+                const text = minute === 0
+                    ? `${HOURS[hour]} ${hourForm(hour)} ровно`
+                    : `${HOURS[hour]} ${hourForm(hour)} ${minute} ${minuteForm(minute)}`;
+
+                const u = new SpeechSynthesisUtterance(text);
+                u.lang  = 'ru-RU';
+                u.rate  = 0.9;
+                u.pitch = 1;
+                u.volume = 1;
+                if (voice) u.voice = voice;
+
+                try { speechSynthesis.resume(); } catch (err) {}
+                speechSynthesis.speak(u);
+            } catch (err) {}
+        }
+
+        /* ============================================================
+           УТИЛИТЫ
+           ============================================================ */
         function setView(view) {
             currentView = view;
             if (view === 'watch') {
@@ -2321,7 +2364,6 @@
             hour = h === 0 ? 12 : h;
         }
 
-        // Рендер через rAF, чтобы не блокировать кадры на iOS
         let renderQueued = false;
         function render() {
             if (renderQueued) return;
@@ -2339,12 +2381,22 @@
             });
         }
 
-        function angleFromEvent(e) {
+        function getPoint(e) {
+            if (e.touches && e.touches.length > 0) {
+                return { x: e.touches[0].clientX, y: e.touches[0].clientY };
+            }
+            if (e.changedTouches && e.changedTouches.length > 0) {
+                return { x: e.changedTouches[0].clientX, y: e.changedTouches[0].clientY };
+            }
+            return { x: e.clientX, y: e.clientY };
+        }
+
+        function angleFromPoint(p) {
             const rect  = clockView.getBoundingClientRect();
             const scale = rect.width / VIEWBOX_W;
             const cx = rect.left + CX * scale;
             const cy = rect.top  + CY * scale;
-            let a = Math.atan2(e.clientY - cy, e.clientX - cx) * 180 / Math.PI + 90;
+            let a = Math.atan2(p.y - cy, p.x - cx) * 180 / Math.PI + 90;
             return (a % 360 + 360) % 360;
         }
 
@@ -2353,200 +2405,167 @@
             return d > 180 ? 360 - d : d;
         }
 
-        function isInsideWatch(e) {
+        function isPointInsideWatch(p) {
             const rect  = clockView.getBoundingClientRect();
             const scale = rect.width / VIEWBOX_W;
             const cx = rect.left + CX * scale;
             const cy = rect.top  + CY * scale;
-            const dist = Math.hypot(e.clientX - cx, e.clientY - cy);
+            const dist = Math.hypot(p.x - cx, p.y - cy);
             return dist <= 170 * scale;
         }
 
-        /* ============ POINTER DOWN ============ */
-        clockView.addEventListener('pointerdown', (e) => {
-            // Только один активный палец
-            if (activePointerId !== null) return;
-            activePointerId = e.pointerId;
+        /* ============================================================
+           ЖЕСТЫ
+           ============================================================ */
+        let gesture = null;
 
-            // Разблокируем синтезатор на первом касании (нужно для iOS)
+        function startGesture(point, source) {
+            if (gesture) return;
+            // Разблокировка синтезатора внутри пользовательского жеста
             unlockSpeech();
-
-            pointerStart = {
-                x: e.clientX,
-                y: e.clientY,
-                time: Date.now(),
-                angle: angleFromEvent(e)
-            };
-
-            // Драг возможен только в режиме часов и внутри циферблата
-            if (currentView === 'watch' && isInsideWatch(e)) {
-                const ang = pointerStart.angle;
-                const hourAng = ((hour % 12) * 30 + minute * 0.5 + 360) % 360;
-                const minAng  = (minute * 6 + 360) % 360;
-                potentialDrag = angleDiff(ang, minAng) <= angleDiff(ang, hourAng)
-                    ? 'minute' : 'hour';
-                try { clockView.setPointerCapture(e.pointerId); } catch (err) {}
-            } else {
-                potentialDrag = null;
-            }
-
-            // Отменяем запланированную озвучку, пока пользователь снова взаимодействует
-            if (pendingSpeakTimer) {
-                clearTimeout(pendingSpeakTimer);
-                pendingSpeakTimer = null;
-            }
-
-            // Останавливаем текущую речь
             if ('speechSynthesis' in window) {
                 try { speechSynthesis.cancel(); } catch (err) {}
             }
-        });
+            gesture = {
+                startX: point.x,
+                startY: point.y,
+                startTime: Date.now(),
+                mode: null,       // 'scroll' | 'drag' | 'other' | null
+                pointer: null,    // 'minute' | 'hour'
+                angle: 0,
+                source: source    // 'touch' | 'mouse'
+            };
+        }
 
-        /* ============ POINTER MOVE ============ */
-        clockView.addEventListener('pointermove', (e) => {
-            if (e.pointerId !== activePointerId) return;
-            if (!pointerStart) return;
+        function moveGesture(e, point) {
+            if (!gesture) return;
+            const dx = point.x - gesture.startX;
+            const dy = point.y - gesture.startY;
+            const adx = Math.abs(dx);
+            const ady = Math.abs(dy);
 
-            // Определяем, стал ли жест драгом
-            if (!dragging && potentialDrag) {
-                const dx = e.clientX - pointerStart.x;
-                const dy = e.clientY - pointerStart.y;
-                if (Math.abs(dx) > DRAG_THRESHOLD || Math.abs(dy) > DRAG_THRESHOLD) {
-                    dragging = potentialDrag;
+            if (!gesture.mode) {
+                if (adx < MOVE_THRESHOLD && ady < MOVE_THRESHOLD) return;
+
+                // Преобладает вертикаль → отдаём браузеру скролл
+                if (ady > adx * 1.5) {
+                    gesture.mode = 'scroll';
+                    return;
+                }
+
+                // Пытаемся начать драг (только по диску часов и только в режиме часов)
+                if (currentView === 'watch' && isPointInsideWatch(point)) {
+                    gesture.mode = 'drag';
+                    const ang = angleFromPoint(point);
+                    const hourAng = ((hour % 12) * 30 + minute * 0.5 + 360) % 360;
+                    const minAng  = (minute * 6 + 360) % 360;
+                    gesture.pointer = angleDiff(ang, minAng) <= angleDiff(ang, hourAng) ? 'minute' : 'hour';
+                    gesture.angle = ang;
                     clockView.classList.add('dragging');
+                } else {
+                    gesture.mode = 'other';
                 }
             }
 
-            if (!dragging) return;
-            e.preventDefault();
-
-            const ang = angleFromEvent(e);
-            const prevAngle = pointerStart.angle;
-
-            if (dragging === 'minute') {
-                let delta = ang - prevAngle;
-                if (delta >  180) delta -= 360;
-                if (delta < -180) delta += 360;
-                totalMinutes += delta / 6;
-                applyTotal();
-            } else {
-                let h = (ang - minute * 0.5) / 30;
-                h = ((Math.round(h) % 12) + 12) % 12;
-                hour = h === 0 ? 12 : h;
-                totalMinutes = (hour % 12) * 60 + minute;
+            if (gesture.mode === 'drag') {
+                if (e.cancelable !== false) {
+                    try { e.preventDefault(); } catch (err) {}
+                }
+                const ang = angleFromPoint(point);
+                if (gesture.pointer === 'minute') {
+                    let delta = ang - gesture.angle;
+                    if (delta > 180) delta -= 360;
+                    if (delta < -180) delta += 360;
+                    totalMinutes += delta / 6;
+                    applyTotal();
+                } else {
+                    let h = (ang - minute * 0.5) / 30;
+                    h = ((Math.round(h) % 12) + 12) % 12;
+                    hour = h === 0 ? 12 : h;
+                    totalMinutes = (hour % 12) * 60 + minute;
+                }
+                gesture.angle = ang;
+                render();
             }
+        }
 
-            pointerStart.angle = ang;
-            render();
-        });
+        function endGesture(point) {
+            if (!gesture) return;
+            const duration = Date.now() - gesture.startTime;
+            const wasDrag = gesture.mode === 'drag';
+            const wasScroll = gesture.mode === 'scroll';
+            const wasOther = gesture.mode === 'other';
 
-        /* ============ POINTER UP / CANCEL ============ */
-        function endGesture(e) {
-            if (e.pointerId !== activePointerId) return;
-
-            const wasDragging = !!dragging;
-            const gestureDuration = pointerStart ? (Date.now() - pointerStart.time) : 9999;
-
-            if (dragging) {
+            if (wasDrag) {
                 clockView.classList.remove('dragging');
-                dragging = null;
-                scheduleSpeak();
-            }
-
-            // Чистый тап = не было драга + короткое время
-            if (!wasDragging && gestureDuration < TAP_MAX_DURATION) {
-                toggleView();
-            }
-
-            // Сброс
-            potentialDrag = null;
-            pointerStart = null;
-            activePointerId = null;
-            try {
-                if (clockView.hasPointerCapture(e.pointerId)) {
-                    clockView.releasePointerCapture(e.pointerId);
+                // ВАЖНО: speak вызывается синхронно внутри обработчика touchend —
+                // iOS разрешает речь только в контексте жеста.
+                speakTime();
+            } else if (!wasScroll && !wasOther && point && duration < TAP_MAX_DURATION) {
+                const ddx = Math.abs(point.x - gesture.startX);
+                const ddy = Math.abs(point.y - gesture.startY);
+                if (ddx < TAP_MAX_MOVE && ddy < TAP_MAX_MOVE) {
+                    // Тап по диску часов переключает вид.
+                    // Тап по схеме минут — возвращает к часам.
+                    if (currentView === 'scheme' || isPointInsideWatch(point)) {
+                        toggleView();
+                    }
                 }
-            } catch (err) {}
+            }
+
+            gesture = null;
         }
 
-        clockView.addEventListener('pointerup', endGesture);
-        clockView.addEventListener('pointercancel', (e) => {
-            if (e.pointerId !== activePointerId) return;
-            clockView.classList.remove('dragging');
-            dragging = null;
-            potentialDrag = null;
-            pointerStart = null;
-            activePointerId = null;
-            try {
-                if (clockView.hasPointerCapture(e.pointerId)) {
-                    clockView.releasePointerCapture(e.pointerId);
-                }
-            } catch (err) {}
+        function cancelGesture() {
+            if (!gesture) return;
+            if (gesture.mode === 'drag') {
+                clockView.classList.remove('dragging');
+            }
+            gesture = null;
+        }
+
+        /* ---------- Touch events (iOS / Android) ---------- */
+        clockView.addEventListener('touchstart', (e) => {
+            if (e.touches.length !== 1) return;
+            startGesture(getPoint(e), 'touch');
+        }, { passive: true });
+
+        clockView.addEventListener('touchmove', (e) => {
+            if (!gesture || gesture.source !== 'touch') return;
+            if (e.touches.length !== 1) {
+                cancelGesture();
+                return;
+            }
+            moveGesture(e, getPoint(e));
+        }, { passive: false });
+
+        clockView.addEventListener('touchend', (e) => {
+            if (!gesture || gesture.source !== 'touch') return;
+            endGesture(getPoint(e));
+        }, { passive: true });
+
+        clockView.addEventListener('touchcancel', () => {
+            if (!gesture || gesture.source !== 'touch') return;
+            cancelGesture();
+        }, { passive: true });
+
+        /* ---------- Mouse events (desktop) ---------- */
+        clockView.addEventListener('mousedown', (e) => {
+            if (e.button !== 0) return;
+            startGesture(getPoint(e), 'mouse');
         });
 
-        /* ============ ОЗВУЧКА ============ */
-        const HOURS = ['', 'один', 'два', 'три', 'четыре', 'пять', 'шесть',
-                       'семь', 'восемь', 'девять', 'десять', 'одиннадцать', 'двенадцать'];
+        window.addEventListener('mousemove', (e) => {
+            if (!gesture || gesture.source !== 'mouse') return;
+            moveGesture(e, getPoint(e));
+        });
 
-        function hourForm(h) {
-            if (h === 1) return 'час';
-            if (h >= 2 && h <= 4) return 'часа';
-            return 'часов';
-        }
-        function minuteForm(m) {
-            const t = m % 100, n = m % 10;
-            if (t >= 11 && t <= 14) return 'минут';
-            if (n === 1) return 'минута';
-            if (n >= 2 && n <= 4) return 'минуты';
-            return 'минут';
-        }
-
-        // Голос ищется в момент речи — на iOS список голосов
-        // заполняется асинхронно, поэтому кешировать его нельзя.
-        function speakTime() {
-            if (!('speechSynthesis' in window)) return;
-            try {
-                speechSynthesis.cancel();
-
-                let voice = null;
-                try {
-                    const voices = speechSynthesis.getVoices() || [];
-                    voice = voices.find(v =>
-                        v && v.lang && v.lang.toLowerCase().indexOf('ru') === 0
-                    ) || null;
-                } catch (err) {}
-
-                const text = minute === 0
-                    ? `${HOURS[hour]} ${hourForm(hour)} ровно`
-                    : `${HOURS[hour]} ${hourForm(hour)} ${minute} ${minuteForm(minute)}`;
-
-                const u = new SpeechSynthesisUtterance(text);
-                u.lang  = 'ru-RU';
-                u.rate  = 0.9;
-                u.pitch = 1;
-                u.volume = 1;
-                if (voice) u.voice = voice;
-
-                // На iOS это спасает от «залипшего» paused
-                try { speechSynthesis.resume(); } catch (err) {}
-
-                speechSynthesis.speak(u);
-            } catch (err) {}
-        }
-
-        function scheduleSpeak() {
-            if (pendingSpeakTimer) clearTimeout(pendingSpeakTimer);
-            pendingSpeakTimer = setTimeout(() => {
-                pendingSpeakTimer = null;
-                speakTime();
-            }, SPEAK_DELAY);
-        }
+        window.addEventListener('mouseup', (e) => {
+            if (!gesture || gesture.source !== 'mouse') return;
+            endGesture(getPoint(e));
+        });
 
         window.clockSpeakCancel = function () {
-            if (pendingSpeakTimer) {
-                clearTimeout(pendingSpeakTimer);
-                pendingSpeakTimer = null;
-            }
             if ('speechSynthesis' in window) {
                 try { speechSynthesis.cancel(); } catch (e) {}
             }
