@@ -2335,7 +2335,7 @@
         })();
     </script>
 
-    <!-- ==================== ЛОГИКА ЧАСОВ ==================== -->
+      <!-- ==================== ЛОГИКА ЧАСОВ ==================== -->
     <script>
     (function () {
         const clockView   = document.getElementById('clockView');
@@ -2361,6 +2361,26 @@
         const GRAB_RADIUS      = 220;
 
         const AUDIO_DIR = 'clock_audio/';
+
+        // --- ИСПРАВЛЕНИЕ ДЛЯ IOS: ГЛОБАЛЬНЫЙ АУДИО ОБЪЕКТ ---
+        let clockAudioPlayer = new Audio();
+        clockAudioPlayer.preload = 'auto';
+        // Эти флаги критичны для iOS, чтобы звук играл внутри страницы
+        clockAudioPlayer.setAttribute('playsinline', 'true');
+        clockAudioPlayer.setAttribute('webkit-playsinline', 'true');
+        
+        // Функция "тихого старта" для разблокировки аудио на iOS
+        function unlockAudio() {
+            if (clockAudioPlayer.paused) {
+                clockAudioPlayer.src = AUDIO_DIR + 'h_00.mp3'; // Пытаемся загрузить любой файл
+                clockAudioPlayer.volume = 0.01; // Очень тихо
+                clockAudioPlayer.play().then(() => {
+                    clockAudioPlayer.pause();
+                    clockAudioPlayer.currentTime = 0;
+                    clockAudioPlayer.volume = 1.0; // Возвращаем громкость
+                }).catch(e => console.log('Audio unlock pending'));
+            }
+        }
 
         function buildMinuteScheme() {
             if (!minuteScheme) return;
@@ -2487,65 +2507,45 @@
         let totalMinutes = (hour % 12) * 60 + minute;
         let currentView = 'watch';
 
-        let currentAudio = null;
-
-        function stopClockAudio() {
-            if (currentAudio) {
-                try {
-                    currentAudio.pause();
-                    currentAudio.currentTime = 0;
-                } catch (e) {}
-                currentAudio = null;
-            }
-        }
-
-        // ==================================================================
-        // Воспроизведение времени с ПРЕДЗАГРУЗКОЙ для iOS.
-        // При первом касании мы создаем объекты Audio и загружаем файлы,
-        // но не играем их громко. При отпускании (endGesture) играем.
-        // ==================================================================
+        // --- ИСПРАВЛЕННАЯ ФУНКЦИЯ ВОСПРОИЗВЕДЕНИЯ ---
         function speakTime() {
-            stopClockAudio();
+            // Останавливаем текущее
+            clockAudioPlayer.pause();
+            clockAudioPlayer.currentTime = 0;
 
             const queue = [`h_${String(hour).padStart(2, '0')}.mp3`];
             if (minute === 0) queue.push('rovno.mp3');
             else              queue.push(`m_${String(minute).padStart(2, '0')}.mp3`);
 
-            const audio = new Audio();
-            audio.setAttribute('playsinline', 'true');
-            audio.setAttribute('webkit-playsinline', 'true');
-            audio.playsInline = true;
-            audio.preload = 'auto';
-            currentAudio = audio;
-
             let idx = 0;
 
             function playNext() {
-                if (idx >= queue.length) {
-                    currentAudio = null;
-                    return;
-                }
-                audio.src = AUDIO_DIR + queue[idx];
-                const p = audio.play();
-                if (p && typeof p.catch === 'function') {
-                    p.catch((err) => {
-                        console.warn('Не удалось воспроизвести', queue[idx], err);
+                if (idx >= queue.length) return;
+                
+                // Меняем источник и играем
+                clockAudioPlayer.src = AUDIO_DIR + queue[idx];
+                
+                // Важно для iOS: вызов play() должен быть максимально быстрым
+                const playPromise = clockAudioPlayer.play();
+                
+                if (playPromise !== undefined) {
+                    playPromise.then(_ => {
+                        // Успешно запустилось
+                    })
+                    .catch(error => {
+                        console.warn("iOS Audio Block:", error);
+                        // Если заблокировано, пробуем следующий файл через паузу
                         idx++;
-                        playNext();
+                        setTimeout(playNext, 100); 
                     });
                 }
             }
 
-            audio.addEventListener('ended', () => {
+            // Когда один файл закончился, играем следующий
+            clockAudioPlayer.onended = () => {
                 idx++;
                 playNext();
-            });
-
-            audio.addEventListener('error', () => {
-                console.warn('Ошибка загрузки', queue[idx]);
-                idx++;
-                playNext();
-            });
+            };
 
             playNext();
         }
@@ -2623,7 +2623,9 @@
 
         function startGesture(point, source) {
             if (gesture) return;
-            stopClockAudio();
+            // При начале жеста пытаемся разблокировать аудио (тихий старт)
+            unlockAudio();
+            
             gesture = {
                 startX: point.x, startY: point.y,
                 startTime: Date.now(),
@@ -2690,7 +2692,7 @@
 
             if (wasDrag) {
                 clockView.classList.remove('dragging');
-                // Вызов строго в стеке touchend/mouseup — это и есть user gesture для iOS
+                // ЗАПУСК ЗВУКА СТРОГО ЗДЕСЬ (в момент отпускания пальца)
                 speakTime();
             } else if (!wasScroll && !wasOther && point &&
                        duration >= TAP_MIN_DURATION &&
@@ -2747,7 +2749,10 @@
             endGesture(getPoint(e));
         });
 
-        window.clockSpeakCancel = stopClockAudio;
+        window.clockSpeakCancel = () => {
+            clockAudioPlayer.pause();
+            clockAudioPlayer.currentTime = 0;
+        };
 
         render();
         setView('watch');
