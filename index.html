@@ -98,8 +98,6 @@
         }
         .header h1::after { content: '.'; color: var(--accent); }
 
-        /* ===== МЕНЮ ПЕРЕКЛЮЧЕНИЯ РЕЖИМОВ ===== */
-
         .section-switch {
             display: flex;
             margin: 0 -20px;
@@ -877,22 +875,19 @@
         }
 
         /* ============================================================
-           ПРОСТАЯ ЛЕНТА ВРЕМЕНИ — мобильная
-           Войны сверху, остальное снизу, всё на тонких линиях-выносках
+           ПРОСТАЯ ЛЕНТА — вертикальный список (мобила)
            ============================================================ */
 
         .simple-timeline {
             border: 1.5px solid var(--fg);
             background: var(--bg);
-            padding: 20px 14px 24px;
-            position: relative;
+            overflow: hidden;
         }
 
         .simple-timeline-head {
             background: var(--fg);
             color: var(--bg);
-            padding: 10px 14px;
-            margin: -20px -14px 20px;
+            padding: 12px 14px;
             text-align: center;
             font-family: var(--font-display);
             font-size: 0.85rem;
@@ -901,140 +896,80 @@
             text-transform: uppercase;
         }
 
-        /* Сетка ленты: сверху войны / линия / снизу остальное / века */
-        .stl-track {
+        .stl-list {
+            list-style: none;
+            margin: 0;
+            padding: 22px 16px 22px 82px;
             position: relative;
-            height: 175px;
-            margin: 0 10px;
         }
 
-        /* Главная линия */
-        .stl-line {
-            position: absolute;
-            left: 0;
-            right: 0;
-            top: 87px;
-            height: 1px;
-            background: var(--fg);
-            opacity: 0.65;
-        }
-
-        /* Мелкие засечки каждые 10 лет */
-        .stl-tick-10 {
-            position: absolute;
-            top: 87px;
-            width: 1px;
-            height: 3px;
-            background: var(--fg);
-            transform: translateX(-50%);
-            opacity: 0.2;
-        }
-        /* Полувековые засечки */
-        .stl-tick-50 {
-            position: absolute;
-            top: 87px;
-            width: 1px;
-            height: 6px;
-            background: var(--fg);
-            transform: translateX(-50%);
-            opacity: 0.4;
-        }
-        /* Вековые засечки */
-        .stl-tick-100 {
-            position: absolute;
-            top: 84px;
-            width: 1px;
-            height: 12px;
-            background: var(--fg);
-            transform: translateX(-50%);
-            opacity: 0.85;
-        }
-
-        /* Красная полоса жизни — по центру оси */
-        .stl-life {
-            position: absolute;
-            top: 79px;
-            height: 17px;
-            background: var(--accent);
-            border: none;
-            box-sizing: border-box;
-            z-index: 5;
-        }
-        .stl-life::before,
-        .stl-life::after {
+        /* Вертикальная линия */
+        .stl-list::before {
             content: '';
             position: absolute;
-            top: -3px;
-            bottom: -3px;
-            width: 1px;
-            background: var(--fg);
+            left: 68px;
+            top: 30px;
+            bottom: 30px;
+            width: 2px;
+            background: rgba(20, 20, 20, 0.18);
         }
-        .stl-life::before { left: -1px; }
-        .stl-life::after  { right: -1px; }
 
-        /* Обёртка события с выноской */
-        .stl-event {
+        .stl-row {
+            position: relative;
+            padding: 10px 0;
+        }
+
+        /* Год слева от линии */
+        .stl-row .stl-year {
             position: absolute;
-            top: 87px; /* на уровне оси */
-            transform: translateX(-50%);
-            z-index: 6;
-            pointer-events: none;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-        /* Тонкая вертикальная линия-выноска */
-        .stl-event-tick {
-            width: 1px;
-            background: var(--fg);
-            opacity: 0.5;
-            flex: 0 0 auto;
-        }
-        /* Война — выноска сверху вниз (линия сверху, потом подпись над линией) */
-        .stl-event.war {
-            transform: translate(-50%, -100%);
-        }
-        .stl-event.war .stl-event-name {
-            margin-bottom: 3px;
-        }
-        /* Остальные — выноска снизу вверх */
-        .stl-event.bottom {
-        }
-        .stl-event.bottom .stl-event-name {
-            margin-top: 3px;
-        }
-
-        .stl-event-name {
-            font-family: var(--font-display);
-            font-size: 0.52rem;
-            font-weight: 600;
-            color: var(--fg);
-            text-transform: uppercase;
-            letter-spacing: 0.02em;
-            line-height: 1;
-            white-space: nowrap;
-            background: var(--bg);
-            padding: 1px 3px;
-        }
-        .stl-event.war .stl-event-name {
-            color: var(--accent);
-        }
-
-        /* Римские века — по центру, ниже событий */
-        .stl-roman {
-            position: absolute;
-            top: 128px;
-            transform: translateX(-50%);
-            font-family: var(--font-display);
-            font-size: 0.95rem;
+            left: -82px;
+            top: 10px;
+            width: 62px;
+            text-align: right;
+            padding-right: 10px;
+            box-sizing: border-box;
+            font-family: var(--font-doc);
+            font-size: 0.72rem;
             font-weight: 700;
-            letter-spacing: 0.06em;
+            letter-spacing: 0.02em;
+            color: var(--fg-3);
+            font-variant-numeric: tabular-nums;
+            line-height: 1.15;
+        }
+
+        /* Название справа */
+        .stl-row .stl-name {
+            display: block;
+            font-family: var(--font-display);
+            font-size: 0.88rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
             color: var(--fg);
+            line-height: 1.15;
+        }
+
+        /* Точка на линии */
+        .stl-row::before {
+            content: '';
+            position: absolute;
+            left: -16px;
+            top: 12px;
+            width: 10px;
+            height: 10px;
             background: var(--bg);
-            padding: 0 6px;
-            line-height: 1;
-            z-index: 6;
-            white-space: nowrap;
+            border: 2px solid rgba(20, 20, 20, 0.45);
+            border-radius: 50%;
+            box-sizing: border-box;
+            z-index: 1;
+        }
+
+        /* Событие, попавшее в годы жизни героя, — красное */
+        .stl-row.alive .stl-year { color: var(--accent); }
+        .stl-row.alive .stl-name { color: var(--accent); }
+        .stl-row.alive::before {
+            background: var(--accent);
+            border-color: var(--accent);
         }
 
         /* ============================================================
@@ -1245,7 +1180,6 @@
             line-height: 1;
         }
 
-        /* По умолчанию (десктоп) — подробная видна, простая скрыта */
         .simple-timeline-wrap { display: none; }
         .detailed-timeline { display: block; }
 
@@ -1428,7 +1362,6 @@
             .century-header { padding: 14px 16px; margin-bottom: 18px; }
             .century-header:not(:first-child) { margin-top: 40px; }
 
-            /* ===== Портреты: 1 в ряд, без чёрной обводки ===== */
             .heroes-grid {
                 grid-template-columns: 1fr;
                 gap: 16px;
@@ -1476,7 +1409,6 @@
                 margin: 12px 0 20px;
             }
 
-            /* ===== МОДАЛКА ГЕРОЯ ===== */
             .hero-modal-close,
             .hero-modal-repeat {
                 width: 42px; height: 42px; top: 10px;
@@ -1512,32 +1444,13 @@
             .simple-timeline-wrap { display: block; }
             .detailed-timeline { display: none; }
 
-            /* ===== МОБИЛЬНАЯ ЛЕНТА ===== */
-            .simple-timeline {
-                padding: 18px 12px 22px;
-                border-width: 1.5px;
-            }
-            .simple-timeline-head {
-                padding: 10px 12px;
-                margin: -18px -12px 18px;
-                font-size: 0.78rem;
-                letter-spacing: 0.24em;
-            }
-            .stl-track {
-                height: 170px;
-                margin: 0 6px;
-            }
-            .stl-roman {
-                top: 122px;
-                font-size: 0.9rem;
-                padding: 0 5px;
-            }
-            .stl-event-name {
-                font-size: 0.5rem;
-                padding: 1px 3px;
-            }
+            .stl-list { padding: 18px 12px 18px 78px; }
+            .stl-list::before { left: 64px; top: 26px; bottom: 26px; }
+            .stl-row { padding: 9px 0; }
+            .stl-row .stl-year { left: -78px; top: 9px; width: 60px; font-size: 0.7rem; }
+            .stl-row .stl-name { font-size: 0.85rem; }
+            .stl-row::before { top: 11px; }
 
-            /* Часы */
             .clock-wrapper { padding: 26px 0 70px; }
             .clock-frame { padding: 12px; box-shadow: 7px 7px 0 var(--accent); border-width: 2px; }
             .frame-head { margin-bottom: 14px; border-width: 1.5px; }
@@ -1557,11 +1470,10 @@
 
         @media (max-width: 380px) {
             .header h1 { font-size: 15vw; }
-            .simple-timeline { padding: 16px 10px 20px; }
-            .simple-timeline-head { margin: -16px -10px 16px; padding: 9px 10px; font-size: 0.72rem; }
-            .stl-track { height: 160px; }
-            .stl-roman { font-size: 0.82rem; }
-            .stl-event-name { font-size: 0.46rem; }
+            .stl-list { padding: 16px 10px 16px 72px; }
+            .stl-list::before { left: 58px; }
+            .stl-row .stl-year { left: -72px; width: 54px; font-size: 0.66rem; }
+            .stl-row .stl-name { font-size: 0.8rem; }
         }
     </style>
 </head>
@@ -1821,13 +1733,20 @@
     <div class="toast-container" id="toastContainer"></div>
 
     <script>
+        /* ============================================================
+           ГЛОБАЛЬНАЯ РАЗБЛОКИРОВКА АУДИО (iOS Safari)
+           ============================================================ */
+        window.__pageAudioUnlocked = false;
+        window.__audioUnlockCallbacks = [];
+
         (function () {
-            let unlocked = false;
             const SILENT_WAV = 'data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEAgD4AAAB9AAACABAAZGF0YQQAAAAAAA==';
 
             function unlock() {
-                if (unlocked) return;
-                unlocked = true;
+                if (window.__pageAudioUnlocked) return;
+                window.__pageAudioUnlocked = true;
+
+                /* 1. Общий "замок" через silent WAV */
                 try {
                     const a = new Audio();
                     a.src = SILENT_WAV;
@@ -1837,6 +1756,8 @@
                         p.then(() => { try { a.pause(); } catch (e) {} }).catch(() => {});
                     }
                 } catch (e) {}
+
+                /* 2. Замок через Web Audio API */
                 try {
                     const Ctx = window.AudioContext || window.webkitAudioContext;
                     if (Ctx) {
@@ -1849,6 +1770,12 @@
                         src.start(0);
                     }
                 } catch (e) {}
+
+                /* 3. Просим все зарегистрированные модули разблокировать свои аудио-элементы */
+                window.__audioUnlockCallbacks.forEach(fn => {
+                    try { fn(); } catch (e) {}
+                });
+                window.__audioUnlockCallbacks = [];
             }
 
             document.addEventListener('touchstart', unlock, { once: true, passive: true });
@@ -1944,25 +1871,38 @@
                 heroes: 'Чти великих'
             };
 
+            /* Кэш аудио слогов */
             const audioCache = new Map();
 
             function preloadSyllableAudio() {
-                let i = 0;
-                const BATCH = 4;
-                function loadBatch() {
-                    const end = Math.min(i + BATCH, syllables.length);
-                    for (; i < end; i++) {
-                        const s = syllables[i];
-                        if (audioCache.has(s)) continue;
-                        const a = new Audio();
-                        a.preload = 'auto';
-                        a.src = 'audio/' + s + '.mp3';
-                        audioCache.set(s, a);
-                    }
-                    if (i < syllables.length) setTimeout(loadBatch, 40);
-                }
-                loadBatch();
+                syllables.forEach(s => {
+                    if (audioCache.has(s)) return;
+                    const a = new Audio();
+                    a.preload = 'auto';
+                    a.src = 'audio/' + s + '.mp3';
+                    audioCache.set(s, a);
+                });
             }
+
+            /* Разблокировать все загруженные слоговые аудио при первом тапе */
+            window.__audioUnlockCallbacks.push(function unlockSyllables() {
+                audioCache.forEach(a => {
+                    try {
+                        a.volume = 0;
+                        a.currentTime = 0;
+                        const p = a.play();
+                        if (p && p.then) {
+                            p.then(() => {
+                                try { a.pause(); a.currentTime = 0; } catch (e) {}
+                                a.volume = 1;
+                            }).catch(() => { a.volume = 1; });
+                        } else {
+                            try { a.pause(); a.currentTime = 0; } catch (e) {}
+                            a.volume = 1;
+                        }
+                    } catch (e) {}
+                });
+            });
 
             function loadLearnedSet() {
                 try { return new Set(JSON.parse(localStorage.getItem('learned_syllables') || '[]')); }
@@ -2340,88 +2280,36 @@
                 { year: 1991, name: 'Разрушение<br>СССР' }
             ];
 
-            /* Мобильные события.
-               Войны уходят вверх, остальные — вниз.
-               Годы убраны, только короткое название. */
-            const MOBILE_WARS = [
-                { year: 1721, short: 'Империя' },
-                { year: 1812, short: '1812' },
-                { year: 1914, short: 'Первая мировая' },
-                { year: 1945, short: 'ВОВ' }
-            ];
-            const MOBILE_OTHERS = [
-                { year: 1825, short: 'Декабристы' },
-                { year: 1861, short: 'Реформы' },
-                { year: 1917, short: 'Революция' },
-                { year: 1991, short: 'Развал' }
+            /* Все ключевые события для мобильного списка — в хронологическом порядке */
+            const MOBILE_EVENTS = [
+                { year: 1721, short: 'Победа в Северной войне' },
+                { year: 1812, short: 'Отечественная война' },
+                { year: 1825, short: 'Восстание декабристов' },
+                { year: 1861, short: 'Отмена крепостного права' },
+                { year: 1914, short: 'Первая мировая война' },
+                { year: 1917, short: 'Октябрьская революция' },
+                { year: 1945, short: 'Победа в ВОВ' },
+                { year: 1991, short: 'Разрушение СССР' }
             ];
 
-            const MOBILE_ROMAN = [
-                { label: 'XVIII', mid: 1750 },
-                { label: 'XIX',   mid: 1850 },
-                { label: 'XX',    mid: 1950 }
-            ];
-
+            /* Мобильная лента: вертикальный список годов и событий.
+               События в период жизни героя — красным. */
             function buildSimpleTimelineHTML(birthYear, deathYear) {
-                const b = Math.max(birthYear, TL_START);
-                const d = Math.min(deathYear, TL_END);
-                const left = tlPos(b);
-                const width = Math.max(tlPos(d) - left, 0.8);
-
                 let html = '<div class="simple-timeline">';
                 html += '<div class="simple-timeline-head">Хронология истории</div>';
-                html += '<div class="stl-track">';
+                html += '<ul class="stl-list">';
 
-                /* Мелкие засечки каждые 10 лет */
-                for (let y = 1700; y <= 2000; y += 10) {
-                    if (y % 100 === 0) continue;
-                    if (y % 50 === 0) continue;
-                    html += `<div class="stl-tick-10" style="left: ${tlPos(y)}%"></div>`;
-                }
-                /* Полувековые засечки */
-                TL_HALVES.forEach(y => {
-                    html += `<div class="stl-tick-50" style="left: ${tlPos(y)}%"></div>`;
-                });
-
-                /* Главная линия */
-                html += '<div class="stl-line"></div>';
-
-                /* Вековые засечки */
-                TL_CENTURIES.forEach(y => {
-                    html += `<div class="stl-tick-100" style="left: ${tlPos(y)}%"></div>`;
-                });
-
-                /* Полоса жизни */
-                html += `<div class="stl-life" style="left: ${left}%; width: ${width}%"></div>`;
-
-                /* События-войны — СВЕРХУ. Выноска вниз к оси, подпись над выноской */
-                MOBILE_WARS.forEach(e => {
-                    const tickLen = 18;
+                MOBILE_EVENTS.forEach(e => {
+                    const alive = (e.year >= birthYear && e.year <= deathYear);
                     html += `
-                        <div class="stl-event war" style="left: ${tlPos(e.year)}%; padding-bottom: ${tickLen}px;">
-                            <div class="stl-event-name">${e.short}</div>
-                            <div class="stl-event-tick" style="height: ${tickLen}px;"></div>
-                        </div>
+                        <li class="stl-row${alive ? ' alive' : ''}">
+                            <span class="stl-year">${e.year}</span>
+                            <span class="stl-name">${e.short}</span>
+                        </li>
                     `;
                 });
 
-                /* Остальные события — СНИЗУ. Выноска вверх к оси, подпись под выноской */
-                MOBILE_OTHERS.forEach(e => {
-                    const tickLen = 18;
-                    html += `
-                        <div class="stl-event bottom" style="left: ${tlPos(e.year)}%; padding-top: ${tickLen}px;">
-                            <div class="stl-event-tick" style="height: ${tickLen}px;"></div>
-                            <div class="stl-event-name">${e.short}</div>
-                        </div>
-                    `;
-                });
-
-                /* Римские века */
-                MOBILE_ROMAN.forEach(r => {
-                    html += `<div class="stl-roman" style="left: ${tlPos(r.mid)}%">${r.label}</div>`;
-                });
-
-                html += '</div></div>';
+                html += '</ul></div>';
                 return html;
             }
 
@@ -2831,29 +2719,66 @@
             currentAudioChain = [];
         }
 
-        const clockAudioCache = new Map();
-        (function preloadClockAudio() {
+        /* ============================================================
+           АУДИО-ПУЛ ЧАСОВ
+           Все mp3 предзагружаем в Map, элементы живут всё время
+           ============================================================ */
+        const clockAudioPool = new Map();
+
+        function preloadClockAudio() {
             const names = [];
             for (let h = 1; h <= 12; h++) names.push(`h_${String(h).padStart(2,'0')}.mp3`);
             for (let m = 1; m <= 59; m++) names.push(`m_${String(m).padStart(2,'0')}.mp3`);
             names.push('rovno.mp3');
+            names.forEach(n => {
+                if (clockAudioPool.has(n)) return;
+                const a = new Audio();
+                a.preload = 'auto';
+                a.src = AUDIO_DIR + n;
+                a.volume = 1;
+                clockAudioPool.set(n, a);
+            });
+        }
 
-            let i = 0;
-            const BATCH = 4;
-            function loadBatch() {
-                const end = Math.min(i + BATCH, names.length);
-                for (; i < end; i++) {
-                    const a = new Audio();
-                    a.preload = 'auto';
-                    a.src = AUDIO_DIR + names[i];
-                    clockAudioCache.set(names[i], a);
-                }
-                if (i < names.length) setTimeout(loadBatch, 30);
+        function getClockAudio(name) {
+            let a = clockAudioPool.get(name);
+            if (!a) {
+                a = new Audio(AUDIO_DIR + name);
+                a.preload = 'auto';
+                a.volume = 1;
+                clockAudioPool.set(name, a);
             }
-            loadBatch();
-        })();
+            return a;
+        }
 
-        let chainEl = null;
+        /* Регистрируем разблокировку всех аудио-элементов часов
+           при первом тапе пользователя. Именно так iOS разрешает
+           впоследствии играть любые из этих элементов. */
+        window.__audioUnlockCallbacks.push(function unlockClockAudio() {
+            clockAudioPool.forEach(a => {
+                try {
+                    a.volume = 0;
+                    a.currentTime = 0;
+                    const p = a.play();
+                    if (p && p.then) {
+                        p.then(() => {
+                            try { a.pause(); a.currentTime = 0; } catch (e) {}
+                            a.volume = 1;
+                        }).catch(() => { a.volume = 1; });
+                    } else {
+                        try { a.pause(); a.currentTime = 0; } catch (e) {}
+                        a.volume = 1;
+                    }
+                } catch (e) { a.volume = 1; }
+            });
+        });
+
+        preloadClockAudio();
+
+        /* ============================================================
+           Воспроизведение цепочки: час + минуты (или "ровно")
+           Каждый звук — из пула, уже разблокированный
+           ============================================================ */
         function speakTime() {
             stopClockAudio();
 
@@ -2866,31 +2791,32 @@
             function playNext() {
                 if (idx >= queue.length) return;
                 const name = queue[idx];
+                const a = getClockAudio(name);
 
-                if (!chainEl) chainEl = new Audio();
-                chainEl.preload = 'auto';
-                chainEl.src = AUDIO_DIR + name;
-                currentAudioChain = [chainEl];
+                try { a.currentTime = 0; } catch (e) {}
+                a.volume = 1;
+                currentAudioChain = [a];
 
                 const onEnded = () => {
-                    chainEl.removeEventListener('ended', onEnded);
-                    chainEl.removeEventListener('error', onError);
+                    a.removeEventListener('ended', onEnded);
+                    a.removeEventListener('error', onErr);
                     idx++;
                     playNext();
                 };
-                const onError = () => {
-                    chainEl.removeEventListener('ended', onEnded);
-                    chainEl.removeEventListener('error', onError);
+                const onErr = () => {
+                    a.removeEventListener('ended', onEnded);
+                    a.removeEventListener('error', onErr);
                     idx++;
                     playNext();
                 };
-                chainEl.addEventListener('ended', onEnded);
-                chainEl.addEventListener('error', onError);
+                a.addEventListener('ended', onEnded);
+                a.addEventListener('error', onErr);
 
-                const p = chainEl.play();
+                const p = a.play();
                 if (p && p.catch) p.catch(() => {
-                    chainEl.removeEventListener('ended', onEnded);
-                    chainEl.removeEventListener('error', onError);
+                    console.warn('Clock audio play failed for', name);
+                    a.removeEventListener('ended', onEnded);
+                    a.removeEventListener('error', onErr);
                     idx++;
                     playNext();
                 });
