@@ -96,6 +96,7 @@
         }
         .header h1::after { content: '.'; color: var(--accent); }
 
+        /* 3 таба (десктоп) */
         .section-switch {
             display: flex;
             margin: 0 -20px;
@@ -122,6 +123,36 @@
         .section-switch-btn:last-child { border-right: none; }
         .section-switch-btn.active { background: var(--fg); color: var(--bg); }
         .section-switch-btn:hover:not(.active) { background: var(--bg-2); }
+
+        /* Одна кнопка переключения разделов (мобила) */
+        .section-cycle-btn {
+            display: none;
+            width: 100%;
+            margin: 0 -14px;
+            background: var(--fg);
+            color: var(--bg);
+            border: none;
+            border-top: 3px solid var(--fg);
+            border-bottom: 3px solid var(--fg);
+            padding: 20px 16px;
+            font-family: var(--font-display);
+            font-weight: 600;
+            font-size: 0.95rem;
+            letter-spacing: 0.16em;
+            text-transform: uppercase;
+            cursor: pointer;
+            text-align: center;
+            transition: background 0.1s linear;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+        .section-cycle-btn .section-cycle-arrow {
+            font-family: var(--font-ui);
+            font-size: 1.1rem;
+            opacity: 0.75;
+        }
+        .section-cycle-btn:active { background: var(--accent); }
 
         .section-subtitles {
             display: flex;
@@ -222,7 +253,7 @@
             transition: width 0.4s linear;
         }
 
-        /* ================= КНОПКИ УПРАВЛЕНИЯ ================= */
+        /* ================= КНОПКИ УПРАВЛЕНИЯ (слоги) ================= */
 
         .controls {
             display: flex;
@@ -277,41 +308,6 @@
             z-index: 10;
         }
         .controls button:hover::after { opacity: 1; visibility: visible; transform: translateX(-50%) translateY(0); }
-
-        /* Кнопка режима (одна переключающая) */
-        .mode-btn {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            gap: 3px;
-            width: auto !important;
-            min-width: 74px;
-            height: 58px;
-            padding: 4px 14px;
-            font-family: var(--font-display);
-            font-weight: 600;
-            font-size: 0.7rem;
-            letter-spacing: 0.08em;
-            text-transform: uppercase;
-            margin-left: 0 !important;
-        }
-        .mode-btn .mode-icon {
-            font-size: 1.2rem;
-            line-height: 1;
-            font-family: var(--font-ui);
-        }
-        .mode-btn .mode-label {
-            font-size: 0.6rem;
-            line-height: 1;
-            letter-spacing: 0.1em;
-        }
-
-        .exam-btn {
-            margin-left: 8px !important;
-            width: 58px !important;
-            height: 58px !important;
-        }
 
         /* ================= СЕТКА СЛОГОВ ================= */
 
@@ -732,7 +728,7 @@
         .hero-age { color: var(--accent); font-weight: 700; }
 
         /* ============================================================
-           МОДАЛКА ГЕРОЯ — БОЛЬШОЙ портрет
+           МОДАЛКА ГЕРОЯ
            ============================================================ */
 
         .hero-modal {
@@ -745,7 +741,7 @@
             z-index: 5000;
             display: flex;
             flex-direction: column;
-            padding: 52px 8px 14px;
+            padding: 62px 8px 14px;
             gap: 6px;
             box-sizing: border-box;
             overflow-y: auto;
@@ -753,30 +749,42 @@
             animation: tabIn 0.22s var(--snap);
         }
 
+        /* Крестик и звук — чистые, сверху, и на мобиле и на десктопе */
         .hero-modal-close,
         .hero-modal-repeat {
             position: fixed;
             top: 8px;
-            background: var(--bg);
-            border: 2px solid var(--fg);
+            width: 52px;
+            height: 52px;
+            border: none;
+            background: transparent;
             color: var(--fg);
-            width: 38px;
-            height: 38px;
             cursor: pointer;
-            font-size: 1.3rem;
             display: flex;
             align-items: center;
             justify-content: center;
-            transition: all 0.1s linear;
-            z-index: 60;
-            font-family: var(--font-ui);
-            line-height: 1;
+            transition: transform 0.12s linear, color 0.12s linear;
+            z-index: 100;
             padding: 0;
+            line-height: 1;
+            border-radius: 50%;
+            font-family: var(--font-ui);
+            -webkit-tap-highlight-color: transparent;
         }
-        .hero-modal-close { right: 8px; }
-        .hero-modal-repeat { left: 8px; font-size: 1rem; }
+        .hero-modal-close {
+            right: 10px;
+            font-size: 2.6rem;
+            font-weight: 300;
+        }
+        .hero-modal-repeat {
+            left: 10px;
+            font-size: 1.8rem;
+        }
         .hero-modal-close:hover,
-        .hero-modal-repeat:hover { background: var(--fg); color: var(--bg); }
+        .hero-modal-repeat:hover {
+            color: var(--accent);
+            transform: scale(1.12);
+        }
 
         .hero-modal-portrait-wrap {
             flex-shrink: 0;
@@ -868,7 +876,7 @@
         }
 
         /* ============================================================
-           ШКАЛА ВРЕМЕНИ — панель-документ
+           ШКАЛА ВРЕМЕНИ
            ============================================================ */
 
         .hero-modal-timeline {
@@ -877,10 +885,7 @@
             margin-top: 8px;
         }
 
-        .htl-panel {
-            border: 2px solid var(--fg);
-            background: var(--bg);
-        }
+        .htl-panel { border: 2px solid var(--fg); background: var(--bg); }
 
         .htl-head {
             display: grid;
@@ -928,16 +933,9 @@
         }
         .htl-head-cell:last-child .htl-head-value { color: var(--accent); }
 
-        .htl-body {
-            padding: 22px 18px 14px;
-            position: relative;
-        }
+        .htl-body { padding: 22px 18px 14px; position: relative; }
 
-        .htl {
-            position: relative;
-            width: 100%;
-            height: 310px;
-        }
+        .htl { position: relative; width: 100%; height: 310px; }
 
         .htl-axis {
             position: absolute;
@@ -962,8 +960,7 @@
         .htl-life::after {
             content: '';
             position: absolute;
-            top: -5px;
-            bottom: -5px;
+            top: -5px; bottom: -5px;
             width: 0.5px;
             background: var(--fg);
         }
@@ -972,141 +969,68 @@
 
         .htl-dtick {
             position: absolute;
-            top: 148px;
-            width: 1px;
-            height: 4px;
-            background: var(--fg);
-            transform: translateX(-50%);
-            opacity: 0.22;
-            z-index: 2;
+            top: 148px; width: 1px; height: 4px;
+            background: var(--fg); transform: translateX(-50%);
+            opacity: 0.22; z-index: 2;
         }
         .htl-htick {
             position: absolute;
-            top: 148px;
-            width: 1px;
-            height: 9px;
-            background: var(--fg);
-            transform: translateX(-50%);
-            opacity: 0.5;
-            z-index: 2;
+            top: 148px; width: 1px; height: 9px;
+            background: var(--fg); transform: translateX(-50%);
+            opacity: 0.5; z-index: 2;
         }
         .htl-ctick {
             position: absolute;
-            top: 148px;
-            width: 2px;
-            height: 30px;
-            background: var(--fg);
-            transform: translateX(-50%);
+            top: 148px; width: 2px; height: 30px;
+            background: var(--fg); transform: translateX(-50%);
             z-index: 3;
         }
 
         .htl-war {
-            position: absolute;
-            top: 0;
-            height: 148px;
+            position: absolute; top: 0; height: 148px;
             transform: translateX(-50%);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            z-index: 4;
+            display: flex; flex-direction: column;
+            align-items: center; z-index: 4;
             padding: 0 2px;
         }
-
-        .htl-war-label {
-            flex-shrink: 0;
-            text-align: center;
-            margin-bottom: 5px;
-            max-width: 100px;
-        }
-
+        .htl-war-label { flex-shrink: 0; text-align: center; margin-bottom: 5px; max-width: 100px; }
         .htl-war-year {
-            font-family: var(--font-doc);
-            font-size: 0.7rem;
-            font-weight: 700;
-            color: var(--accent);
-            letter-spacing: 0.02em;
-            line-height: 1;
-            margin-bottom: 3px;
+            font-family: var(--font-doc); font-size: 0.7rem; font-weight: 700;
+            color: var(--accent); letter-spacing: 0.02em; line-height: 1; margin-bottom: 3px;
         }
-
         .htl-war-name {
-            font-family: var(--font-display);
-            font-size: 0.54rem;
-            font-weight: 600;
-            color: var(--fg);
-            text-transform: uppercase;
-            letter-spacing: 0.02em;
-            line-height: 1.14;
+            font-family: var(--font-display); font-size: 0.54rem; font-weight: 600;
+            color: var(--fg); text-transform: uppercase; letter-spacing: 0.02em; line-height: 1.14;
         }
-
-        .htl-war-tick {
-            flex: 1 1 auto;
-            width: 2px;
-            background: var(--fg);
-            opacity: 0.7;
-            min-height: 4px;
-        }
+        .htl-war-tick { flex: 1 1 auto; width: 2px; background: var(--fg); opacity: 0.7; min-height: 4px; }
 
         .htl-other {
-            position: absolute;
-            top: 148px;
-            height: 100px;
+            position: absolute; top: 148px; height: 100px;
             transform: translateX(-50%);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            z-index: 4;
+            display: flex; flex-direction: column;
+            align-items: center; z-index: 4;
             padding: 0 2px;
         }
-
         .htl-other-tick {
-            flex: 1 1 auto;
-            width: 2px;
-            background: var(--fg);
-            opacity: 0.7;
-            min-height: 4px;
-            margin-bottom: 5px;
+            flex: 1 1 auto; width: 2px; background: var(--fg);
+            opacity: 0.7; min-height: 4px; margin-bottom: 5px;
         }
-
-        .htl-other-label {
-            flex-shrink: 0;
-            text-align: center;
-            max-width: 100px;
-        }
-
+        .htl-other-label { flex-shrink: 0; text-align: center; max-width: 100px; }
         .htl-other-year {
-            font-family: var(--font-doc);
-            font-size: 0.7rem;
-            font-weight: 700;
-            color: var(--accent);
-            letter-spacing: 0.02em;
-            line-height: 1;
-            margin-bottom: 3px;
+            font-family: var(--font-doc); font-size: 0.7rem; font-weight: 700;
+            color: var(--accent); letter-spacing: 0.02em; line-height: 1; margin-bottom: 3px;
         }
-
         .htl-other-name {
-            font-family: var(--font-display);
-            font-size: 0.54rem;
-            font-weight: 600;
-            color: var(--fg);
-            text-transform: uppercase;
-            letter-spacing: 0.02em;
-            line-height: 1.14;
+            font-family: var(--font-display); font-size: 0.54rem; font-weight: 600;
+            color: var(--fg); text-transform: uppercase; letter-spacing: 0.02em; line-height: 1.14;
         }
 
         .htl-cnum {
-            position: absolute;
-            top: 262px;
+            position: absolute; top: 262px;
             transform: translateX(-50%);
-            font-family: var(--font-display);
-            font-size: 1.15rem;
-            font-weight: 600;
-            letter-spacing: 0.03em;
-            color: var(--fg);
-            background: var(--bg);
-            padding: 0 6px;
-            z-index: 7;
-            line-height: 1;
+            font-family: var(--font-display); font-size: 1.15rem; font-weight: 600;
+            letter-spacing: 0.03em; color: var(--fg);
+            background: var(--bg); padding: 0 6px; z-index: 7; line-height: 1;
         }
 
         /* ============================================================
@@ -1128,11 +1052,7 @@
             width: min(520px, 94vw);
         }
 
-        .frame-head {
-            border: 2px solid var(--fg);
-            margin-bottom: 18px;
-            background: var(--bg);
-        }
+        .frame-head { border: 2px solid var(--fg); margin-bottom: 18px; background: var(--bg); }
 
         .frame-head-top,
         .frame-head-bot {
@@ -1178,11 +1098,7 @@
             text-overflow: ellipsis;
         }
 
-        .clock-stack {
-            width: 100%;
-            margin: 0 auto;
-            position: relative;
-        }
+        .clock-stack { width: 100%; margin: 0 auto; position: relative; }
 
         .clock-view {
             width: 100%;
@@ -1222,10 +1138,7 @@
             color: var(--fg);
         }
         .scheme-view.active { display: flex; }
-        .scheme-view svg {
-            width: 100%; height: auto; max-height: 100%;
-            display: block; overflow: visible;
-        }
+        .scheme-view svg { width: 100%; height: auto; max-height: 100%; display: block; overflow: visible; }
         .clock-view .watch-container.hidden { display: none; }
 
         /* ============================================================
@@ -1245,7 +1158,7 @@
                 padding: 12px 14px;
             }
 
-            /* 3. Название сайта не выпирает */
+            /* Название не выпирает */
             .header h1 {
                 font-size: clamp(2.4rem, 13.5vw, 4.5rem);
                 letter-spacing: -0.02em;
@@ -1255,17 +1168,12 @@
                 margin: 16px 0 22px;
             }
 
-            .section-switch { margin: 0 -14px; }
-            .section-switch-btn {
-                font-size: 0.68rem;
-                padding: 16px 4px;
-                letter-spacing: 0.1em;
-                white-space: normal;
-            }
+            /* Скрываем 3 десктопных таба, показываем одну кнопку */
+            .section-switch { display: none; }
+            .section-cycle-btn { display: flex; }
 
             .section-subtitles { margin: 0 -14px; min-height: 40px; }
 
-            /* 5. Подписи по центру, без переносов */
             .section-subtitle {
                 font-size: 0.56rem;
                 padding: 10px 6px;
@@ -1290,33 +1198,18 @@
             }
             .learn-dot { width: 12px; height: 12px; top: 6px; right: 6px; border-width: 1.6px; }
 
-            /* 4. Кнопки слогов компактнее */
+            /* Кнопки слогов компактнее */
             .controls {
                 padding: 16px 14px 12px;
-                gap: 8px;
+                gap: 4px;
             }
             .controls button {
-                width: 40px;
-                height: 40px;
-                font-size: 1rem;
+                width: 42px;
+                height: 42px;
+                font-size: 1.05rem;
                 border-width: 1.5px;
-                margin-left: 0;
             }
             .controls button::after { display: none; }
-
-            .mode-btn {
-                min-width: 66px;
-                height: 44px;
-                padding: 3px 10px;
-            }
-            .mode-btn .mode-icon { font-size: 1rem; }
-            .mode-btn .mode-label { font-size: 0.52rem; }
-            .exam-btn {
-                width: 44px !important;
-                height: 44px !important;
-                font-size: 1.1rem !important;
-                margin-left: 6px !important;
-            }
 
             .exam-exit-btn { top: auto; bottom: 20px; left: 20px; width: 42px; height: 42px; font-size: 1rem; }
             .exam-options { grid-template-columns: repeat(2, 1fr); gap: 8px; }
@@ -1326,10 +1219,26 @@
             .century-header { padding: 14px 16px; margin-bottom: 18px; }
             .century-header:not(:first-child) { margin-top: 40px; }
 
-            /* 6. Портреты не вылезают */
+            /* Личности — горизонтальная лента в один ряд */
             .heroes-grid {
-                grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+                display: flex;
+                flex-wrap: nowrap;
+                overflow-x: auto;
+                overflow-y: hidden;
                 gap: 10px;
+                padding: 4px 4px 12px;
+                margin-bottom: 18px;
+                scroll-snap-type: x proximity;
+                -webkit-overflow-scrolling: touch;
+                scrollbar-width: thin;
+            }
+            .heroes-grid::-webkit-scrollbar { height: 4px; }
+            .heroes-grid::-webkit-scrollbar-track { background: var(--bg-2); }
+            .heroes-grid::-webkit-scrollbar-thumb { background: var(--fg); }
+
+            .hero-item {
+                flex: 0 0 168px;
+                scroll-snap-align: start;
             }
             .hero-info { padding: 10px 10px 12px; }
             .hero-name { font-size: 1rem; }
@@ -1337,51 +1246,28 @@
 
             .soviet-band { font-size: 0.95rem; padding: 10px 14px; letter-spacing: 0.18em; gap: 12px; }
 
-            .hero-modal { padding: 50px 6px 80px; gap: 4px; }
+            .hero-modal { padding: 62px 6px 14px; gap: 4px; }
 
-            /* 8. Кнопки модалки — крестик справа снизу, повтор слева снизу */
-            .hero-modal-close,
-            .hero-modal-repeat {
-                position: fixed;
-                width: 48px;
-                height: 48px;
-                border: none;
-                background: transparent;
-                color: var(--fg);
-                top: auto;
-                bottom: 16px;
-                z-index: 100;
-                padding: 0;
-                line-height: 1;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                transition: transform 0.1s linear, color 0.1s linear, background 0.1s linear;
-                border-radius: 50%;
-            }
+            /* Крестик/звук на мобиле тоже сверху */
             .hero-modal-close {
-                right: 14px;
-                font-size: 2.4rem;
-                font-weight: 300;
+                right: 8px;
+                width: 46px;
+                height: 46px;
+                font-size: 2.3rem;
             }
             .hero-modal-repeat {
-                left: 14px;
-                font-size: 1.7rem;
-            }
-            .hero-modal-close:hover,
-            .hero-modal-repeat:hover {
-                background: var(--accent);
-                color: var(--accent-fg);
-                transform: scale(1.08);
+                left: 8px;
+                width: 46px;
+                height: 46px;
+                font-size: 1.6rem;
             }
 
             .hero-nav { width: 38px; height: 38px; font-size: 1.2rem; }
             .hero-nav.prev { left: 4px; }
             .hero-nav.next { right: 4px; }
 
-            /* 6. При нажатии портрет значительно больше */
             .hero-modal-portrait-wrap {
-                height: 78vh;
+                height: 74vh;
                 min-height: 300px;
             }
 
@@ -1389,7 +1275,7 @@
             .hero-modal-info h3 { font-size: 1.75rem; }
             .hero-modal-years { font-size: 0.88rem; margin-top: 6px; }
 
-            /* 7. Лента времени на мобиле скрыта */
+            /* Лента времени на мобиле скрыта */
             .hero-modal-timeline { display: none; }
 
             /* Часы */
@@ -1411,7 +1297,7 @@
         }
 
         @media (max-width: 420px) {
-            /* 1. «СХЕМА» всегда видна */
+            /* «СХЕМА» всегда видна */
             .frame-head-top {
                 justify-content: center;
                 gap: 6px;
@@ -1428,41 +1314,23 @@
                 display: none;
             }
 
-            /* 3. Ещё чуть меньше заголовок на очень узких */
-            .header h1 {
-                font-size: clamp(2.2rem, 13vw, 3.8rem);
-            }
+            .header h1 { font-size: clamp(2.2rem, 13vw, 3.8rem); }
 
-            /* 4. Кнопки ещё компактнее */
             .controls button {
-                width: 36px;
-                height: 36px;
-                font-size: 0.9rem;
-            }
-            .mode-btn {
-                min-width: 60px;
-                height: 40px;
-                padding: 2px 8px;
-            }
-            .mode-btn .mode-icon { font-size: 0.95rem; }
-            .mode-btn .mode-label { font-size: 0.48rem; }
-            .exam-btn {
-                width: 40px !important;
-                height: 40px !important;
-                font-size: 1rem !important;
+                width: 38px;
+                height: 38px;
+                font-size: 0.95rem;
             }
 
-            /* 6. Один ряд на очень узких */
-            .heroes-grid {
-                grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
-                gap: 8px;
-            }
-
-            /* 5. Ещё сильнее прижать подписи */
             .section-subtitle {
                 font-size: 0.52rem;
                 letter-spacing: 0.06em;
             }
+
+            /* Портреты — крупнее, в один ряд */
+            .hero-item { flex: 0 0 152px; }
+            .hero-name { font-size: 0.92rem; }
+            .hero-years { font-size: 0.58rem; }
         }
     </style>
 </head>
@@ -1473,11 +1341,18 @@
 
         <h1>Грамотиньо</h1>
 
+        <!-- Десктоп: 3 таба -->
         <div class="section-switch">
             <button class="section-switch-btn active" data-section="syllables">Учи слоги</button>
             <button class="section-switch-btn" data-section="clock">Знай время</button>
             <button class="section-switch-btn" data-section="heroes">Чти великих</button>
         </div>
+
+        <!-- Мобила: одна кнопка переключения разделов -->
+        <button class="section-cycle-btn" id="sectionCycleBtn" type="button">
+            <span class="section-cycle-label">Учи слоги</span>
+            <span class="section-cycle-arrow">↻</span>
+        </button>
 
         <div class="section-subtitles">
             <div class="section-subtitle active" data-section="syllables">Жми · Слушай · Запоминай</div>
@@ -1491,11 +1366,11 @@
     <div class="content-wrapper">
         <section id="syllablesSection" class="tab-section active">
             <div class="controls">
-                <button id="modeBtn" class="mode-btn" data-mode="all">
-                    <span class="mode-icon">▦</span>
-                    <span class="mode-label">Все</span>
-                </button>
-                <button id="examBtn" class="exam-btn" data-tooltip="Викторина">✎</button>
+                <button id="normalBtn" class="active" data-tooltip="Все">▦</button>
+                <button id="randomBtn" data-tooltip="Случайно">⇄</button>
+                <button id="hideLearnedBtn" data-tooltip="Скрыть/показать">◐</button>
+                <button id="clearLearnedBtn" data-tooltip="Очистить">✕</button>
+                <button id="examBtn" data-tooltip="Викторина">✎</button>
             </div>
 
             <div class="grid-container">
@@ -1761,7 +1636,10 @@
 
             const grid = document.getElementById('syllableGrid');
             const toastContainer = document.getElementById('toastContainer');
-            const modeBtn = document.getElementById('modeBtn');
+            const normalBtn = document.getElementById('normalBtn');
+            const randomBtn = document.getElementById('randomBtn');
+            const hideLearnedBtn = document.getElementById('hideLearnedBtn');
+            const clearLearnedBtn = document.getElementById('clearLearnedBtn');
             const examBtn = document.getElementById('examBtn');
             const progressContainer = document.getElementById('progressContainer');
             const progressLabel = document.getElementById('progressLabel');
@@ -1779,6 +1657,7 @@
             const celebrationClose = document.getElementById('celebrationClose');
             const sectionBtns = document.querySelectorAll('.section-switch-btn');
             const sectionSubtitleEls = document.querySelectorAll('.section-subtitle');
+            const sectionCycleBtn = document.getElementById('sectionCycleBtn');
             const syllablesSection = document.getElementById('syllablesSection');
             const clockSection = document.getElementById('clockSection');
             const heroesSection = document.getElementById('heroesSection');
@@ -1793,6 +1672,26 @@
             let currentExamCorrect = '';
             let currentSection = 'syllables';
             let progressTimer = null;
+
+            // === Одна кнопка переключения разделов ===
+            const SECTION_ORDER = ['syllables', 'clock', 'heroes'];
+            const SECTION_LABELS = {
+                syllables: 'Учи слоги',
+                clock: 'Знай время',
+                heroes: 'Чти великих'
+            };
+            function updateCycleBtn() {
+                if (!sectionCycleBtn) return;
+                const label = sectionCycleBtn.querySelector('.section-cycle-label');
+                if (label) label.textContent = SECTION_LABELS[currentSection];
+            }
+            if (sectionCycleBtn) {
+                sectionCycleBtn.addEventListener('click', () => {
+                    const idx = SECTION_ORDER.indexOf(currentSection);
+                    const next = SECTION_ORDER[(idx + 1) % SECTION_ORDER.length];
+                    switchSection(next);
+                });
+            }
 
             function loadLearnedSet() {
                 try { return new Set(JSON.parse(localStorage.getItem('learned_syllables') || '[]')); }
@@ -1815,6 +1714,7 @@
                 sectionSubtitleEls.forEach(el => {
                     el.classList.toggle('active', el.dataset.section === section);
                 });
+                updateCycleBtn();
                 if (section !== 'clock' && window.clockSpeakCancel) {
                     window.clockSpeakCancel();
                 }
@@ -1919,56 +1819,35 @@
                 playAudio(syllable);
             }
 
-            // === 9. Одна кнопка переключения режимов ===
-            const MODES = [
-                { id: 'all',    icon: '▦', label: 'Все' },
-                { id: 'random', icon: '⇄', label: 'Случайно' },
-                { id: 'hide',   icon: '◐', label: 'Скрыть' },
-                { id: 'clear',  icon: '✕', label: 'Очистить' },
-                { id: 'exam',   icon: '✎', label: 'Викторина' }
-            ];
-            let modeIndex = 0;
-            let hideLearnedActive = false;
-
-            function applyMode(modeId) {
-                if (modeId === 'all') {
-                    currentMode = 'all';
-                    hideLearnedActive = false;
-                    grid.classList.remove('hide-learned');
-                    renderGrid();
-                } else if (modeId === 'random') {
-                    currentMode = 'random';
-                    hideLearnedActive = false;
-                    grid.classList.remove('hide-learned');
-                    generateRandomItems();
-                    renderGrid();
-                } else if (modeId === 'hide') {
-                    hideLearnedActive = !hideLearnedActive;
-                    grid.classList.toggle('hide-learned', hideLearnedActive);
-                } else if (modeId === 'clear') {
-                    learnedSet.clear();
-                    saveLearnedSet(learnedSet);
-                    renderGrid();
-                    flashProgress();
-                    showToast('Очищено', 'success');
-                } else if (modeId === 'exam') {
-                    startExam();
-                }
-            }
-
-            modeBtn.addEventListener('click', () => {
-                modeIndex = (modeIndex + 1) % MODES.length;
-                const m = MODES[modeIndex];
-                modeBtn.querySelector('.mode-icon').textContent = m.icon;
-                modeBtn.querySelector('.mode-label').textContent = m.label;
-                modeBtn.dataset.mode = m.id;
-                applyMode(m.id);
+            // === Кнопки слогов (восстановлены) ===
+            normalBtn.addEventListener('click', () => {
+                currentMode = 'all';
+                normalBtn.classList.add('active');
+                randomBtn.classList.remove('active');
+                renderGrid();
             });
-
+            randomBtn.addEventListener('click', () => {
+                currentMode = 'random';
+                generateRandomItems();
+                randomBtn.classList.add('active');
+                normalBtn.classList.remove('active');
+                renderGrid();
+            });
             function generateRandomItems() {
                 const shuffled = syllables.slice().sort(() => Math.random() - 0.5);
                 randomItems = shuffled.slice(0, Math.min(10, shuffled.length));
             }
+            hideLearnedBtn.addEventListener('click', () => {
+                hideLearnedBtn.classList.toggle('active');
+                grid.classList.toggle('hide-learned', hideLearnedBtn.classList.contains('active'));
+            });
+            clearLearnedBtn.addEventListener('click', () => {
+                learnedSet.clear();
+                saveLearnedSet(learnedSet);
+                renderGrid();
+                flashProgress();
+                showToast('Очищено', 'success');
+            });
 
             examBtn.addEventListener('click', startExam);
             function startExam() {
@@ -2188,8 +2067,6 @@
                 const d = Math.min(deathYear, TL_END);
                 const left = tlPos(b);
                 const width = tlPos(d) - left;
-                const age = deathYear - birthYear;
-                const ageWord = plural(age, ['год', 'года', 'лет']);
 
                 let html = '<div class="htl-panel">';
 
@@ -2351,8 +2228,8 @@
                 heroModal = document.createElement('div');
                 heroModal.className = 'hero-modal';
                 heroModal.innerHTML = `
-                    <button class="hero-modal-close" type="button" aria-label="Закрыть">×</button>
                     <button class="hero-modal-repeat" type="button" aria-label="Повторить звук">♪</button>
+                    <button class="hero-modal-close" type="button" aria-label="Закрыть">×</button>
                     <div class="hero-modal-portrait-wrap">
                         ${navHTML}
                         <img class="hero-modal-portrait" src="${images[0]}" alt="${name}">
@@ -2414,6 +2291,7 @@
 
             renderHeroesTimeline();
             renderGrid();
+            updateCycleBtn();
 
         })();
     </script>
@@ -2451,7 +2329,6 @@
 
         const AUDIO_DIR = 'clock_audio/';
 
-        // 2. Кэш аудио + playsInline для iPhone
         const audioCache = {};
         function tryLoadAudio(name) {
             if (audioCache[name]) return audioCache[name];
@@ -2599,7 +2476,6 @@
             currentAudioChain = [];
         }
 
-        // 2. Улучшенное воспроизведение времени
         function speakTime() {
             stopClockAudio();
 
