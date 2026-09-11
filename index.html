@@ -100,7 +100,6 @@
 
         /* ===== МЕНЮ ПЕРЕКЛЮЧЕНИЯ РЕЖИМОВ ===== */
 
-        /* Десктоп: три кнопки как раньше */
         .section-switch {
             display: flex;
             margin: 0 -20px;
@@ -128,7 +127,6 @@
         .section-switch-btn.active { background: var(--fg); color: var(--bg); }
         .section-switch-btn:hover:not(.active) { background: var(--bg-2); }
 
-        /* Мобильная кнопка — одна, показывается только на мобиле */
         .section-cycle-btn {
             display: none;
             width: 100%;
@@ -904,55 +902,57 @@
 
         .stl-track {
             position: relative;
-            height: 100px;
+            height: 130px;
             margin: 0 10px;
         }
 
-        /* Главная линия */
+        /* Главная линия — тонкая */
         .stl-line {
             position: absolute;
             left: 0;
             right: 0;
             top: 54px;
-            height: 2px;
+            height: 1px;
             background: var(--fg);
+            opacity: 0.7;
         }
 
-        /* Засечки: мелкие (10 лет), средние (50 лет), вековые (100 лет) */
+        /* Засечки: все тонкие */
         .stl-tick-10 {
             position: absolute;
             top: 54px;
             width: 1px;
-            height: 5px;
+            height: 4px;
             background: var(--fg);
             transform: translateX(-50%);
-            opacity: 0.3;
+            opacity: 0.25;
         }
         .stl-tick-50 {
             position: absolute;
             top: 54px;
-            width: 1.5px;
-            height: 10px;
+            width: 1px;
+            height: 8px;
             background: var(--fg);
             transform: translateX(-50%);
-            opacity: 0.55;
+            opacity: 0.45;
         }
         .stl-tick-100 {
             position: absolute;
-            top: 50px;
-            width: 2px;
-            height: 24px;
+            top: 52px;
+            width: 1px;
+            height: 18px;
             background: var(--fg);
             transform: translateX(-50%);
+            opacity: 0.85;
         }
 
         /* Красная полоса жизни */
         .stl-life {
             position: absolute;
-            top: 43px;
-            height: 22px;
+            top: 44px;
+            height: 20px;
             background: var(--accent);
-            border: 1.5px solid var(--fg);
+            border: none;
             box-sizing: border-box;
             z-index: 5;
         }
@@ -960,20 +960,18 @@
         .stl-life::after {
             content: '';
             position: absolute;
-            top: -4px;
-            bottom: -4px;
+            top: -3px;
+            bottom: -3px;
             width: 1px;
             background: var(--fg);
         }
         .stl-life::before { left: -1px; }
         .stl-life::after  { right: -1px; }
 
-        /* Римские века — между отметками, то есть на 50-летних засечках.
-           XVIII = 1700–1800, XIX = 1800–1900, XX = 1900–2000.
-           Подписи ставим в середине каждого промежутка. */
+        /* Римские века — между отметками, чуть выше линии событий */
         .stl-roman {
             position: absolute;
-            top: 68px;
+            top: 66px;
             transform: translateX(-50%);
             font-family: var(--font-display);
             font-size: 0.95rem;
@@ -981,16 +979,16 @@
             letter-spacing: 0.06em;
             color: var(--fg);
             background: var(--bg);
-            padding: 0 5px;
+            padding: 0 6px;
             line-height: 1;
             z-index: 6;
             white-space: nowrap;
         }
 
-        /* События под линией — очень мелкий шрифт */
+        /* События — под римскими веками, БЕЗ годов, только короткое имя.
+           Названия разнесены вертикально по двум рядам, чтобы не наезжали. */
         .stl-event {
             position: absolute;
-            top: 60px;
             transform: translateX(-50%);
             display: flex;
             flex-direction: column;
@@ -998,18 +996,17 @@
             z-index: 7;
             pointer-events: none;
         }
-        .stl-event-year {
-            font-family: var(--font-doc);
-            font-size: 0.48rem;
-            font-weight: 700;
-            color: var(--accent);
-            letter-spacing: 0.02em;
-            line-height: 1;
-            margin-bottom: 2px;
+        /* Ряд A — ближе к линии */
+        .stl-event.row-a {
+            top: 92px;
+        }
+        /* Ряд B — ниже, чтобы не пересекаться с рядом A */
+        .stl-event.row-b {
+            top: 112px;
         }
         .stl-event-name {
             font-family: var(--font-display);
-            font-size: 0.44rem;
+            font-size: 0.52rem;
             font-weight: 600;
             color: var(--fg);
             text-transform: uppercase;
@@ -1017,7 +1014,10 @@
             line-height: 1;
             white-space: nowrap;
             background: var(--bg);
-            padding: 0 2px;
+            padding: 1px 3px;
+        }
+        .stl-event-name.accent {
+            color: var(--accent);
         }
 
         /* ============================================================
@@ -1350,31 +1350,39 @@
         }
 
         @media (max-width: 640px) {
-            .header { padding: 12px 14px 0; }
+            /* ===== ШАПКА ===== */
+            .header { padding: 12px 0 0; }
             .header-kicker {
-                margin-bottom: 22px;
-                font-size: 0.6rem;
-                letter-spacing: 0.16em;
+                margin: 0 0 20px;
+                font-size: 0.58rem;
+                letter-spacing: 0.14em;
                 padding: 12px 14px;
             }
+
+            /* Грамотиньо — во всю ширину экрана */
             .header h1 {
-                margin: 16px 0 22px;
-                letter-spacing: 0;
-                font-size: clamp(2rem, 12.5vw, 3.6rem);
+                margin: 12px 0 22px;
+                padding: 0 6px;
+                font-size: 15.5vw;
+                line-height: 0.88;
+                letter-spacing: -0.01em;
+                text-align: center;
             }
 
-            /* ===== МЕНЮ НА МОБИЛЕ: одна циклическая кнопка ===== */
+            /* ===== МЕНЮ: одна циклическая кнопка ===== */
             .section-switch { display: none; }
-            .section-cycle-btn { display: flex; margin: 0 -14px; }
+            .section-cycle-btn { display: flex; margin: 0; }
 
-            .section-subtitles { margin: 0 -14px; min-height: 40px; }
+            /* ПОДЗАГОЛОВКИ — по центру */
+            .section-subtitles { margin: 0; min-height: 44px; }
             .section-subtitle {
-                font-size: 0.56rem;
-                padding: 10px 6px;
-                letter-spacing: 0.12em;
-                min-height: 3.2em;
+                font-size: 0.6rem;
+                padding: 12px 14px;
+                letter-spacing: 0.14em;
+                min-height: 3em;
+                text-align: center;
             }
-            .digital-clock-inline { font-size: 0.9rem; letter-spacing: 0.1em; }
+            .digital-clock-inline { font-size: 0.95rem; letter-spacing: 0.1em; }
 
             .content-wrapper { padding: 0 14px; }
             .grid-container { padding: 0 14px 90px; }
@@ -1387,15 +1395,15 @@
             }
             .learn-dot { width: 12px; height: 12px; top: 6px; right: 6px; border-width: 1.6px; }
 
-            /* ===== КНОПКИ УПРАВЛЕНИЯ НА МОБИЛЕ: в 2 раза меньше, с зазором ===== */
+            /* ===== КНОПКИ УПРАВЛЕНИЯ — маленькие, с зазором ===== */
             .controls {
                 padding: 22px 14px 16px;
                 gap: 10px;
             }
             .controls button {
-                width: 28px;
-                height: 28px;
-                font-size: 0.78rem;
+                width: 30px;
+                height: 30px;
+                font-size: 0.8rem;
                 border-width: 1.5px;
             }
             .controls button::after { display: none; }
@@ -1408,47 +1416,71 @@
             .century-header { padding: 14px 16px; margin-bottom: 18px; }
             .century-header:not(:first-child) { margin-top: 40px; }
 
-            /* Портреты: 1 в ряд, имя ПОД портретом */
+            /* ===== Портреты: 1 в ряд, имя ПОД портретом, БЕЗ чёрной обводки ===== */
             .heroes-grid {
                 grid-template-columns: 1fr;
-                gap: 12px;
+                gap: 16px;
                 justify-items: center;
             }
             .hero-item {
                 flex-direction: column;
                 width: 100%;
-                max-width: 190px;
+                max-width: 200px;
+                border: 1px solid var(--bg-3);
+                background: var(--bg);
+                border-radius: 2px;
+                box-shadow: 0 2px 10px rgba(20, 20, 20, 0.06);
+                overflow: hidden;
+            }
+            .hero-item:hover,
+            .hero-item:active {
+                transform: none;
+                box-shadow: 0 3px 14px rgba(20, 20, 20, 0.1);
             }
             .hero-photo {
                 width: 100%;
                 height: auto;
                 aspect-ratio: 1 / 1;
-                border-bottom: 2px solid var(--fg);
+                border-bottom: none;
                 border-right: none;
+                background: var(--bg-2);
             }
             .hero-info {
-                padding: 10px 10px 12px;
+                padding: 10px 12px 14px;
                 align-items: center;
                 text-align: center;
-                gap: 3px;
+                gap: 4px;
+                border-top: 1px solid var(--bg-3);
             }
             .hero-name { font-size: 0.98rem; line-height: 1.05; }
-            .hero-years { font-size: 0.62rem; justify-content: center; }
+            .hero-years { font-size: 0.62rem; justify-content: center; color: var(--fg-3); }
+            .hero-age { color: var(--accent); }
 
-            .soviet-band { font-size: 0.95rem; padding: 10px 14px; letter-spacing: 0.18em; gap: 12px; }
+            .soviet-band {
+                font-size: 0.95rem;
+                padding: 12px 14px;
+                letter-spacing: 0.18em;
+                gap: 12px;
+                margin: 12px 0 20px;
+            }
 
-            /* ===== МОДАЛКА ГЕРОЯ НА МОБИЛЕ ===== */
+            /* ===== МОДАЛКА ГЕРОЯ ===== */
             .hero-modal-close,
             .hero-modal-repeat {
                 width: 42px; height: 42px; top: 10px;
                 background: rgba(242,236,223,0.94);
                 backdrop-filter: blur(4px);
                 -webkit-backdrop-filter: blur(4px);
+                border-width: 1.5px;
             }
             .hero-modal-close { right: 10px; font-size: 1.4rem; }
             .hero-modal-repeat { left: 10px; font-size: 1rem; }
 
-            .hero-nav { width: 42px; height: 42px; font-size: 1.3rem; }
+            .hero-nav {
+                width: 42px; height: 42px; font-size: 1.3rem;
+                background: rgba(242,236,223,0.85);
+                border-width: 1.5px;
+            }
             .hero-nav.prev { left: 8px; }
             .hero-nav.next { right: 8px; }
 
@@ -1459,7 +1491,7 @@
 
             .hero-modal-bottom {
                 padding: 22px 14px 44px;
-                gap: 20px;
+                gap: 22px;
             }
 
             .hero-modal-info h3 { font-size: 1.85rem; }
@@ -1469,10 +1501,42 @@
             .simple-timeline-wrap { display: block; }
             .detailed-timeline { display: none; }
 
+            /* ===== МОБИЛЬНАЯ ЛЕНТА ВРЕМЕНИ ===== */
+            .simple-timeline {
+                padding: 18px 12px 40px;
+                border-width: 1.5px;
+            }
+            .simple-timeline-head {
+                padding: 10px 12px;
+                margin: -18px -12px 22px;
+                font-size: 0.78rem;
+                letter-spacing: 0.24em;
+            }
+
+            .stl-track {
+                height: 138px;
+                margin: 0 6px;
+            }
+
+            /* Внутренние размеры под мобиль — уже заданы в базовых стилях,
+               но здесь корректируем отступы, чтобы подписи дышали */
+            .stl-roman {
+                top: 68px;
+                font-size: 0.9rem;
+                padding: 0 5px;
+            }
+            .stl-event.row-a { top: 94px; }
+            .stl-event.row-b { top: 116px; }
+            .stl-event-name {
+                font-size: 0.5rem;
+                letter-spacing: 0.01em;
+                padding: 1px 3px;
+            }
+
             /* Часы */
             .clock-wrapper { padding: 26px 0 70px; }
-            .clock-frame { padding: 12px; box-shadow: 7px 7px 0 var(--accent); }
-            .frame-head { margin-bottom: 14px; }
+            .clock-frame { padding: 12px; box-shadow: 7px 7px 0 var(--accent); border-width: 2px; }
+            .frame-head { margin-bottom: 14px; border-width: 1.5px; }
             .frame-head-title {
                 padding: 9px 10px;
                 font-size: clamp(0.6rem, 2.9vw, 0.82rem);
@@ -1488,11 +1552,11 @@
         }
 
         @media (max-width: 380px) {
-            .simple-timeline { padding: 16px 10px 40px; }
-            .simple-timeline-head { margin: -16px -10px 22px; padding: 9px 12px; font-size: 0.75rem; }
+            .header h1 { font-size: 15vw; }
+            .simple-timeline { padding: 16px 10px 36px; }
+            .simple-timeline-head { margin: -16px -10px 20px; padding: 9px 10px; font-size: 0.72rem; }
             .stl-roman { font-size: 0.82rem; }
-            .stl-event-year { font-size: 0.44rem; }
-            .stl-event-name { font-size: 0.4rem; }
+            .stl-event-name { font-size: 0.46rem; }
         }
     </style>
 </head>
@@ -1938,7 +2002,6 @@
                 });
             });
 
-            /* Мобильная кнопка — циклично переключает разделы */
             if (sectionCycleBtn) {
                 sectionCycleBtn.addEventListener('click', () => {
                     const idx = SECTION_ORDER.indexOf(currentSection);
@@ -2277,18 +2340,18 @@
                 { year: 1991, name: 'Разрушение<br>СССР' }
             ];
 
-            /* События для мобильной ленты — сокращённые названия */
+            /* Мобильные события: без годов, только короткое название.
+               Ряды row-a / row-b чередуются, чтобы соседние не наезжали. */
             const MOBILE_EVENTS = [
-                { year: 1721, short: 'Империя' },
-                { year: 1812, short: '1812' },
-                { year: 1825, short: 'Декабристы' },
-                { year: 1861, short: 'Реформы' },
-                { year: 1917, short: 'Революция' },
-                { year: 1991, short: 'Развал' }
+                { year: 1721, short: 'Империя',     row: 'a' },
+                { year: 1812, short: '1812',        row: 'a' },
+                { year: 1825, short: 'Декабристы',  row: 'b' },
+                { year: 1861, short: 'Реформы',     row: 'b' },
+                { year: 1917, short: 'Революция',   row: 'a' },
+                { year: 1991, short: 'Развал',      row: 'b' }
             ];
 
-            /* Римские века — подписи ставим в середине промежутка.
-               XVIII = 1700..1800, XIX = 1800..1900, XX = 1900..2000 */
+            /* Римские века — между отметками */
             const MOBILE_ROMAN = [
                 { label: 'XVIII', mid: 1750 },
                 { label: 'XIX',   mid: 1850 },
@@ -2327,16 +2390,15 @@
                 /* Полоса жизни */
                 html += `<div class="stl-life" style="left: ${left}%; width: ${width}%"></div>`;
 
-                /* Римские века — между отметками */
+                /* Римские века */
                 MOBILE_ROMAN.forEach(r => {
                     html += `<div class="stl-roman" style="left: ${tlPos(r.mid)}%">${r.label}</div>`;
                 });
 
-                /* События — очень мелкие, сокращённые */
+                /* События без годов, в двух рядах */
                 MOBILE_EVENTS.forEach(e => {
                     html += `
-                        <div class="stl-event" style="left: ${tlPos(e.year)}%">
-                            <div class="stl-event-year">${e.year}</div>
+                        <div class="stl-event row-${e.row}" style="left: ${tlPos(e.year)}%">
                             <div class="stl-event-name">${e.short}</div>
                         </div>
                     `;
