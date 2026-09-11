@@ -48,20 +48,23 @@
             overflow-x: hidden;
         }
 
-        body::before {
-            content: '';
-            position: fixed;
-            inset: 0;
-            background-image:
-                linear-gradient(var(--rule-soft) 1px, transparent 1px),
-                linear-gradient(90deg, var(--rule-soft) 1px, transparent 1px);
-            background-size: 40px 40px;
-            background-position: -1px -1px;
-            pointer-events: none;
-            z-index: 0;
-            opacity: 0.35;
+        /* Сеточный фон оставляем только на десктопе — на мобиле он сильно бьёт по FPS при скролле */
+        @media (min-width: 641px) {
+            body::before {
+                content: '';
+                position: fixed;
+                inset: 0;
+                background-image:
+                    linear-gradient(var(--rule-soft) 1px, transparent 1px),
+                    linear-gradient(90deg, var(--rule-soft) 1px, transparent 1px);
+                background-size: 40px 40px;
+                background-position: -1px -1px;
+                pointer-events: none;
+                z-index: 0;
+                opacity: 0.35;
+            }
+            body > * { position: relative; z-index: 1; }
         }
-        body > * { position: relative; z-index: 1; }
 
         /* ================= ШАПКА ================= */
 
@@ -118,7 +121,7 @@
             font-size: 0.82rem;
             letter-spacing: 0.14em;
             text-transform: uppercase;
-            transition: all 0.1s linear;
+            transition: background 0.1s linear, color 0.1s linear;
             white-space: nowrap;
         }
         .section-switch-btn:last-child { border-right: none; }
@@ -211,12 +214,8 @@
         }
 
         .tab-section { display: none; }
-        .tab-section.active { display: block; animation: tabIn 0.35s var(--snap) forwards; }
-
-        @keyframes tabIn {
-            from { opacity: 0; transform: translateY(6px); }
-            to   { opacity: 1; transform: translateY(0); }
-        }
+        /* Убрал animation — она заставляла браузер перекомпоновывать DOM при каждом переключении */
+        .tab-section.active { display: block; }
 
         /* ================= ПРОГРЕСС ================= */
 
@@ -231,6 +230,7 @@
             transition: transform 0.4s var(--ease);
             border-top: 6px solid var(--accent);
             pointer-events: none;
+            will-change: transform;
         }
         .progress-container.show { transform: translateY(0); pointer-events: auto; }
 
@@ -280,12 +280,15 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            transition: all 0.1s linear;
+            transition: background 0.1s linear, color 0.1s linear, border-color 0.1s linear;
             position: relative;
         }
-        .controls button:hover { background: var(--fg); color: var(--bg); z-index: 3; }
         .controls button.active { background: var(--accent); border-color: var(--accent); color: var(--accent-fg); z-index: 2; }
-        .controls button.active:hover { background: var(--accent); color: var(--accent-fg); }
+
+        @media (min-width: 641px) {
+            .controls button:hover { background: var(--fg); color: var(--bg); z-index: 3; }
+            .controls button.active:hover { background: var(--accent); color: var(--accent-fg); }
+        }
 
         .controls button::after {
             content: attr(data-tooltip);
@@ -349,17 +352,18 @@
             display: flex;
             align-items: center;
             justify-content: center;
+            /* Отсекаем перерисовку карточек вне вьюпорта */
+            content-visibility: auto;
+            contain-intrinsic-size: 78px;
         }
-        .syllable-card:not(.learned):hover { background: var(--fg); color: var(--bg); }
+        @media (min-width: 641px) {
+            .syllable-card:not(.learned):hover { background: var(--fg); color: var(--bg); }
+        }
         .syllable-card.playing {
             background: var(--accent);
             color: var(--accent-fg);
-            animation: pulsePlay 0.5s var(--snap);
         }
-        @keyframes pulsePlay {
-            0%, 100% { transform: scale(1); }
-            35%      { transform: scale(0.94); }
-        }
+        /* Пульсацию убрал — она давала layout thrash при каждом тапе */
         .syllable-card.learned { background: var(--bg-2); color: var(--fg-3); }
         .syllable-card.learned .syllable-text {
             text-decoration: line-through;
@@ -381,7 +385,9 @@
             transition: all 0.12s linear;
             opacity: 0.55;
         }
-        .syllable-card:not(.learned):hover .learn-dot { border-color: var(--bg); opacity: 1; }
+        @media (min-width: 641px) {
+            .syllable-card:not(.learned):hover .learn-dot { border-color: var(--bg); opacity: 1; }
+        }
         .learn-dot:hover { opacity: 1; }
         .syllable-card.learned .learn-dot {
             background: var(--accent);
@@ -405,16 +411,10 @@
             display: none;
             align-items: center;
             justify-content: center;
-            transition: all 0.1s linear;
+            transition: background 0.1s linear, color 0.1s linear;
             z-index: 1001;
         }
         .scroll-top-btn.visible { display: flex; }
-        .scroll-top-btn:hover {
-            background: var(--fg);
-            color: var(--bg);
-            transform: translate(-3px, -3px);
-            box-shadow: 4px 4px 0 var(--accent);
-        }
 
         /* ================= ЭКЗАМЕН ================= */
 
@@ -431,7 +431,7 @@
             padding: 24px;
             gap: 32px;
         }
-        .exam-overlay.show { display: flex; animation: tabIn 0.25s var(--snap); }
+        .exam-overlay.show { display: flex; }
 
         .exam-header { display: flex; align-items: center; gap: 14px; }
 
@@ -455,7 +455,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            transition: all 0.1s linear;
+            transition: background 0.1s linear, color 0.1s linear;
         }
         .exam-repeat-btn:hover { background: var(--fg); color: var(--bg); }
         .exam-next-btn {
@@ -466,7 +466,6 @@
             font-size: 1.3rem;
         }
         .exam-next-btn.show { display: flex; }
-        .exam-next-btn:hover { transform: translate(-2px, -2px); box-shadow: 4px 4px 0 var(--fg); }
 
         .exam-options {
             display: grid;
@@ -488,13 +487,7 @@
             color: var(--fg);
             text-transform: uppercase;
             letter-spacing: 0.05em;
-            transition: all 0.1s linear;
-        }
-        .exam-option:hover:not(:disabled) {
-            background: var(--fg);
-            color: var(--bg);
-            transform: translate(-3px, -3px);
-            box-shadow: 4px 4px 0 var(--accent);
+            transition: background 0.1s linear, color 0.1s linear;
         }
         .exam-option.correct { background: #2a6b3f; border-color: #2a6b3f; color: #ffffff; }
         .exam-option.wrong { background: var(--accent); border-color: var(--accent); color: var(--accent-fg); }
@@ -518,7 +511,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            transition: all 0.1s linear;
+            transition: background 0.1s linear, color 0.1s linear;
             z-index: 10;
         }
         .exam-exit-btn:hover { background: var(--fg); color: var(--bg); }
@@ -573,9 +566,7 @@
             font-size: 0.9rem;
             letter-spacing: 0.14em;
             text-transform: uppercase;
-            transition: all 0.1s linear;
         }
-        .celebration-close:hover { background: var(--accent); border-color: var(--accent); color: var(--accent-fg); }
 
         /* ================= ТОСТЫ ================= */
 
@@ -674,13 +665,8 @@
             border: 2px solid var(--fg);
             background: var(--bg);
             cursor: pointer;
-            transition: all 0.14s linear;
             display: flex;
             flex-direction: column;
-        }
-        .hero-item:hover {
-            transform: translate(-3px, -3px);
-            box-shadow: 6px 6px 0 var(--accent);
         }
 
         .hero-photo {
@@ -696,10 +682,20 @@
             height: 100%;
             object-fit: cover;
             display: block;
-            filter: grayscale(1) contrast(1.15);
-            transition: filter 0.22s linear;
         }
-        .hero-item:hover .hero-photo img { filter: grayscale(0) contrast(1.15); }
+
+        /* grayscale-фильтр — только на десктопе, на мобиле он жрёт GPU */
+        @media (min-width: 641px) {
+            .hero-photo img {
+                filter: grayscale(1) contrast(1.15);
+                transition: filter 0.22s linear;
+            }
+            .hero-item:hover {
+                transform: translate(-3px, -3px);
+                box-shadow: 6px 6px 0 var(--accent);
+            }
+            .hero-item:hover .hero-photo img { filter: grayscale(0) contrast(1.15); }
+        }
 
         .hero-info {
             padding: 12px 12px 14px;
@@ -743,7 +739,6 @@
             overflow-y: auto;
             overflow-x: hidden;
             -webkit-overflow-scrolling: touch;
-            animation: tabIn 0.22s var(--snap);
         }
 
         .hero-modal-scroll {
@@ -768,7 +763,6 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            transition: all 0.1s linear;
             z-index: 60;
             font-family: var(--font-ui);
             line-height: 1;
@@ -832,7 +826,6 @@
             justify-content: center;
             font-size: 1.5rem;
             font-family: var(--font-ui);
-            transition: all 0.1s linear;
             z-index: 20;
             padding: 0;
             line-height: 1;
@@ -840,7 +833,6 @@
         }
         .hero-nav.prev { left: 8px; }
         .hero-nav.next { right: 8px; }
-        .hero-nav:hover { background: var(--fg); color: var(--bg); opacity: 1; }
 
         .hero-modal-bottom {
             flex: 1 0 auto;
@@ -903,7 +895,6 @@
             position: relative;
         }
 
-        /* Вертикальная линия */
         .stl-list::before {
             content: '';
             position: absolute;
@@ -919,7 +910,6 @@
             padding: 10px 0;
         }
 
-        /* Год слева от линии */
         .stl-row .stl-year {
             position: absolute;
             left: -82px;
@@ -937,7 +927,6 @@
             line-height: 1.15;
         }
 
-        /* Название справа */
         .stl-row .stl-name {
             display: block;
             font-family: var(--font-display);
@@ -949,7 +938,6 @@
             line-height: 1.15;
         }
 
-        /* Точка на линии */
         .stl-row::before {
             content: '';
             position: absolute;
@@ -964,7 +952,6 @@
             z-index: 1;
         }
 
-        /* Событие, попавшее в годы жизни героя, — красное */
         .stl-row.alive .stl-year { color: var(--accent); }
         .stl-row.alive .stl-name { color: var(--accent); }
         .stl-row.alive::before {
@@ -1339,6 +1326,7 @@
                 font-size: 1.15rem;
                 min-height: 62px;
                 padding: 16px 4px;
+                contain-intrinsic-size: 62px;
             }
             .learn-dot { width: 12px; height: 12px; top: 6px; right: 6px; border-width: 1.6px; }
 
@@ -1374,13 +1362,10 @@
                 border: 1px solid var(--bg-3);
                 background: var(--bg);
                 border-radius: 2px;
-                box-shadow: 0 2px 10px rgba(20, 20, 20, 0.06);
                 overflow: hidden;
-            }
-            .hero-item:hover,
-            .hero-item:active {
-                transform: none;
-                box-shadow: 0 3px 14px rgba(20, 20, 20, 0.1);
+                /* Не рисуем карточки, пока они не вошли во вьюпорт — экономит GPU */
+                content-visibility: auto;
+                contain-intrinsic-size: 260px;
             }
             .hero-photo {
                 width: 100%;
@@ -1409,12 +1394,11 @@
                 margin: 12px 0 20px;
             }
 
+            /* Убираем backdrop-filter — очень тяжёлая штука на мобиле */
             .hero-modal-close,
             .hero-modal-repeat {
                 width: 42px; height: 42px; top: 10px;
-                background: rgba(242,236,223,0.94);
-                backdrop-filter: blur(4px);
-                -webkit-backdrop-filter: blur(4px);
+                background: rgba(242,236,223,0.96);
                 border-width: 1.5px;
             }
             .hero-modal-close { right: 10px; font-size: 1.4rem; }
@@ -1422,7 +1406,7 @@
 
             .hero-nav {
                 width: 42px; height: 42px; font-size: 1.3rem;
-                background: rgba(242,236,223,0.85);
+                background: rgba(242,236,223,0.9);
                 border-width: 1.5px;
             }
             .hero-nav.prev { left: 8px; }
@@ -1599,18 +1583,9 @@
                                             <stop offset="0.55" stop-color="#ffffff" stop-opacity="0.16"/>
                                             <stop offset="1"    stop-color="#ffffff" stop-opacity="0"/>
                                         </linearGradient>
-                                        <filter id="clk-strapShadow" x="-30%" y="-30%" width="160%" height="160%">
-                                            <feGaussianBlur in="SourceAlpha" stdDeviation="3"/>
-                                            <feOffset dx="0" dy="3"/>
-                                            <feComponentTransfer><feFuncA type="linear" slope="0.5"/></feComponentTransfer>
-                                            <feMerge>
-                                                <feMergeNode/>
-                                                <feMergeNode in="SourceGraphic"/>
-                                            </feMerge>
-                                        </filter>
                                     </defs>
 
-                                    <g filter="url(#clk-strapShadow)">
+                                    <g>
                                         <path d="M 138 -10 L 262 -10 L 272 105 L 128 105 Z" fill="url(#clk-strapGrad)"/>
                                         <path d="M 138 -10 L 148 -10 L 138 105 L 128 105 Z" fill="rgba(0,0,0,0.3)"/>
                                         <path d="M 252 -10 L 262 -10 L 272 105 L 262 105 Z" fill="rgba(0,0,0,0.3)"/>
@@ -1619,7 +1594,7 @@
                                         <line x1="245" y1="-8" x2="254" y2="103" stroke="#c9a070" stroke-width="0.8" stroke-dasharray="3,4" opacity="0.55"/>
                                     </g>
 
-                                    <g filter="url(#clk-strapShadow)">
+                                    <g>
                                         <path d="M 128 415 L 272 415 L 262 530 L 138 530 Z" fill="url(#clk-strapGrad)"/>
                                         <path d="M 128 415 L 138 415 L 148 530 L 138 530 Z" fill="rgba(0,0,0,0.3)"/>
                                         <path d="M 262 415 L 272 415 L 262 530 L 252 530 Z" fill="rgba(0,0,0,0.3)"/>
@@ -1734,7 +1709,7 @@
 
     <script>
         /* ============================================================
-           ГЛОБАЛЬНАЯ РАЗБЛОКИРОВКА АУДИО (iOS Safari)
+           Разблокировка аудио (iOS)
            ============================================================ */
         window.__pageAudioUnlocked = false;
         window.__audioUnlockCallbacks = [];
@@ -1746,7 +1721,6 @@
                 if (window.__pageAudioUnlocked) return;
                 window.__pageAudioUnlocked = true;
 
-                /* 1. Общий "замок" через silent WAV */
                 try {
                     const a = new Audio();
                     a.src = SILENT_WAV;
@@ -1757,7 +1731,6 @@
                     }
                 } catch (e) {}
 
-                /* 2. Замок через Web Audio API */
                 try {
                     const Ctx = window.AudioContext || window.webkitAudioContext;
                     if (Ctx) {
@@ -1771,7 +1744,6 @@
                     }
                 } catch (e) {}
 
-                /* 3. Просим все зарегистрированные модули разблокировать свои аудио-элементы */
                 window.__audioUnlockCallbacks.forEach(fn => {
                     try { fn(); } catch (e) {}
                 });
@@ -1871,38 +1843,22 @@
                 heroes: 'Чти великих'
             };
 
-            /* Кэш аудио слогов */
+            /* ============================================================
+               Кэш аудио слогов — БЕЗ предзагрузки. Играем по требованию,
+               параллельно кладём в Map для последующих игр.
+               Это убирает 300 сетевых запросов при загрузке страницы.
+               ============================================================ */
             const audioCache = new Map();
 
-            function preloadSyllableAudio() {
-                syllables.forEach(s => {
-                    if (audioCache.has(s)) return;
-                    const a = new Audio();
+            function getSyllableAudio(syllable) {
+                let a = audioCache.get(syllable);
+                if (!a) {
+                    a = new Audio('audio/' + syllable + '.mp3');
                     a.preload = 'auto';
-                    a.src = 'audio/' + s + '.mp3';
-                    audioCache.set(s, a);
-                });
+                    audioCache.set(syllable, a);
+                }
+                return a;
             }
-
-            /* Разблокировать все загруженные слоговые аудио при первом тапе */
-            window.__audioUnlockCallbacks.push(function unlockSyllables() {
-                audioCache.forEach(a => {
-                    try {
-                        a.volume = 0;
-                        a.currentTime = 0;
-                        const p = a.play();
-                        if (p && p.then) {
-                            p.then(() => {
-                                try { a.pause(); a.currentTime = 0; } catch (e) {}
-                                a.volume = 1;
-                            }).catch(() => { a.volume = 1; });
-                        } else {
-                            try { a.pause(); a.currentTime = 0; } catch (e) {}
-                            a.volume = 1;
-                        }
-                    } catch (e) {}
-                });
-            });
 
             function loadLearnedSet() {
                 try { return new Set(JSON.parse(localStorage.getItem('learned_syllables') || '[]')); }
@@ -1950,9 +1906,15 @@
                 });
             }
 
+            /* Скролл-кнопка — не дёргаем layout на каждый скролл, троттлим через rAF */
+            let scrollRaf = null;
             window.addEventListener('scroll', () => {
-                scrollTopBtn.classList.toggle('visible', window.scrollY > 300);
-            });
+                if (scrollRaf) return;
+                scrollRaf = requestAnimationFrame(() => {
+                    scrollTopBtn.classList.toggle('visible', window.scrollY > 300);
+                    scrollRaf = null;
+                });
+            }, { passive: true });
             scrollTopBtn.addEventListener('click', () => {
                 window.scrollTo({ top: 0, behavior: 'smooth' });
             });
@@ -1977,6 +1939,7 @@
             function renderGrid() {
                 grid.innerHTML = '';
                 const items = currentMode === 'random' ? randomItems : syllables;
+                const frag = document.createDocumentFragment();
                 items.forEach(syllable => {
                     const card = document.createElement('div');
                     card.className = 'syllable-card';
@@ -2006,8 +1969,9 @@
                             handleSyllableClick(syllable, card);
                         }
                     });
-                    grid.appendChild(card);
+                    frag.appendChild(card);
                 });
+                grid.appendChild(frag);
                 refreshProgressData();
             }
 
@@ -2029,12 +1993,7 @@
                         currentAudio.currentTime = 0;
                     } catch (e) {}
                 }
-                let audio = audioCache.get(syllable);
-                if (!audio) {
-                    audio = new Audio('audio/' + syllable + '.mp3');
-                    audio.preload = 'auto';
-                    audioCache.set(syllable, audio);
-                }
+                const audio = getSyllableAudio(syllable);
                 try { audio.currentTime = 0; } catch (e) {}
                 audio.volume = 1;
                 currentAudio = audio;
@@ -2044,7 +2003,7 @@
 
             function handleSyllableClick(syllable, card) {
                 card.classList.add('playing');
-                setTimeout(() => card.classList.remove('playing'), 500);
+                setTimeout(() => card.classList.remove('playing'), 400);
                 playAudio(syllable);
             }
 
@@ -2197,11 +2156,9 @@
                 }
             });
 
-            function showToast(message, type = 'info') {
+            function showToast(message) {
                 const toast = document.createElement('div');
                 toast.className = 'toast';
-                if (type === 'error') toast.classList.add('error');
-                if (type === 'success') toast.classList.add('success');
                 toast.textContent = message;
                 toastContainer.appendChild(toast);
                 setTimeout(() => toast.remove(), 2000);
@@ -2280,7 +2237,6 @@
                 { year: 1991, name: 'Разрушение<br>СССР' }
             ];
 
-            /* Все ключевые события для мобильного списка — в хронологическом порядке */
             const MOBILE_EVENTS = [
                 { year: 1721, short: 'Победа в Северной войне' },
                 { year: 1812, short: 'Отечественная война' },
@@ -2292,8 +2248,6 @@
                 { year: 1991, short: 'Разрушение СССР' }
             ];
 
-            /* Мобильная лента: вертикальный список годов и событий.
-               События в период жизни героя — красным. */
             function buildSimpleTimelineHTML(birthYear, deathYear) {
                 let html = '<div class="simple-timeline">';
                 html += '<div class="simple-timeline-head">Хронология истории</div>';
@@ -2420,7 +2374,7 @@
                                  data-audio="${encodePath('Great Rus/' + hero.audio)}" 
                                  data-images='${imagesJson}'>
                                 <div class="hero-photo">
-                                    <img src="${imagePath}" alt="${hero.name}" loading="lazy">
+                                    <img src="${imagePath}" alt="${hero.name}" loading="lazy" decoding="async">
                                 </div>
                                 <div class="hero-info">
                                     <div class="hero-name">${hero.name}</div>
@@ -2474,7 +2428,7 @@
                     <div class="hero-modal-scroll">
                         <div class="hero-modal-portrait-wrap">
                             ${navHTML}
-                            <img class="hero-modal-portrait" src="${images[0]}" alt="${name}">
+                            <img class="hero-modal-portrait" src="${images[0]}" alt="${name}" decoding="async">
                         </div>
                         <div class="hero-modal-bottom">
                             <div class="hero-modal-info">
@@ -2493,7 +2447,6 @@
 
                 const imgEl = heroModal.querySelector('.hero-modal-portrait');
                 imgEl.addEventListener('error', () => {
-                    console.warn('Не удалось загрузить изображение:', imgEl.src);
                     const placeholder = document.createElement('div');
                     placeholder.className = 'hero-portrait-placeholder';
                     placeholder.textContent = initials;
@@ -2539,12 +2492,11 @@
                 } catch (e) {}
                 heroAudio.src = src;
                 const p = heroAudio.play();
-                if (p && p.catch) p.catch(e => console.log('Ошибка воспроизведения', e));
+                if (p && p.catch) p.catch(() => {});
             }
 
             renderHeroesTimeline();
             renderGrid();
-            preloadSyllableAudio();
 
         })();
     </script>
@@ -2557,12 +2509,6 @@
         const schemeView  = document.getElementById('schemeView');
         const minuteScheme= document.getElementById('minuteScheme');
         if (!clockView || !watchView || !schemeView) return;
-
-        document.querySelectorAll('[filter="url(#clk-strapShadow)"]').forEach(el => {
-            el.removeAttribute('filter');
-        });
-        const strapFilter = document.getElementById('clk-strapShadow');
-        if (strapFilter) strapFilter.remove();
 
         const hourHandEl   = document.getElementById('clk-hourHand');
         const minuteHandEl = document.getElementById('clk-minuteHand');
@@ -2720,40 +2666,28 @@
         }
 
         /* ============================================================
-           АУДИО-ПУЛ ЧАСОВ
-           Все mp3 предзагружаем в Map, элементы живут всё время
+           АУДИО-ПУЛ ЧАСОВ — только те, что реально нужны при запуске.
+           Всё остальное догружаем при первом использовании.
+           Это убирает 71 сетевой запрос в момент загрузки.
            ============================================================ */
         const clockAudioPool = new Map();
-
-        function preloadClockAudio() {
-            const names = [];
-            for (let h = 1; h <= 12; h++) names.push(`h_${String(h).padStart(2,'0')}.mp3`);
-            for (let m = 1; m <= 59; m++) names.push(`m_${String(m).padStart(2,'0')}.mp3`);
-            names.push('rovno.mp3');
-            names.forEach(n => {
-                if (clockAudioPool.has(n)) return;
-                const a = new Audio();
-                a.preload = 'auto';
-                a.src = AUDIO_DIR + n;
-                a.volume = 1;
-                clockAudioPool.set(n, a);
-            });
-        }
 
         function getClockAudio(name) {
             let a = clockAudioPool.get(name);
             if (!a) {
                 a = new Audio(AUDIO_DIR + name);
                 a.preload = 'auto';
-                a.volume = 1;
                 clockAudioPool.set(name, a);
             }
             return a;
         }
 
-        /* Регистрируем разблокировку всех аудио-элементов часов
-           при первом тапе пользователя. Именно так iOS разрешает
-           впоследствии играть любые из этих элементов. */
+        /* Прогреваем только те, что с высокой вероятностью нужны при первом клике */
+        function preloadClockCore() {
+            ['rovno.mp3'].forEach(n => getClockAudio(n));
+            for (let h = 1; h <= 12; h++) getClockAudio(`h_${String(h).padStart(2,'0')}.mp3`);
+        }
+
         window.__audioUnlockCallbacks.push(function unlockClockAudio() {
             clockAudioPool.forEach(a => {
                 try {
@@ -2773,12 +2707,8 @@
             });
         });
 
-        preloadClockAudio();
+        preloadClockCore();
 
-        /* ============================================================
-           Воспроизведение цепочки: час + минуты (или "ровно")
-           Каждый звук — из пула, уже разблокированный
-           ============================================================ */
         function speakTime() {
             stopClockAudio();
 
@@ -2814,7 +2744,6 @@
 
                 const p = a.play();
                 if (p && p.catch) p.catch(() => {
-                    console.warn('Clock audio play failed for', name);
                     a.removeEventListener('ended', onEnded);
                     a.removeEventListener('error', onErr);
                     idx++;
