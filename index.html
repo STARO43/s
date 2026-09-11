@@ -12,7 +12,10 @@
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
 
-        :root {
+        /* ================= БУМАГА (сорта) ================= */
+
+        :root,
+        body[data-paper="newsprint"] {
             --bg:        #f2ecdf;
             --bg-2:      #e8e0ce;
             --bg-3:      #ddd3bd;
@@ -20,14 +23,76 @@
             --fg-2:      #3a3a3a;
             --fg-3:      #8a8060;
             --rule-soft: rgba(20, 20, 20, 0.16);
+        }
+        body[data-paper="vatman"] {
+            --bg:        #ffffff;
+            --bg-2:      #f4f4f4;
+            --bg-3:      #e8e8e8;
+            --fg:        #000000;
+            --fg-2:      #333333;
+            --fg-3:      #888888;
+            --rule-soft: rgba(0, 0, 0, 0.14);
+        }
+        body[data-paper="calk"] {
+            --bg:        #e6e4dd;
+            --bg-2:      #d8d5cc;
+            --bg-3:      #c8c5bb;
+            --fg:        #1c1c1c;
+            --fg-2:      #3d3d3d;
+            --fg-3:      #888070;
+            --rule-soft: rgba(20, 20, 20, 0.15);
+        }
+        body[data-paper="millimeter"] {
+            --bg:        #eef5ec;
+            --bg-2:      #dfe9dc;
+            --bg-3:      #c9d9c5;
+            --fg:        #141414;
+            --fg-2:      #2f3a2e;
+            --fg-3:      #6d8068;
+            --rule-soft: rgba(30, 80, 40, 0.20);
+        }
+        body[data-paper="blueprint"] {
+            --bg:        #0a1a2e;
+            --bg-2:      #0f2340;
+            --bg-3:      #143056;
+            --fg:        #e8f0ff;
+            --fg-2:      #a8bcd8;
+            --fg-3:      #5a7090;
+            --rule-soft: rgba(200, 220, 255, 0.14);
+        }
+        body[data-paper="carbon"] {
+            --bg:        #1a1815;
+            --bg-2:      #241f1a;
+            --bg-3:      #302822;
+            --fg:        #f5e8d0;
+            --fg-2:      #b8a888;
+            --fg-3:      #7a6850;
+            --rule-soft: rgba(245, 232, 208, 0.13);
+        }
 
-            --accent:    #e30613;
+        /* ================= КРАСКИ (типографские пигменты) ================= */
+
+        body[data-ink="kinovar"]     { --accent: #e30613; --accent-fg: #ffffff; }
+        body[data-ink="ultramarine"] { --accent: #1e3a8a; --accent-fg: #ffffff; }
+        body[data-ink="berlin"]      { --accent: #003153; --accent-fg: #ffffff; }
+        body[data-ink="ochre"]       { --accent: #b8860b; --accent-fg: #ffffff; }
+        body[data-ink="sepia"]       { --accent: #704214; --accent-fg: #ffffff; }
+        body[data-ink="emerald"]     { --accent: #046307; --accent-fg: #ffffff; }
+        body[data-ink="purpur"]      { --accent: #6b0f7d; --accent-fg: #ffffff; }
+        body[data-ink="cadmium"]     { --accent: #e85d04; --accent-fg: #141414; }
+
+        /* На тёмных бумагах тёмные краски теряют контраст — глушим */
+        body[data-paper="blueprint"][data-ink="berlin"],
+        body[data-paper="carbon"][data-ink="sepia"],
+        body[data-paper="carbon"][data-ink="berlin"] {
+            --accent: #c11d1d;
             --accent-fg: #ffffff;
+        }
 
+        :root {
             --font-display: 'Oswald', 'Arial Narrow', sans-serif;
             --font-doc:     'IBM Plex Mono', 'Courier New', monospace;
             --font-ui:      'Inter', system-ui, sans-serif;
-
             --ease: cubic-bezier(0.16, 1, 0.3, 1);
             --snap: cubic-bezier(0.4, 0, 0.2, 1);
         }
@@ -45,6 +110,7 @@
             display: flex;
             flex-direction: column;
             overscroll-behavior-x: none;
+            transition: background 0.4s ease, color 0.4s ease;
         }
 
         body::before {
@@ -62,6 +128,205 @@
         }
         body > * { position: relative; z-index: 1; }
 
+        /* ================= КОЛОНТИТУЛ ГАЗЕТЫ ================= */
+
+        .header-masthead {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 14px;
+            padding: 10px 0;
+            border-top: none;
+            border-bottom: 3px solid var(--fg);
+            font-family: var(--font-doc);
+            font-size: 0.6rem;
+            font-weight: 600;
+            letter-spacing: 0.16em;
+            text-transform: uppercase;
+            color: var(--fg);
+            margin-bottom: 4px;
+            flex-wrap: wrap;
+        }
+
+        .masthead-cell {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            min-width: 0;
+        }
+        .masthead-cell.masthead-left   { flex: 1 1 auto; justify-content: flex-start; }
+        .masthead-cell.masthead-center { flex: 0 1 auto; justify-content: center; }
+        .masthead-cell.masthead-right  { flex: 1 1 auto; justify-content: flex-end; }
+
+        .masthead-sep {
+            color: var(--fg-3);
+            opacity: 0.6;
+            padding: 0 2px;
+            user-select: none;
+        }
+
+        .masthead-switch {
+            background: transparent;
+            border: none;
+            padding: 2px 0;
+            font-family: inherit;
+            font-size: inherit;
+            font-weight: 700;
+            letter-spacing: inherit;
+            text-transform: inherit;
+            color: var(--fg);
+            cursor: pointer;
+            position: relative;
+            transition: color 0.12s linear;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 100%;
+        }
+        .masthead-switch::after {
+            content: '';
+            position: absolute;
+            left: 0; right: 0; bottom: -1px;
+            height: 1px;
+            background-image: linear-gradient(90deg, currentColor 50%, transparent 50%);
+            background-size: 4px 1px;
+            background-repeat: repeat-x;
+            opacity: 0.55;
+            transition: opacity 0.12s linear;
+        }
+        .masthead-switch:hover {
+            color: var(--accent);
+        }
+        .masthead-switch:hover::after {
+            opacity: 1;
+        }
+        .masthead-switch:active {
+            color: var(--accent);
+        }
+
+        /* ================= МИНИ-ШТАМП (раскрывающийся список) ================= */
+
+        .masthead-stamp {
+            position: fixed;
+            z-index: 1400;
+            background: var(--bg);
+            border: 2px solid var(--fg);
+            box-shadow: 8px 8px 0 var(--accent);
+            min-width: 240px;
+            max-width: 92vw;
+            padding: 0;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-6px);
+            transition: opacity 0.18s linear, transform 0.18s var(--snap), visibility 0.18s;
+            font-family: var(--font-doc);
+        }
+        .masthead-stamp.show {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+
+        .stamp-head {
+            padding: 8px 12px;
+            background: var(--bg-2);
+            border-bottom: 1px solid var(--fg);
+            font-size: 0.55rem;
+            font-weight: 700;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            color: var(--fg);
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            gap: 10px;
+        }
+        .stamp-head-count {
+            color: var(--fg-3);
+            font-weight: 600;
+        }
+
+        .stamp-list {
+            padding: 6px;
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 2px;
+        }
+        .stamp-list.single-col {
+            grid-template-columns: 1fr;
+        }
+
+        .stamp-opt {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 7px 9px;
+            background: transparent;
+            border: 1.5px solid transparent;
+            color: var(--fg);
+            font-family: var(--font-display);
+            font-weight: 500;
+            font-size: 0.78rem;
+            letter-spacing: 0.03em;
+            text-transform: uppercase;
+            cursor: pointer;
+            text-align: left;
+            transition: all 0.1s linear;
+            width: 100%;
+            min-width: 0;
+        }
+        .stamp-opt:hover {
+            background: var(--bg-2);
+            border-color: var(--fg);
+        }
+        .stamp-opt.active {
+            background: var(--fg);
+            color: var(--bg);
+            border-color: var(--fg);
+        }
+        .stamp-opt-swatch {
+            width: 14px;
+            height: 14px;
+            border: 1.5px solid currentColor;
+            flex-shrink: 0;
+            background: var(--sw, #fff);
+        }
+        .stamp-opt-label {
+            flex: 1;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .stamp-opt-check {
+            font-family: var(--font-doc);
+            font-size: 0.7rem;
+            font-weight: 700;
+            opacity: 0;
+            flex-shrink: 0;
+        }
+        .stamp-opt.active .stamp-opt-check { opacity: 1; }
+
+        /* Сваточки бумаг */
+        .stamp-opt[data-paper-opt="newsprint"]  { --sw: #f2ecdf; }
+        .stamp-opt[data-paper-opt="vatman"]     { --sw: #ffffff; }
+        .stamp-opt[data-paper-opt="calk"]       { --sw: #e6e4dd; }
+        .stamp-opt[data-paper-opt="millimeter"] { --sw: #eef5ec; }
+        .stamp-opt[data-paper-opt="blueprint"]  { --sw: #0a1a2e; }
+        .stamp-opt[data-paper-opt="carbon"]     { --sw: #1a1815; }
+
+        /* Сваточки красок */
+        .stamp-opt[data-ink-opt="kinovar"]     .stamp-opt-swatch { background: #e30613; }
+        .stamp-opt[data-ink-opt="ultramarine"] .stamp-opt-swatch { background: #1e3a8a; }
+        .stamp-opt[data-ink-opt="berlin"]      .stamp-opt-swatch { background: #003153; }
+        .stamp-opt[data-ink-opt="ochre"]       .stamp-opt-swatch { background: #b8860b; }
+        .stamp-opt[data-ink-opt="sepia"]       .stamp-opt-swatch { background: #704214; }
+        .stamp-opt[data-ink-opt="emerald"]     .stamp-opt-swatch { background: #046307; }
+        .stamp-opt[data-ink-opt="purpur"]      .stamp-opt-swatch { background: #6b0f7d; }
+        .stamp-opt[data-ink-opt="cadmium"]     .stamp-opt-swatch { background: #e85d04; }
+
         /* ================= ШАПКА ================= */
 
         .header { padding: 16px 20px 0; }
@@ -71,7 +336,7 @@
             align-items: center;
             justify-content: center;
             padding: 14px 20px;
-            border-top: 3px solid var(--fg);
+            border-top: none;
             border-bottom: 3px solid var(--fg);
             font-family: var(--font-doc);
             font-size: 0.72rem;
@@ -93,12 +358,13 @@
             text-transform: uppercase;
             color: var(--fg);
             margin: 20px 0 28px;
+text-align: center; 
         }
         .header h1::after { content: '.'; color: var(--accent); }
 
         .section-switch {
             display: flex;
-            margin: 0 -20px;
+            margin: 0;
             border-top: 3px solid var(--fg);
             border-bottom: 3px solid var(--fg);
         }
@@ -123,7 +389,6 @@
         .section-switch-btn.active { background: var(--fg); color: var(--bg); }
         .section-switch-btn:hover:not(.active) { background: var(--bg-2); }
 
-        /* Одна кнопка переключения разделов (только мобила) */
         .section-cycle-btn {
             display: none;
             width: calc(100% + 40px);
@@ -155,7 +420,7 @@
 
         .section-subtitles {
             display: flex;
-            margin: 0 -20px;
+            margin: 0;
             border-bottom: 2px solid var(--fg);
             background: var(--bg-2);
             min-height: 44px;
@@ -242,7 +507,7 @@
         .progress-bar {
             width: 100%;
             height: 8px;
-            background: rgba(255,255,255,0.18);
+            background: rgba(128,128,128,0.25);
             overflow: hidden;
         }
         .progress-fill {
@@ -252,7 +517,7 @@
             transition: width 0.4s linear;
         }
 
-        /* ================= КНОПКИ УПРАВЛЕНИЯ (слоги) ================= */
+        /* ================= КНОПКИ УПРАВЛЕНИЯ ================= */
 
         .controls {
             display: flex;
@@ -348,16 +613,15 @@
             align-items: center;
             justify-content: center;
         }
-        
-        /* Анимация приподнятия как у портретов */
-        .syllable-card:not(.learned):hover { 
-            background: var(--fg); 
-            color: var(--bg); 
+
+        .syllable-card:not(.learned):hover {
+            background: var(--fg);
+            color: var(--bg);
             transform: translate(-3px, -3px);
             box-shadow: 6px 6px 0 var(--accent);
             z-index: 10;
         }
-        
+
         .syllable-card.playing {
             background: var(--accent);
             color: var(--accent-fg);
@@ -513,7 +777,6 @@
             line-height: 1;
         }
 
-        /* Исправленный крестик выхода (как в модалке героев) */
         .exam-exit-btn {
             position: absolute;
             top: 24px; left: 24px;
@@ -535,9 +798,9 @@
             font-family: var(--font-ui);
             -webkit-tap-highlight-color: transparent;
         }
-        .exam-exit-btn:hover { 
-            color: var(--accent); 
-            transform: scale(1.12); 
+        .exam-exit-btn:hover {
+            color: var(--accent);
+            transform: scale(1.12);
         }
 
         /* ================= ПОЗДРАВЛЕНИЕ ================= */
@@ -628,13 +891,13 @@
         .footer {
             text-align: center;
             padding: 26px 20px;
-            color: var(--fg-3);
             font-family: var(--font-doc);
             font-size: 0.62rem;
             font-weight: 600;
             letter-spacing: 0.18em;
             text-transform: uppercase;
             border-top: 3px solid var(--fg);
+            color: var(--fg-3);
         }
 
         /* ============================================================
@@ -673,7 +936,7 @@
 
         .soviet-band {
             background: var(--accent);
-            color: #ffffff;
+            color: var(--accent-fg);
             padding: 14px 24px;
             display: flex;
             align-items: center;
@@ -971,7 +1234,6 @@
             border: 1.5px solid var(--fg);
             box-sizing: border-box;
             z-index: 6;
-            box-shadow: 0 0 0 1px rgba(255,255,255,0.35) inset;
         }
         .htl-life::before,
         .htl-life::after {
@@ -1169,33 +1431,48 @@
         @media (max-width: 640px) {
             .header { padding: 12px 14px 0; }
 
-            /* Подпись сверху — компактнее */
+            .header-masthead {
+                padding: 8px 0;
+                font-size: 0.5rem;
+                letter-spacing: 0.12em;
+                gap: 4px 10px;
+                flex-wrap: wrap;
+                justify-content: center;
+                margin-bottom: 2px;
+            }
+            .masthead-cell.masthead-left,
+            .masthead-cell.masthead-right {
+                flex: 0 1 auto;
+                justify-content: center;
+            }
+            .masthead-cell.masthead-center { display: none; }
+            .masthead-sep.optional { display: none; }
+
             .header-kicker {
                 margin-bottom: 14px;
                 font-size: 0.52rem;
                 letter-spacing: 0.14em;
                 padding: 10px 12px;
                 line-height: 1.3;
+                border-top: 1px solid var(--fg);
             }
 
-            /* НАЗВАНИЕ — огромное, почти на всю ширину экрана */
-           .header h1 {
-    font-size: 18vw;
-    line-height: 0.85;
-    letter-spacing: -0.05em;
-    white-space: nowrap;
-    word-break: keep-all;
-    overflow-wrap: normal;
-    margin: 10px 0 16px;
-    max-width: 100%;
-}
+            .header h1 {
+                font-size: 18vw;
+                line-height: 0.85;
+                letter-spacing: -0.05em;
+                white-space: nowrap;
+                word-break: keep-all;
+                overflow-wrap: normal;
+                margin: 10px 0 16px;
+                max-width: 100%;
+            }
 
-            /* 3 таба прячем, показываем одну кнопку-цикл */
             .section-switch { display: none; }
             .section-cycle-btn {
                 display: flex;
-                width: calc(100% + 28px);
-                margin: 0 -14px;
+                width: 100%;
+                margin: 0;
                 font-size: 0.8rem;
                 letter-spacing: 0.14em;
                 padding: 16px 14px;
@@ -1206,7 +1483,6 @@
 
             .section-subtitles { margin: 0 -14px; min-height: 40px; }
 
-            /* Активная подпись занимает всю ширину и центрируется */
             .section-subtitle {
                 display: none;
                 padding: 10px 10px;
@@ -1258,7 +1534,6 @@
             .century-header { padding: 14px 16px; margin-bottom: 18px; }
             .century-header:not(:first-child) { margin-top: 40px; }
 
-            /* 5. Портреты — вертикально, без горизонтального скролла */
             .heroes-grid {
                 display: grid;
                 grid-template-columns: repeat(auto-fill, minmax(148px, 1fr));
@@ -1267,10 +1542,7 @@
                 overflow: visible;
                 padding: 0;
             }
-            .hero-item {
-                flex: none;
-                scroll-snap-align: none;
-            }
+            .hero-item { flex: none; scroll-snap-align: none; }
             .hero-info { padding: 10px 10px 12px; }
             .hero-name { font-size: 1rem; }
             .hero-years { font-size: 0.62rem; }
@@ -1305,7 +1577,6 @@
             .hero-modal-info h3 { font-size: 1.75rem; }
             .hero-modal-years { font-size: 0.88rem; margin-top: 6px; }
 
-            /* Лента времени на мобиле скрыта */
             .hero-modal-timeline { display: none; }
 
             .clock-wrapper { padding: 26px 0 70px; }
@@ -1323,10 +1594,22 @@
             }
 
             .progress-container { padding: 14px 18px 16px; }
+
+            .masthead-stamp {
+                left: 50% !important;
+                right: auto !important;
+                top: auto !important;
+                bottom: 20px !important;
+                transform: translateX(-50%) translateY(8px);
+                box-shadow: 6px 6px 0 var(--accent);
+                max-width: calc(100vw - 24px);
+            }
+            .masthead-stamp.show {
+                transform: translateX(-50%) translateY(0);
+            }
         }
 
         @media (max-width: 420px) {
-            /* «СХЕМА» всегда видна */
             .frame-head-top {
                 justify-content: center;
                 gap: 6px;
@@ -1343,7 +1626,6 @@
                 display: none;
             }
 
-            /* Ещё больше название на узких */
             .header h1 {
                 font-size: 18vw;
                 letter-spacing: -0.06em;
@@ -1352,6 +1634,10 @@
             .header-kicker {
                 font-size: 0.48rem;
                 letter-spacing: 0.12em;
+            }
+            .header-masthead {
+                font-size: 0.46rem;
+                letter-spacing: 0.1em;
             }
             .section-cycle-btn {
                 font-size: 0.75rem;
@@ -1369,36 +1655,53 @@
                 letter-spacing: 0.06em;
             }
 
-            /* Портреты — 2 колонки даже на самых узких */
             .heroes-grid {
                 grid-template-columns: repeat(auto-fill, minmax(132px, 1fr));
                 gap: 10px;
             }
             .hero-name { font-size: 0.92rem; }
             .hero-years { font-size: 0.58rem; }
-            
-            /* Часы чуть уже на совсем мелких */
+
             .clock-frame {
                 width: min(480px, 96vw);
             }
         }
     </style>
 </head>
-<body>
+<body data-paper="newsprint" data-ink="kinovar">
 
     <header class="header">
+        <div class="header-masthead">
+            <div class="masthead-cell masthead-left">
+                <span></span>
+            </div>
+
+            <div class="masthead-cell masthead-center">
+                <span class="masthead-sep"></span>
+                <span></span>
+                <span class="masthead-sep"></span>
+            </div>
+
+            <div class="masthead-cell masthead-right">
+                <span class="masthead-sep optional">|</span>
+                <span>Бумага:</span>
+                <button class="masthead-switch" id="paperSwitch" type="button" title="Бумага">газетная</button>
+                <span class="masthead-sep">·</span>
+                <span>Краска:</span>
+                <button class="masthead-switch" id="inkSwitch" type="button" title="Краска">киноварь</button>
+            </div>
+        </div>
+
         <div class="header-kicker">УЧИТЬСЯ, УЧИТЬСЯ И ЕЩЁ РАЗ УЧИТЬСЯ</div>
 
         <h1>Грамотиньо</h1>
 
-        <!-- Десктоп: 3 таба -->
         <div class="section-switch">
             <button class="section-switch-btn active" data-section="syllables">УЧИ СЛОГИ</button>
             <button class="section-switch-btn" data-section="clock">ЗНАЙ ВРЕМЯ</button>
             <button class="section-switch-btn" data-section="heroes">ЧТИ ВЕЛИКИХ</button>
         </div>
 
-        <!-- Мобила: одна кнопка переключения разделов -->
         <button class="section-cycle-btn" id="sectionCycleBtn" type="button">
             <span class="section-cycle-label">УЧИ СЛОГИ</span>
             <span class="section-cycle-arrow">➛</span>
@@ -1412,6 +1715,14 @@
             <div class="section-subtitle" data-section="heroes">ВЕЛИКИЕ ЛИЧНОСТИ ОТЕЧЕСТВА</div>
         </div>
     </header>
+
+    <div class="masthead-stamp" id="mastheadStamp" role="dialog" aria-hidden="true">
+        <div class="stamp-head">
+            <span id="stampTitle">Выбор бумаги</span>
+            <span class="stamp-head-count" id="stampCount">01 / 06</span>
+        </div>
+        <div class="stamp-list" id="stampList"></div>
+    </div>
 
     <div class="content-wrapper">
         <section id="syllablesSection" class="tab-section active">
@@ -1631,7 +1942,7 @@
     </div>
 
     <footer class="footer">
-        <p>Спасибо за вайбкодинг в тегешечку @vnvax</p>
+        <p>Вайбкодинг тг @vnvax</p>
     </footer>
 
     <div class="toast-container" id="toastContainer"></div>
@@ -2333,9 +2644,227 @@
             updateCycleBtn();
 
         })();
+
+        /* ============================================================
+           КОЛОНТИТУЛ ГАЗЕТЫ — логика
+           ============================================================ */
+        (function() {
+            const STORAGE_PAPER = 'gramotino_paper';
+            const STORAGE_INK   = 'gramotino_ink';
+
+            const PAPERS = [
+                { key: 'newsprint',  label: 'газетная' },
+                { key: 'vatman',     label: 'ватман' },
+                { key: 'calk',       label: 'калька' },
+                { key: 'millimeter', label: 'миллиметровка' },
+                { key: 'blueprint',  label: 'синька' },
+                { key: 'carbon',     label: 'копирка' }
+            ];
+
+            const INKS = [
+                { key: 'kinovar',     label: 'киноварь' },
+                { key: 'ultramarine', label: 'ультрамарин' },
+                { key: 'berlin',      label: 'берлинская лазурь' },
+                { key: 'ochre',       label: 'охра' },
+                { key: 'sepia',       label: 'сепия' },
+                { key: 'emerald',     label: 'изумрудная' },
+                { key: 'purpur',      label: 'пурпур' },
+                { key: 'cadmium',     label: 'кадмий' }
+            ];
+
+            const body = document.body;
+            const paperSwitch = document.getElementById('paperSwitch');
+            const inkSwitch = document.getElementById('inkSwitch');
+            const stamp = document.getElementById('mastheadStamp');
+            const stampTitle = document.getElementById('stampTitle');
+            const stampCount = document.getElementById('stampCount');
+            const stampList = document.getElementById('stampList');
+
+            let currentPaperKey = 'newsprint';
+            let currentInkKey = 'kinovar';
+            let openMode = null;
+
+            function pad2(n) { return String(n).padStart(2, '0'); }
+
+            function findPaper(key) { return PAPERS.find(p => p.key === key) || PAPERS[0]; }
+            function findInk(key)   { return INKS.find(i => i.key === key)   || INKS[0]; }
+
+            function applyPaper(key, silent) {
+                if (!PAPERS.some(p => p.key === key)) key = 'newsprint';
+                currentPaperKey = key;
+                body.dataset.paper = key;
+                try { localStorage.setItem(STORAGE_PAPER, key); } catch(e) {}
+                if (paperSwitch) paperSwitch.textContent = findPaper(key).label;
+                if (!silent && openMode === 'paper') renderStampList('paper');
+            }
+
+            function applyInk(key, silent) {
+                if (!INKS.some(i => i.key === key)) key = 'kinovar';
+                currentInkKey = key;
+                body.dataset.ink = key;
+                try { localStorage.setItem(STORAGE_INK, key); } catch(e) {}
+                if (inkSwitch) inkSwitch.textContent = findInk(key).label;
+                if (!silent && openMode === 'ink') renderStampList('ink');
+            }
+
+            function cyclePaper() {
+                const idx = PAPERS.findIndex(p => p.key === currentPaperKey);
+                const next = PAPERS[(idx + 1) % PAPERS.length];
+                applyPaper(next.key);
+            }
+            function cycleInk() {
+                const idx = INKS.findIndex(i => i.key === currentInkKey);
+                const next = INKS[(idx + 1) % INKS.length];
+                applyInk(next.key);
+            }
+
+            function renderStampList(mode) {
+                const list = mode === 'paper' ? PAPERS : INKS;
+                const currentKey = mode === 'paper' ? currentPaperKey : currentInkKey;
+                const currentIdx = list.findIndex(item => item.key === currentKey);
+
+                stampTitle.textContent = mode === 'paper' ? 'Выбор бумаги' : 'Выбор краски';
+                stampCount.textContent = `${pad2(currentIdx + 1)} / ${pad2(list.length)}`;
+
+                stampList.classList.toggle('single-col', mode === 'paper');
+
+                stampList.innerHTML = '';
+                list.forEach(item => {
+                    const btn = document.createElement('button');
+                    btn.type = 'button';
+                    btn.className = 'stamp-opt' + (item.key === currentKey ? ' active' : '');
+                    if (mode === 'paper') btn.setAttribute('data-paper-opt', item.key);
+                    else                  btn.setAttribute('data-ink-opt', item.key);
+
+                    const swatch = document.createElement('span');
+                    swatch.className = 'stamp-opt-swatch';
+
+                    const label = document.createElement('span');
+                    label.className = 'stamp-opt-label';
+                    label.textContent = item.label;
+
+                    const check = document.createElement('span');
+                    check.className = 'stamp-opt-check';
+                    check.textContent = '✓';
+
+                    btn.appendChild(swatch);
+                    btn.appendChild(label);
+                    btn.appendChild(check);
+
+                    btn.addEventListener('click', () => {
+                        if (mode === 'paper') applyPaper(item.key);
+                        else                  applyInk(item.key);
+                    });
+                    stampList.appendChild(btn);
+                });
+            }
+
+            function openStamp(mode, anchor) {
+                openMode = mode;
+                renderStampList(mode);
+
+                const rect = anchor.getBoundingClientRect();
+                const isMobile = window.innerWidth <= 640;
+
+                if (!isMobile) {
+                    let left = rect.left;
+                    const stampWidth = 260;
+                    if (left + stampWidth > window.innerWidth - 12) {
+                        left = window.innerWidth - stampWidth - 12;
+                    }
+                    if (left < 12) left = 12;
+
+                    stamp.style.left = left + 'px';
+                    stamp.style.right = 'auto';
+                    stamp.style.top = (rect.bottom + 8) + 'px';
+                    stamp.style.bottom = 'auto';
+                    stamp.style.transform = '';
+                }
+
+                stamp.classList.add('show');
+                stamp.setAttribute('aria-hidden', 'false');
+            }
+
+            function closeStamp() {
+                openMode = null;
+                stamp.classList.remove('show');
+                stamp.setAttribute('aria-hidden', 'true');
+            }
+
+            paperSwitch.addEventListener('click', () => {
+                if (openMode) { closeStamp(); return; }
+                cyclePaper();
+            });
+            inkSwitch.addEventListener('click', () => {
+                if (openMode) { closeStamp(); return; }
+                cycleInk();
+            });
+
+            paperSwitch.addEventListener('contextmenu', (e) => {
+                e.preventDefault();
+                if (openMode === 'paper') closeStamp();
+                else openStamp('paper', paperSwitch);
+            });
+            inkSwitch.addEventListener('contextmenu', (e) => {
+                e.preventDefault();
+                if (openMode === 'ink') closeStamp();
+                else openStamp('ink', inkSwitch);
+            });
+
+            function attachLongPress(el, mode) {
+                let pressTimer = null;
+                let longPressFired = false;
+
+                el.addEventListener('touchstart', () => {
+                    longPressFired = false;
+                    pressTimer = setTimeout(() => {
+                        longPressFired = true;
+                        if (openMode === mode) closeStamp();
+                        else openStamp(mode, el);
+                    }, 500);
+                }, { passive: true });
+
+                el.addEventListener('touchend', (e) => {
+                    if (pressTimer) { clearTimeout(pressTimer); pressTimer = null; }
+                    if (longPressFired) {
+                        e.preventDefault();
+                        longPressFired = false;
+                    }
+                }, { passive: false });
+
+                el.addEventListener('touchmove', () => {
+                    if (pressTimer) { clearTimeout(pressTimer); pressTimer = null; }
+                }, { passive: true });
+            }
+            attachLongPress(paperSwitch, 'paper');
+            attachLongPress(inkSwitch, 'ink');
+
+            document.addEventListener('click', (e) => {
+                if (!openMode) return;
+                if (stamp.contains(e.target)) return;
+                if (e.target === paperSwitch || e.target === inkSwitch) return;
+                closeStamp();
+            });
+
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape' && openMode) closeStamp();
+            });
+
+            window.addEventListener('resize', () => { if (openMode) closeStamp(); });
+            window.addEventListener('scroll', () => { if (openMode) closeStamp(); }, { passive: true });
+
+            let savedPaper = 'newsprint';
+            let savedInk = 'kinovar';
+            try {
+                savedPaper = localStorage.getItem(STORAGE_PAPER) || 'newsprint';
+                savedInk = localStorage.getItem(STORAGE_INK) || 'kinovar';
+            } catch(e) {}
+            applyPaper(savedPaper, true);
+            applyInk(savedInk, true);
+        })();
     </script>
 
-      <!-- ==================== ЛОГИКА ЧАСОВ ==================== -->
+    <!-- ==================== ЛОГИКА ЧАСОВ (вернул к исходной версии) ==================== -->
     <script>
     (function () {
         const clockView   = document.getElementById('clockView');
@@ -2361,26 +2890,6 @@
         const GRAB_RADIUS      = 220;
 
         const AUDIO_DIR = 'clock_audio/';
-
-        // --- ИСПРАВЛЕНИЕ ДЛЯ IOS: ГЛОБАЛЬНЫЙ АУДИО ОБЪЕКТ ---
-        let clockAudioPlayer = new Audio();
-        clockAudioPlayer.preload = 'auto';
-        // Эти флаги критичны для iOS, чтобы звук играл внутри страницы
-        clockAudioPlayer.setAttribute('playsinline', 'true');
-        clockAudioPlayer.setAttribute('webkit-playsinline', 'true');
-        
-        // Функция "тихого старта" для разблокировки аудио на iOS
-        function unlockAudio() {
-            if (clockAudioPlayer.paused) {
-                clockAudioPlayer.src = AUDIO_DIR + 'h_00.mp3'; // Пытаемся загрузить любой файл
-                clockAudioPlayer.volume = 0.01; // Очень тихо
-                clockAudioPlayer.play().then(() => {
-                    clockAudioPlayer.pause();
-                    clockAudioPlayer.currentTime = 0;
-                    clockAudioPlayer.volume = 1.0; // Возвращаем громкость
-                }).catch(e => console.log('Audio unlock pending'));
-            }
-        }
 
         function buildMinuteScheme() {
             if (!minuteScheme) return;
@@ -2507,11 +3016,20 @@
         let totalMinutes = (hour % 12) * 60 + minute;
         let currentView = 'watch';
 
-        // --- ИСПРАВЛЕННАЯ ФУНКЦИЯ ВОСПРОИЗВЕДЕНИЯ ---
+        let currentAudioChain = [];
+
+        function stopClockAudio() {
+            currentAudioChain.forEach(a => {
+                try {
+                    a.pause();
+                    a.currentTime = 0;
+                } catch (e) {}
+            });
+            currentAudioChain = [];
+        }
+
         function speakTime() {
-            // Останавливаем текущее
-            clockAudioPlayer.pause();
-            clockAudioPlayer.currentTime = 0;
+            stopClockAudio();
 
             const queue = [`h_${String(hour).padStart(2, '0')}.mp3`];
             if (minute === 0) queue.push('rovno.mp3');
@@ -2521,31 +3039,24 @@
 
             function playNext() {
                 if (idx >= queue.length) return;
-                
-                // Меняем источник и играем
-                clockAudioPlayer.src = AUDIO_DIR + queue[idx];
-                
-                // Важно для iOS: вызов play() должен быть максимально быстрым
-                const playPromise = clockAudioPlayer.play();
-                
-                if (playPromise !== undefined) {
-                    playPromise.then(_ => {
-                        // Успешно запустилось
-                    })
-                    .catch(error => {
-                        console.warn("iOS Audio Block:", error);
-                        // Если заблокировано, пробуем следующий файл через паузу
-                        idx++;
-                        setTimeout(playNext, 100); 
-                    });
-                }
+                const audio = new Audio(AUDIO_DIR + queue[idx]);
+                audio.preload = 'auto';
+                currentAudioChain.push(audio);
+                audio.addEventListener('ended', () => {
+                    idx++;
+                    playNext();
+                });
+                audio.addEventListener('error', () => {
+                    console.warn('Не удалось воспроизвести', queue[idx]);
+                    idx++;
+                    playNext();
+                });
+                audio.play().catch(e => {
+                    console.warn('Ошибка play():', e);
+                    idx++;
+                    playNext();
+                });
             }
-
-            // Когда один файл закончился, играем следующий
-            clockAudioPlayer.onended = () => {
-                idx++;
-                playNext();
-            };
 
             playNext();
         }
@@ -2623,9 +3134,6 @@
 
         function startGesture(point, source) {
             if (gesture) return;
-            // При начале жеста пытаемся разблокировать аудио (тихий старт)
-            unlockAudio();
-            
             gesture = {
                 startX: point.x, startY: point.y,
                 startTime: Date.now(),
@@ -2692,7 +3200,6 @@
 
             if (wasDrag) {
                 clockView.classList.remove('dragging');
-                // ЗАПУСК ЗВУКА СТРОГО ЗДЕСЬ (в момент отпускания пальца)
                 speakTime();
             } else if (!wasScroll && !wasOther && point &&
                        duration >= TAP_MIN_DURATION &&
@@ -2749,10 +3256,7 @@
             endGesture(getPoint(e));
         });
 
-        window.clockSpeakCancel = () => {
-            clockAudioPlayer.pause();
-            clockAudioPlayer.currentTime = 0;
-        };
+        window.clockSpeakCancel = stopClockAudio;
 
         render();
         setView('watch');
