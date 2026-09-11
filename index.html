@@ -878,12 +878,13 @@
 
         /* ============================================================
            ПРОСТАЯ ЛЕНТА ВРЕМЕНИ — мобильная
+           Войны сверху, остальное снизу, всё на тонких линиях-выносках
            ============================================================ */
 
         .simple-timeline {
-            border: 2px solid var(--fg);
+            border: 1.5px solid var(--fg);
             background: var(--bg);
-            padding: 20px 14px 44px;
+            padding: 20px 14px 24px;
             position: relative;
         }
 
@@ -891,7 +892,7 @@
             background: var(--fg);
             color: var(--bg);
             padding: 10px 14px;
-            margin: -20px -14px 28px;
+            margin: -20px -14px 20px;
             text-align: center;
             font-family: var(--font-display);
             font-size: 0.85rem;
@@ -900,57 +901,60 @@
             text-transform: uppercase;
         }
 
+        /* Сетка ленты: сверху войны / линия / снизу остальное / века */
         .stl-track {
             position: relative;
-            height: 130px;
+            height: 175px;
             margin: 0 10px;
         }
 
-        /* Главная линия — тонкая */
+        /* Главная линия */
         .stl-line {
             position: absolute;
             left: 0;
             right: 0;
-            top: 54px;
+            top: 87px;
             height: 1px;
             background: var(--fg);
-            opacity: 0.7;
+            opacity: 0.65;
         }
 
-        /* Засечки: все тонкие */
+        /* Мелкие засечки каждые 10 лет */
         .stl-tick-10 {
             position: absolute;
-            top: 54px;
+            top: 87px;
             width: 1px;
-            height: 4px;
+            height: 3px;
             background: var(--fg);
             transform: translateX(-50%);
-            opacity: 0.25;
+            opacity: 0.2;
         }
+        /* Полувековые засечки */
         .stl-tick-50 {
             position: absolute;
-            top: 54px;
+            top: 87px;
             width: 1px;
-            height: 8px;
+            height: 6px;
             background: var(--fg);
             transform: translateX(-50%);
-            opacity: 0.45;
+            opacity: 0.4;
         }
+        /* Вековые засечки */
         .stl-tick-100 {
             position: absolute;
-            top: 52px;
+            top: 84px;
             width: 1px;
-            height: 18px;
+            height: 12px;
             background: var(--fg);
             transform: translateX(-50%);
             opacity: 0.85;
         }
 
-        /* Красная полоса жизни */
+        /* Красная полоса жизни — по центру оси */
         .stl-life {
             position: absolute;
-            top: 44px;
-            height: 20px;
+            top: 79px;
+            height: 17px;
             background: var(--accent);
             border: none;
             box-sizing: border-box;
@@ -968,42 +972,38 @@
         .stl-life::before { left: -1px; }
         .stl-life::after  { right: -1px; }
 
-        /* Римские века — между отметками, чуть выше линии событий */
-        .stl-roman {
-            position: absolute;
-            top: 66px;
-            transform: translateX(-50%);
-            font-family: var(--font-display);
-            font-size: 0.95rem;
-            font-weight: 700;
-            letter-spacing: 0.06em;
-            color: var(--fg);
-            background: var(--bg);
-            padding: 0 6px;
-            line-height: 1;
-            z-index: 6;
-            white-space: nowrap;
-        }
-
-        /* События — под римскими веками, БЕЗ годов, только короткое имя.
-           Названия разнесены вертикально по двум рядам, чтобы не наезжали. */
+        /* Обёртка события с выноской */
         .stl-event {
             position: absolute;
+            top: 87px; /* на уровне оси */
             transform: translateX(-50%);
+            z-index: 6;
+            pointer-events: none;
             display: flex;
             flex-direction: column;
             align-items: center;
-            z-index: 7;
-            pointer-events: none;
         }
-        /* Ряд A — ближе к линии */
-        .stl-event.row-a {
-            top: 92px;
+        /* Тонкая вертикальная линия-выноска */
+        .stl-event-tick {
+            width: 1px;
+            background: var(--fg);
+            opacity: 0.5;
+            flex: 0 0 auto;
         }
-        /* Ряд B — ниже, чтобы не пересекаться с рядом A */
-        .stl-event.row-b {
-            top: 112px;
+        /* Война — выноска сверху вниз (линия сверху, потом подпись над линией) */
+        .stl-event.war {
+            transform: translate(-50%, -100%);
         }
+        .stl-event.war .stl-event-name {
+            margin-bottom: 3px;
+        }
+        /* Остальные — выноска снизу вверх */
+        .stl-event.bottom {
+        }
+        .stl-event.bottom .stl-event-name {
+            margin-top: 3px;
+        }
+
         .stl-event-name {
             font-family: var(--font-display);
             font-size: 0.52rem;
@@ -1016,8 +1016,25 @@
             background: var(--bg);
             padding: 1px 3px;
         }
-        .stl-event-name.accent {
+        .stl-event.war .stl-event-name {
             color: var(--accent);
+        }
+
+        /* Римские века — по центру, ниже событий */
+        .stl-roman {
+            position: absolute;
+            top: 128px;
+            transform: translateX(-50%);
+            font-family: var(--font-display);
+            font-size: 0.95rem;
+            font-weight: 700;
+            letter-spacing: 0.06em;
+            color: var(--fg);
+            background: var(--bg);
+            padding: 0 6px;
+            line-height: 1;
+            z-index: 6;
+            white-space: nowrap;
         }
 
         /* ============================================================
@@ -1350,7 +1367,6 @@
         }
 
         @media (max-width: 640px) {
-            /* ===== ШАПКА ===== */
             .header { padding: 12px 0 0; }
             .header-kicker {
                 margin: 0 0 20px;
@@ -1359,7 +1375,6 @@
                 padding: 12px 14px;
             }
 
-            /* Грамотиньо — во всю ширину экрана */
             .header h1 {
                 margin: 12px 0 22px;
                 padding: 0 6px;
@@ -1369,11 +1384,9 @@
                 text-align: center;
             }
 
-            /* ===== МЕНЮ: одна циклическая кнопка ===== */
             .section-switch { display: none; }
             .section-cycle-btn { display: flex; margin: 0; }
 
-            /* ПОДЗАГОЛОВКИ — по центру */
             .section-subtitles { margin: 0; min-height: 44px; }
             .section-subtitle {
                 font-size: 0.6rem;
@@ -1395,7 +1408,6 @@
             }
             .learn-dot { width: 12px; height: 12px; top: 6px; right: 6px; border-width: 1.6px; }
 
-            /* ===== КНОПКИ УПРАВЛЕНИЯ — маленькие, с зазором ===== */
             .controls {
                 padding: 22px 14px 16px;
                 gap: 10px;
@@ -1416,7 +1428,7 @@
             .century-header { padding: 14px 16px; margin-bottom: 18px; }
             .century-header:not(:first-child) { margin-top: 40px; }
 
-            /* ===== Портреты: 1 в ряд, имя ПОД портретом, БЕЗ чёрной обводки ===== */
+            /* ===== Портреты: 1 в ряд, без чёрной обводки ===== */
             .heroes-grid {
                 grid-template-columns: 1fr;
                 gap: 16px;
@@ -1497,39 +1509,31 @@
             .hero-modal-info h3 { font-size: 1.85rem; }
             .hero-modal-years { font-size: 0.95rem; margin-top: 6px; }
 
-            /* Мобильная лента вместо подробной */
             .simple-timeline-wrap { display: block; }
             .detailed-timeline { display: none; }
 
-            /* ===== МОБИЛЬНАЯ ЛЕНТА ВРЕМЕНИ ===== */
+            /* ===== МОБИЛЬНАЯ ЛЕНТА ===== */
             .simple-timeline {
-                padding: 18px 12px 40px;
+                padding: 18px 12px 22px;
                 border-width: 1.5px;
             }
             .simple-timeline-head {
                 padding: 10px 12px;
-                margin: -18px -12px 22px;
+                margin: -18px -12px 18px;
                 font-size: 0.78rem;
                 letter-spacing: 0.24em;
             }
-
             .stl-track {
-                height: 138px;
+                height: 170px;
                 margin: 0 6px;
             }
-
-            /* Внутренние размеры под мобиль — уже заданы в базовых стилях,
-               но здесь корректируем отступы, чтобы подписи дышали */
             .stl-roman {
-                top: 68px;
+                top: 122px;
                 font-size: 0.9rem;
                 padding: 0 5px;
             }
-            .stl-event.row-a { top: 94px; }
-            .stl-event.row-b { top: 116px; }
             .stl-event-name {
                 font-size: 0.5rem;
-                letter-spacing: 0.01em;
                 padding: 1px 3px;
             }
 
@@ -1553,8 +1557,9 @@
 
         @media (max-width: 380px) {
             .header h1 { font-size: 15vw; }
-            .simple-timeline { padding: 16px 10px 36px; }
-            .simple-timeline-head { margin: -16px -10px 20px; padding: 9px 10px; font-size: 0.72rem; }
+            .simple-timeline { padding: 16px 10px 20px; }
+            .simple-timeline-head { margin: -16px -10px 16px; padding: 9px 10px; font-size: 0.72rem; }
+            .stl-track { height: 160px; }
             .stl-roman { font-size: 0.82rem; }
             .stl-event-name { font-size: 0.46rem; }
         }
@@ -1567,14 +1572,12 @@
 
         <h1>Грамотиньо</h1>
 
-        <!-- Десктопное меню -->
         <div class="section-switch">
             <button class="section-switch-btn active" data-section="syllables">Учи слоги</button>
             <button class="section-switch-btn" data-section="clock">Знай время</button>
             <button class="section-switch-btn" data-section="heroes">Чти великих</button>
         </div>
 
-        <!-- Мобильное меню: одна кнопка-цикл -->
         <button class="section-cycle-btn" id="sectionCycleBtn" type="button">
             <span id="sectionCycleLabel">Учи слоги</span>
             <span class="cycle-arrow">▸</span>
@@ -1818,9 +1821,6 @@
     <div class="toast-container" id="toastContainer"></div>
 
     <script>
-        /* ============================================================
-           ГЛОБАЛЬНАЯ РАЗБЛОКИРОВКА АУДИО (iOS Safari)
-           ============================================================ */
         (function () {
             let unlocked = false;
             const SILENT_WAV = 'data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEAgD4AAAB9AAACABAAZGF0YQQAAAAAAA==';
@@ -2340,18 +2340,22 @@
                 { year: 1991, name: 'Разрушение<br>СССР' }
             ];
 
-            /* Мобильные события: без годов, только короткое название.
-               Ряды row-a / row-b чередуются, чтобы соседние не наезжали. */
-            const MOBILE_EVENTS = [
-                { year: 1721, short: 'Империя',     row: 'a' },
-                { year: 1812, short: '1812',        row: 'a' },
-                { year: 1825, short: 'Декабристы',  row: 'b' },
-                { year: 1861, short: 'Реформы',     row: 'b' },
-                { year: 1917, short: 'Революция',   row: 'a' },
-                { year: 1991, short: 'Развал',      row: 'b' }
+            /* Мобильные события.
+               Войны уходят вверх, остальные — вниз.
+               Годы убраны, только короткое название. */
+            const MOBILE_WARS = [
+                { year: 1721, short: 'Империя' },
+                { year: 1812, short: '1812' },
+                { year: 1914, short: 'Первая мировая' },
+                { year: 1945, short: 'ВОВ' }
+            ];
+            const MOBILE_OTHERS = [
+                { year: 1825, short: 'Декабристы' },
+                { year: 1861, short: 'Реформы' },
+                { year: 1917, short: 'Революция' },
+                { year: 1991, short: 'Развал' }
             ];
 
-            /* Римские века — между отметками */
             const MOBILE_ROMAN = [
                 { label: 'XVIII', mid: 1750 },
                 { label: 'XIX',   mid: 1850 },
@@ -2390,18 +2394,31 @@
                 /* Полоса жизни */
                 html += `<div class="stl-life" style="left: ${left}%; width: ${width}%"></div>`;
 
-                /* Римские века */
-                MOBILE_ROMAN.forEach(r => {
-                    html += `<div class="stl-roman" style="left: ${tlPos(r.mid)}%">${r.label}</div>`;
+                /* События-войны — СВЕРХУ. Выноска вниз к оси, подпись над выноской */
+                MOBILE_WARS.forEach(e => {
+                    const tickLen = 18;
+                    html += `
+                        <div class="stl-event war" style="left: ${tlPos(e.year)}%; padding-bottom: ${tickLen}px;">
+                            <div class="stl-event-name">${e.short}</div>
+                            <div class="stl-event-tick" style="height: ${tickLen}px;"></div>
+                        </div>
+                    `;
                 });
 
-                /* События без годов, в двух рядах */
-                MOBILE_EVENTS.forEach(e => {
+                /* Остальные события — СНИЗУ. Выноска вверх к оси, подпись под выноской */
+                MOBILE_OTHERS.forEach(e => {
+                    const tickLen = 18;
                     html += `
-                        <div class="stl-event row-${e.row}" style="left: ${tlPos(e.year)}%">
+                        <div class="stl-event bottom" style="left: ${tlPos(e.year)}%; padding-top: ${tickLen}px;">
+                            <div class="stl-event-tick" style="height: ${tickLen}px;"></div>
                             <div class="stl-event-name">${e.short}</div>
                         </div>
                     `;
+                });
+
+                /* Римские века */
+                MOBILE_ROMAN.forEach(r => {
+                    html += `<div class="stl-roman" style="left: ${tlPos(r.mid)}%">${r.label}</div>`;
                 });
 
                 html += '</div></div>';
