@@ -1160,14 +1160,16 @@
             }
 
             /* НАЗВАНИЕ — огромное, почти на всю ширину экрана */
-            .header h1 {
-                font-size: clamp(3.2rem, 20vw, 6.5rem);
-                line-height: 0.82;
-                letter-spacing: -0.04em;
-                word-break: break-word;
-                overflow-wrap: anywhere;
-                margin: 10px 0 16px;
-            }
+           .header h1 {
+    font-size: 19vw;
+    line-height: 0.85;
+    letter-spacing: -0.05em;
+    white-space: nowrap;
+    word-break: keep-all;
+    overflow-wrap: normal;
+    margin: 10px 0 16px;
+    max-width: 100%;
+}
 
             /* 3 таба прячем, показываем одну кнопку-цикл */
             .section-switch { display: none; }
@@ -1324,9 +1326,9 @@
 
             /* Ещё больше название на узких */
             .header h1 {
-                font-size: clamp(3rem, 21vw, 6rem);
-                letter-spacing: -0.045em;
-            }
+    font-size: 19.5vw;
+    letter-spacing: -0.055em;
+}
             .header-kicker {
                 font-size: 0.48rem;
                 letter-spacing: 0.12em;
@@ -1366,23 +1368,23 @@
 
         <!-- Десктоп: 3 таба -->
         <div class="section-switch">
-            <button class="section-switch-btn active" data-section="syllables">Учи слоги</button>
-            <button class="section-switch-btn" data-section="clock">Знай время</button>
-            <button class="section-switch-btn" data-section="heroes">Чти великих</button>
+            <button class="section-switch-btn active" data-section="syllables">УЧИ СЛОГИ</button>
+            <button class="section-switch-btn" data-section="clock">ЗНАЙ ВРЕМЯ</button>
+            <button class="section-switch-btn" data-section="heroes">ЧТИ ВЕЛИКИХ</button>
         </div>
 
         <!-- Мобила: одна кнопка переключения разделов -->
         <button class="section-cycle-btn" id="sectionCycleBtn" type="button">
-            <span class="section-cycle-label">Учи слоги</span>
-            <span class="section-cycle-arrow">↻</span>
+            <span class="section-cycle-label">УЧИ СЛОГИ</span>
+            <span class="section-cycle-arrow">➛</span>
         </button>
 
         <div class="section-subtitles">
-            <div class="section-subtitle active" data-section="syllables">Жми · Слушай · Запоминай</div>
+            <div class="section-subtitle active" data-section="syllables">ЖМИ · СЛУШАЙ · ЗАПОМИНАЙ</div>
             <div class="section-subtitle" data-section="clock">
                 <span class="digital-clock-inline" id="clockDigital24">03:00</span>
             </div>
-            <div class="section-subtitle" data-section="heroes">Великие личности Отечества</div>
+            <div class="section-subtitle" data-section="heroes">ВЕЛИКИЕ ЛИЧНОСТИ ОТЕЧЕСТВА</div>
         </div>
     </header>
 
