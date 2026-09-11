@@ -87,9 +87,6 @@
 
         .header h1 {
             font-family: var(--font-display);
-            /* Раньше было 18vw — не влезало на узких экранах.
-               Теперь clamp считает так, чтобы 10-буквенное слово
-               укладывалось в ширину экрана с запасом. */
             font-size: clamp(2.2rem, 12.5vw, 10.5rem);
             font-weight: 700;
             line-height: 0.9;
@@ -702,7 +699,7 @@
         .hero-age { color: var(--accent); font-weight: 700; }
 
         /* ============================================================
-           МОДАЛКА ГЕРОЯ — БОЛЬШОЙ портрет
+           МОДАЛКА ГЕРОЯ
            ============================================================ */
 
         .hero-modal {
@@ -845,6 +842,7 @@
             flex-shrink: 0;
             width: 100%;
             margin-top: 8px;
+            position: relative;
         }
 
         .htl-panel {
@@ -852,55 +850,19 @@
             background: var(--bg);
         }
 
-        /* ---------- Шапка панели ---------- */
-
+        /* Шапка панели — единый заголовок */
         .htl-head {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            border-bottom: 2px solid var(--fg);
-            background: var(--bg-2);
-        }
-
-        .htl-head-cell {
-            padding: 9px 14px 11px;
-            display: flex;
-            flex-direction: column;
-            gap: 3px;
-            min-width: 0;
-        }
-        .htl-head-cell:last-child {
-            border-left: 2px solid var(--fg);
-            text-align: right;
-            align-items: flex-end;
-        }
-
-        .htl-head-label {
-            font-family: var(--font-doc);
-            font-size: 0.56rem;
+            background: var(--fg);
+            color: var(--bg);
+            padding: 12px 16px;
+            text-align: center;
+            font-family: var(--font-display);
+            font-size: clamp(0.8rem, 3vw, 1rem);
             font-weight: 600;
-            letter-spacing: 0.2em;
+            letter-spacing: 0.28em;
             text-transform: uppercase;
-            color: var(--fg-2);
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            max-width: 100%;
+            border-bottom: 2px solid var(--fg);
         }
-
-        .htl-head-value {
-            font-family: var(--font-doc);
-            font-size: clamp(0.85rem, 2.2vw, 1.05rem);
-            font-weight: 700;
-            color: var(--fg);
-            letter-spacing: 0.05em;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            max-width: 100%;
-        }
-        .htl-head-cell:last-child .htl-head-value { color: var(--accent); }
-
-        /* ---------- Тело панели с осью ---------- */
 
         .htl-body {
             padding: 22px 18px 14px;
@@ -1211,7 +1173,6 @@
             .header h1 {
                 margin: 16px 0 22px;
                 letter-spacing: 0;
-                /* Явно подгоняем под ширину экрана, чтобы «ГРАМОТИНЬО» не вылезал. */
                 font-size: clamp(2rem, 12.5vw, 3.6rem);
             }
 
@@ -1255,36 +1216,38 @@
             .century-header { padding: 14px 16px; margin-bottom: 18px; }
             .century-header:not(:first-child) { margin-top: 40px; }
 
-            /* ===== Портреты: по одному в ряд, компактно (фото слева, инфо справа) ===== */
+            /* ===== Портреты: 1 в ряд, имя ПОД портретом, компактно ===== */
             .heroes-grid {
                 grid-template-columns: 1fr;
-                gap: 10px;
+                gap: 12px;
+                justify-items: center;
             }
             .hero-item {
-                flex-direction: row;
-                align-items: stretch;
+                flex-direction: column;
+                width: 100%;
+                max-width: 190px;
             }
             .hero-photo {
-                width: 92px;
-                min-width: 92px;
-                height: 92px;
+                width: 100%;
+                height: auto;
                 aspect-ratio: 1 / 1;
-                border-bottom: none;
-                border-right: 2px solid var(--fg);
+                border-bottom: 2px solid var(--fg);
+                border-right: none;
             }
             .hero-info {
-                padding: 10px 14px;
-                justify-content: center;
-                gap: 4px;
-                min-width: 0;
+                padding: 10px 10px 12px;
+                align-items: center;
+                text-align: center;
+                gap: 3px;
             }
             .hero-name {
-                font-size: 1.05rem;
+                font-size: 0.98rem;
                 line-height: 1.05;
-                overflow: hidden;
-                text-overflow: ellipsis;
             }
-            .hero-years { font-size: 0.66rem; }
+            .hero-years {
+                font-size: 0.62rem;
+                justify-content: center;
+            }
 
             .soviet-band { font-size: 0.95rem; padding: 10px 14px; letter-spacing: 0.18em; gap: 12px; }
 
@@ -1297,16 +1260,17 @@
             .hero-nav.prev { left: 4px; }
             .hero-nav.next { right: 4px; }
 
+            /* Портрет в модалке короче, чтобы влезла хронология */
             .hero-modal-portrait-wrap {
-                height: 62vh;
-                min-height: 220px;
+                height: 42vh;
+                min-height: 200px;
             }
 
             .hero-modal-info { padding: 6px 0 2px; }
             .hero-modal-info h3 { font-size: 1.75rem; }
             .hero-modal-years { font-size: 0.88rem; margin-top: 6px; }
 
-            /* Шкала на мобиле — остаётся горизонтальной (в портрете и в ландшафте) */
+            /* Внутренности панели хронологии (в портретной ориентации сама панель повёрнута — см. ниже) */
             .htl-body { padding: 16px 10px 10px; }
             .htl { height: 250px; }
             .htl-axis     { top: 116px; }
@@ -1326,9 +1290,7 @@
             .htl-other-year { font-size: 0.6rem; }
             .htl-other-name { font-size: 0.46rem; letter-spacing: 0; }
 
-            .htl-head-cell { padding: 8px 10px 10px; }
-            .htl-head-label { font-size: 0.5rem; letter-spacing: 0.14em; }
-            .htl-head-value { font-size: 0.82rem; letter-spacing: 0.03em; }
+            .htl-head { font-size: 0.78rem; letter-spacing: 0.24em; padding: 10px 12px; }
 
             /* Часы */
             .clock-wrapper { padding: 26px 0 70px; }
@@ -1348,11 +1310,38 @@
             .progress-container { padding: 14px 18px 16px; }
         }
 
-        /* В ландшафте на телефонах подрезаем высоту портрета, шкала остаётся горизонтальной */
+        /* ============================================================
+           ПОВОРОТ ХРОНОЛОГИИ В ПОРТРЕТНОЙ ОРИЕНТАЦИИ
+           — панель физически поворачиваем на -90°,
+             чтобы человек развернул телефон и прочитал табличку
+             горизонтально. В ландшафтной ориентации поворот снимается,
+             и табличка и так горизонтальна.
+           ============================================================ */
+        @media (max-width: 640px) and (orientation: portrait) {
+            .hero-modal-timeline {
+                width: 100%;
+                height: 62vh;
+                min-height: 340px;
+                position: relative;
+                overflow: hidden;
+                margin-top: 10px;
+            }
+            .hero-modal-timeline .htl-panel {
+                position: absolute;
+                top: 50%;
+                left: 50%;
+                width: 62vh;
+                transform: translate(-50%, -50%) rotate(-90deg);
+                transform-origin: center center;
+            }
+        }
+
+        /* В ландшафте на телефонах слегка ужимаем портрет,
+           хронология при этом остаётся горизонтальной */
         @media (max-width: 900px) and (orientation: landscape) {
             .hero-modal-portrait-wrap {
-                height: 55vh;
-                min-height: 180px;
+                height: 42vh;
+                min-height: 160px;
             }
             .hero-modal { padding-top: 44px; }
         }
@@ -1614,7 +1603,6 @@
            ============================================================ */
         (function () {
             let unlocked = false;
-            // Минимальный валидный silent WAV (44 байта заголовка, 1 сэмпл тишины)
             const SILENT_WAV = 'data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEAgD4AAAB9AAACABAAZGF0YQQAAAAAAA==';
 
             function unlock() {
@@ -1729,15 +1717,12 @@
 
             /* ============================================================
                ПРЕДЗАГРУЗКА АУДИО СЛОГОВ
-               Раньше каждый клик создавал new Audio() заново — файл качался
-               по сети в момент клика, отсюда задержка. Теперь держим пул
-               Audio-объектов с preload='auto'.
                ============================================================ */
             const audioCache = new Map();
 
             function preloadSyllableAudio() {
                 let i = 0;
-                const BATCH = 4;          // сколько файлов запускаем параллельно
+                const BATCH = 4;
                 function loadBatch() {
                     const end = Math.min(i + BATCH, syllables.length);
                     for (; i < end; i++) {
@@ -1860,7 +1845,6 @@
                 flashProgress();
             }
 
-            /* Играем из кэша — моментально, без сетевой задержки */
             function playAudio(syllable) {
                 if (currentAudio) {
                     try {
@@ -2133,20 +2117,11 @@
                 const d = Math.min(deathYear, TL_END);
                 const left = tlPos(b);
                 const width = tlPos(d) - left;
-                const age = deathYear - birthYear;
-                const ageWord = plural(age, ['год', 'года', 'лет']);
 
                 let html = '<div class="htl-panel">';
 
-                /* Шапка панели: слева период жизни, справа возраст */
-                html += `
-                    <div class="htl-head">
-                        <div class="htl-head-cell">
-                            <div class="htl-head-label">ХРОНОЛОГИЯ ИСТОРИИ</div>
-                            <div class="htl-head-cell">
-                            
-                    </div>
-                `;
+                /* Единый заголовок панели */
+                html += '<div class="htl-head">Хронология истории</div>';
 
                 html += '<div class="htl-body"><div class="htl">';
 
@@ -2539,7 +2514,6 @@
             currentAudioChain = [];
         }
 
-        /* Предзагрузка всех mp3 часов */
         const clockAudioCache = new Map();
         (function preloadClockAudio() {
             const names = [];
@@ -2572,9 +2546,6 @@
             return a;
         }
 
-        /* Воспроизведение цепочки через ОДИН общий элемент.
-           На iOS Safari так надёжнее: первый play() — из user gesture,
-           дальше просто меняем src у уже разблокированного элемента. */
         let chainEl = null;
         function speakTime() {
             stopClockAudio();
@@ -2589,7 +2560,6 @@
                 if (idx >= queue.length) return;
                 const name = queue[idx];
 
-                // Первый звук — сразу (внутри user gesture). Дальше — из 'ended'.
                 if (!chainEl) chainEl = new Audio();
                 chainEl.preload = 'auto';
                 chainEl.src = AUDIO_DIR + name;
@@ -2612,7 +2582,6 @@
 
                 const p = chainEl.play();
                 if (p && p.catch) p.catch(() => {
-                    // Не удалось — пропускаем
                     chainEl.removeEventListener('ended', onEnded);
                     chainEl.removeEventListener('error', onError);
                     idx++;
