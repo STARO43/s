@@ -7,194 +7,216 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=IBM+Plex+Mono:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Old+Standard+TT:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
     <title>Грамотиньо</title>
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-
         :root {
-            --bg:        #f2ecdf;
-            --bg-2:      #e8e0ce;
-            --bg-3:      #ddd3bd;
-            --fg:        #141414;
-            --fg-2:      #3a3a3a;
-            --fg-3:      #8a8060;
-            --rule-soft: rgba(20, 20, 20, 0.16);
-
-            --accent:    #e30613;
-            --accent-fg: #ffffff;
-
-            --font-display: 'Oswald', 'Arial Narrow', sans-serif;
-            --font-doc:     'IBM Plex Mono', 'Courier New', monospace;
-            --font-ui:      'Inter', system-ui, sans-serif;
-
-            --ease: cubic-bezier(0.16, 1, 0.3, 1);
-            --snap: cubic-bezier(0.4, 0, 0.2, 1);
+            --bg: #0d0d0d;
+            --bg-card: #0d0d0d;
+            --bg-card-hover: #1a1a1a;
+            --border: #ffffff;
+            --text: #ffffff;
+            --text-secondary: #8a8a8a;
+            --accent: #e30613;
+            --learned-bg: #1c1c1c;
+            --learned-fg: #6a6a6a;
+            --radius: 0px;
+            --transition: 0.15s linear;
+            --font: 'Helvetica Neue', Helvetica, Arial, 'Liberation Sans', sans-serif;
+            --mono: 'Courier New', Courier, monospace;
         }
+
+        body.light-mode {
+            --bg: #ffffff;
+            --bg-card: #ffffff;
+            --bg-card-hover: #f0f0f0;
+            --border: #000000;
+            --text: #000000;
+            --text-secondary: #767676;
+            --learned-bg: #e4e4e4;
+            --learned-fg: #9a9a9a;
+        }
+
+        body.theme-blue   { --accent: #0033ff; }
+        body.theme-green  { --accent: #00a300; }
+        body.theme-red    { --accent: #e30613; }
+        body.theme-orange { --accent: #ff6a00; }
+        body.theme-purple { --accent: #7b00ff; }
+        body.theme-pink   { --accent: #ff0080; }
+        body.theme-cyan   { --accent: #00b3c7; }
+        body.theme-yellow { --accent: #ffc700; }
+        body.theme-teal   { --accent: #009688; }
+        body.theme-indigo { --accent: #3f51b5; }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
 
         html { -webkit-text-size-adjust: 100%; }
 
         body {
             background: var(--bg);
-            color: var(--fg);
-            font-family: var(--font-ui);
+            color: var(--text);
+            font-family: var(--font);
             font-size: 16px;
             min-height: 100vh;
-            line-height: 1.4;
+            line-height: 1.35;
             -webkit-font-smoothing: antialiased;
             display: flex;
             flex-direction: column;
+            transition: background 0.2s linear, color 0.2s linear;
             overscroll-behavior-x: none;
-            overflow-x: hidden;
-        }
-
-        /* Сеточный фон оставляем только на десктопе — на мобиле он сильно бьёт по FPS при скролле */
-        @media (min-width: 641px) {
-            body::before {
-                content: '';
-                position: fixed;
-                inset: 0;
-                background-image:
-                    linear-gradient(var(--rule-soft) 1px, transparent 1px),
-                    linear-gradient(90deg, var(--rule-soft) 1px, transparent 1px);
-                background-size: 40px 40px;
-                background-position: -1px -1px;
-                pointer-events: none;
-                z-index: 0;
-                opacity: 0.35;
-            }
-            body > * { position: relative; z-index: 1; }
         }
 
         /* ================= ШАПКА ================= */
 
-        .header { padding: 16px 20px 0; }
+        .header {
+            padding: 22px 20px 0;
+            text-align: center;
+            border-bottom: 3px solid var(--border);
+            position: relative;
+            background: var(--bg);
+        }
 
-        .header-kicker {
+        .theme-toggle,
+        .theme-cycle { position: absolute; top: 18px; }
+
+        .theme-toggle { right: 20px; }
+        .theme-cycle  { left: 20px; }
+
+        .theme-toggle button,
+        .theme-cycle button {
+            background: var(--bg);
+            border: 2px solid var(--border);
+            color: var(--text);
+            border-radius: 0;
+            width: 38px;
+            height: 38px;
+            cursor: pointer;
+            font-size: 1rem;
             display: flex;
             align-items: center;
             justify-content: center;
-            padding: 14px 20px;
-            border-top: 3px solid var(--fg);
-            border-bottom: 3px solid var(--fg);
-            font-family: var(--font-doc);
-            font-size: 0.72rem;
-            font-weight: 700;
-            letter-spacing: 0.22em;
-            text-transform: uppercase;
-            color: var(--fg);
-            margin-bottom: 30px;
-            text-align: center;
-            line-height: 1.35;
+            transition: var(--transition);
+        }
+
+        .theme-toggle button:hover,
+        .theme-cycle button:hover {
+            background: var(--text);
+            color: var(--bg);
+        }
+
+        .theme-cycle .color-indicator {
+            width: 16px;
+            height: 16px;
+            border-radius: 0;
+            background: var(--accent);
+            transition: background 0.2s linear;
+        }
+
+        .theme-toggle .theme-ball {
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background: #ffd400;
+            transition: background 0.2s linear;
+        }
+        body.light-mode .theme-toggle .theme-ball {
+            background: #000000;
         }
 
         .header h1 {
-            font-family: var(--font-display);
-            font-size: clamp(2.2rem, 12.5vw, 10.5rem);
-            font-weight: 700;
-            line-height: 0.9;
-            letter-spacing: -0.005em;
+            font-size: clamp(2.2rem, 8.5vw, 4.6rem);
+            font-weight: 800;
+            letter-spacing: 0.015em;
             text-transform: uppercase;
-            color: var(--fg);
-            margin: 20px 0 28px;
-            overflow-wrap: anywhere;
+            line-height: 0.92;
+            color: var(--text);
+            margin: 30px 0 14px;
         }
-        .header h1::after { content: '.'; color: var(--accent); }
+
+        .header h1::after {
+            content: '.';
+            color: var(--accent);
+        }
+
+        /* ================= ПЕРЕКЛЮЧАТЕЛЬ РАЗДЕЛОВ ================= */
 
         .section-switch {
             display: flex;
             margin: 0 -20px;
-            border-top: 3px solid var(--fg);
-            border-bottom: 3px solid var(--fg);
+            border-top: 2px solid var(--border);
+            background: var(--bg);
         }
 
         .section-switch-btn {
             flex: 1 1 0;
             background: transparent;
             border: none;
-            border-right: 3px solid var(--fg);
-            color: var(--fg);
-            padding: 20px 10px;
+            border-right: 2px solid var(--border);
+            color: var(--text-secondary);
+            padding: 15px 8px;
             cursor: pointer;
-            font-family: var(--font-display);
-            font-weight: 600;
-            font-size: 0.82rem;
-            letter-spacing: 0.14em;
+            font-family: var(--font);
+            font-weight: 700;
+            font-size: 0.78rem;
+            letter-spacing: 0.08em;
             text-transform: uppercase;
-            transition: background 0.1s linear, color 0.1s linear;
+            transition: var(--transition);
             white-space: nowrap;
         }
-        .section-switch-btn:last-child { border-right: none; }
-        .section-switch-btn.active { background: var(--fg); color: var(--bg); }
-        .section-switch-btn:hover:not(.active) { background: var(--bg-2); }
 
-        .section-cycle-btn {
-            display: none;
-            width: 100%;
-            background: var(--fg);
+        .section-switch-btn:last-child { border-right: none; }
+
+        .section-switch-btn.active {
+            background: var(--text);
             color: var(--bg);
-            border: none;
-            border-top: 3px solid var(--fg);
-            border-bottom: 3px solid var(--fg);
-            padding: 20px 10px;
-            cursor: pointer;
-            font-family: var(--font-display);
-            font-weight: 600;
-            font-size: 1rem;
-            letter-spacing: 0.18em;
-            text-transform: uppercase;
-            transition: background 0.1s linear;
-            align-items: center;
-            justify-content: center;
-            gap: 12px;
-            -webkit-tap-highlight-color: transparent;
-            user-select: none;
         }
-        .section-cycle-btn:active {
-            background: var(--accent);
-            color: var(--accent-fg);
+
+        .section-switch-btn:hover:not(.active) {
+            background: var(--bg-card-hover);
+            color: var(--text);
         }
-        .section-cycle-btn .cycle-arrow {
-            font-family: var(--font-ui);
-            font-size: 0.9rem;
-            opacity: 0.75;
-        }
+
+        /* ================= ПОДПИСИ ПОД КНОПКАМИ ================= */
 
         .section-subtitles {
             display: flex;
             margin: 0 -20px;
-            border-bottom: 2px solid var(--fg);
-            background: var(--bg-2);
-            min-height: 44px;
+            background: var(--bg);
         }
 
         .section-subtitle {
             flex: 1 1 0;
-            padding: 12px 14px;
+            border-right: 2px solid var(--border);
+            padding: 12px 10px;
             text-align: center;
-            font-family: var(--font-doc);
-            font-size: 0.64rem;
-            font-weight: 600;
-            letter-spacing: 0.16em;
+            font-size: 0.6rem;
+            font-weight: 700;
+            letter-spacing: 0.12em;
             text-transform: uppercase;
-            color: var(--fg);
+            color: var(--text);
             opacity: 0;
             visibility: hidden;
-            transition: opacity 0.2s linear;
+            transition: opacity 0.2s linear, visibility 0.2s;
             display: flex;
             align-items: center;
             justify-content: center;
-            min-height: 3em;
+            min-height: 3.2em;
             line-height: 1.35;
         }
-        .section-subtitle.active { opacity: 1; visibility: visible; }
+
+        .section-subtitle:last-child { border-right: none; }
+
+        .section-subtitle.active {
+            opacity: 1;
+            visibility: visible;
+        }
 
         .digital-clock-inline {
-            font-family: var(--font-doc);
-            font-size: 1.1rem;
+            font-family: var(--mono);
+            font-size: 1.05rem;
             font-weight: 700;
             letter-spacing: 0.16em;
-            color: var(--accent);
+            color: var(--text);
             background: transparent;
             border: none;
             padding: 0;
@@ -207,53 +229,65 @@
 
         .content-wrapper {
             flex: 1;
-            max-width: 960px;
+            max-width: 900px;
             width: 100%;
             margin: 0 auto;
             padding: 0 20px;
         }
 
         .tab-section { display: none; }
-        /* Убрал animation — она заставляла браузер перекомпоновывать DOM при каждом переключении */
-        .tab-section.active { display: block; }
+        .tab-section.active { display: block; animation: tabEnter 0.25s linear forwards; }
+
+        @keyframes tabEnter {
+            from { opacity: 0; }
+            to   { opacity: 1; }
+        }
 
         /* ================= ПРОГРЕСС ================= */
 
         .progress-container {
             position: fixed;
-            left: 0; right: 0; bottom: 0;
-            background: var(--fg);
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: var(--text);
             color: var(--bg);
-            padding: 16px 24px 20px;
+            padding: 16px 20px 18px;
             z-index: 900;
             transform: translateY(101%);
-            transition: transform 0.4s var(--ease);
-            border-top: 6px solid var(--accent);
+            transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            border-top: 4px solid var(--accent);
             pointer-events: none;
-            will-change: transform;
         }
-        .progress-container.show { transform: translateY(0); pointer-events: auto; }
+
+        .progress-container.show {
+            transform: translateY(0);
+            pointer-events: auto;
+        }
 
         .progress-label {
-            font-family: var(--font-doc);
             font-size: 0.7rem;
-            font-weight: 600;
-            letter-spacing: 0.16em;
+            font-weight: 700;
+            letter-spacing: 0.14em;
             text-transform: uppercase;
-            margin-bottom: 12px;
+            margin-bottom: 10px;
+            text-align: left;
         }
 
         .progress-bar {
             width: 100%;
-            height: 8px;
-            background: rgba(255,255,255,0.18);
+            height: 10px;
+            background: rgba(128, 128, 128, 0.35);
+            border-radius: 0;
             overflow: hidden;
         }
+
         .progress-fill {
             height: 100%;
             background: var(--accent);
             width: 0%;
-            transition: width 0.4s linear;
+            border-radius: 0;
+            transition: width 0.3s linear;
         }
 
         /* ================= КНОПКИ УПРАВЛЕНИЯ ================= */
@@ -261,33 +295,49 @@
         .controls {
             display: flex;
             justify-content: center;
-            padding: 32px 20px 26px;
+            gap: 0;
+            padding: 24px 20px 20px;
             flex-wrap: wrap;
-            gap: 10px;
         }
 
         .controls button {
             background: var(--bg);
-            border: 2px solid var(--fg);
-            color: var(--fg);
-            width: 58px;
-            height: 58px;
+            border: 2px solid var(--border);
+            color: var(--text);
+            border-radius: 0;
+            width: 50px;
+            height: 50px;
             cursor: pointer;
-            font-family: var(--font-ui);
+            font-size: 1.35rem;
             font-weight: 700;
-            font-size: 1.45rem;
             line-height: 1;
             display: flex;
             align-items: center;
             justify-content: center;
-            transition: background 0.1s linear, color 0.1s linear, border-color 0.1s linear;
+            transition: var(--transition);
             position: relative;
+            margin-left: -2px;
+            font-family: var(--font);
         }
-        .controls button.active { background: var(--accent); border-color: var(--accent); color: var(--accent-fg); z-index: 2; }
 
-        @media (min-width: 641px) {
-            .controls button:hover { background: var(--fg); color: var(--bg); z-index: 3; }
-            .controls button.active:hover { background: var(--accent); color: var(--accent-fg); }
+        .controls button:first-child { margin-left: 0; }
+
+        .controls button:hover {
+            background: var(--text);
+            color: var(--bg);
+            z-index: 3;
+        }
+
+        .controls button.active {
+            background: var(--accent);
+            border-color: var(--accent);
+            color: #ffffff;
+            z-index: 2;
+        }
+
+        .controls button.active:hover {
+            background: var(--accent);
+            color: #ffffff;
         }
 
         .controls button::after {
@@ -295,30 +345,37 @@
             position: absolute;
             bottom: calc(100% + 10px);
             left: 50%;
-            transform: translateX(-50%) translateY(4px);
-            background: var(--fg);
+            transform: translateX(-50%) translateY(6px);
+            background: var(--text);
             color: var(--bg);
-            padding: 6px 10px;
-            font-family: var(--font-doc);
-            font-size: 0.62rem;
-            font-weight: 600;
-            letter-spacing: 0.14em;
+            padding: 7px 11px;
+            border-radius: 0;
+            font-family: var(--font);
+            font-size: 0.65rem;
+            font-weight: 700;
+            letter-spacing: 0.1em;
             text-transform: uppercase;
             white-space: nowrap;
+            border: none;
             pointer-events: none;
             opacity: 0;
             visibility: hidden;
-            transition: opacity 0.12s linear, transform 0.12s linear, visibility 0.12s;
+            transition: opacity 0.15s linear, transform 0.15s linear, visibility 0.15s;
             z-index: 10;
         }
-        .controls button:hover::after { opacity: 1; visibility: visible; transform: translateX(-50%) translateY(0); }
+
+        .controls button:hover::after {
+            opacity: 1;
+            visibility: visible;
+            transform: translateX(-50%) translateY(0);
+        }
 
         /* ================= СЕТКА СЛОГОВ ================= */
 
         .grid-container {
-            max-width: 960px;
+            max-width: 900px;
             margin: 0 auto;
-            padding: 0 20px 100px;
+            padding: 0 20px 60px;
             width: 100%;
         }
 
@@ -326,69 +383,77 @@
             display: grid;
             grid-template-columns: repeat(4, 1fr);
             gap: 0;
-            border-top: 2px solid var(--fg);
-            border-left: 2px solid var(--fg);
+            border-top: 2px solid var(--border);
+            border-left: 2px solid var(--border);
         }
+
         .syllable-grid.hide-learned .syllable-card.learned { display: none; }
 
         .syllable-card {
             background: var(--bg);
-            border-right: 2px solid var(--fg);
-            border-bottom: 2px solid var(--fg);
-            padding: 22px 8px;
-            min-height: 78px;
+            border-right: 2px solid var(--border);
+            border-bottom: 2px solid var(--border);
+            border-radius: 0;
+            padding: 18px 8px;
             text-align: center;
             cursor: pointer;
-            font-family: var(--font-display);
-            font-size: clamp(1.05rem, 2vw, 1.35rem);
-            font-weight: 600;
-            letter-spacing: 0.04em;
-            color: var(--fg);
+            font-size: clamp(0.9rem, 1.7vw, 1.05rem);
+            font-weight: 700;
+            color: var(--text);
             user-select: none;
             -webkit-tap-highlight-color: transparent;
-            transition: background 0.08s linear, color 0.08s linear;
+            transition: background 0.12s linear, color 0.12s linear;
             position: relative;
+            font-family: var(--font);
+            letter-spacing: 0.02em;
             text-transform: uppercase;
             display: flex;
             align-items: center;
             justify-content: center;
-            /* Отсекаем перерисовку карточек вне вьюпорта */
-            content-visibility: auto;
-            contain-intrinsic-size: 78px;
+            min-height: 68px;
         }
-        @media (min-width: 641px) {
-            .syllable-card:not(.learned):hover { background: var(--fg); color: var(--bg); }
+
+        .syllable-card:not(.learned):hover {
+            background: var(--text);
+            color: var(--bg);
         }
+
         .syllable-card.playing {
             background: var(--accent);
-            color: var(--accent-fg);
+            color: #ffffff;
         }
-        /* Пульсацию убрал — она давала layout thrash при каждом тапе */
-        .syllable-card.learned { background: var(--bg-2); color: var(--fg-3); }
+
+        .syllable-card.learned {
+            background: var(--learned-bg);
+            color: var(--learned-fg);
+        }
+
         .syllable-card.learned .syllable-text {
             text-decoration: line-through;
-            text-decoration-thickness: 2px;
-            text-decoration-color: var(--accent);
-            opacity: 0.8;
+            opacity: 0.55;
         }
-        .syllable-text { pointer-events: none; }
 
         .learn-dot {
             position: absolute;
-            top: 8px;
-            right: 8px;
-            width: 15px;
-            height: 15px;
+            bottom: 6px;
+            right: 6px;
+            width: 13px;
+            height: 13px;
             background: transparent;
-            border: 2px solid var(--fg);
+            border: 2px solid var(--border);
+            border-radius: 0;
             cursor: pointer;
-            transition: all 0.12s linear;
-            opacity: 0.55;
+            transition: var(--transition);
+            opacity: 0.3;
         }
-        @media (min-width: 641px) {
-            .syllable-card:not(.learned):hover .learn-dot { border-color: var(--bg); opacity: 1; }
+
+        .syllable-card:not(.learned):hover .learn-dot {
+            border-color: var(--bg);
+            opacity: 1;
         }
+
         .learn-dot:hover { opacity: 1; }
+
         .syllable-card.learned .learn-dot {
             background: var(--accent);
             border-color: var(--accent);
@@ -399,22 +464,25 @@
 
         .scroll-top-btn {
             position: fixed;
-            bottom: 24px; right: 24px;
-            width: 52px; height: 52px;
+            bottom: 20px;
+            right: 20px;
+            width: 48px;
+            height: 48px;
+            border-radius: 0;
             background: var(--bg);
-            border: 2px solid var(--fg);
-            color: var(--fg);
-            font-size: 1.25rem;
-            font-family: var(--font-ui);
-            font-weight: 900;
+            border: 2px solid var(--border);
+            color: var(--text);
+            font-size: 1.3rem;
             cursor: pointer;
             display: none;
             align-items: center;
             justify-content: center;
-            transition: background 0.1s linear, color 0.1s linear;
+            transition: var(--transition);
             z-index: 1001;
         }
+
         .scroll-top-btn.visible { display: flex; }
+        .scroll-top-btn:hover { background: var(--text); color: var(--bg); }
 
         /* ================= ЭКЗАМЕН ================= */
 
@@ -428,93 +496,129 @@
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            padding: 24px;
-            gap: 32px;
+            padding: 20px;
+            gap: 34px;
         }
+
         .exam-overlay.show { display: flex; }
 
-        .exam-header { display: flex; align-items: center; gap: 14px; }
+        .exam-header {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
 
         .exam-question {
-            font-family: var(--font-doc);
-            font-size: 0.72rem;
+            font-size: 0.75rem;
             font-weight: 700;
-            letter-spacing: 0.2em;
+            letter-spacing: 0.18em;
             text-transform: uppercase;
-            color: var(--fg-2);
+            color: var(--text-secondary);
         }
 
         .exam-repeat-btn,
         .exam-next-btn {
             background: var(--bg);
-            border: 2px solid var(--fg);
-            color: var(--fg);
-            width: 48px; height: 48px;
+            border: 2px solid var(--border);
+            color: var(--text);
+            border-radius: 0;
+            width: 46px;
+            height: 46px;
             cursor: pointer;
             font-size: 1.1rem;
             display: flex;
             align-items: center;
             justify-content: center;
-            transition: background 0.1s linear, color 0.1s linear;
+            transition: var(--transition);
         }
-        .exam-repeat-btn:hover { background: var(--fg); color: var(--bg); }
+
+        .exam-repeat-btn:hover {
+            background: var(--text);
+            color: var(--bg);
+        }
+
         .exam-next-btn {
             display: none;
             background: var(--accent);
             border-color: var(--accent);
-            color: var(--accent-fg);
-            font-size: 1.3rem;
+            color: #ffffff;
+            font-size: 1.4rem;
         }
+
         .exam-next-btn.show { display: flex; }
+        .exam-next-btn:hover { opacity: 0.8; }
 
         .exam-options {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
             gap: 10px;
-            max-width: 660px;
+            max-width: 620px;
             width: 100%;
         }
 
         .exam-option {
-            padding: 22px 12px;
+            padding: 20px 12px;
             background: var(--bg);
-            border: 2px solid var(--fg);
+            border: 2px solid var(--border);
+            border-radius: 0;
             cursor: pointer;
             text-align: center;
-            font-family: var(--font-display);
-            font-size: 1.25rem;
-            font-weight: 600;
-            color: var(--fg);
+            font-family: var(--font);
+            font-size: 1rem;
+            font-weight: 700;
+            color: var(--text);
             text-transform: uppercase;
-            letter-spacing: 0.05em;
-            transition: background 0.1s linear, color 0.1s linear;
+            letter-spacing: 0.04em;
+            transition: var(--transition);
         }
-        .exam-option.correct { background: #2a6b3f; border-color: #2a6b3f; color: #ffffff; }
-        .exam-option.wrong { background: var(--accent); border-color: var(--accent); color: var(--accent-fg); }
+
+        .exam-option:hover:not(:disabled) {
+            background: var(--text);
+            color: var(--bg);
+        }
+
+        .exam-option.correct {
+            background: #00a300;
+            border-color: #00a300;
+            color: #ffffff;
+        }
+
+        .exam-option.wrong {
+            background: var(--accent);
+            border-color: var(--accent);
+            color: #ffffff;
+        }
 
         .exam-result {
-            font-size: 2.6rem;
+            font-size: 2.4rem;
             text-align: center;
-            min-height: 2.6rem;
+            min-height: 2.4rem;
             line-height: 1;
         }
 
         .exam-exit-btn {
             position: absolute;
-            top: 24px; left: 24px;
+            top: 20px;
+            left: 20px;
             background: var(--bg);
-            border: 2px solid var(--fg);
-            color: var(--fg);
-            width: 48px; height: 48px;
+            border: 2px solid var(--border);
+            color: var(--text);
+            border-radius: 0;
+            width: 46px;
+            height: 46px;
             cursor: pointer;
-            font-size: 1.2rem;
+            font-size: 1.3rem;
             display: flex;
             align-items: center;
             justify-content: center;
-            transition: background 0.1s linear, color 0.1s linear;
+            transition: var(--transition);
             z-index: 10;
         }
-        .exam-exit-btn:hover { background: var(--fg); color: var(--bg); }
+
+        .exam-exit-btn:hover {
+            background: var(--text);
+            color: var(--bg);
+        }
 
         /* ================= ПОЗДРАВЛЕНИЕ ================= */
 
@@ -522,57 +626,68 @@
             position: fixed;
             top: 0; left: 0;
             width: 100%; height: 100%;
-            background: rgba(20, 20, 20, 0.82);
+            background: rgba(0, 0, 0, 0.88);
             z-index: 3000;
             display: none;
             align-items: center;
             justify-content: center;
-            padding: 20px;
         }
+
         .celebration-overlay.show { display: flex; }
 
         .celebration-box {
             background: var(--bg);
-            border: 4px solid var(--fg);
-            padding: 32px;
+            border: 3px solid var(--border);
+            border-radius: 0;
+            padding: 28px;
             text-align: center;
             max-width: 90vw;
             max-height: 90vh;
-            box-shadow: 12px 12px 0 var(--accent);
         }
+
         .celebration-box h2 {
-            font-family: var(--font-display);
-            font-size: 1.9rem;
-            font-weight: 700;
-            letter-spacing: 0.02em;
+            margin-bottom: 18px;
+            font-size: 1.4rem;
+            font-weight: 800;
             text-transform: uppercase;
-            margin-bottom: 20px;
+            letter-spacing: 0.04em;
         }
+
         .celebration-box img {
             max-width: 300px;
-            max-height: 240px;
-            border: 3px solid var(--fg);
+            max-height: 250px;
+            border-radius: 0;
+            border: 2px solid var(--border);
         }
 
         .celebration-close {
-            margin-top: 22px;
-            padding: 14px 36px;
-            background: var(--fg);
+            margin-top: 20px;
+            padding: 12px 34px;
+            background: var(--text);
             color: var(--bg);
-            border: 2px solid var(--fg);
+            border: 2px solid var(--text);
+            border-radius: 0;
             cursor: pointer;
-            font-family: var(--font-display);
-            font-weight: 600;
-            font-size: 0.9rem;
-            letter-spacing: 0.14em;
+            font-family: var(--font);
+            font-weight: 700;
+            font-size: 0.78rem;
+            letter-spacing: 0.12em;
             text-transform: uppercase;
+            transition: var(--transition);
+        }
+
+        .celebration-close:hover {
+            background: var(--accent);
+            border-color: var(--accent);
+            color: #ffffff;
         }
 
         /* ================= ТОСТЫ ================= */
 
         .toast-container {
             position: fixed;
-            bottom: 100px; left: 50%;
+            bottom: 24px;
+            left: 50%;
             transform: translateX(-50%);
             z-index: 4000;
             display: flex;
@@ -583,32 +698,41 @@
         }
 
         .toast {
-            background: var(--fg);
+            background: var(--text);
             color: var(--bg);
-            padding: 13px 24px;
-            font-family: var(--font-doc);
-            font-size: 0.7rem;
-            font-weight: 600;
-            letter-spacing: 0.16em;
+            border: none;
+            border-radius: 0;
+            padding: 13px 22px;
+            font-family: var(--font);
+            font-size: 0.72rem;
+            font-weight: 700;
+            letter-spacing: 0.12em;
             text-transform: uppercase;
-            animation: toastIn 0.18s linear, toastOut 0.18s linear 2.5s forwards;
+            animation: toastIn 0.2s linear, toastOut 0.2s linear 2.5s forwards;
             pointer-events: auto;
         }
-        @keyframes toastIn { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
-        @keyframes toastOut { from { opacity: 1; } to { opacity: 0; } }
+
+        @keyframes toastIn {
+            from { opacity: 0; transform: translateY(14px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes toastOut {
+            from { opacity: 1; }
+            to   { opacity: 0; }
+        }
 
         /* ================= ПОДВАЛ ================= */
 
         .footer {
             text-align: center;
-            padding: 26px 20px;
-            color: var(--fg-3);
-            font-family: var(--font-doc);
+            padding: 22px 20px;
+            color: var(--text-secondary);
             font-size: 0.62rem;
-            font-weight: 600;
-            letter-spacing: 0.18em;
+            font-weight: 700;
+            letter-spacing: 0.14em;
             text-transform: uppercase;
-            border-top: 3px solid var(--fg);
+            border-top: 3px solid var(--border);
         }
 
         /* ============================================================
@@ -616,623 +740,326 @@
            ============================================================ */
 
         .heroes-timeline {
-            max-width: 960px;
-            margin: 0 auto;
-            padding: 40px 0 80px;
+            max-width: 800px;
+            margin: 40px auto;
+            padding: 0 20px;
+            position: relative;
         }
 
-        .century-header {
-            background: var(--fg);
-            color: var(--bg);
-            padding: 18px 22px;
-            margin: 0 0 24px;
-            text-align: center;
-        }
-        .century-header:not(:first-child) { margin-top: 56px; }
-
-        .century-title {
-            font-family: var(--font-display);
-            font-size: clamp(1.5rem, 4.2vw, 2.15rem);
-            font-weight: 600;
-            letter-spacing: 0.1em;
-            text-transform: uppercase;
+        .timeline-container {
+            position: relative;
+            padding-left: 60px;
         }
 
-        .heroes-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(176px, 1fr));
-            gap: 18px;
-            margin-bottom: 24px;
+        .timeline-line {
+            position: absolute;
+            left: 30px;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: var(--border);
+            z-index: 0;
         }
 
-        .soviet-band {
+        .century-sentinel {
+            height: 1px;
+            margin: 60px 0 40px;
+            position: relative;
+        }
+
+        .century-sentinel:first-child { margin-top: 0; }
+
+        .century-sentinel::before {
+            content: '';
+            position: absolute;
+            left: -37px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 16px;
+            height: 16px;
             background: var(--accent);
-            color: #ffffff;
-            padding: 14px 24px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 20px;
-            font-family: var(--font-display);
-            font-size: 1.15rem;
-            font-weight: 600;
-            letter-spacing: 0.24em;
-            text-transform: uppercase;
-            margin: 12px 0 24px;
+            border-radius: 0;
+            z-index: 1;
         }
 
         .hero-item {
-            border: 2px solid var(--fg);
-            background: var(--bg);
-            cursor: pointer;
+            position: relative;
             display: flex;
-            flex-direction: column;
+            align-items: center;
+            gap: 22px;
+            margin-bottom: 26px;
+            cursor: pointer;
+            padding: 0;
+            border-radius: 0;
         }
 
-        .hero-photo {
-            position: relative;
-            aspect-ratio: 1 / 1;
-            border-bottom: 2px solid var(--fg);
+        .hero-circle {
+            width: 82px;
+            height: 82px;
+            border-radius: 0;
+            border: 2px solid var(--border);
             overflow: hidden;
-            background: var(--bg-2);
             flex-shrink: 0;
+            background: var(--bg-card);
+            transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1),
+                        border-color 0.2s linear,
+                        box-shadow 0.3s linear;
+            position: relative;
+            z-index: 1;
+            transform-origin: center center;
         }
-        .hero-photo img {
+
+        .hero-item:hover .hero-circle {
+            transform: scale(1.45);
+            border-color: var(--accent);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+            z-index: 5;
+        }
+
+        .hero-circle img {
             width: 100%;
             height: 100%;
             object-fit: cover;
-            display: block;
+            filter: grayscale(1) contrast(1.1);
+            transition: filter 0.3s linear;
         }
 
-        /* grayscale-фильтр — только на десктопе, на мобиле он жрёт GPU */
-        @media (min-width: 641px) {
-            .hero-photo img {
-                filter: grayscale(1) contrast(1.15);
-                transition: filter 0.22s linear;
-            }
-            .hero-item:hover {
-                transform: translate(-3px, -3px);
-                box-shadow: 6px 6px 0 var(--accent);
-            }
-            .hero-item:hover .hero-photo img { filter: grayscale(0) contrast(1.15); }
+        .hero-item:hover .hero-circle img {
+            filter: grayscale(0) contrast(1);
         }
 
         .hero-info {
-            padding: 12px 12px 14px;
             display: flex;
             flex-direction: column;
-            gap: 4px;
+            gap: 5px;
+            position: relative;
+            z-index: 2;
         }
+
         .hero-name {
-            font-family: var(--font-display);
             font-size: 1.15rem;
-            font-weight: 600;
-            line-height: 1.05;
-            letter-spacing: 0.03em;
+            font-weight: 800;
+            color: var(--text);
             text-transform: uppercase;
-            color: var(--fg);
+            letter-spacing: -0.01em;
         }
+
         .hero-years {
-            font-family: var(--font-doc);
-            font-size: 0.68rem;
-            font-weight: 600;
-            letter-spacing: 0.05em;
-            color: var(--fg-2);
+            font-size: 0.78rem;
+            color: var(--accent);
+            font-weight: 700;
+            letter-spacing: 0.08em;
             display: flex;
             align-items: baseline;
-            gap: 6px;
+            gap: 8px;
         }
-        .hero-age { color: var(--accent); font-weight: 700; }
 
-        /* ============================================================
-           МОДАЛКА ГЕРОЯ
-           ============================================================ */
+        .hero-age {
+            font-size: 0.7rem;
+            font-weight: 400;
+            color: var(--text-secondary);
+            letter-spacing: 0.04em;
+        }
+
+        .soviet-era {
+            background: rgba(227, 6, 19, 0.07);
+            margin: 40px 0 40px -60px;
+            padding: 44px 30px 44px 60px;
+            position: relative;
+            border-left: 6px solid #e30613;
+            border-radius: 0;
+        }
+
+        body.light-mode .soviet-era { background: rgba(227, 6, 19, 0.05); }
+
+        .soviet-era::before {
+            content: '☭';
+            position: absolute;
+            top: 50%;
+            right: 40px;
+            transform: translateY(-50%);
+            font-size: 7rem;
+            font-weight: 900;
+            color: rgba(227, 6, 19, 0.09);
+            pointer-events: none;
+            line-height: 1;
+        }
+
+        .soviet-era::after {
+            content: 'СССР';
+            position: absolute;
+            top: 18px;
+            right: 24px;
+            font-size: 0.8rem;
+            font-weight: 800;
+            color: #e30613;
+            letter-spacing: 0.3em;
+            pointer-events: none;
+        }
+
+        .century-popup {
+            position: fixed;
+            bottom: 40px;
+            left: 50%;
+            transform: translateX(-50%) translateY(16px);
+            background: var(--text);
+            color: var(--bg);
+            border: none;
+            padding: 15px 34px;
+            border-radius: 0;
+            font-family: var(--font);
+            font-size: 0.85rem;
+            font-weight: 800;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            z-index: 100;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.35s ease, transform 0.35s ease;
+        }
+
+        .century-popup.show {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+        }
 
         .hero-modal {
             position: fixed;
-            inset: 0;
-            width: 100vw;
-            height: 100vh;
-            height: 100dvh;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
             background: var(--bg);
             z-index: 5000;
-            overflow-y: auto;
-            overflow-x: hidden;
-            -webkit-overflow-scrolling: touch;
-        }
-
-        .hero-modal-scroll {
-            min-height: 100%;
-            display: flex;
-            flex-direction: column;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        .hero-modal-close,
-        .hero-modal-repeat {
-            position: fixed;
-            top: 8px;
-            background: var(--bg);
-            border: 2px solid var(--fg);
-            color: var(--fg);
-            width: 40px;
-            height: 40px;
-            cursor: pointer;
-            font-size: 1.3rem;
             display: flex;
             align-items: center;
             justify-content: center;
-            z-index: 60;
-            font-family: var(--font-ui);
-            line-height: 1;
-            padding: 0;
+            animation: tabEnter 0.2s linear;
         }
-        .hero-modal-close { right: 8px; }
-        .hero-modal-repeat { left: 8px; font-size: 1rem; }
-        .hero-modal-close:hover,
-        .hero-modal-repeat:hover { background: var(--fg); color: var(--bg); }
 
-        .hero-modal-portrait-wrap {
-            flex-shrink: 0;
+        .hero-modal-content {
             width: 100%;
-            height: 100vh;
-            height: 100dvh;
+            height: 100%;
             position: relative;
             display: flex;
+            flex-direction: column;
             align-items: center;
             justify-content: center;
-            overflow: hidden;
-            background: var(--bg-2);
+            padding: 20px;
+        }
+
+        .hero-modal-close {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: var(--bg);
+            border: 2px solid var(--border);
+            color: var(--text);
+            font-size: 1.6rem;
+            width: 48px;
+            height: 48px;
+            cursor: pointer;
+            z-index: 20;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: var(--transition);
+            font-family: var(--font);
+            line-height: 1;
+        }
+
+        .hero-modal-close:hover {
+            background: var(--text);
+            color: var(--bg);
+        }
+
+        .hero-modal-repeat {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background: var(--bg);
+            border: 2px solid var(--border);
+            color: var(--text);
+            border-radius: 0;
+            width: 48px;
+            height: 48px;
+            cursor: pointer;
+            font-size: 1.2rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: var(--transition);
+            z-index: 20;
+        }
+
+        .hero-modal-repeat:hover {
+            background: var(--text);
+            color: var(--bg);
         }
 
         .hero-modal-portrait {
-            max-width: 100%;
-            max-height: 100%;
-            width: auto;
-            height: auto;
+            max-width: 88%;
+            max-height: 62vh;
             object-fit: contain;
-            display: block;
+            border-radius: 0;
+            border: 3px solid var(--border);
         }
 
-        .hero-portrait-placeholder {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            width: 100%;
-            height: 100%;
-            font-family: var(--font-display);
-            font-size: clamp(8rem, 32vw, 22rem);
-            font-weight: 700;
-            color: var(--fg);
-            background: var(--bg-2);
+        .hero-modal h3 {
+            font-size: clamp(1.4rem, 5vw, 2.4rem);
+            margin: 24px 0 0;
+            color: var(--text);
             text-transform: uppercase;
-            user-select: none;
-            letter-spacing: 0.04em;
+            font-weight: 800;
+            letter-spacing: -0.02em;
+            text-align: center;
         }
 
-        .hero-nav {
+        .hero-modal-nav {
             position: absolute;
             top: 50%;
             transform: translateY(-50%);
+            left: 0;
+            right: 0;
+            display: flex;
+            justify-content: space-between;
+            padding: 0 20px;
+            z-index: 10;
+        }
+
+        .hero-modal-nav button {
             background: var(--bg);
-            border: 2px solid var(--fg);
-            color: var(--fg);
-            width: 46px;
-            height: 46px;
+            border: 2px solid var(--border);
+            color: var(--text);
+            font-size: 1.6rem;
+            width: 52px;
+            height: 52px;
             cursor: pointer;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 1.5rem;
-            font-family: var(--font-ui);
-            z-index: 20;
-            padding: 0;
-            line-height: 1;
-            opacity: 0.9;
-        }
-        .hero-nav.prev { left: 8px; }
-        .hero-nav.next { right: 8px; }
-
-        .hero-modal-bottom {
-            flex: 1 0 auto;
-            padding: 20px 16px 40px;
-            display: flex;
-            flex-direction: column;
-            gap: 16px;
+            transition: var(--transition);
+            border-radius: 0;
+            font-family: var(--font);
         }
 
-        .hero-modal-info {
-            text-align: center;
-            padding: 4px 0 2px;
-        }
-        .hero-modal-info h3 {
-            font-family: var(--font-display);
-            font-size: clamp(2rem, 8vw, 3.4rem);
-            font-weight: 600;
-            letter-spacing: 0.03em;
-            text-transform: uppercase;
-            color: var(--fg);
-            line-height: 1;
-        }
-
-        .hero-modal-years {
-            font-family: var(--font-doc);
-            font-size: clamp(1rem, 3vw, 1.15rem);
-            font-weight: 700;
-            letter-spacing: 0.08em;
-            color: var(--accent);
-            margin-top: 8px;
-            user-select: none;
-        }
-
-        /* ============================================================
-           ПРОСТАЯ ЛЕНТА — вертикальный список (мобила)
-           ============================================================ */
-
-        .simple-timeline {
-            border: 1.5px solid var(--fg);
-            background: var(--bg);
-            overflow: hidden;
-        }
-
-        .simple-timeline-head {
-            background: var(--fg);
+        .hero-modal-nav button:hover {
+            background: var(--text);
             color: var(--bg);
-            padding: 12px 14px;
-            text-align: center;
-            font-family: var(--font-display);
-            font-size: 0.85rem;
-            font-weight: 600;
-            letter-spacing: 0.26em;
-            text-transform: uppercase;
         }
-
-        .stl-list {
-            list-style: none;
-            margin: 0;
-            padding: 22px 16px 22px 82px;
-            position: relative;
-        }
-
-        .stl-list::before {
-            content: '';
-            position: absolute;
-            left: 68px;
-            top: 30px;
-            bottom: 30px;
-            width: 2px;
-            background: rgba(20, 20, 20, 0.18);
-        }
-
-        .stl-row {
-            position: relative;
-            padding: 10px 0;
-        }
-
-        .stl-row .stl-year {
-            position: absolute;
-            left: -82px;
-            top: 10px;
-            width: 62px;
-            text-align: right;
-            padding-right: 10px;
-            box-sizing: border-box;
-            font-family: var(--font-doc);
-            font-size: 0.72rem;
-            font-weight: 700;
-            letter-spacing: 0.02em;
-            color: var(--fg-3);
-            font-variant-numeric: tabular-nums;
-            line-height: 1.15;
-        }
-
-        .stl-row .stl-name {
-            display: block;
-            font-family: var(--font-display);
-            font-size: 0.88rem;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 0.04em;
-            color: var(--fg);
-            line-height: 1.15;
-        }
-
-        .stl-row::before {
-            content: '';
-            position: absolute;
-            left: -16px;
-            top: 12px;
-            width: 10px;
-            height: 10px;
-            background: var(--bg);
-            border: 2px solid rgba(20, 20, 20, 0.45);
-            border-radius: 50%;
-            box-sizing: border-box;
-            z-index: 1;
-        }
-
-        .stl-row.alive .stl-year { color: var(--accent); }
-        .stl-row.alive .stl-name { color: var(--accent); }
-        .stl-row.alive::before {
-            background: var(--accent);
-            border-color: var(--accent);
-        }
-
-        /* ============================================================
-           ПОДРОБНАЯ ШКАЛА — десктоп
-           ============================================================ */
-
-        .detailed-timeline {
-            width: 100%;
-            margin-top: 8px;
-        }
-
-        .htl-panel {
-            border: 2px solid var(--fg);
-            background: var(--bg);
-        }
-
-        .htl-head {
-            background: var(--fg);
-            color: var(--bg);
-            padding: 12px 16px;
-            text-align: center;
-            font-family: var(--font-display);
-            font-size: clamp(0.8rem, 3vw, 1rem);
-            font-weight: 600;
-            letter-spacing: 0.28em;
-            text-transform: uppercase;
-            border-bottom: 2px solid var(--fg);
-        }
-
-        .htl-body {
-            padding: 22px 18px 14px;
-            position: relative;
-        }
-
-        .htl {
-            position: relative;
-            width: 100%;
-            height: 310px;
-        }
-
-        .htl-axis {
-            position: absolute;
-            left: 0; right: 0;
-            top: 148px;
-            height: 1.5px;
-            background: var(--fg);
-            z-index: 1;
-        }
-
-        .htl-life {
-            position: absolute;
-            top: 133px;
-            height: 31px;
-            background: var(--accent);
-            border: 1.5px solid var(--fg);
-            box-sizing: border-box;
-            z-index: 6;
-            box-shadow: 0 0 0 1px rgba(255,255,255,0.35) inset;
-        }
-        .htl-life::before,
-        .htl-life::after {
-            content: '';
-            position: absolute;
-            top: -5px;
-            bottom: -5px;
-            width: 0.5px;
-            background: var(--fg);
-        }
-        .htl-life::before { left: -1px; }
-        .htl-life::after  { right: -1px; }
-
-        .htl-dtick {
-            position: absolute;
-            top: 148px;
-            width: 1px;
-            height: 4px;
-            background: var(--fg);
-            transform: translateX(-50%);
-            opacity: 0.22;
-            z-index: 2;
-        }
-        .htl-htick {
-            position: absolute;
-            top: 148px;
-            width: 1px;
-            height: 9px;
-            background: var(--fg);
-            transform: translateX(-50%);
-            opacity: 0.5;
-            z-index: 2;
-        }
-        .htl-ctick {
-            position: absolute;
-            top: 148px;
-            width: 2px;
-            height: 30px;
-            background: var(--fg);
-            transform: translateX(-50%);
-            z-index: 3;
-        }
-
-        .htl-war {
-            position: absolute;
-            top: 0;
-            height: 148px;
-            transform: translateX(-50%);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            z-index: 4;
-            padding: 0 2px;
-        }
-
-        .htl-war-label {
-            flex-shrink: 0;
-            text-align: center;
-            margin-bottom: 5px;
-            max-width: 100px;
-        }
-
-        .htl-war-year {
-            font-family: var(--font-doc);
-            font-size: 0.7rem;
-            font-weight: 700;
-            color: var(--accent);
-            letter-spacing: 0.02em;
-            line-height: 1;
-            margin-bottom: 3px;
-        }
-
-        .htl-war-name {
-            font-family: var(--font-display);
-            font-size: 0.54rem;
-            font-weight: 600;
-            color: var(--fg);
-            text-transform: uppercase;
-            letter-spacing: 0.02em;
-            line-height: 1.14;
-        }
-
-        .htl-war-tick {
-            flex: 1 1 auto;
-            width: 2px;
-            background: var(--fg);
-            opacity: 0.7;
-            min-height: 4px;
-        }
-
-        .htl-other {
-            position: absolute;
-            top: 148px;
-            height: 100px;
-            transform: translateX(-50%);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            z-index: 4;
-            padding: 0 2px;
-        }
-
-        .htl-other-tick {
-            flex: 1 1 auto;
-            width: 2px;
-            background: var(--fg);
-            opacity: 0.7;
-            min-height: 4px;
-            margin-bottom: 5px;
-        }
-
-        .htl-other-label {
-            flex-shrink: 0;
-            text-align: center;
-            max-width: 100px;
-        }
-
-        .htl-other-year {
-            font-family: var(--font-doc);
-            font-size: 0.7rem;
-            font-weight: 700;
-            color: var(--accent);
-            letter-spacing: 0.02em;
-            line-height: 1;
-            margin-bottom: 3px;
-        }
-
-        .htl-other-name {
-            font-family: var(--font-display);
-            font-size: 0.54rem;
-            font-weight: 600;
-            color: var(--fg);
-            text-transform: uppercase;
-            letter-spacing: 0.02em;
-            line-height: 1.14;
-        }
-
-        .htl-cnum {
-            position: absolute;
-            top: 262px;
-            transform: translateX(-50%);
-            font-family: var(--font-display);
-            font-size: 1.15rem;
-            font-weight: 600;
-            letter-spacing: 0.03em;
-            color: var(--fg);
-            background: var(--bg);
-            padding: 0 6px;
-            z-index: 7;
-            line-height: 1;
-        }
-
-        .simple-timeline-wrap { display: none; }
-        .detailed-timeline { display: block; }
 
         /* ============================================================
            ЧАСЫ
            ============================================================ */
 
         .clock-wrapper {
-            padding: 40px 0 90px;
+            padding: 50px 0 80px;
             width: 100%;
             display: flex;
             justify-content: center;
-        }
-
-        .clock-frame {
-            border: 3px solid var(--fg);
-            padding: 18px;
-            background: var(--bg);
-            box-shadow: 10px 10px 0 var(--accent);
-            width: min(520px, 94vw);
-        }
-
-        .frame-head {
-            border: 2px solid var(--fg);
-            margin-bottom: 18px;
-            background: var(--bg);
-        }
-
-        .frame-head-top {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            gap: 10px;
-            padding: 6px 10px;
-            font-family: var(--font-doc);
-            font-size: 0.56rem;
-            font-weight: 600;
-            letter-spacing: 0.16em;
-            text-transform: uppercase;
-            color: var(--fg);
-            background: var(--bg-2);
-            border-bottom: 1px solid var(--fg);
-        }
-
-        .frame-head-tag {
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-
-        .frame-head-title {
-            padding: 11px 14px;
-            text-align: center;
-            font-family: var(--font-display);
-            font-weight: 600;
-            font-size: clamp(0.72rem, 2.5vw, 1.05rem);
-            letter-spacing: 0.1em;
-            text-transform: uppercase;
-            line-height: 1.15;
-            color: var(--fg);
         }
 
         .clock-stack {
-            width: 100%;
+            width: min(400px, 88vw);
             margin: 0 auto;
-            position: relative;
         }
 
         .clock-view {
@@ -1240,6 +1067,8 @@
             aspect-ratio: 440 / 520;
             position: relative;
             cursor: pointer;
+            /* pan-y — разрешаем вертикальный скролл страницы через область часов,
+               перехватываем только горизонтальные/круговые жесты под перетаскивание стрелок */
             touch-action: pan-y;
             user-select: none;
             -webkit-user-select: none;
@@ -1260,9 +1089,18 @@
             height: 100%;
             display: block;
         }
-        .watch-container svg { width: 100%; height: 100%; display: block; overflow: visible; }
 
-        #clk-hourHand, #clk-minuteHand { will-change: transform; }
+        .watch-container svg {
+            width: 100%;
+            height: 100%;
+            display: block;
+            overflow: visible;
+        }
+
+        #clk-hourHand,
+        #clk-minuteHand {
+            will-change: transform;
+        }
 
         .scheme-view {
             position: absolute;
@@ -1270,13 +1108,19 @@
             display: none;
             align-items: center;
             justify-content: center;
-            color: var(--fg);
+            color: var(--text);
         }
+
         .scheme-view.active { display: flex; }
+
         .scheme-view svg {
-            width: 100%; height: auto; max-height: 100%;
-            display: block; overflow: visible;
+            width: 100%;
+            height: auto;
+            max-height: 100%;
+            display: block;
+            overflow: visible;
         }
+
         .clock-view .watch-container.hidden { display: none; }
 
         /* ============================================================
@@ -1288,184 +1132,94 @@
         }
 
         @media (max-width: 640px) {
-            .header { padding: 12px 0 0; }
-            .header-kicker {
-                margin: 0 0 20px;
-                font-size: 0.58rem;
-                letter-spacing: 0.14em;
-                padding: 12px 14px;
-            }
+            .header { padding: 16px 14px 0; }
+            .header h1 { margin: 34px 0 10px; letter-spacing: 0.01em; }
 
-            .header h1 {
-                margin: 12px 0 22px;
-                padding: 0 6px;
-                font-size: 15.5vw;
-                line-height: 0.88;
-                letter-spacing: -0.01em;
-                text-align: center;
-            }
+            .theme-toggle { top: 12px; right: 14px; }
+            .theme-cycle  { top: 12px; left: 14px; }
+            .theme-toggle button,
+            .theme-cycle button { width: 32px; height: 32px; font-size: 0.85rem; }
+            .theme-cycle .color-indicator { width: 13px; height: 13px; }
+            .theme-toggle .theme-ball { width: 13px; height: 13px; }
 
-            .section-switch { display: none; }
-            .section-cycle-btn { display: flex; margin: 0; }
-
-            .section-subtitles { margin: 0; min-height: 44px; }
-            .section-subtitle {
+            .section-switch { margin: 0 -14px; }
+            .section-switch-btn {
                 font-size: 0.6rem;
-                padding: 12px 14px;
-                letter-spacing: 0.14em;
-                min-height: 3em;
-                text-align: center;
+                padding: 13px 4px;
+                letter-spacing: 0.04em;
+                white-space: normal;
             }
-            .digital-clock-inline { font-size: 0.95rem; letter-spacing: 0.1em; }
+
+            .section-subtitles { margin: 0 -14px; }
+            .section-subtitle {
+                font-size: 0.52rem;
+                padding: 10px 4px;
+                letter-spacing: 0.08em;
+                min-height: 3.2em;
+            }
+
+            .digital-clock-inline { font-size: 0.9rem; letter-spacing: 0.1em; }
 
             .content-wrapper { padding: 0 14px; }
-            .grid-container { padding: 0 14px 90px; }
+            .grid-container { padding: 0 14px 50px; }
 
             .syllable-grid { grid-template-columns: repeat(2, 1fr); }
             .syllable-card {
-                font-size: 1.15rem;
-                min-height: 62px;
-                padding: 16px 4px;
-                contain-intrinsic-size: 62px;
+                font-size: 0.82rem;
+                min-height: 54px;
+                padding: 12px 4px;
             }
-            .learn-dot { width: 12px; height: 12px; top: 6px; right: 6px; border-width: 1.6px; }
+            .learn-dot { width: 10px; height: 10px; bottom: 4px; right: 4px; border-width: 1px; }
 
-            .controls {
-                padding: 22px 14px 16px;
-                gap: 10px;
-            }
-            .controls button {
-                width: 30px;
-                height: 30px;
-                font-size: 0.8rem;
-                border-width: 1.5px;
-            }
+            .controls { padding: 18px 14px 14px; }
+            .controls button { width: 42px; height: 42px; font-size: 1.15rem; }
             .controls button::after { display: none; }
 
-            .exam-exit-btn { top: auto; bottom: 20px; left: 20px; width: 42px; height: 42px; font-size: 1rem; }
+            .exam-exit-btn { top: auto; bottom: 14px; left: 14px; width: 40px; height: 40px; font-size: 1.1rem; }
             .exam-options { grid-template-columns: repeat(2, 1fr); gap: 8px; }
-            .exam-option { padding: 18px 8px; font-size: 1.1rem; }
+            .exam-option { padding: 16px 8px; font-size: 0.9rem; }
 
-            .heroes-timeline { padding: 24px 0 70px; }
-            .century-header { padding: 14px 16px; margin-bottom: 18px; }
-            .century-header:not(:first-child) { margin-top: 40px; }
+            .heroes-timeline { padding: 0 14px; }
+            .timeline-container { padding-left: 46px; }
+            .timeline-line { left: 22px; }
+            .century-sentinel::before { left: -29px; width: 14px; height: 14px; }
+            .hero-circle { width: 64px; height: 64px; }
+            .hero-item { gap: 14px; margin-bottom: 20px; }
+            .hero-name { font-size: 0.9rem; }
+            .hero-years { font-size: 0.68rem; }
+            .hero-age { font-size: 0.6rem; }
+            .hero-item:hover .hero-circle { transform: scale(1.25); }
 
-            .heroes-grid {
-                grid-template-columns: 1fr;
-                gap: 16px;
-                justify-items: center;
-            }
-            .hero-item {
-                flex-direction: column;
-                width: 100%;
-                max-width: 200px;
-                border: 1px solid var(--bg-3);
-                background: var(--bg);
-                border-radius: 2px;
-                overflow: hidden;
-                /* Не рисуем карточки, пока они не вошли во вьюпорт — экономит GPU */
-                content-visibility: auto;
-                contain-intrinsic-size: 260px;
-            }
-            .hero-photo {
-                width: 100%;
-                height: auto;
-                aspect-ratio: 1 / 1;
-                border-bottom: none;
-                border-right: none;
-                background: var(--bg-2);
-            }
-            .hero-info {
-                padding: 10px 12px 14px;
-                align-items: center;
-                text-align: center;
-                gap: 4px;
-                border-top: 1px solid var(--bg-3);
-            }
-            .hero-name { font-size: 0.98rem; line-height: 1.05; }
-            .hero-years { font-size: 0.62rem; justify-content: center; color: var(--fg-3); }
-            .hero-age { color: var(--accent); }
+            .soviet-era { margin-left: -46px; padding: 30px 16px 30px 46px; }
+            .soviet-era::before { font-size: 4.5rem; right: 8px; }
+            .soviet-era::after { font-size: 0.6rem; right: 12px; top: 12px; letter-spacing: 0.2em; }
 
-            .soviet-band {
-                font-size: 0.95rem;
-                padding: 12px 14px;
-                letter-spacing: 0.18em;
-                gap: 12px;
-                margin: 12px 0 20px;
-            }
+            .century-popup { font-size: 0.65rem; padding: 11px 22px; bottom: 24px; letter-spacing: 0.14em; }
 
-            /* Убираем backdrop-filter — очень тяжёлая штука на мобиле */
-            .hero-modal-close,
-            .hero-modal-repeat {
-                width: 42px; height: 42px; top: 10px;
-                background: rgba(242,236,223,0.96);
-                border-width: 1.5px;
-            }
-            .hero-modal-close { right: 10px; font-size: 1.4rem; }
-            .hero-modal-repeat { left: 10px; font-size: 1rem; }
+            .hero-modal-nav button { width: 44px; height: 44px; font-size: 1.3rem; }
+            .hero-modal-portrait { max-height: 52vh; }
 
-            .hero-nav {
-                width: 42px; height: 42px; font-size: 1.3rem;
-                background: rgba(242,236,223,0.9);
-                border-width: 1.5px;
-            }
-            .hero-nav.prev { left: 8px; }
-            .hero-nav.next { right: 8px; }
+            .clock-wrapper { padding: 30px 0 60px; }
+            .clock-stack { width: min(340px, 94vw); }
 
-            .hero-modal-portrait-wrap {
-                height: 100vh;
-                height: 100dvh;
-            }
-
-            .hero-modal-bottom {
-                padding: 22px 14px 44px;
-                gap: 22px;
-            }
-
-            .hero-modal-info h3 { font-size: 1.85rem; }
-            .hero-modal-years { font-size: 0.95rem; margin-top: 6px; }
-
-            .simple-timeline-wrap { display: block; }
-            .detailed-timeline { display: none; }
-
-            .stl-list { padding: 18px 12px 18px 78px; }
-            .stl-list::before { left: 64px; top: 26px; bottom: 26px; }
-            .stl-row { padding: 9px 0; }
-            .stl-row .stl-year { left: -78px; top: 9px; width: 60px; font-size: 0.7rem; }
-            .stl-row .stl-name { font-size: 0.85rem; }
-            .stl-row::before { top: 11px; }
-
-            .clock-wrapper { padding: 26px 0 70px; }
-            .clock-frame { padding: 12px; box-shadow: 7px 7px 0 var(--accent); border-width: 2px; }
-            .frame-head { margin-bottom: 14px; border-width: 1.5px; }
-            .frame-head-title {
-                padding: 9px 10px;
-                font-size: clamp(0.6rem, 2.9vw, 0.82rem);
-                letter-spacing: 0.06em;
-            }
-            .frame-head-top {
-                font-size: 0.55rem;
-                padding: 6px 8px;
-                letter-spacing: 0.12em;
-            }
-
-            .progress-container { padding: 14px 18px 16px; }
-        }
-
-        @media (max-width: 380px) {
-            .header h1 { font-size: 15vw; }
-            .stl-list { padding: 16px 10px 16px 72px; }
-            .stl-list::before { left: 58px; }
-            .stl-row .stl-year { left: -72px; width: 54px; font-size: 0.66rem; }
-            .stl-row .stl-name { font-size: 0.8rem; }
+            .progress-container { padding: 12px 14px 14px; }
         }
     </style>
 </head>
-<body>
+<body class="theme-blue light-mode">
 
     <header class="header">
-        <div class="header-kicker">УЧИТЬСЯ, УЧИТЬСЯ И ЕЩЁ РАЗ УЧИТЬСЯ</div>
+        <div class="theme-cycle">
+            <button id="themeCycleBtn" title="Сменить цвет">
+                <span class="color-indicator" id="colorIndicator"></span>
+            </button>
+        </div>
 
+        <div class="theme-toggle">
+            <button id="themeToggle" title="Сменить тему">
+                <span class="theme-ball" id="themeBall"></span>
+            </button>
+        </div>
         <h1>Грамотиньо</h1>
 
         <div class="section-switch">
@@ -1474,13 +1228,8 @@
             <button class="section-switch-btn" data-section="heroes">Чти великих</button>
         </div>
 
-        <button class="section-cycle-btn" id="sectionCycleBtn" type="button">
-            <span id="sectionCycleLabel">Учи слоги</span>
-            <span class="cycle-arrow">▸</span>
-        </button>
-
         <div class="section-subtitles">
-            <div class="section-subtitle active" data-section="syllables">Жми · Слушай · Запоминай</div>
+            <div class="section-subtitle active" data-section="syllables">Жми, слушай, запоминай</div>
             <div class="section-subtitle" data-section="clock">
                 <span class="digital-clock-inline" id="clockDigital24">03:00</span>
             </div>
@@ -1491,11 +1240,11 @@
     <div class="content-wrapper">
         <section id="syllablesSection" class="tab-section active">
             <div class="controls">
-                <button id="normalBtn" class="active" data-tooltip="Все">▦</button>
-                <button id="randomBtn" data-tooltip="Случайно">⇄</button>
-                <button id="hideLearnedBtn" data-tooltip="Скрыть/показать">◐</button>
-                <button id="clearLearnedBtn" data-tooltip="Очистить">✕</button>
-                <button id="examBtn" data-tooltip="Викторина">✎</button>
+                <button id="normalBtn" class="active" data-tooltip="Все">≡</button>
+                <button id="randomBtn" data-tooltip="Случайно">⟳</button>
+                <button id="hideLearnedBtn" data-tooltip="Скрыть/показать">◑</button>
+                <button id="clearLearnedBtn" data-tooltip="Очистить">×</button>
+                <button id="examBtn" data-tooltip="Викторина">?</button>
             </div>
 
             <div class="grid-container">
@@ -1505,165 +1254,189 @@
 
         <section id="clockSection" class="tab-section">
             <div class="clock-wrapper">
-                <div class="clock-frame">
-                    <div class="frame-head">
-                        <div class="frame-head-top">
-                            <span class="frame-head-tag">СХЕМА</span>
+                <div class="clock-stack">
+                    <div class="clock-view view-watch" id="clockView">
+                        <div class="watch-container" id="watchView">
+                            <svg viewBox="-20 0 440 520" xmlns="http://www.w3.org/2000/svg">
+                                <defs>
+                                    <radialGradient id="clk-caseGrad" cx="0.35" cy="0.28" r="0.9">
+                                        <stop offset="0"    stop-color="#f5f5f5"/>
+                                        <stop offset="0.15" stop-color="#d8d8d8"/>
+                                        <stop offset="0.4"  stop-color="#a8a8a8"/>
+                                        <stop offset="0.7"  stop-color="#787878"/>
+                                        <stop offset="0.9"  stop-color="#585858"/>
+                                        <stop offset="1"    stop-color="#3a3a3a"/>
+                                    </radialGradient>
+
+                                    <linearGradient id="clk-caseShine" x1="0.15" y1="0" x2="0.85" y2="1">
+                                        <stop offset="0"    stop-color="#ffffff" stop-opacity="0.5"/>
+                                        <stop offset="0.25" stop-color="#ffffff" stop-opacity="0.1"/>
+                                        <stop offset="0.5"  stop-color="#ffffff" stop-opacity="0"/>
+                                        <stop offset="0.75" stop-color="#000000" stop-opacity="0.05"/>
+                                        <stop offset="1"    stop-color="#000000" stop-opacity="0.3"/>
+                                    </linearGradient>
+
+                                    <linearGradient id="clk-bezelGrad" x1="0" y1="0" x2="0.25" y2="1">
+                                        <stop offset="0"    stop-color="#ffffff"/>
+                                        <stop offset="0.1"  stop-color="#e8e8e8"/>
+                                        <stop offset="0.25" stop-color="#b0b0b0"/>
+                                        <stop offset="0.4"  stop-color="#e0e0e0"/>
+                                        <stop offset="0.55" stop-color="#888888"/>
+                                        <stop offset="0.75" stop-color="#c0c0c0"/>
+                                        <stop offset="0.9"  stop-color="#606060"/>
+                                        <stop offset="1"    stop-color="#404040"/>
+                                    </linearGradient>
+
+                                    <linearGradient id="clk-bezelHighlight" x1="0.2" y1="0" x2="0.8" y2="1">
+                                        <stop offset="0"   stop-color="#ffffff" stop-opacity="0.65"/>
+                                        <stop offset="0.3" stop-color="#ffffff" stop-opacity="0"/>
+                                        <stop offset="0.7" stop-color="#ffffff" stop-opacity="0"/>
+                                        <stop offset="1"   stop-color="#ffffff" stop-opacity="0.25"/>
+                                    </linearGradient>
+
+                                    <radialGradient id="clk-dialGrad" cx="0.45" cy="0.38" r="0.78">
+                                        <stop offset="0"    stop-color="#fefdf8"/>
+                                        <stop offset="0.55" stop-color="#f8f2e2"/>
+                                        <stop offset="1"    stop-color="#e9dec3"/>
+                                    </radialGradient>
+
+                                    <radialGradient id="clk-dialVignette" cx="0.5" cy="0.5" r="0.5">
+                                        <stop offset="0.6"  stop-color="#000000" stop-opacity="0"/>
+                                        <stop offset="0.88" stop-color="#000000" stop-opacity="0.06"/>
+                                        <stop offset="1"    stop-color="#000000" stop-opacity="0.2"/>
+                                    </radialGradient>
+
+                                    <linearGradient id="clk-crystalGrad" x1="0" y1="0" x2="0.6" y2="0.6">
+                                        <stop offset="0"    stop-color="#ffffff" stop-opacity="0.4"/>
+                                        <stop offset="0.2"  stop-color="#ffffff" stop-opacity="0"/>
+                                        <stop offset="0.5"  stop-color="#ffffff" stop-opacity="0"/>
+                                        <stop offset="0.85" stop-color="#ffffff" stop-opacity="0"/>
+                                        <stop offset="1"    stop-color="#ffffff" stop-opacity="0.15"/>
+                                    </linearGradient>
+
+                                    <linearGradient id="clk-handGrad" x1="0" y1="0" x2="1" y2="0">
+                                        <stop offset="0"   stop-color="#4a4a4a"/>
+                                        <stop offset="0.5" stop-color="#0d0d0d"/>
+                                        <stop offset="1"   stop-color="#4a4a4a"/>
+                                    </linearGradient>
+
+                                    <linearGradient id="clk-strapGrad" x1="0" y1="0" x2="1" y2="0">
+                                        <stop offset="0"    stop-color="#2a1508"/>
+                                        <stop offset="0.18" stop-color="#4a2410"/>
+                                        <stop offset="0.5"  stop-color="#6b3a18"/>
+                                        <stop offset="0.82" stop-color="#4a2410"/>
+                                        <stop offset="1"    stop-color="#2a1508"/>
+                                    </linearGradient>
+
+                                    <linearGradient id="clk-strapShine" x1="0" y1="0" x2="1" y2="0">
+                                        <stop offset="0"    stop-color="#ffffff" stop-opacity="0"/>
+                                        <stop offset="0.45" stop-color="#ffffff" stop-opacity="0.16"/>
+                                        <stop offset="0.55" stop-color="#ffffff" stop-opacity="0.16"/>
+                                        <stop offset="1"    stop-color="#ffffff" stop-opacity="0"/>
+                                    </linearGradient>
+
+                                    <filter id="clk-strapShadow" x="-30%" y="-30%" width="160%" height="160%">
+                                        <feGaussianBlur in="SourceAlpha" stdDeviation="3"/>
+                                        <feOffset dx="0" dy="3"/>
+                                        <feComponentTransfer><feFuncA type="linear" slope="0.5"/></feComponentTransfer>
+                                        <feMerge>
+                                            <feMergeNode/>
+                                            <feMergeNode in="SourceGraphic"/>
+                                        </feMerge>
+                                    </filter>
+                                </defs>
+
+                                <g filter="url(#clk-strapShadow)">
+                                    <path d="M 138 -10 L 262 -10 L 272 105 L 128 105 Z"
+                                          fill="url(#clk-strapGrad)"/>
+                                    <path d="M 138 -10 L 148 -10 L 138 105 L 128 105 Z"
+                                          fill="rgba(0,0,0,0.3)"/>
+                                    <path d="M 252 -10 L 262 -10 L 272 105 L 262 105 Z"
+                                          fill="rgba(0,0,0,0.3)"/>
+                                    <path d="M 170 -10 L 230 -10 L 235 105 L 165 105 Z"
+                                          fill="url(#clk-strapShine)"/>
+                                    <line x1="155" y1="-8" x2="146" y2="103"
+                                          stroke="#c9a070" stroke-width="0.8"
+                                          stroke-dasharray="3,4" opacity="0.55"/>
+                                    <line x1="245" y1="-8" x2="254" y2="103"
+                                          stroke="#c9a070" stroke-width="0.8"
+                                          stroke-dasharray="3,4" opacity="0.55"/>
+                                </g>
+
+                                <g filter="url(#clk-strapShadow)">
+                                    <path d="M 128 415 L 272 415 L 262 530 L 138 530 Z"
+                                          fill="url(#clk-strapGrad)"/>
+                                    <path d="M 128 415 L 138 415 L 148 530 L 138 530 Z"
+                                          fill="rgba(0,0,0,0.3)"/>
+                                    <path d="M 262 415 L 272 415 L 262 530 L 252 530 Z"
+                                          fill="rgba(0,0,0,0.3)"/>
+                                    <path d="M 165 415 L 235 415 L 230 530 L 170 530 Z"
+                                          fill="url(#clk-strapShine)"/>
+                                    <line x1="146" y1="417" x2="155" y2="528"
+                                          stroke="#c9a070" stroke-width="0.8"
+                                          stroke-dasharray="3,4" opacity="0.55"/>
+                                    <line x1="254" y1="417" x2="245" y2="528"
+                                          stroke="#c9a070" stroke-width="0.8"
+                                          stroke-dasharray="3,4" opacity="0.55"/>
+                                </g>
+
+                                <rect x="122" y="76" width="156" height="38" rx="13" fill="url(#clk-caseGrad)"/>
+                                <rect x="122" y="406" width="156" height="38" rx="13" fill="url(#clk-caseGrad)"/>
+
+                                <rect x="362" y="248" width="22" height="24" rx="4" fill="url(#clk-caseGrad)"/>
+                                <rect x="364" y="251" width="18" height="18" rx="3" fill="url(#clk-bezelGrad)"/>
+                                <line x1="367" y1="254" x2="367" y2="266" stroke="#505050" stroke-width="0.5"/>
+                                <line x1="370" y1="254" x2="370" y2="266" stroke="#505050" stroke-width="0.5"/>
+                                <line x1="373" y1="254" x2="373" y2="266" stroke="#505050" stroke-width="0.5"/>
+                                <line x1="376" y1="254" x2="376" y2="266" stroke="#505050" stroke-width="0.5"/>
+                                <line x1="379" y1="254" x2="379" y2="266" stroke="#505050" stroke-width="0.5"/>
+
+                                <circle cx="200" cy="260" r="170" fill="url(#clk-caseGrad)"/>
+                                <circle cx="200" cy="260" r="170" fill="url(#clk-caseShine)"/>
+                                <circle cx="200" cy="260" r="159" fill="none" stroke="#2a2a2a" stroke-width="1.2" opacity="0.85"/>
+                                <circle cx="200" cy="260" r="158" fill="url(#clk-bezelGrad)"/>
+                                <circle cx="200" cy="260" r="158" fill="url(#clk-bezelHighlight)"/>
+                                <circle cx="200" cy="260" r="156" fill="none" stroke="#808080" stroke-width="0.4" opacity="0.5"/>
+                                <circle cx="200" cy="260" r="154" fill="none" stroke="#a0a0a0" stroke-width="0.4" opacity="0.4"/>
+                                <circle cx="200" cy="260" r="152" fill="none" stroke="#707070" stroke-width="0.4" opacity="0.4"/>
+                                <circle cx="200" cy="260" r="151" fill="#1a1a1a"/>
+                                <circle cx="200" cy="260" r="147" fill="url(#clk-dialGrad)"/>
+                                <circle cx="200" cy="260" r="147" fill="url(#clk-dialVignette)"/>
+
+                                <g id="clk-ticksGroup"></g>
+                                <g id="clk-numbersGroup"></g>
+
+                                <text x="200" y="210" text-anchor="middle"
+                                      font-family="'Old Standard TT', Georgia, 'Times New Roman', serif"
+                                      font-size="12" font-weight="700" letter-spacing="2.8"
+                                      fill="#1a1a1a" pointer-events="none">ПОБЕДА</text>
+
+                                <text x="200" y="315" text-anchor="middle"
+                                      font-family="'Old Standard TT', Georgia, 'Times New Roman', serif"
+                                      font-size="6.5" font-weight="700" letter-spacing="3"
+                                      fill="#3a3a3a" pointer-events="none">СДЕЛАНО В СССР</text>
+
+                                <circle cx="200" cy="260" r="147" fill="url(#clk-crystalGrad)" pointer-events="none"/>
+
+                                <g id="clk-hands">
+                                    <g id="clk-hourHand">
+                                        <path d="M 200 165 L 206 220 L 205 250 L 200 270 L 195 250 L 194 220 Z"
+                                              fill="url(#clk-handGrad)"/>
+                                    </g>
+                                    <g id="clk-minuteHand">
+                                        <path d="M 200 115 L 204 200 L 203 250 L 200 272 L 197 250 L 196 200 Z"
+                                              fill="url(#clk-handGrad)"/>
+                                    </g>
+                                </g>
+
+                                <circle cx="200" cy="260" r="8" fill="url(#clk-caseGrad)"/>
+                                <circle cx="200" cy="260" r="5" fill="url(#clk-bezelGrad)"/>
+                                <circle cx="200" cy="260" r="2.5" fill="#1a1a1a"/>
+                            </svg>
                         </div>
-                        <div class="frame-head-title">АУДИОВИЗУАЛЬНОГО ИЗУЧЕНИЯ ЧАСОВ</div>
-                    </div>
-                    <div class="clock-stack">
-                        <div class="clock-view view-watch" id="clockView">
-                            <div class="watch-container" id="watchView">
-                                <svg viewBox="-20 0 440 520" xmlns="http://www.w3.org/2000/svg">
-                                    <defs>
-                                        <radialGradient id="clk-caseGrad" cx="0.35" cy="0.28" r="0.9">
-                                            <stop offset="0"    stop-color="#f5f5f5"/>
-                                            <stop offset="0.15" stop-color="#d8d8d8"/>
-                                            <stop offset="0.4"  stop-color="#a8a8a8"/>
-                                            <stop offset="0.7"  stop-color="#787878"/>
-                                            <stop offset="0.9"  stop-color="#585858"/>
-                                            <stop offset="1"    stop-color="#3a3a3a"/>
-                                        </radialGradient>
-                                        <linearGradient id="clk-caseShine" x1="0.15" y1="0" x2="0.85" y2="1">
-                                            <stop offset="0"    stop-color="#ffffff" stop-opacity="0.5"/>
-                                            <stop offset="0.25" stop-color="#ffffff" stop-opacity="0.1"/>
-                                            <stop offset="0.5"  stop-color="#ffffff" stop-opacity="0"/>
-                                            <stop offset="0.75" stop-color="#000000" stop-opacity="0.05"/>
-                                            <stop offset="1"    stop-color="#000000" stop-opacity="0.3"/>
-                                        </linearGradient>
-                                        <linearGradient id="clk-bezelGrad" x1="0" y1="0" x2="0.25" y2="1">
-                                            <stop offset="0"    stop-color="#ffffff"/>
-                                            <stop offset="0.1"  stop-color="#e8e8e8"/>
-                                            <stop offset="0.25" stop-color="#b0b0b0"/>
-                                            <stop offset="0.4"  stop-color="#e0e0e0"/>
-                                            <stop offset="0.55" stop-color="#888888"/>
-                                            <stop offset="0.75" stop-color="#c0c0c0"/>
-                                            <stop offset="0.9"  stop-color="#606060"/>
-                                            <stop offset="1"    stop-color="#404040"/>
-                                        </linearGradient>
-                                        <linearGradient id="clk-bezelHighlight" x1="0.2" y1="0" x2="0.8" y2="1">
-                                            <stop offset="0"   stop-color="#ffffff" stop-opacity="0.65"/>
-                                            <stop offset="0.3" stop-color="#ffffff" stop-opacity="0"/>
-                                            <stop offset="0.7" stop-color="#ffffff" stop-opacity="0"/>
-                                            <stop offset="1"   stop-color="#ffffff" stop-opacity="0.25"/>
-                                        </linearGradient>
-                                        <radialGradient id="clk-dialGrad" cx="0.45" cy="0.38" r="0.78">
-                                            <stop offset="0"    stop-color="#fefdf8"/>
-                                            <stop offset="0.55" stop-color="#f8f2e2"/>
-                                            <stop offset="1"    stop-color="#e9dec3"/>
-                                        </radialGradient>
-                                        <radialGradient id="clk-dialVignette" cx="0.5" cy="0.5" r="0.5">
-                                            <stop offset="0.6"  stop-color="#000000" stop-opacity="0"/>
-                                            <stop offset="0.88" stop-color="#000000" stop-opacity="0.06"/>
-                                            <stop offset="1"    stop-color="#000000" stop-opacity="0.2"/>
-                                        </radialGradient>
-                                        <linearGradient id="clk-crystalGrad" x1="0" y1="0" x2="0.6" y2="0.6">
-                                            <stop offset="0"    stop-color="#ffffff" stop-opacity="0.4"/>
-                                            <stop offset="0.2"  stop-color="#ffffff" stop-opacity="0"/>
-                                            <stop offset="0.5"  stop-color="#ffffff" stop-opacity="0"/>
-                                            <stop offset="0.85" stop-color="#ffffff" stop-opacity="0"/>
-                                            <stop offset="1"    stop-color="#ffffff" stop-opacity="0.15"/>
-                                        </linearGradient>
-                                        <linearGradient id="clk-handGrad" x1="0" y1="0" x2="1" y2="0">
-                                            <stop offset="0"   stop-color="#4a4a4a"/>
-                                            <stop offset="0.5" stop-color="#0d0d0d"/>
-                                            <stop offset="1"   stop-color="#4a4a4a"/>
-                                        </linearGradient>
-                                        <linearGradient id="clk-strapGrad" x1="0" y1="0" x2="1" y2="0">
-                                            <stop offset="0"    stop-color="#2a1508"/>
-                                            <stop offset="0.18" stop-color="#4a2410"/>
-                                            <stop offset="0.5"  stop-color="#6b3a18"/>
-                                            <stop offset="0.82" stop-color="#4a2410"/>
-                                            <stop offset="1"    stop-color="#2a1508"/>
-                                        </linearGradient>
-                                        <linearGradient id="clk-strapShine" x1="0" y1="0" x2="1" y2="0">
-                                            <stop offset="0"    stop-color="#ffffff" stop-opacity="0"/>
-                                            <stop offset="0.45" stop-color="#ffffff" stop-opacity="0.16"/>
-                                            <stop offset="0.55" stop-color="#ffffff" stop-opacity="0.16"/>
-                                            <stop offset="1"    stop-color="#ffffff" stop-opacity="0"/>
-                                        </linearGradient>
-                                    </defs>
 
-                                    <g>
-                                        <path d="M 138 -10 L 262 -10 L 272 105 L 128 105 Z" fill="url(#clk-strapGrad)"/>
-                                        <path d="M 138 -10 L 148 -10 L 138 105 L 128 105 Z" fill="rgba(0,0,0,0.3)"/>
-                                        <path d="M 252 -10 L 262 -10 L 272 105 L 262 105 Z" fill="rgba(0,0,0,0.3)"/>
-                                        <path d="M 170 -10 L 230 -10 L 235 105 L 165 105 Z" fill="url(#clk-strapShine)"/>
-                                        <line x1="155" y1="-8" x2="146" y2="103" stroke="#c9a070" stroke-width="0.8" stroke-dasharray="3,4" opacity="0.55"/>
-                                        <line x1="245" y1="-8" x2="254" y2="103" stroke="#c9a070" stroke-width="0.8" stroke-dasharray="3,4" opacity="0.55"/>
-                                    </g>
-
-                                    <g>
-                                        <path d="M 128 415 L 272 415 L 262 530 L 138 530 Z" fill="url(#clk-strapGrad)"/>
-                                        <path d="M 128 415 L 138 415 L 148 530 L 138 530 Z" fill="rgba(0,0,0,0.3)"/>
-                                        <path d="M 262 415 L 272 415 L 262 530 L 252 530 Z" fill="rgba(0,0,0,0.3)"/>
-                                        <path d="M 165 415 L 235 415 L 230 530 L 170 530 Z" fill="url(#clk-strapShine)"/>
-                                        <line x1="146" y1="417" x2="155" y2="528" stroke="#c9a070" stroke-width="0.8" stroke-dasharray="3,4" opacity="0.55"/>
-                                        <line x1="254" y1="417" x2="245" y2="528" stroke="#c9a070" stroke-width="0.8" stroke-dasharray="3,4" opacity="0.55"/>
-                                    </g>
-
-                                    <rect x="122" y="76" width="156" height="38" rx="13" fill="url(#clk-caseGrad)"/>
-                                    <rect x="122" y="406" width="156" height="38" rx="13" fill="url(#clk-caseGrad)"/>
-
-                                    <rect x="362" y="248" width="22" height="24" rx="4" fill="url(#clk-caseGrad)"/>
-                                    <rect x="364" y="251" width="18" height="18" rx="3" fill="url(#clk-bezelGrad)"/>
-                                    <line x1="367" y1="254" x2="367" y2="266" stroke="#505050" stroke-width="0.5"/>
-                                    <line x1="370" y1="254" x2="370" y2="266" stroke="#505050" stroke-width="0.5"/>
-                                    <line x1="373" y1="254" x2="373" y2="266" stroke="#505050" stroke-width="0.5"/>
-                                    <line x1="376" y1="254" x2="376" y2="266" stroke="#505050" stroke-width="0.5"/>
-                                    <line x1="379" y1="254" x2="379" y2="266" stroke="#505050" stroke-width="0.5"/>
-
-                                    <circle cx="200" cy="260" r="170" fill="url(#clk-caseGrad)"/>
-                                    <circle cx="200" cy="260" r="170" fill="url(#clk-caseShine)"/>
-                                    <circle cx="200" cy="260" r="159" fill="none" stroke="#2a2a2a" stroke-width="1.2" opacity="0.85"/>
-                                    <circle cx="200" cy="260" r="158" fill="url(#clk-bezelGrad)"/>
-                                    <circle cx="200" cy="260" r="158" fill="url(#clk-bezelHighlight)"/>
-                                    <circle cx="200" cy="260" r="156" fill="none" stroke="#808080" stroke-width="0.4" opacity="0.5"/>
-                                    <circle cx="200" cy="260" r="154" fill="none" stroke="#a0a0a0" stroke-width="0.4" opacity="0.4"/>
-                                    <circle cx="200" cy="260" r="152" fill="none" stroke="#707070" stroke-width="0.4" opacity="0.4"/>
-                                    <circle cx="200" cy="260" r="151" fill="#1a1a1a"/>
-                                    <circle cx="200" cy="260" r="147" fill="url(#clk-dialGrad)"/>
-                                    <circle cx="200" cy="260" r="147" fill="url(#clk-dialVignette)"/>
-
-                                    <g id="clk-ticksGroup"></g>
-                                    <g id="clk-numbersGroup"></g>
-
-                                    <text x="200" y="210" text-anchor="middle"
-                                          font-family="Georgia, 'Times New Roman', serif"
-                                          font-size="12" font-weight="700" letter-spacing="2.8"
-                                          fill="#1a1a1a" pointer-events="none">ПОБЕДА</text>
-
-                                    <text x="200" y="315" text-anchor="middle"
-                                          font-family="Georgia, 'Times New Roman', serif"
-                                          font-size="6.5" font-weight="700" letter-spacing="3"
-                                          fill="#3a3a3a" pointer-events="none">СДЕЛАНО В СССР</text>
-
-                                    <circle cx="200" cy="260" r="147" fill="url(#clk-crystalGrad)" pointer-events="none"/>
-
-                                    <circle cx="200" cy="260" r="7" fill="url(#clk-caseGrad)"/>
-
-                                    <g id="clk-hands">
-                                        <g id="clk-hourHand">
-                                            <path d="M 200 165 L 206 220 L 205 250 L 200 270 L 195 250 L 194 220 Z"
-                                                  fill="url(#clk-handGrad)"
-                                                  stroke="#141414" stroke-width="0.6" stroke-linejoin="round"/>
-                                        </g>
-                                        <g id="clk-minuteHand">
-                                            <path d="M 200 115 L 204 200 L 203 250 L 200 272 L 197 250 L 196 200 Z"
-                                                  fill="url(#clk-handGrad)"
-                                                  stroke="#141414" stroke-width="0.6" stroke-linejoin="round"/>
-                                        </g>
-                                    </g>
-
-                                    <circle cx="200" cy="260" r="5" fill="url(#clk-bezelGrad)"/>
-                                    <circle cx="200" cy="260" r="2.5" fill="#1a1a1a"/>
-                                </svg>
-                            </div>
-
-                            <div class="scheme-view" id="schemeView">
-                                <svg viewBox="0 0 200 200" id="minuteScheme" aria-hidden="true"></svg>
-                            </div>
+                        <div class="scheme-view" id="schemeView">
+                            <svg viewBox="0 0 200 200" id="minuteScheme" aria-hidden="true"></svg>
                         </div>
                     </div>
                 </div>
@@ -1680,13 +1453,15 @@
         <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
     </div>
 
+    <div class="century-popup" id="centuryPopup"></div>
+
     <button class="scroll-top-btn" id="scrollTopBtn" title="Наверх">↑</button>
 
     <div class="exam-overlay" id="examOverlay">
         <button class="exam-exit-btn" id="examExitBtn" title="Выйти">✕</button>
         <div class="exam-header">
             <div class="exam-question" id="examQuestion"></div>
-            <button class="exam-repeat-btn" id="examRepeatBtn" title="Повторить">♪</button>
+            <button class="exam-repeat-btn" id="examRepeatBtn" title="Повторить">🔊</button>
             <button class="exam-next-btn" id="examNextBtn" title="Далее">→</button>
         </div>
         <div class="exam-options" id="examOptions"></div>
@@ -1695,7 +1470,7 @@
 
     <div class="celebration-overlay" id="celebrationOverlay">
         <div class="celebration-box">
-            <h2>Умница!</h2>
+            <h2>Умница! 😻😻😽😽</h2>
             <img id="celebrationGif" src="" alt="Победа">
             <button class="celebration-close" id="celebrationClose">Закрыть</button>
         </div>
@@ -1706,56 +1481,6 @@
     </footer>
 
     <div class="toast-container" id="toastContainer"></div>
-
-    <script>
-        /* ============================================================
-           Разблокировка аудио (iOS)
-           ============================================================ */
-        window.__pageAudioUnlocked = false;
-        window.__audioUnlockCallbacks = [];
-
-        (function () {
-            const SILENT_WAV = 'data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEAgD4AAAB9AAACABAAZGF0YQQAAAAAAA==';
-
-            function unlock() {
-                if (window.__pageAudioUnlocked) return;
-                window.__pageAudioUnlocked = true;
-
-                try {
-                    const a = new Audio();
-                    a.src = SILENT_WAV;
-                    a.volume = 0.001;
-                    const p = a.play();
-                    if (p && p.then) {
-                        p.then(() => { try { a.pause(); } catch (e) {} }).catch(() => {});
-                    }
-                } catch (e) {}
-
-                try {
-                    const Ctx = window.AudioContext || window.webkitAudioContext;
-                    if (Ctx) {
-                        const ctx = new Ctx();
-                        if (ctx.state === 'suspended') ctx.resume();
-                        const buf = ctx.createBuffer(1, 1, 22050);
-                        const src = ctx.createBufferSource();
-                        src.buffer = buf;
-                        src.connect(ctx.destination);
-                        src.start(0);
-                    }
-                } catch (e) {}
-
-                window.__audioUnlockCallbacks.forEach(fn => {
-                    try { fn(); } catch (e) {}
-                });
-                window.__audioUnlockCallbacks = [];
-            }
-
-            document.addEventListener('touchstart', unlock, { once: true, passive: true });
-            document.addEventListener('touchend',   unlock, { once: true, passive: true });
-            document.addEventListener('mousedown',  unlock, { once: true });
-            document.addEventListener('click',      unlock, { once: true });
-        })();
-    </script>
 
     <script>
         (function() {
@@ -1798,6 +1523,9 @@
 
             const grid = document.getElementById('syllableGrid');
             const toastContainer = document.getElementById('toastContainer');
+            const themeToggle = document.getElementById('themeToggle');
+            const themeCycleBtn = document.getElementById('themeCycleBtn');
+            const colorIndicator = document.getElementById('colorIndicator');
             const normalBtn = document.getElementById('normalBtn');
             const randomBtn = document.getElementById('randomBtn');
             const hideLearnedBtn = document.getElementById('hideLearnedBtn');
@@ -1818,13 +1546,12 @@
             const celebrationGif = document.getElementById('celebrationGif');
             const celebrationClose = document.getElementById('celebrationClose');
             const sectionBtns = document.querySelectorAll('.section-switch-btn');
-            const sectionCycleBtn = document.getElementById('sectionCycleBtn');
-            const sectionCycleLabel = document.getElementById('sectionCycleLabel');
             const sectionSubtitleEls = document.querySelectorAll('.section-subtitle');
             const syllablesSection = document.getElementById('syllablesSection');
             const clockSection = document.getElementById('clockSection');
             const heroesSection = document.getElementById('heroesSection');
             const heroesTimeline = document.getElementById('heroesTimeline');
+            const centuryPopup = document.getElementById('centuryPopup');
 
             let currentMode = 'all';
             let randomItems = [];
@@ -1834,31 +1561,14 @@
             let examScore = 0;
             let currentExamCorrect = '';
             let currentSection = 'syllables';
+            let popupHideTimer = null;
             let progressTimer = null;
 
-            const SECTION_ORDER = ['syllables', 'clock', 'heroes'];
-            const SECTION_LABELS = {
-                syllables: 'Учи слоги',
-                clock: 'Знай время',
-                heroes: 'Чти великих'
-            };
-
-            /* ============================================================
-               Кэш аудио слогов — БЕЗ предзагрузки. Играем по требованию,
-               параллельно кладём в Map для последующих игр.
-               Это убирает 300 сетевых запросов при загрузке страницы.
-               ============================================================ */
-            const audioCache = new Map();
-
-            function getSyllableAudio(syllable) {
-                let a = audioCache.get(syllable);
-                if (!a) {
-                    a = new Audio('audio/' + syllable + '.mp3');
-                    a.preload = 'auto';
-                    audioCache.set(syllable, a);
-                }
-                return a;
-            }
+            const themeList = [
+                'theme-blue', 'theme-green', 'theme-red', 'theme-orange',
+                'theme-purple', 'theme-pink', 'theme-cyan', 'theme-yellow',
+                'theme-teal', 'theme-indigo'
+            ];
 
             function loadLearnedSet() {
                 try { return new Set(JSON.parse(localStorage.getItem('learned_syllables') || '[]')); }
@@ -1868,6 +1578,37 @@
                 localStorage.setItem('learned_syllables', JSON.stringify(Array.from(set)));
             }
             let learnedSet = loadLearnedSet();
+
+            function applyTheme(themeClass) {
+                document.body.className = '';
+                document.body.classList.add(themeClass);
+                if (localStorage.getItem('theme') !== 'dark') {
+                    document.body.classList.add('light-mode');
+                }
+                localStorage.setItem('accentTheme', themeClass);
+                const accent = getComputedStyle(document.body).getPropertyValue('--accent').trim();
+                colorIndicator.style.background = accent;
+            }
+
+            let currentThemeIndex = 0;
+            const savedTheme = localStorage.getItem('accentTheme') || 'theme-blue';
+            currentThemeIndex = themeList.indexOf(savedTheme);
+            if (currentThemeIndex === -1) currentThemeIndex = 0;
+            applyTheme(themeList[currentThemeIndex]);
+
+            if (localStorage.getItem('theme') !== 'dark') {
+                document.body.classList.add('light-mode');
+            }
+
+            themeToggle.addEventListener('click', () => {
+                document.body.classList.toggle('light-mode');
+                localStorage.setItem('theme', document.body.classList.contains('light-mode') ? 'light' : 'dark');
+            });
+
+            themeCycleBtn.addEventListener('click', () => {
+                currentThemeIndex = (currentThemeIndex + 1) % themeList.length;
+                applyTheme(themeList[currentThemeIndex]);
+            });
 
             function switchSection(section) {
                 if (section === currentSection) return;
@@ -1881,9 +1622,6 @@
                 sectionSubtitleEls.forEach(el => {
                     el.classList.toggle('active', el.dataset.section === section);
                 });
-                if (sectionCycleLabel) {
-                    sectionCycleLabel.textContent = SECTION_LABELS[section];
-                }
                 if (section !== 'clock' && window.clockSpeakCancel) {
                     window.clockSpeakCancel();
                 }
@@ -1898,23 +1636,9 @@
                 });
             });
 
-            if (sectionCycleBtn) {
-                sectionCycleBtn.addEventListener('click', () => {
-                    const idx = SECTION_ORDER.indexOf(currentSection);
-                    const next = SECTION_ORDER[(idx + 1) % SECTION_ORDER.length];
-                    switchSection(next);
-                });
-            }
-
-            /* Скролл-кнопка — не дёргаем layout на каждый скролл, троттлим через rAF */
-            let scrollRaf = null;
             window.addEventListener('scroll', () => {
-                if (scrollRaf) return;
-                scrollRaf = requestAnimationFrame(() => {
-                    scrollTopBtn.classList.toggle('visible', window.scrollY > 300);
-                    scrollRaf = null;
-                });
-            }, { passive: true });
+                scrollTopBtn.classList.toggle('visible', window.scrollY > 300);
+            });
             scrollTopBtn.addEventListener('click', () => {
                 window.scrollTo({ top: 0, behavior: 'smooth' });
             });
@@ -1939,7 +1663,6 @@
             function renderGrid() {
                 grid.innerHTML = '';
                 const items = currentMode === 'random' ? randomItems : syllables;
-                const frag = document.createDocumentFragment();
                 items.forEach(syllable => {
                     const card = document.createElement('div');
                     card.className = 'syllable-card';
@@ -1969,9 +1692,8 @@
                             handleSyllableClick(syllable, card);
                         }
                     });
-                    frag.appendChild(card);
+                    grid.appendChild(card);
                 });
-                grid.appendChild(frag);
                 refreshProgressData();
             }
 
@@ -1988,22 +1710,19 @@
 
             function playAudio(syllable) {
                 if (currentAudio) {
-                    try {
-                        currentAudio.pause();
-                        currentAudio.currentTime = 0;
-                    } catch (e) {}
+                    currentAudio.pause();
+                    currentAudio.src = '';
                 }
-                const audio = getSyllableAudio(syllable);
-                try { audio.currentTime = 0; } catch (e) {}
+                const audio = new Audio('audio/' + syllable + '.mp3');
                 audio.volume = 1;
                 currentAudio = audio;
-                const p = audio.play();
-                if (p && p.catch) p.catch(() => {});
+                audio.addEventListener('ended', () => { currentAudio = null; });
+                audio.play().catch(() => {});
             }
 
             function handleSyllableClick(syllable, card) {
                 card.classList.add('playing');
-                setTimeout(() => card.classList.remove('playing'), 400);
+                setTimeout(() => card.classList.remove('playing'), 700);
                 playAudio(syllable);
             }
 
@@ -2099,13 +1818,13 @@
                 if (selected === correct) {
                     btn.classList.add('correct');
                     examScore++;
-                    examResult.textContent = '✓';
+                    examResult.textContent = '👍';
                 } else {
                     btn.classList.add('wrong');
                     allOptions.forEach(opt => {
                         if (opt.textContent === correct.toUpperCase()) opt.classList.add('correct');
                     });
-                    examResult.textContent = '✕';
+                    examResult.textContent = '❌';
                 }
                 examRepeatBtn.style.display = 'none';
                 examNextBtn.classList.add('show');
@@ -2118,12 +1837,13 @@
             examExitBtn.addEventListener('click', () => {
                 examOverlay.classList.remove('show');
                 if (currentAudio) {
-                    try { currentAudio.pause(); currentAudio.currentTime = 0; } catch (e) {}
+                    currentAudio.pause();
+                    currentAudio.src = '';
                     currentAudio = null;
                 }
                 examNextBtn.classList.remove('show');
                 examRepeatBtn.style.display = 'flex';
-                showToast('Прервано', 'info');
+                showToast('💔', 'info');
             });
             examRepeatBtn.addEventListener('click', () => {
                 if (currentExamCorrect) playAudio(currentExamCorrect);
@@ -2156,9 +1876,11 @@
                 }
             });
 
-            function showToast(message) {
+            function showToast(message, type = 'info') {
                 const toast = document.createElement('div');
                 toast.className = 'toast';
+                if (type === 'error') toast.classList.add('error');
+                if (type === 'success') toast.classList.add('success');
                 toast.textContent = message;
                 toastContainer.appendChild(toast);
                 setTimeout(() => toast.remove(), 2000);
@@ -2193,7 +1915,7 @@
                 { name: "Островский", birthYear: 1904, deathYear: 1936, images: ["Островский.jpg"], audio: "Островский.mp3" },
                 { name: "Павлов", birthYear: 1849, deathYear: 1936, images: ["Павлов.png"], audio: "Павлов.mp3" },
                 { name: "Папанин", birthYear: 1894, deathYear: 1986, images: ["Папанин.jpg"], audio: "Папанин.mp3" },
-                { name: "Пётр Великий", birthYear: 1672, deathYear: 1725, images: ["Петр.jpg","Пётр2.jpg"], audio: "Первый.mp3" },
+                { name: "Пётр I", birthYear: 1672, deathYear: 1725, images: ["Петр.jpg","Пётр2.jpg"], audio: "Первый.mp3" },
                 { name: "Писарев", birthYear: 1840, deathYear: 1868, images: ["Писарев.jpg"], audio: "Писарев.mp3" },
                 { name: "Попов", birthYear: 1859, deathYear: 1906, images: ["Попов.jpg"], audio: "Попов.mp3" },
                 { name: "Пушкин", birthYear: 1799, deathYear: 1837, images: ["Пушкин.jpg","Пушкин3.jpg"], audio: "Пушкин.mp3" },
@@ -2215,123 +1937,6 @@
                 { name: "Шолохов", birthYear: 1905, deathYear: 1984, images: ["Шолохов.jpg"], audio: "Шолохов.mp3" }
             ];
 
-            const TL_START = 1650;
-            const TL_END   = 2010;
-            const TL_RANGE = TL_END - TL_START;
-            const tlPos = (year) => ((year - TL_START) / TL_RANGE) * 100;
-
-            const TL_CENTURIES = [1700, 1800, 1900, 2000];
-            const TL_HALVES    = [1750, 1850, 1950];
-
-            const TL_WARS = [
-                { year: 1721, name: 'Победа в<br>Северной<br>войне' },
-                { year: 1812, name: 'Отечественная<br>война' },
-                { year: 1914, name: 'Первая<br>мировая' },
-                { year: 1945, name: 'Победа<br>в Великой Отечественной' }
-            ];
-
-            const TL_OTHERS = [
-                { year: 1825, name: 'Восстание<br>декабристов' },
-                { year: 1861, name: 'Отмена<br>крепостного<br>права' },
-                { year: 1917, name: 'Октябрьская<br>революция' },
-                { year: 1991, name: 'Разрушение<br>СССР' }
-            ];
-
-            const MOBILE_EVENTS = [
-                { year: 1721, short: 'Победа в Северной войне' },
-                { year: 1812, short: 'Отечественная война' },
-                { year: 1825, short: 'Восстание декабристов' },
-                { year: 1861, short: 'Отмена крепостного права' },
-                { year: 1914, short: 'Первая мировая война' },
-                { year: 1917, short: 'Октябрьская революция' },
-                { year: 1945, short: 'Победа в ВОВ' },
-                { year: 1991, short: 'Разрушение СССР' }
-            ];
-
-            function buildSimpleTimelineHTML(birthYear, deathYear) {
-                let html = '<div class="simple-timeline">';
-                html += '<div class="simple-timeline-head">Хронология истории</div>';
-                html += '<ul class="stl-list">';
-
-                MOBILE_EVENTS.forEach(e => {
-                    const alive = (e.year >= birthYear && e.year <= deathYear);
-                    html += `
-                        <li class="stl-row${alive ? ' alive' : ''}">
-                            <span class="stl-year">${e.year}</span>
-                            <span class="stl-name">${e.short}</span>
-                        </li>
-                    `;
-                });
-
-                html += '</ul></div>';
-                return html;
-            }
-
-            function buildDetailedTimelineHTML(birthYear, deathYear) {
-                const b = Math.max(birthYear, TL_START);
-                const d = Math.min(deathYear, TL_END);
-                const left = tlPos(b);
-                const width = tlPos(d) - left;
-
-                let html = '<div class="htl-panel">';
-                html += '<div class="htl-head">Хронология истории</div>';
-                html += '<div class="htl-body"><div class="htl">';
-
-                for (let y = 1700; y <= 2000; y += 10) {
-                    if (y % 100 === 0) continue;
-                    if (y % 50 === 0) continue;
-                    html += `<div class="htl-dtick" style="left: ${tlPos(y)}%"></div>`;
-                }
-
-                TL_HALVES.forEach(y => {
-                    html += `<div class="htl-htick" style="left: ${tlPos(y)}%"></div>`;
-                });
-
-                html += '<div class="htl-axis"></div>';
-
-                TL_CENTURIES.forEach(y => {
-                    html += `<div class="htl-ctick" style="left: ${tlPos(y)}%"></div>`;
-                });
-
-                html += `<div class="htl-life" style="left: ${left}%; width: ${width}%"></div>`;
-
-                TL_WARS.forEach(e => {
-                    html += `
-                        <div class="htl-war" style="left: ${tlPos(e.year)}%">
-                            <div class="htl-war-label">
-                                <div class="htl-war-year">${e.year}</div>
-                                <div class="htl-war-name">${e.name}</div>
-                            </div>
-                            <div class="htl-war-tick"></div>
-                        </div>
-                    `;
-                });
-
-                TL_OTHERS.forEach(e => {
-                    html += `
-                        <div class="htl-other" style="left: ${tlPos(e.year)}%">
-                            <div class="htl-other-tick"></div>
-                            <div class="htl-other-label">
-                                <div class="htl-other-year">${e.year}</div>
-                                <div class="htl-other-name">${e.name}</div>
-                            </div>
-                        </div>
-                    `;
-                });
-
-                TL_CENTURIES.forEach(y => {
-                    html += `<div class="htl-cnum" style="left: ${tlPos(y)}%">${y}</div>`;
-                });
-
-                html += '</div></div>';
-                html += '</div>';
-                return html;
-            }
-
-            function encodePath(p) {
-                return p.split('/').map(seg => encodeURIComponent(seg)).join('/');
-            }
-
             function renderHeroesTimeline() {
                 if (!heroesTimeline) return;
 
@@ -2341,64 +1946,74 @@
                     { name: "XX век",    filter: h => h.overrideCentury === 20 || (!h.overrideCentury && h.deathYear > 1921) }
                 ];
 
-                let html = '';
+                let html = '<div class="timeline-container">';
+                html += '<div class="timeline-line"></div>';
 
                 centuries.forEach(c => {
                     const heroes = heroesData.filter(c.filter).sort((a, b) => a.deathYear - b.deathYear);
                     if (heroes.length === 0) return;
 
-                    html += `<div class="century-header"><span class="century-title">${c.name}</span></div>`;
+                    html += `<div class="century-sentinel" data-century="${c.name}"></div>`;
 
-                    html += `<div class="heroes-grid">`;
                     let sovietStarted = false;
 
                     heroes.forEach(hero => {
                         if (!sovietStarted && hero.name === "Ленин") {
-                            html += `</div>
-                            <div class="soviet-band"><span>★</span> Советский период <span>★</span></div>
-                            <div class="heroes-grid">`;
+                            html += `<div class="soviet-era">`;
                             sovietStarted = true;
                         }
 
-                        const imagePath = encodePath('Great Rus/' + hero.images[0]);
+                        const imagePath = `Great Rus/${hero.images[0]}`;
                         const age = hero.deathYear - hero.birthYear;
-                        const imagesJson = JSON.stringify(
-                            hero.images.map(img => encodePath('Great Rus/' + img))
-                        );
 
                         html += `
                             <div class="hero-item" 
                                  data-name="${hero.name}" 
-                                 data-birth="${hero.birthYear}"
-                                 data-death="${hero.deathYear}"
-                                 data-audio="${encodePath('Great Rus/' + hero.audio)}" 
-                                 data-images='${imagesJson}'>
-                                <div class="hero-photo">
-                                    <img src="${imagePath}" alt="${hero.name}" loading="lazy" decoding="async">
+                                 data-audio="Great Rus/${hero.audio}" 
+                                 data-images='${JSON.stringify(hero.images.map(img => "Great Rus/" + img))}'>
+                                <div class="hero-circle">
+                                    <img src="${imagePath}" alt="${hero.name}" loading="lazy">
                                 </div>
                                 <div class="hero-info">
                                     <div class="hero-name">${hero.name}</div>
-                                    <div class="hero-years">${hero.birthYear}—${hero.deathYear} <span class="hero-age">${age}</span></div>
+                                    <div class="hero-years">${hero.birthYear} — ${hero.deathYear} <span class="hero-age">(${age})</span></div>
                                 </div>
                             </div>
                         `;
                     });
-
-                    html += `</div>`;
+                    if (sovietStarted) {
+                        html += `</div>`;
+                    }
                 });
+                html += '</div>';
 
                 heroesTimeline.innerHTML = html;
 
                 heroesTimeline.querySelectorAll('.hero-item').forEach(item => {
                     item.addEventListener('click', function() {
-                        openHeroModal(
-                            this.dataset.name,
-                            JSON.parse(this.dataset.images),
-                            this.dataset.audio,
-                            parseInt(this.dataset.birth, 10),
-                            parseInt(this.dataset.death, 10)
-                        );
+                        openHeroModal(this.dataset.name, JSON.parse(this.dataset.images), this.dataset.audio);
                     });
+                });
+
+                const centuryObserver = new IntersectionObserver((entries) => {
+                    entries.forEach(entry => {
+                        if (entry.isIntersecting) {
+                            const text = entry.target.dataset.century;
+                            centuryPopup.textContent = text;
+                            centuryPopup.classList.add('show');
+                            clearTimeout(popupHideTimer);
+                            popupHideTimer = setTimeout(() => {
+                                centuryPopup.classList.remove('show');
+                            }, 2200);
+                        }
+                    });
+                }, {
+                    threshold: 0,
+                    rootMargin: '-15% 0px -75% 0px'
+                });
+
+                heroesTimeline.querySelectorAll('.century-sentinel').forEach(sentinel => {
+                    centuryObserver.observe(sentinel);
                 });
             }
 
@@ -2407,52 +2022,26 @@
             let currentImageIndex = 0;
             let currentImages = [];
 
-            function openHeroModal(name, images, audioSrc, birthYear, deathYear) {
+            function openHeroModal(name, images, audioSrc) {
                 if (heroModal) heroModal.remove();
 
                 currentImages = images;
                 currentImageIndex = 0;
 
-                const navHTML = images.length > 1
-                    ? `<button class="hero-nav prev" type="button" aria-label="Предыдущий">‹</button>
-                       <button class="hero-nav next" type="button" aria-label="Следующий">›</button>`
-                    : '';
-
-                const initials = name.split(/\s+/).map(w => w.charAt(0)).join('').slice(0, 2).toUpperCase();
-
                 heroModal = document.createElement('div');
                 heroModal.className = 'hero-modal';
                 heroModal.innerHTML = `
-                    <button class="hero-modal-close" type="button" aria-label="Закрыть">×</button>
-                    <button class="hero-modal-repeat" type="button" aria-label="Повторить звук">♪</button>
-                    <div class="hero-modal-scroll">
-                        <div class="hero-modal-portrait-wrap">
-                            ${navHTML}
-                            <img class="hero-modal-portrait" src="${images[0]}" alt="${name}" decoding="async">
-                        </div>
-                        <div class="hero-modal-bottom">
-                            <div class="hero-modal-info">
-                                <h3>${name}</h3>
-                                <div class="hero-modal-years">${birthYear} — ${deathYear}</div>
-                            </div>
-                            <div class="simple-timeline-wrap">
-                                ${buildSimpleTimelineHTML(birthYear, deathYear)}
-                            </div>
-                            <div class="detailed-timeline">
-                                ${buildDetailedTimelineHTML(birthYear, deathYear)}
-                            </div>
+                    <div class="hero-modal-content">
+                        <button class="hero-modal-close">&times;</button>
+                        <button class="hero-modal-repeat">🔊</button>
+                        <img class="hero-modal-portrait" src="${images[0]}" alt="${name}">
+                        <h3>${name}</h3>
+                        <div class="hero-modal-nav">
+                            <button class="prev-image" style="${images.length <= 1 ? 'display:none;' : ''}">&#10094;</button>
+                            <button class="next-image" style="${images.length <= 1 ? 'display:none;' : ''}">&#10095;</button>
                         </div>
                     </div>
                 `;
-
-                const imgEl = heroModal.querySelector('.hero-modal-portrait');
-                imgEl.addEventListener('error', () => {
-                    const placeholder = document.createElement('div');
-                    placeholder.className = 'hero-portrait-placeholder';
-                    placeholder.textContent = initials;
-                    imgEl.replaceWith(placeholder);
-                });
-
                 document.body.appendChild(heroModal);
 
                 playHeroAudio(audioSrc);
@@ -2463,36 +2052,37 @@
                     heroAudio.currentTime = 0;
                 });
 
-                heroModal.querySelector('.hero-modal-repeat').addEventListener('click', () => {
-                    playHeroAudio(audioSrc);
+                heroModal.addEventListener('click', (e) => {
+                    if (e.target === heroModal) {
+                        heroModal.remove();
+                        heroAudio.pause();
+                        heroAudio.currentTime = 0;
+                    }
                 });
 
-                const prevBtn = heroModal.querySelector('.hero-nav.prev');
-                const nextBtn = heroModal.querySelector('.hero-nav.next');
+                const prevBtn = heroModal.querySelector('.prev-image');
+                const nextBtn = heroModal.querySelector('.next-image');
                 if (prevBtn) {
                     prevBtn.addEventListener('click', () => {
                         currentImageIndex = (currentImageIndex - 1 + currentImages.length) % currentImages.length;
-                        const im = heroModal.querySelector('.hero-modal-portrait');
-                        if (im) im.src = currentImages[currentImageIndex];
+                        heroModal.querySelector('.hero-modal-portrait').src = currentImages[currentImageIndex];
                     });
                 }
                 if (nextBtn) {
                     nextBtn.addEventListener('click', () => {
                         currentImageIndex = (currentImageIndex + 1) % currentImages.length;
-                        const im = heroModal.querySelector('.hero-modal-portrait');
-                        if (im) im.src = currentImages[currentImageIndex];
+                        heroModal.querySelector('.hero-modal-portrait').src = currentImages[currentImageIndex];
                     });
                 }
+
+                heroModal.querySelector('.hero-modal-repeat').addEventListener('click', () => {
+                    playHeroAudio(audioSrc);
+                });
             }
 
             function playHeroAudio(src) {
-                try {
-                    heroAudio.pause();
-                    heroAudio.currentTime = 0;
-                } catch (e) {}
                 heroAudio.src = src;
-                const p = heroAudio.play();
-                if (p && p.catch) p.catch(() => {});
+                heroAudio.play().catch(e => console.log('Ошибка воспроизведения', e));
             }
 
             renderHeroesTimeline();
@@ -2501,7 +2091,7 @@
         })();
     </script>
 
-    <!-- ==================== ЛОГИКА ЧАСОВ ==================== -->
+           <!-- ==================== ЛОГИКА ЧАСОВ + ПЕРЕКЛЮЧЕНИЕ ВИДА ==================== -->
     <script>
     (function () {
         const clockView   = document.getElementById('clockView');
@@ -2509,6 +2099,18 @@
         const schemeView  = document.getElementById('schemeView');
         const minuteScheme= document.getElementById('minuteScheme');
         if (!clockView || !watchView || !schemeView) return;
+
+        /* ============================================================
+           ЛЁГКОЕ ОТКЛЮЧЕНИЕ SVG-ФИЛЬТРА (без исчезновения ремешка)
+           ============================================================
+           Сначала снимаем ссылку filter со всех элементов, которые на неё
+           указывают, — и только потом удаляем сам фильтр из <defs>.
+           Иначе Safari считает url(#...) невалидным и скрывает элемент. */
+        document.querySelectorAll('[filter="url(#clk-strapShadow)"]').forEach(el => {
+            el.removeAttribute('filter');
+        });
+        const strapFilter = document.getElementById('clk-strapShadow');
+        if (strapFilter) strapFilter.remove();
 
         const hourHandEl   = document.getElementById('clk-hourHand');
         const minuteHandEl = document.getElementById('clk-minuteHand');
@@ -2528,6 +2130,9 @@
 
         const AUDIO_DIR = 'clock_audio/';
 
+        /* ============================================================
+           СХЕМА-ЦИФЕРБЛАТ МИНУТ
+           ============================================================ */
         function buildMinuteScheme() {
             if (!minuteScheme) return;
             minuteScheme.innerHTML = '';
@@ -2581,9 +2186,9 @@
                 text.setAttribute('y', SCY + 62 * Math.sin(a));
                 text.setAttribute('text-anchor', 'middle');
                 text.setAttribute('dominant-baseline', 'central');
-                text.setAttribute('font-family', "'IBM Plex Mono', 'Courier New', monospace");
+                text.setAttribute('font-family', "'Helvetica Neue', Helvetica, Arial, sans-serif");
                 text.setAttribute('font-size', '22');
-                text.setAttribute('font-weight', '700');
+                text.setAttribute('font-weight', '800');
                 text.setAttribute('letter-spacing', '-0.03em');
                 text.setAttribute('fill', 'currentColor');
                 text.textContent = val;
@@ -2592,6 +2197,9 @@
         }
         buildMinuteScheme();
 
+        /* ============================================================
+           ЖЕЛЕЗНАЯ ДОРОГА И ЦИФРЫ ЧАСОВ
+           ============================================================ */
         const R_TRACK_IN  = 131;
         const R_TRACK_OUT = 138;
 
@@ -2640,7 +2248,7 @@
             text.setAttribute('y', CY + R_NUM * Math.sin(a));
             text.setAttribute('text-anchor', 'middle');
             text.setAttribute('dominant-baseline', 'central');
-            text.setAttribute('font-family', "Georgia, 'Times New Roman', serif");
+            text.setAttribute('font-family', "'Old Standard TT', 'Playfair Display', Georgia, 'Times New Roman', serif");
             text.setAttribute('font-size', '26');
             text.setAttribute('font-weight', '700');
             text.setAttribute('fill', i === 12 ? '#b81e1e' : '#1a1a1a');
@@ -2648,69 +2256,114 @@
             numbersGroup.appendChild(text);
         }
 
+        /* ============================================================
+           СОСТОЯНИЕ
+           ============================================================ */
         let hour = 3;
         let minute = 0;
         let totalMinutes = (hour % 12) * 60 + minute;
         let currentView = 'watch';
 
-        let currentAudioChain = [];
+        /* ============================================================
+           АУДИО (WebAudio — самый надёжный путь для iOS)
+           ============================================================ */
+        let audioCtx = null;
+        const audioBuffers = {};          // filename -> AudioBuffer
+        let playingNodes = [];            // активные источники
+        let playbackGeneration = 0;       // токен для отмены цепочки
+        let preloadStarted = false;
+
+        function ensureAudioCtx() {
+            if (audioCtx) return audioCtx;
+            const Ctx = window.AudioContext || window.webkitAudioContext;
+            if (!Ctx) return null;
+            try { audioCtx = new Ctx(); } catch (e) { return null; }
+            return audioCtx;
+        }
+
+        // Разблокировка контекста ВНУТРИ пользовательского жеста.
+        // Играем короткий (1 сэмпл) тихий буфер — это переводит контекст
+        // в состояние 'running'. После этого любые .start() будут работать.
+        function unlockAudio() {
+            const ctx = ensureAudioCtx();
+            if (!ctx) return;
+            if (ctx.state === 'suspended') {
+                ctx.resume().catch(() => {});
+            }
+            try {
+                const silent = ctx.createBuffer(1, 1, 22050);
+                const src = ctx.createBufferSource();
+                src.buffer = silent;
+                src.connect(ctx.destination);
+                src.start(0);
+            } catch (e) {}
+        }
+
+        // Регистрируем разблокировку на самом первом касании/клике ГДЕ УГОДНО.
+        // capture: true — чтобы сработало раньше обработчиков часов.
+        document.addEventListener('touchend',    unlockAudio, { capture: true });
+        document.addEventListener('touchstart',  unlockAudio, { capture: true, passive: true });
+        document.addEventListener('mousedown',   unlockAudio, { capture: true });
+        document.addEventListener('click',       unlockAudio, { capture: true });
+
+        // Загрузка mp3 в AudioBuffer
+        async function loadBuffer(name) {
+            if (audioBuffers[name]) return audioBuffers[name];
+            const ctx = ensureAudioCtx();
+            if (!ctx) return null;
+            try {
+                const resp = await fetch(AUDIO_DIR + name);
+                if (!resp.ok) throw new Error('HTTP ' + resp.status + ' для ' + name);
+                const arr = await resp.arrayBuffer();
+                const buf = await ctx.decodeAudioData(arr);
+                audioBuffers[name] = buf;
+                return buf;
+            } catch (e) {
+                console.warn('Не удалось загрузить ' + name + ':', e);
+                return null;
+            }
+        }
+
+        function preloadAllBuffers() {
+            if (preloadStarted) return;
+            preloadStarted = true;
+            const names = [];
+            for (let h = 1; h <= 12; h++) names.push(`h_${String(h).padStart(2,'0')}.mp3`);
+            for (let m = 1; m <= 59; m++) names.push(`m_${String(m).padStart(2,'0')}.mp3`);
+            names.push('rovno.mp3');
+            (async () => {
+                for (const n of names) {
+                    await loadBuffer(n);
+                }
+                console.log('Аудио часов: загружено ' + Object.keys(audioBuffers).length + ' файлов');
+            })();
+        }
+
+        // Запускаем предзагрузку, но чуть отложенно, чтобы не мешать первому рендеру.
+        if ('requestIdleCallback' in window) {
+            requestIdleCallback(preloadAllBuffers);
+        } else {
+            setTimeout(preloadAllBuffers, 500);
+        }
 
         function stopClockAudio() {
-            currentAudioChain.forEach(a => {
-                try {
-                    a.pause();
-                    a.currentTime = 0;
-                } catch (e) {}
-            });
-            currentAudioChain = [];
-        }
-
-        /* ============================================================
-           АУДИО-ПУЛ ЧАСОВ — только те, что реально нужны при запуске.
-           Всё остальное догружаем при первом использовании.
-           Это убирает 71 сетевой запрос в момент загрузки.
-           ============================================================ */
-        const clockAudioPool = new Map();
-
-        function getClockAudio(name) {
-            let a = clockAudioPool.get(name);
-            if (!a) {
-                a = new Audio(AUDIO_DIR + name);
-                a.preload = 'auto';
-                clockAudioPool.set(name, a);
+            playbackGeneration++;
+            for (const node of playingNodes) {
+                try { node.stop(); } catch (e) {}
             }
-            return a;
+            playingNodes = [];
         }
 
-        /* Прогреваем только те, что с высокой вероятностью нужны при первом клике */
-        function preloadClockCore() {
-            ['rovno.mp3'].forEach(n => getClockAudio(n));
-            for (let h = 1; h <= 12; h++) getClockAudio(`h_${String(h).padStart(2,'0')}.mp3`);
-        }
-
-        window.__audioUnlockCallbacks.push(function unlockClockAudio() {
-            clockAudioPool.forEach(a => {
-                try {
-                    a.volume = 0;
-                    a.currentTime = 0;
-                    const p = a.play();
-                    if (p && p.then) {
-                        p.then(() => {
-                            try { a.pause(); a.currentTime = 0; } catch (e) {}
-                            a.volume = 1;
-                        }).catch(() => { a.volume = 1; });
-                    } else {
-                        try { a.pause(); a.currentTime = 0; } catch (e) {}
-                        a.volume = 1;
-                    }
-                } catch (e) { a.volume = 1; }
-            });
-        });
-
-        preloadClockCore();
-
+        // Вызывается СИНХРОННО из touchend/mouseup.
         function speakTime() {
+            const ctx = ensureAudioCtx();
+            if (!ctx) return;
+            if (ctx.state === 'suspended') {
+                ctx.resume().catch(() => {});
+            }
+
             stopClockAudio();
+            const myGen = playbackGeneration;
 
             const queue = [`h_${String(hour).padStart(2, '0')}.mp3`];
             if (minute === 0) queue.push('rovno.mp3');
@@ -2719,41 +2372,38 @@
             let idx = 0;
 
             function playNext() {
+                if (myGen !== playbackGeneration) return;
                 if (idx >= queue.length) return;
                 const name = queue[idx];
-                const a = getClockAudio(name);
+                const buf  = audioBuffers[name];
 
-                try { a.currentTime = 0; } catch (e) {}
-                a.volume = 1;
-                currentAudioChain = [a];
+                if (!buf) {
+                    // не загружен — грузим и продолжаем
+                    loadBuffer(name).then(() => {
+                        if (myGen !== playbackGeneration) return;
+                        playNext();
+                    });
+                    return;
+                }
 
-                const onEnded = () => {
-                    a.removeEventListener('ended', onEnded);
-                    a.removeEventListener('error', onErr);
-                    idx++;
+                idx++;
+                const src = ctx.createBufferSource();
+                src.buffer = buf;
+                src.connect(ctx.destination);
+                src.onended = () => {
+                    const i = playingNodes.indexOf(src);
+                    if (i >= 0) playingNodes.splice(i, 1);
                     playNext();
                 };
-                const onErr = () => {
-                    a.removeEventListener('ended', onEnded);
-                    a.removeEventListener('error', onErr);
-                    idx++;
-                    playNext();
-                };
-                a.addEventListener('ended', onEnded);
-                a.addEventListener('error', onErr);
-
-                const p = a.play();
-                if (p && p.catch) p.catch(() => {
-                    a.removeEventListener('ended', onEnded);
-                    a.removeEventListener('error', onErr);
-                    idx++;
-                    playNext();
-                });
+                playingNodes.push(src);
+                try { src.start(0); } catch (e) {}
             }
-
             playNext();
         }
 
+        /* ============================================================
+           УТИЛИТЫ
+           ============================================================ */
         function setView(view) {
             currentView = view;
             if (view === 'watch') {
@@ -2823,6 +2473,9 @@
             return dist <= GRAB_RADIUS * scale;
         }
 
+        /* ============================================================
+           ЖЕСТЫ
+           ============================================================ */
         let gesture = null;
 
         function startGesture(point, source) {
@@ -2916,6 +2569,7 @@
             gesture = null;
         }
 
+        /* ---------- Touch ---------- */
         clockView.addEventListener('touchstart', (e) => {
             if (e.touches.length !== 1) return;
             startGesture(getPoint(e), 'touch');
@@ -2937,6 +2591,7 @@
             cancelGesture();
         }, { passive: true });
 
+        /* ---------- Mouse ---------- */
         clockView.addEventListener('mousedown', (e) => {
             if (e.button !== 0) return;
             startGesture(getPoint(e), 'mouse');
