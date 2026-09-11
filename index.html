@@ -835,7 +835,7 @@
         }
 
         /* ============================================================
-           ШКАЛА ВРЕМЕНИ — панель-документ
+           ШКАЛА ВРЕМЕНИ
            ============================================================ */
 
         .hero-modal-timeline {
@@ -850,7 +850,6 @@
             background: var(--bg);
         }
 
-        /* Шапка панели — единый заголовок */
         .htl-head {
             background: var(--fg);
             color: var(--bg);
@@ -1216,7 +1215,7 @@
             .century-header { padding: 14px 16px; margin-bottom: 18px; }
             .century-header:not(:first-child) { margin-top: 40px; }
 
-            /* ===== Портреты: 1 в ряд, имя ПОД портретом, компактно ===== */
+            /* Портреты: 1 в ряд, имя ПОД портретом */
             .heroes-grid {
                 grid-template-columns: 1fr;
                 gap: 12px;
@@ -1240,14 +1239,8 @@
                 text-align: center;
                 gap: 3px;
             }
-            .hero-name {
-                font-size: 0.98rem;
-                line-height: 1.05;
-            }
-            .hero-years {
-                font-size: 0.62rem;
-                justify-content: center;
-            }
+            .hero-name { font-size: 0.98rem; line-height: 1.05; }
+            .hero-years { font-size: 0.62rem; justify-content: center; }
 
             .soviet-band { font-size: 0.95rem; padding: 10px 14px; letter-spacing: 0.18em; gap: 12px; }
 
@@ -1260,37 +1253,14 @@
             .hero-nav.prev { left: 4px; }
             .hero-nav.next { right: 4px; }
 
-            /* Портрет в модалке короче, чтобы влезла хронология */
             .hero-modal-portrait-wrap {
-                height: 42vh;
+                height: 40vh;
                 min-height: 200px;
             }
 
             .hero-modal-info { padding: 6px 0 2px; }
             .hero-modal-info h3 { font-size: 1.75rem; }
             .hero-modal-years { font-size: 0.88rem; margin-top: 6px; }
-
-            /* Внутренности панели хронологии (в портретной ориентации сама панель повёрнута — см. ниже) */
-            .htl-body { padding: 16px 10px 10px; }
-            .htl { height: 250px; }
-            .htl-axis     { top: 116px; }
-            .htl-life     { top: 104px; height: 26px; }
-            .htl-dtick    { top: 116px; height: 4px; }
-            .htl-htick    { top: 116px; height: 8px; }
-            .htl-ctick    { top: 116px; height: 12px; }
-            .htl-cnum     { top: 208px; font-size: 0.9rem; padding: 0 4px; }
-
-            .htl-war      { height: 116px; }
-            .htl-war-label { max-width: 68px; }
-            .htl-war-year { font-size: 0.6rem; }
-            .htl-war-name { font-size: 0.46rem; letter-spacing: 0; }
-
-            .htl-other    { top: 116px; height: 78px; }
-            .htl-other-label { max-width: 68px; }
-            .htl-other-year { font-size: 0.6rem; }
-            .htl-other-name { font-size: 0.46rem; letter-spacing: 0; }
-
-            .htl-head { font-size: 0.78rem; letter-spacing: 0.24em; padding: 10px 12px; }
 
             /* Часы */
             .clock-wrapper { padding: 26px 0 70px; }
@@ -1311,39 +1281,79 @@
         }
 
         /* ============================================================
-           ПОВОРОТ ХРОНОЛОГИИ В ПОРТРЕТНОЙ ОРИЕНТАЦИИ
-           — панель физически поворачиваем на -90°,
-             чтобы человек развернул телефон и прочитал табличку
-             горизонтально. В ландшафтной ориентации поворот снимается,
-             и табличка и так горизонтальна.
+           ПОВОРОТ ХРОНОЛОГИИ — ПОРТРЕТНАЯ ОРИЕНТАЦИЯ ТЕЛЕФОНА
+           Панель поворачиваем на +90° (по часовой), чтобы человек
+           развернул телефон ПРОТИВ часовой стрелки — и табличка
+           стала горизонтальной. Длину панели задаём через vh
+           (длинная сторона экрана в портрете ≈ 100vh).
            ============================================================ */
         @media (max-width: 640px) and (orientation: portrait) {
             .hero-modal-timeline {
                 width: 100%;
-                height: 62vh;
-                min-height: 340px;
+                height: 100vw;              /* квадрат: длинная сторона */
+                min-height: 320px;
                 position: relative;
                 overflow: hidden;
-                margin-top: 10px;
+                margin-top: 12px;
             }
+
             .hero-modal-timeline .htl-panel {
                 position: absolute;
                 top: 50%;
                 left: 50%;
-                width: 62vh;
-                transform: translate(-50%, -50%) rotate(-90deg);
+                /* Ширина панели = длинной стороне экрана (100vh),
+                   поэтому лента получается длинной — подписи не наезжают. */
+                width: 100vh;
+                max-width: none;
+                transform: translate(-50%, -50%) rotate(90deg);
                 transform-origin: center center;
             }
+
+            /* Внутри повёрнутой панели разрешаем подписям быть шире —
+               места теперь много по длине. */
+            .hero-modal-timeline .htl-war-label,
+            .hero-modal-timeline .htl-other-label {
+                max-width: 130px;
+            }
+            .hero-modal-timeline .htl-war-year,
+            .hero-modal-timeline .htl-other-year { font-size: 0.72rem; }
+            .hero-modal-timeline .htl-war-name,
+            .hero-modal-timeline .htl-other-name { font-size: 0.56rem; }
+            .hero-modal-timeline .htl-head {
+                font-size: 0.82rem;
+                letter-spacing: 0.32em;
+                padding: 11px 14px;
+            }
+
+            /* Внутренние размеры шкалы под длинную панель */
+            .hero-modal-timeline .htl-body { padding: 20px 18px 14px; }
+            .hero-modal-timeline .htl { height: 290px; }
+            .hero-modal-timeline .htl-axis  { top: 138px; }
+            .hero-modal-timeline .htl-life  { top: 123px; height: 31px; }
+            .hero-modal-timeline .htl-dtick { top: 138px; height: 4px; }
+            .hero-modal-timeline .htl-htick { top: 138px; height: 9px; }
+            .hero-modal-timeline .htl-ctick { top: 138px; height: 26px; }
+            .hero-modal-timeline .htl-cnum  { top: 244px; font-size: 1.05rem; }
+            .hero-modal-timeline .htl-war   { height: 138px; }
+            .hero-modal-timeline .htl-other { top: 138px; height: 92px; }
         }
 
-        /* В ландшафте на телефонах слегка ужимаем портрет,
-           хронология при этом остаётся горизонтальной */
+        /* В ландшафте на телефонах портрет короче, хронология — обычная горизонтальная */
         @media (max-width: 900px) and (orientation: landscape) {
             .hero-modal-portrait-wrap {
-                height: 42vh;
+                height: 44vh;
                 min-height: 160px;
             }
             .hero-modal { padding-top: 44px; }
+            .hero-modal-timeline {
+                height: auto;
+                width: 100%;
+            }
+            .hero-modal-timeline .htl-panel {
+                position: static;
+                width: 100%;
+                transform: none;
+            }
         }
     </style>
 </head>
@@ -1715,9 +1725,6 @@
             let currentSection = 'syllables';
             let progressTimer = null;
 
-            /* ============================================================
-               ПРЕДЗАГРУЗКА АУДИО СЛОГОВ
-               ============================================================ */
             const audioCache = new Map();
 
             function preloadSyllableAudio() {
@@ -2103,15 +2110,6 @@
                 { year: 1991, name: 'Разрушение<br>СССР' }
             ];
 
-            function plural(n, forms) {
-                const n100 = n % 100;
-                const n10 = n % 10;
-                if (n100 >= 11 && n100 <= 19) return forms[2];
-                if (n10 === 1) return forms[0];
-                if (n10 >= 2 && n10 <= 4) return forms[1];
-                return forms[2];
-            }
-
             function buildTimelineHTML(birthYear, deathYear) {
                 const b = Math.max(birthYear, TL_START);
                 const d = Math.min(deathYear, TL_END);
@@ -2119,10 +2117,7 @@
                 const width = tlPos(d) - left;
 
                 let html = '<div class="htl-panel">';
-
-                /* Единый заголовок панели */
                 html += '<div class="htl-head">Хронология истории</div>';
-
                 html += '<div class="htl-body"><div class="htl">';
 
                 for (let y = 1700; y <= 2000; y += 10) {
@@ -2535,16 +2530,6 @@
             }
             loadBatch();
         })();
-
-        function getClockAudio(name) {
-            let a = clockAudioCache.get(name);
-            if (!a) {
-                a = new Audio(AUDIO_DIR + name);
-                a.preload = 'auto';
-                clockAudioCache.set(name, a);
-            }
-            return a;
-        }
 
         let chainEl = null;
         function speakTime() {
