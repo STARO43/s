@@ -341,14 +341,23 @@
             color: var(--fg);
             user-select: none;
             -webkit-tap-highlight-color: transparent;
-            transition: background 0.08s linear, color 0.08s linear;
+            transition: background 0.08s linear, color 0.08s linear, transform 0.1s linear, box-shadow 0.1s linear;
             position: relative;
             text-transform: uppercase;
             display: flex;
             align-items: center;
             justify-content: center;
         }
-        .syllable-card:not(.learned):hover { background: var(--fg); color: var(--bg); }
+        
+        /* Анимация приподнятия как у портретов */
+        .syllable-card:not(.learned):hover { 
+            background: var(--fg); 
+            color: var(--bg); 
+            transform: translate(-3px, -3px);
+            box-shadow: 6px 6px 0 var(--accent);
+            z-index: 10;
+        }
+        
         .syllable-card.playing {
             background: var(--accent);
             color: var(--accent-fg);
@@ -504,22 +513,32 @@
             line-height: 1;
         }
 
+        /* Исправленный крестик выхода (как в модалке героев) */
         .exam-exit-btn {
             position: absolute;
             top: 24px; left: 24px;
-            background: var(--bg);
-            border: 2px solid var(--fg);
+            background: transparent;
+            border: none;
             color: var(--fg);
             width: 48px; height: 48px;
             cursor: pointer;
-            font-size: 1.2rem;
+            font-size: 2.6rem;
+            font-weight: 300;
             display: flex;
             align-items: center;
             justify-content: center;
-            transition: all 0.1s linear;
+            transition: transform 0.12s linear, color 0.12s linear;
             z-index: 10;
+            padding: 0;
+            line-height: 1;
+            border-radius: 50%;
+            font-family: var(--font-ui);
+            -webkit-tap-highlight-color: transparent;
         }
-        .exam-exit-btn:hover { background: var(--fg); color: var(--bg); }
+        .exam-exit-btn:hover { 
+            color: var(--accent); 
+            transform: scale(1.12); 
+        }
 
         /* ================= ПОЗДРАВЛЕНИЕ ================= */
 
@@ -1326,9 +1345,10 @@
 
             /* Ещё больше название на узких */
             .header h1 {
-    font-size: 19.5vw;
-    letter-spacing: -0.055em;
-}
+                font-size: 18.5vw;
+                letter-spacing: -0.06em;
+                margin: 8px 0 14px;
+            }
             .header-kicker {
                 font-size: 0.48rem;
                 letter-spacing: 0.12em;
@@ -1356,6 +1376,11 @@
             }
             .hero-name { font-size: 0.92rem; }
             .hero-years { font-size: 0.58rem; }
+            
+            /* Часы чуть уже на совсем мелких */
+            .clock-frame {
+                width: min(480px, 96vw);
+            }
         }
     </style>
 </head>
@@ -1487,18 +1512,9 @@
                                             <stop offset="0.55" stop-color="#ffffff" stop-opacity="0.16"/>
                                             <stop offset="1"    stop-color="#ffffff" stop-opacity="0"/>
                                         </linearGradient>
-                                        <filter id="clk-strapShadow" x="-30%" y="-30%" width="160%" height="160%">
-                                            <feGaussianBlur in="SourceAlpha" stdDeviation="3"/>
-                                            <feOffset dx="0" dy="3"/>
-                                            <feComponentTransfer><feFuncA type="linear" slope="0.5"/></feComponentTransfer>
-                                            <feMerge>
-                                                <feMergeNode/>
-                                                <feMergeNode in="SourceGraphic"/>
-                                            </feMerge>
-                                        </filter>
                                     </defs>
 
-                                    <g filter="url(#clk-strapShadow)">
+                                    <g>
                                         <path d="M 138 -10 L 262 -10 L 272 105 L 128 105 Z" fill="url(#clk-strapGrad)"/>
                                         <path d="M 138 -10 L 148 -10 L 138 105 L 128 105 Z" fill="rgba(0,0,0,0.3)"/>
                                         <path d="M 252 -10 L 262 -10 L 272 105 L 262 105 Z" fill="rgba(0,0,0,0.3)"/>
@@ -1507,7 +1523,7 @@
                                         <line x1="245" y1="-8" x2="254" y2="103" stroke="#c9a070" stroke-width="0.8" stroke-dasharray="3,4" opacity="0.55"/>
                                     </g>
 
-                                    <g filter="url(#clk-strapShadow)">
+                                    <g>
                                         <path d="M 128 415 L 272 415 L 262 530 L 138 530 Z" fill="url(#clk-strapGrad)"/>
                                         <path d="M 128 415 L 138 415 L 148 530 L 138 530 Z" fill="rgba(0,0,0,0.3)"/>
                                         <path d="M 262 415 L 272 415 L 262 530 L 252 530 Z" fill="rgba(0,0,0,0.3)"/>
@@ -2328,12 +2344,6 @@
         const minuteScheme= document.getElementById('minuteScheme');
         if (!clockView || !watchView || !schemeView) return;
 
-        document.querySelectorAll('[filter="url(#clk-strapShadow)"]').forEach(el => {
-            el.removeAttribute('filter');
-        });
-        const strapFilter = document.getElementById('clk-strapShadow');
-        if (strapFilter) strapFilter.remove();
-
         const hourHandEl   = document.getElementById('clk-hourHand');
         const minuteHandEl = document.getElementById('clk-minuteHand');
         const ticksGroup   = document.getElementById('clk-ticksGroup');
@@ -2490,11 +2500,9 @@
         }
 
         // ==================================================================
-        // Воспроизведение времени.
-        // Важно для iOS: Audio создаётся ЗАНОВО прямо внутри жеста пользователя
-        // (speakTime вызывается из touchend-обработчика), без кэша и без
-        // предзагрузки всех mp3. Второй файл играем тем же элементом,
-        // меняя src в обработчике 'ended'.
+        // Воспроизведение времени с ПРЕДЗАГРУЗКОЙ для iOS.
+        // При первом касании мы создаем объекты Audio и загружаем файлы,
+        // но не играем их громко. При отпускании (endGesture) играем.
         // ==================================================================
         function speakTime() {
             stopClockAudio();
