@@ -11,7 +11,6 @@
 <title>Грамотиньо</title>
 <style>
 * { margin: 0; padding: 0; box-sizing: border-box; }
-/* ================= БУМАГА (сорта) ================= */
 :root,
 body[data-paper="newsprint"] {
 --bg:        #f2ecdf;
@@ -67,7 +66,6 @@ body[data-paper="carbon"] {
 --fg-3:      #7a6850;
 --rule-soft: rgba(245, 232, 208, 0.13);
 }
-/* ================= КРАСКИ (типографские пигменты) ================= */
 body[data-ink="kinovar"]     { --accent: #e30613; --accent-fg: #ffffff; }
 body[data-ink="ultramarine"] { --accent: #1e3a8a; --accent-fg: #ffffff; }
 body[data-ink="berlin"]      { --accent: #003153; --accent-fg: #ffffff; }
@@ -76,7 +74,6 @@ body[data-ink="sepia"]       { --accent: #704214; --accent-fg: #ffffff; }
 body[data-ink="emerald"]     { --accent: #046307; --accent-fg: #ffffff; }
 body[data-ink="purpur"]      { --accent: #6b0f7d; --accent-fg: #ffffff; }
 body[data-ink="cadmium"]     { --accent: #e85d04; --accent-fg: #141414; }
-/* На тёмных бумагах тёмные краски теряют контраст — глушим */
 body[data-paper="blueprint"][data-ink="berlin"],
 body[data-paper="carbon"][data-ink="sepia"],
 body[data-paper="carbon"][data-ink="berlin"] {
@@ -118,7 +115,6 @@ z-index: 0;
 opacity: 0.35;
 }
 body > * { position: relative; z-index: 1; }
-/* ================= КОЛОНТИТУЛ ГАЗЕТЫ ================= */
 .header-masthead {
 display: flex;
 align-items: center;
@@ -183,16 +179,9 @@ background-repeat: repeat-x;
 opacity: 0.55;
 transition: opacity 0.12s linear;
 }
-.masthead-switch:hover {
-color: var(--accent);
-}
-.masthead-switch:hover::after {
-opacity: 1;
-}
-.masthead-switch:active {
-color: var(--accent);
-}
-/* ================= МИНИ-ШТАМП (раскрывающийся список) ================= */
+.masthead-switch:hover { color: var(--accent); }
+.masthead-switch:hover::after { opacity: 1; }
+.masthead-switch:active { color: var(--accent); }
 .masthead-stamp {
 position: fixed;
 z-index: 1400;
@@ -289,14 +278,12 @@ opacity: 0;
 flex-shrink: 0;
 }
 .stamp-opt.active .stamp-opt-check { opacity: 1; }
-/* Сваточки бумаг */
 .stamp-opt[data-paper-opt="newsprint"]  { --sw: #f2ecdf; }
 .stamp-opt[data-paper-opt="vatman"]     { --sw: #ffffff; }
 .stamp-opt[data-paper-opt="calk"]       { --sw: #e6e4dd; }
 .stamp-opt[data-paper-opt="millimeter"] { --sw: #eef5ec; }
 .stamp-opt[data-paper-opt="blueprint"]  { --sw: #0a1a2e; }
 .stamp-opt[data-paper-opt="carbon"]     { --sw: #1a1815; }
-/* Сваточки красок */
 .stamp-opt[data-ink-opt="kinovar"]     .stamp-opt-swatch { background: #e30613; }
 .stamp-opt[data-ink-opt="ultramarine"] .stamp-opt-swatch { background: #1e3a8a; }
 .stamp-opt[data-ink-opt="berlin"]      .stamp-opt-swatch { background: #003153; }
@@ -305,7 +292,6 @@ flex-shrink: 0;
 .stamp-opt[data-ink-opt="emerald"]     .stamp-opt-swatch { background: #046307; }
 .stamp-opt[data-ink-opt="purpur"]      .stamp-opt-swatch { background: #6b0f7d; }
 .stamp-opt[data-ink-opt="cadmium"]     .stamp-opt-swatch { background: #e85d04; }
-/* ================= ШАПКА ================= */
 .header { padding: 16px 20px 0; }
 .header-kicker {
 display: flex;
@@ -429,7 +415,6 @@ text-transform: none;
 line-height: 1;
 font-variant-numeric: tabular-nums;
 }
-/* ================= КОНТЕНТ ================= */
 .content-wrapper {
 flex: 1;
 max-width: 960px;
@@ -443,7 +428,6 @@ padding: 0 20px;
 from { opacity: 0; transform: translateY(6px); }
 to   { opacity: 1; transform: translateY(0); }
 }
-/* ================= ПРОГРЕСС ================= */
 .progress-container {
 position: fixed;
 left: 0; right: 0; bottom: 0;
@@ -477,7 +461,6 @@ background: var(--accent);
 width: 0%;
 transition: width 0.4s linear;
 }
-/* ================= КНОПКИ УПРАВЛЕНИЯ ================= */
 .controls {
 display: flex;
 justify-content: center;
@@ -529,7 +512,6 @@ transition: opacity 0.12s linear, transform 0.12s linear, visibility 0.12s;
 z-index: 10;
 }
 .controls button:hover::after { opacity: 1; visibility: visible; transform: translateX(-50%) translateY(0); }
-/* ================= СЕТКА СЛОГОВ ================= */
 .grid-container {
 max-width: 960px;
 margin: 0 auto;
@@ -609,52 +591,6 @@ background: var(--accent);
 border-color: var(--accent);
 opacity: 1;
 }
-/* ================= КНОПКА ОЗВУЧКИ ЧАСОВ ================= */
-.clock-speak-btn {
-    position: fixed;
-    bottom: 90px;
-    right: 24px;
-    width: 52px;
-    height: 52px;
-    background: var(--bg);
-    border: 2px solid var(--fg);
-    color: var(--fg);
-    font-size: 1.6rem;
-    font-family: var(--font-ui);
-    font-weight: 700;
-    cursor: pointer;
-    display: none;
-    align-items: center;
-    justify-content: center;
-    transition: all 0.1s linear;
-    z-index: 1002;
-    line-height: 1;
-}
-.clock-speak-btn.visible {
-    display: flex;
-}
-.clock-speak-btn:hover, .clock-speak-btn:active {
-    background: var(--fg);
-    color: var(--bg);
-    transform: translate(-3px, -3px);
-    box-shadow: 4px 4px 0 var(--accent);
-}
-/* Скрываем на десктопах, оставляем только для мобильных и планшетов */
-@media (min-width: 1025px) {
-    .clock-speak-btn {
-        display: none !important; 
-    }
-}
-@media (max-width: 640px) {
-    .clock-speak-btn {
-        bottom: 80px;
-        right: 16px;
-        width: 46px;
-        height: 46px;
-        font-size: 1.4rem;
-    }
-}
-/* ================= КНОПКА НАВЕРХ ================= */
 .scroll-top-btn {
 position: fixed;
 bottom: 24px; right: 24px;
@@ -679,7 +615,6 @@ color: var(--bg);
 transform: translate(-3px, -3px);
 box-shadow: 4px 4px 0 var(--accent);
 }
-/* ================= ЭКЗАМЕН ================= */
 .exam-overlay {
 position: fixed;
 top: 0; left: 0;
@@ -786,7 +721,6 @@ font-family: var(--font-ui);
 color: var(--accent);
 transform: scale(1.12);
 }
-/* ================= ПОЗДРАВЛЕНИЕ ================= */
 .celebration-overlay {
 position: fixed;
 top: 0; left: 0;
@@ -836,7 +770,6 @@ text-transform: uppercase;
 transition: all 0.1s linear;
 }
 .celebration-close:hover { background: var(--accent); border-color: var(--accent); color: var(--accent-fg); }
-/* ================= ТОСТЫ ================= */
 .toast-container {
 position: fixed;
 bottom: 100px; left: 50%;
@@ -862,7 +795,6 @@ pointer-events: auto;
 }
 @keyframes toastIn { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
 @keyframes toastOut { from { opacity: 1; } to { opacity: 0; } }
-/* ================= ПОДВАЛ ================= */
 .footer {
 text-align: center;
 padding: 26px 20px;
@@ -874,9 +806,6 @@ text-transform: uppercase;
 border-top: 3px solid var(--fg);
 color: var(--fg-3);
 }
-/* ============================================================
-ЛИЧНОСТИ
-============================================================ */
 .heroes-timeline {
 max-width: 960px;
 margin: 0 auto;
@@ -973,9 +902,6 @@ align-items: baseline;
 gap: 6px;
 }
 .hero-age { color: var(--accent); font-weight: 700; }
-/* ============================================================
-МОДАЛКА ГЕРОЯ
-============================================================ */
 .hero-modal {
 position: fixed;
 inset: 0;
@@ -1111,9 +1037,6 @@ color: var(--accent);
 margin-top: 8px;
 user-select: none;
 }
-/* ============================================================
-ШКАЛА ВРЕМЕНИ
-============================================================ */
 .hero-modal-timeline {
 flex-shrink: 0;
 width: 100%;
@@ -1253,9 +1176,6 @@ font-family: var(--font-display); font-size: 1.15rem; font-weight: 600;
 letter-spacing: 0.03em; color: var(--fg);
 background: var(--bg); padding: 0 6px; z-index: 7; line-height: 1;
 }
-/* ============================================================
-ЧАСЫ
-============================================================ */
 .clock-wrapper {
 padding: 40px 0 90px;
 width: 100%;
@@ -1268,8 +1188,31 @@ padding: 18px;
 background: var(--bg);
 box-shadow: 10px 10px 0 var(--accent);
 width: min(520px, 94vw);
+position: relative;
 }
-.frame-head { border: 2px solid var(--fg); margin-bottom: 18px; background: var(--bg); }
+.clock-frame::before {
+content: '';
+position: absolute;
+top: 18px;
+left: 18px;
+right: 18px;
+bottom: 18px;
+background-image:
+linear-gradient(var(--rule-soft) 1px, transparent 1px),
+linear-gradient(90deg, var(--rule-soft) 1px, transparent 1px);
+background-size: 8px 8px;
+background-position: -1px -1px;
+pointer-events: none;
+z-index: 0;
+opacity: 0.25;
+}
+.frame-head { 
+    border: 2px solid var(--fg); 
+    margin-bottom: 18px; 
+    background: var(--bg);
+    position: relative;
+    z-index: 1;
+}
 .frame-head-top,
 .frame-head-bot {
 display: flex;
@@ -1311,7 +1254,12 @@ overflow: hidden;
 color: var(--fg);
 text-overflow: ellipsis;
 }
-.clock-stack { width: 100%; margin: 0 auto; position: relative; }
+.clock-stack { 
+    width: 100%; 
+    margin: 0 auto; 
+    position: relative;
+    z-index: 1;
+}
 .clock-view {
 width: 100%;
 aspect-ratio: 440 / 520;
@@ -1348,9 +1296,6 @@ color: var(--fg);
 .scheme-view.active { display: flex; }
 .scheme-view svg { width: 100%; height: auto; max-height: 100%; display: block; overflow: visible; }
 .clock-view .watch-container.hidden { display: none; }
-/* ============================================================
-АДАПТИВ
-============================================================ */
 @media (max-width: 1024px) {
 .syllable-grid { grid-template-columns: repeat(3, 1fr); }
 }
@@ -1644,97 +1589,132 @@ width: min(480px, 96vw);
 <svg viewBox="-20 0 440 520" xmlns="http://www.w3.org/2000/svg">
 <defs>
 <radialGradient id="clk-caseGrad" cx="0.35" cy="0.28" r="0.9">
-<stop offset="0"    stop-color="#f5f5f5"/>
-<stop offset="0.15" stop-color="#d8d8d8"/>
-<stop offset="0.4"  stop-color="#a8a8a8"/>
-<stop offset="0.7"  stop-color="#787878"/>
-<stop offset="0.9"  stop-color="#585858"/>
-<stop offset="1"    stop-color="#3a3a3a"/>
+<stop offset="0"    stop-color="#f8f8f8"/>
+<stop offset="0.15" stop-color="#e0e0e0"/>
+<stop offset="0.4"  stop-color="#b8b8b8"/>
+<stop offset="0.7"  stop-color="#888888"/>
+<stop offset="0.9"  stop-color="#606060"/>
+<stop offset="1"    stop-color="#484848"/>
 </radialGradient>
 <linearGradient id="clk-caseShine" x1="0.15" y1="0" x2="0.85" y2="1">
-<stop offset="0"    stop-color="#ffffff" stop-opacity="0.5"/>
-<stop offset="0.25" stop-color="#ffffff" stop-opacity="0.1"/>
+<stop offset="0"    stop-color="#ffffff" stop-opacity="0.6"/>
+<stop offset="0.25" stop-color="#ffffff" stop-opacity="0.15"/>
 <stop offset="0.5"  stop-color="#ffffff" stop-opacity="0"/>
-<stop offset="0.75" stop-color="#000000" stop-opacity="0.05"/>
-<stop offset="1"    stop-color="#000000" stop-opacity="0.3"/>
+<stop offset="0.75" stop-color="#000000" stop-opacity="0.08"/>
+<stop offset="1"    stop-color="#000000" stop-opacity="0.35"/>
 </linearGradient>
 <linearGradient id="clk-bezelGrad" x1="0" y1="0" x2="0.25" y2="1">
 <stop offset="0"    stop-color="#ffffff"/>
-<stop offset="0.1"  stop-color="#e8e8e8"/>
-<stop offset="0.25" stop-color="#b0b0b0"/>
-<stop offset="0.4"  stop-color="#e0e0e0"/>
-<stop offset="0.55" stop-color="#888888"/>
-<stop offset="0.75" stop-color="#c0c0c0"/>
-<stop offset="0.9"  stop-color="#606060"/>
-<stop offset="1"    stop-color="#404040"/>
+<stop offset="0.1"  stop-color="#f0f0f0"/>
+<stop offset="0.25" stop-color="#c0c0c0"/>
+<stop offset="0.4"  stop-color="#e8e8e8"/>
+<stop offset="0.55" stop-color="#989898"/>
+<stop offset="0.75" stop-color="#c8c8c8"/>
+<stop offset="0.9"  stop-color="#686868"/>
+<stop offset="1"    stop-color="#484848"/>
 </linearGradient>
 <linearGradient id="clk-bezelHighlight" x1="0.2" y1="0" x2="0.8" y2="1">
-<stop offset="0"   stop-color="#ffffff" stop-opacity="0.65"/>
+<stop offset="0"   stop-color="#ffffff" stop-opacity="0.7"/>
 <stop offset="0.3" stop-color="#ffffff" stop-opacity="0"/>
 <stop offset="0.7" stop-color="#ffffff" stop-opacity="0"/>
-<stop offset="1"   stop-color="#ffffff" stop-opacity="0.25"/>
+<stop offset="1"   stop-color="#ffffff" stop-opacity="0.3"/>
 </linearGradient>
 <radialGradient id="clk-dialGrad" cx="0.45" cy="0.38" r="0.78">
-<stop offset="0"    stop-color="#fefdf8"/>
-<stop offset="0.55" stop-color="#f8f2e2"/>
-<stop offset="1"    stop-color="#e9dec3"/>
+<stop offset="0"    stop-color="#fffef8"/>
+<stop offset="0.55" stop-color="#f8f0d8"/>
+<stop offset="1"    stop-color="#e8d8c0"/>
 </radialGradient>
 <radialGradient id="clk-dialVignette" cx="0.5" cy="0.5" r="0.5">
 <stop offset="0.6"  stop-color="#000000" stop-opacity="0"/>
-<stop offset="0.88" stop-color="#000000" stop-opacity="0.06"/>
-<stop offset="1"    stop-color="#000000" stop-opacity="0.2"/>
+<stop offset="0.88" stop-color="#000000" stop-opacity="0.08"/>
+<stop offset="1"    stop-color="#000000" stop-opacity="0.25"/>
 </radialGradient>
 <linearGradient id="clk-crystalGrad" x1="0" y1="0" x2="0.6" y2="0.6">
-<stop offset="0"    stop-color="#ffffff" stop-opacity="0.4"/>
+<stop offset="0"    stop-color="#ffffff" stop-opacity="0.45"/>
 <stop offset="0.2"  stop-color="#ffffff" stop-opacity="0"/>
 <stop offset="0.5"  stop-color="#ffffff" stop-opacity="0"/>
 <stop offset="0.85" stop-color="#ffffff" stop-opacity="0"/>
-<stop offset="1"    stop-color="#ffffff" stop-opacity="0.15"/>
+<stop offset="1"    stop-color="#ffffff" stop-opacity="0.2"/>
 </linearGradient>
 <linearGradient id="clk-handGrad" x1="0" y1="0" x2="1" y2="0">
-<stop offset="0"   stop-color="#4a4a4a"/>
-<stop offset="0.5" stop-color="#0d0d0d"/>
-<stop offset="1"   stop-color="#4a4a4a"/>
+<stop offset="0"   stop-color="#3a3a3a"/>
+<stop offset="0.5" stop-color="#1a1a1a"/>
+<stop offset="1"   stop-color="#3a3a3a"/>
 </linearGradient>
 <linearGradient id="clk-strapGrad" x1="0" y1="0" x2="1" y2="0">
-<stop offset="0"    stop-color="#2a1508"/>
-<stop offset="0.18" stop-color="#4a2410"/>
-<stop offset="0.5"  stop-color="#6b3a18"/>
-<stop offset="0.82" stop-color="#4a2410"/>
-<stop offset="1"    stop-color="#2a1508"/>
+<stop offset="0"    stop-color="#3d2414"/>
+<stop offset="0.18" stop-color="#5c3a1e"/>
+<stop offset="0.5"  stop-color="#8b5a2b"/>
+<stop offset="0.82" stop-color="#5c3a1e"/>
+<stop offset="1"    stop-color="#3d2414"/>
 </linearGradient>
 <linearGradient id="clk-strapShine" x1="0" y1="0" x2="1" y2="0">
 <stop offset="0"    stop-color="#ffffff" stop-opacity="0"/>
-<stop offset="0.45" stop-color="#ffffff" stop-opacity="0.16"/>
-<stop offset="0.55" stop-color="#ffffff" stop-opacity="0.16"/>
+<stop offset="0.45" stop-color="#ffffff" stop-opacity="0.18"/>
+<stop offset="0.55" stop-color="#ffffff" stop-opacity="0.18"/>
 <stop offset="1"    stop-color="#ffffff" stop-opacity="0"/>
 </linearGradient>
+<!-- Градиент для заводной головки: поперёк цилиндра (сверху вниз для горизонтали) -->
+<linearGradient id="clk-crownGrad" x1="0" y1="0" x2="0" y2="1">
+<stop offset="0"    stop-color="#b0b0b0"/>
+<stop offset="0.25" stop-color="#e8e8e8"/>
+<stop offset="0.5"  stop-color="#ffffff"/>
+<stop offset="0.75" stop-color="#d0d0d0"/>
+<stop offset="1"    stop-color="#888888"/>
+</linearGradient>
+<linearGradient id="clk-crownStem" x1="0" y1="0" x2="0" y2="1">
+<stop offset="0"    stop-color="#909090"/>
+<stop offset="0.5"  stop-color="#d0d0d0"/>
+<stop offset="1"    stop-color="#808080"/>
+</linearGradient>
 </defs>
+
+<!-- Ремешок верхний -->
 <g>
 <path d="M 138 -10 L 262 -10 L 272 105 L 128 105 Z" fill="url(#clk-strapGrad)"/>
-<path d="M 138 -10 L 148 -10 L 138 105 L 128 105 Z" fill="rgba(0,0,0,0.3)"/>
-<path d="M 252 -10 L 262 -10 L 272 105 L 262 105 Z" fill="rgba(0,0,0,0.3)"/>
+<path d="M 138 -10 L 148 -10 L 138 105 L 128 105 Z" fill="rgba(0,0,0,0.35)"/>
+<path d="M 252 -10 L 262 -10 L 272 105 L 262 105 Z" fill="rgba(0,0,0,0.35)"/>
 <path d="M 170 -10 L 230 -10 L 235 105 L 165 105 Z" fill="url(#clk-strapShine)"/>
-<line x1="155" y1="-8" x2="146" y2="103" stroke="#c9a070" stroke-width="0.8" stroke-dasharray="3,4" opacity="0.55"/>
-<line x1="245" y1="-8" x2="254" y2="103" stroke="#c9a070" stroke-width="0.8" stroke-dasharray="3,4" opacity="0.55"/>
+<line x1="155" y1="-8" x2="146" y2="103" stroke="#c9a070" stroke-width="1" stroke-dasharray="4,5" opacity="0.7"/>
+<line x1="245" y1="-8" x2="254" y2="103" stroke="#c9a070" stroke-width="1" stroke-dasharray="4,5" opacity="0.7"/>
 </g>
+<!-- Ремешок нижний -->
 <g>
 <path d="M 128 415 L 272 415 L 262 530 L 138 530 Z" fill="url(#clk-strapGrad)"/>
-<path d="M 128 415 L 138 415 L 148 530 L 138 530 Z" fill="rgba(0,0,0,0.3)"/>
-<path d="M 262 415 L 272 415 L 262 530 L 252 530 Z" fill="rgba(0,0,0,0.3)"/>
+<path d="M 128 415 L 138 415 L 148 530 L 138 530 Z" fill="rgba(0,0,0,0.35)"/>
+<path d="M 262 415 L 272 415 L 262 530 L 252 530 Z" fill="rgba(0,0,0,0.35)"/>
 <path d="M 165 415 L 235 415 L 230 530 L 170 530 Z" fill="url(#clk-strapShine)"/>
-<line x1="146" y1="417" x2="155" y2="528" stroke="#c9a070" stroke-width="0.8" stroke-dasharray="3,4" opacity="0.55"/>
-<line x1="254" y1="417" x2="245" y2="528" stroke="#c9a070" stroke-width="0.8" stroke-dasharray="3,4" opacity="0.55"/>
+<line x1="146" y1="417" x2="155" y2="528" stroke="#c9a070" stroke-width="1" stroke-dasharray="4,5" opacity="0.7"/>
+<line x1="254" y1="417" x2="245" y2="528" stroke="#c9a070" stroke-width="1" stroke-dasharray="4,5" opacity="0.7"/>
 </g>
+
+<!-- Ушки -->
 <rect x="122" y="76" width="156" height="38" rx="13" fill="url(#clk-caseGrad)"/>
 <rect x="122" y="406" width="156" height="38" rx="13" fill="url(#clk-caseGrad)"/>
-<rect x="362" y="248" width="22" height="24" rx="4" fill="url(#clk-caseGrad)"/>
-<rect x="364" y="251" width="18" height="18" rx="3" fill="url(#clk-bezelGrad)"/>
-<line x1="367" y1="254" x2="367" y2="266" stroke="#505050" stroke-width="0.5"/>
-<line x1="370" y1="254" x2="370" y2="266" stroke="#505050" stroke-width="0.5"/>
-<line x1="373" y1="254" x2="373" y2="266" stroke="#505050" stroke-width="0.5"/>
-<line x1="376" y1="254" x2="376" y2="266" stroke="#505050" stroke-width="0.5"/>
-<line x1="379" y1="254" x2="379" y2="266" stroke="#505050" stroke-width="0.5"/>
+
+<!-- ЗАВОДНАЯ ГОЛОВКА (как на часах "Победа") -->
+<g id="clk-crown">
+  <!-- Шейка (основание крепления к корпусу) -->
+  <rect x="366" y="253" width="6" height="14" fill="url(#clk-crownStem)" stroke="#505050" stroke-width="0.4"/>
+  <!-- Основной бочонок головки с рифлением -->
+  <rect x="372" y="248" width="22" height="24" rx="3" fill="url(#clk-crownGrad)" stroke="#404040" stroke-width="0.7"/>
+  <!-- Мелкое рифление по окружности (горизонтальные насечки) -->
+  <g stroke="#505050" stroke-width="0.6" opacity="0.75" stroke-linecap="round">
+    <line x1="373" y1="251" x2="393" y2="251"/>
+    <line x1="373" y1="254" x2="393" y2="254"/>
+    <line x1="373" y1="257" x2="393" y2="257"/>
+    <line x1="373" y1="260" x2="393" y2="260"/>
+    <line x1="373" y1="263" x2="393" y2="263"/>
+    <line x1="373" y1="266" x2="393" y2="266"/>
+    <line x1="373" y1="269" x2="393" y2="269"/>
+  </g>
+  <!-- Блик на верхней части головки -->
+  <rect x="373" y="249" width="20" height="3" rx="1" fill="#ffffff" opacity="0.5"/>
+  <!-- Тень под головкой -->
+  <ellipse cx="383" cy="273" rx="10" ry="1.5" fill="#000000" opacity="0.15"/>
+</g>
+
+<!-- Корпус -->
 <circle cx="200" cy="260" r="170" fill="url(#clk-caseGrad)"/>
 <circle cx="200" cy="260" r="170" fill="url(#clk-caseShine)"/>
 <circle cx="200" cy="260" r="159" fill="none" stroke="#2a2a2a" stroke-width="1.2" opacity="0.85"/>
@@ -1744,10 +1724,14 @@ width: min(480px, 96vw);
 <circle cx="200" cy="260" r="154" fill="none" stroke="#a0a0a0" stroke-width="0.4" opacity="0.4"/>
 <circle cx="200" cy="260" r="152" fill="none" stroke="#707070" stroke-width="0.4" opacity="0.4"/>
 <circle cx="200" cy="260" r="151" fill="#1a1a1a"/>
+
+<!-- Циферблат -->
 <circle cx="200" cy="260" r="147" fill="url(#clk-dialGrad)"/>
 <circle cx="200" cy="260" r="147" fill="url(#clk-dialVignette)"/>
 <g id="clk-ticksGroup"></g>
 <g id="clk-numbersGroup"></g>
+
+<!-- Надписи на циферблате (под стрелками, но стрелки будут поверх всего) -->
 <text x="200" y="210" text-anchor="middle"
 font-family="Georgia, 'Times New Roman', serif"
 font-size="12" font-weight="700" letter-spacing="2.8"
@@ -1756,8 +1740,11 @@ fill="#1a1a1a" pointer-events="none">ПОБЕДА</text>
 font-family="Georgia, 'Times New Roman', serif"
 font-size="6.5" font-weight="700" letter-spacing="3"
 fill="#3a3a3a" pointer-events="none">СДЕЛАНО В СССР</text>
+
+<!-- Стекло (блик) -->
 <circle cx="200" cy="260" r="147" fill="url(#clk-crystalGrad)" pointer-events="none"/>
-<circle cx="200" cy="260" r="7" fill="url(#clk-caseGrad)"/>
+
+<!-- СТРЕЛКИ (теперь ПОВЕРХ ВСЕХ НАДПИСЕЙ И ЦИФР!) -->
 <g id="clk-hands">
 <g id="clk-hourHand">
 <path d="M 200 165 L 206 220 L 205 250 L 200 270 L 195 250 L 194 220 Z"
@@ -1770,6 +1757,8 @@ fill="url(#clk-handGrad)"
 stroke="#141414" stroke-width="0.6" stroke-linejoin="round"/>
 </g>
 </g>
+
+<!-- Центральная ось (поверх стрелок) -->
 <circle cx="200" cy="260" r="5" fill="url(#clk-bezelGrad)"/>
 <circle cx="200" cy="260" r="2.5" fill="#1a1a1a"/>
 </svg>
@@ -1791,7 +1780,6 @@ stroke="#141414" stroke-width="0.6" stroke-linejoin="round"/>
 <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
 </div>
 <button class="scroll-top-btn" id="scrollTopBtn" title="Наверх">↑</button>
-<button class="clock-speak-btn" id="clockSpeakBtn" title="Озвучить время" aria-label="Озвучить время">♪</button>
 <div class="exam-overlay" id="examOverlay">
 <button class="exam-exit-btn" id="examExitBtn" title="Выйти">✕</button>
 <div class="exam-header">
@@ -1861,7 +1849,6 @@ const progressContainer = document.getElementById('progressContainer');
 const progressLabel = document.getElementById('progressLabel');
 const progressFill = document.getElementById('progressFill');
 const scrollTopBtn = document.getElementById('scrollTopBtn');
-const clockSpeakBtn = document.getElementById('clockSpeakBtn');
 const examOverlay = document.getElementById('examOverlay');
 const examQuestion = document.getElementById('examQuestion');
 const examOptions = document.getElementById('examOptions');
@@ -1933,9 +1920,6 @@ window.clockSpeakCancel();
 if (section !== 'syllables') {
 progressContainer.classList.remove('show');
 }
-if (clockSpeakBtn) {
-clockSpeakBtn.classList.toggle('visible', section === 'clock');
-}
 }
 sectionBtns.forEach(btn => {
 btn.addEventListener('click', () => {
@@ -1948,13 +1932,6 @@ scrollTopBtn.classList.toggle('visible', window.scrollY > 300);
 scrollTopBtn.addEventListener('click', () => {
 window.scrollTo({ top: 0, behavior: 'smooth' });
 });
-if (clockSpeakBtn) {
-clockSpeakBtn.addEventListener('click', () => {
-if (window.speakClockTime) {
-window.speakClockTime();
-}
-});
-}
 function refreshProgressData() {
 const total = syllables.length;
 const marked = [...syllables].filter(s => learnedSet.has(s)).length;
@@ -2454,9 +2431,6 @@ renderHeroesTimeline();
 renderGrid();
 updateCycleBtn();
 })();
-/* ============================================================
-КОЛОНТИТУЛ ГАЗЕТЫ — логика
-============================================================ */
 (function() {
 const STORAGE_PAPER = 'gramotino_paper';
 const STORAGE_INK   = 'gramotino_ink';
@@ -2638,7 +2612,6 @@ applyPaper(savedPaper, true);
 applyInk(savedInk, true);
 })();
 </script>
-<!-- ==================== ЛОГИКА ЧАСОВ (вернул к исходной версии) ==================== -->
 <script>
 (function () {
 const clockView   = document.getElementById('clockView');
