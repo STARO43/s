@@ -590,7 +590,6 @@ justify-content: center;
 .htl-other-name { font-family: var(--font-display); font-size: 0.54rem; font-weight: 600; color: var(--fg); text-transform: uppercase; letter-spacing: 0.02em; line-height: 1.14; }
 .htl-cnum { position: absolute; top: 262px; transform: translateX(-50%); font-family: var(--font-display); font-size: 1.15rem; font-weight: 600; letter-spacing: 0.03em; color: var(--fg); background: var(--bg); padding: 0 6px; z-index: 7; line-height: 1; }
 
-/* ================= ЧАСЫ ================= */
 .clock-wrapper { padding: 40px 0 90px; width: 100%; display: flex; flex-direction: column; align-items: center; gap: 0; }
 .clock-frame {
 border: 3px solid var(--fg);
@@ -614,7 +613,6 @@ pointer-events: none;
 z-index: 0;
 opacity: 0.3;
 }
-/* Кнопка «СХЕМА / АУДИОВИЗУАЛЬНОГО ИЗУЧЕНИЯ ЧАСОВ» — без анимаций. */
 .frame-head { border: 2px solid var(--fg); margin-bottom: 18px; background: var(--bg); position: relative; z-index: 1; cursor: pointer; -webkit-tap-highlight-color: transparent; }
 .frame-head-top, .frame-head-bot { display: flex; justify-content: space-between; align-items: center; gap: 10px; padding: 6px 10px; font-family: var(--font-doc); font-size: 0.56rem; font-weight: 600; letter-spacing: 0.16em; text-transform: uppercase; color: var(--fg); background: var(--bg-2); }
 .frame-head-top { border-bottom: 1px solid var(--fg); }
@@ -634,7 +632,6 @@ opacity: 0.3;
 .watch-container { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
 .watch-svg { width: 100%; height: 100%; display: block; overflow: visible; }
 
-/* По умолчанию (десктоп) — только классический SVG. iOS-версия скрыта. */
 #watchSvgIOS { display: none; }
 body.is-ios #watchSvgDesktop { display: none; }
 body.is-ios #watchSvgIOS { display: block; }
@@ -644,7 +641,6 @@ body.is-ios #watchSvgIOS { display: block; }
 .scheme-view svg { width: 100%; height: auto; max-height: 100%; display: block; overflow: visible; }
 .clock-view .watch-container.hidden { display: none; }
 
-/* ================= АДАПТИВ ================= */
 @media (max-width: 1024px) { .syllable-grid { grid-template-columns: repeat(3, 1fr); } }
 @media (max-width: 640px) {
 .header { padding: 12px 14px 0; }
@@ -780,7 +776,6 @@ body.is-ios #watchSvgIOS { display: block; }
 <div class="clock-view view-watch" id="clockView">
 <div class="watch-container" id="watchView">
 
-<!-- ==================== ДЕСКТОП: классическая «Победа» ==================== -->
 <svg id="watchSvgDesktop" class="watch-svg" viewBox="-20 0 440 520" xmlns="http://www.w3.org/2000/svg">
 <defs>
 <radialGradient id="clkD-caseGrad" cx="0.35" cy="0.28" r="0.9">
@@ -879,7 +874,6 @@ body.is-ios #watchSvgIOS { display: block; }
 <circle cx="200" cy="260" r="2.5" fill="#1a1a1a"/>
 </svg>
 
-<!-- ==================== iOS: чёрно-золотые часы ==================== -->
 <svg id="watchSvgIOS" class="watch-svg" viewBox="-20 0 440 520" xmlns="http://www.w3.org/2000/svg">
 <defs>
 <radialGradient id="clkI-caseGrad" cx="0.35" cy="0.28" r="0.9">
@@ -1129,7 +1123,6 @@ let sp = 'newsprint', si = 'kinovar'; try { sp = localStorage.getItem(STORAGE_PA
 const clockView = document.getElementById('clockView'), watchView = document.getElementById('watchView'), schemeView = document.getElementById('schemeView'), minuteScheme = document.getElementById('minuteScheme');
 if (!clockView || !watchView || !schemeView) return;
 
-// Определяем iOS (iPhone/iPad/iPod, включая iPadOS 13+ с MacIntel + touch).
 const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) ||
               (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
 if (isIOS) document.body.classList.add('is-ios');
@@ -1149,30 +1142,24 @@ const numbersGroup = activeSvg.querySelector('#' + prefix + '-numbersGroup');
 const subTicksGroup = isIOS ? activeSvg.querySelector('#' + prefix + '-subTicks') : null;
 const digital24El = document.getElementById('clockDigital24');
 
-let clockAudioPlayer = new Audio();
+// Единственный <audio> для воспроизведения времени (общий для платформ).
+const clockAudioPlayer = new Audio();
 clockAudioPlayer.preload = 'auto';
 clockAudioPlayer.setAttribute('playsinline', 'true');
 clockAudioPlayer.setAttribute('webkit-playsinline', 'true');
 
-function unlockAudio() {
-if (clockAudioPlayer.paused) {
-clockAudioPlayer.src = AUDIO_DIR + 'h_00.mp3';
-clockAudioPlayer.volume = 0.01;
-const p = clockAudioPlayer.play();
-if (p && typeof p.catch === 'function') {
-p.catch(() => { }).then(() => {
-clockAudioPlayer.pause();
-clockAudioPlayer.currentTime = 0;
-clockAudioPlayer.volume = 1.0;
-});
-} else {
-setTimeout(() => {
-clockAudioPlayer.pause();
-clockAudioPlayer.currentTime = 0;
-clockAudioPlayer.volume = 1.0;
-}, 100);
-}
-}
+// Unlock для iOS: отдельный <audio>, чтобы не путаться с основным.
+let _iosAudioUnlocked = false;
+function unlockAudioIOS() {
+  if (!isIOS) return;
+  if (_iosAudioUnlocked) return;
+  _iosAudioUnlocked = true;
+  try {
+    const u = new Audio(AUDIO_DIR + 'h_00.mp3');
+    u.volume = 0.001;
+    const p = u.play();
+    if (p && p.catch) p.catch(() => {});
+  } catch (e) { /* ignore */ }
 }
 
 function buildMinuteScheme() {
@@ -1279,27 +1266,38 @@ function stopClockAudio() {
 try { clockAudioPlayer.pause(); clockAudioPlayer.currentTime = 0; } catch (e) { }
 }
 
+// Токен сессии: защищает от того, что старые колбэки (onended/onerror/catch)
+// от предыдущего speakTime() помешают текущему воспроизведению.
+let speakSessionToken = 0;
+
 function speakTime() {
-stopClockAudio();
-const queue = [`h_${String(hour).padStart(2, '0')}.mp3`];
-if (minute === 0) queue.push('rovno.mp3');
-else queue.push(`m_${String(minute).padStart(2, '0')}.mp3`);
-let idx = 0;
-function playNext() {
-if (idx >= queue.length) return;
-clockAudioPlayer.src = AUDIO_DIR + queue[idx];
-const playPromise = clockAudioPlayer.play();
-if (playPromise !== undefined) {
-playPromise.catch(error => {
-console.warn("iOS Audio Block:", error);
-idx++;
-setTimeout(playNext, 100);
-});
-}
-}
-clockAudioPlayer.onended = () => { idx++; playNext(); };
-clockAudioPlayer.onerror = () => { console.warn('Ошибка загрузки', queue[idx]); idx++; playNext(); };
-playNext();
+  const myToken = ++speakSessionToken;
+  stopClockAudio();
+  const queue = [`h_${String(hour).padStart(2, '0')}.mp3`];
+  if (minute === 0) queue.push('rovno.mp3');
+  else queue.push(`m_${String(minute).padStart(2, '0')}.mp3`);
+
+  let idx = 0;
+  const isStale = () => myToken !== speakSessionToken;
+
+  const playNext = () => {
+    if (isStale()) return;
+    if (idx >= queue.length) return;
+    clockAudioPlayer.src = AUDIO_DIR + queue[idx];
+    const p = clockAudioPlayer.play();
+    if (p && p.catch) {
+      p.catch(() => {
+        if (isStale()) return;
+        idx++;
+        setTimeout(() => { if (!isStale()) playNext(); }, 80);
+      });
+    }
+  };
+
+  clockAudioPlayer.onended = () => { if (isStale()) return; idx++; playNext(); };
+  clockAudioPlayer.onerror = () => { if (isStale()) return; idx++; playNext(); };
+
+  playNext();
 }
 
 function setView(view) {
@@ -1357,7 +1355,6 @@ minuteHandEl.setAttribute('transform', `rotate(${minuteDeg} ${CX} ${CY})`);
 digital24El.textContent = `${String(hour).padStart(2, '0')}:${String(minute).padStart(2, '0')}`;
 }
 
-// Секундная стрелка (только на iOS-версии SVG). При 60с — двигает минуту.
 function tickSeconds() {
 seconds = (seconds + 1) % 60;
 if (seconds === 0) {
@@ -1389,7 +1386,7 @@ return Math.hypot(p.x - cx, p.y - cy) <= GRAB_RADIUS * scale;
 let gesture = null;
 function startGesture(point, source) {
 if (gesture) return;
-unlockAudio();
+unlockAudioIOS();
 gesture = { startX: point.x, startY: point.y, startTime: Date.now(), mode: null, pointer: null, angle: 0, source: source };
 }
 function moveGesture(e, point) {
@@ -1430,7 +1427,8 @@ const duration = Date.now() - gesture.startTime;
 const wasDrag = gesture.mode === 'drag', wasScroll = gesture.mode === 'scroll', wasOther = gesture.mode === 'other';
 if (wasDrag) {
 clockView.classList.remove('dragging');
-// НЕ на iOS: после перетаскивания стрелок автоматически зачитываем время.
+// Автоозвучка после перетаскивания — только на десктопе.
+// На iOS перетаскивание не должно озвучиваться, там только кнопка.
 if (!isIOS) {
 lastDragTime = Date.now();
 speakTime();
@@ -1453,9 +1451,8 @@ clockView.addEventListener('mousedown', e => { if (e.button !== 0) return; start
 window.addEventListener('mousemove', e => { if (!gesture || gesture.source !== 'mouse') return; moveGesture(e, getPoint(e)); });
 window.addEventListener('mouseup', e => { if (!gesture || gesture.source !== 'mouse') return; endGesture(getPoint(e)); });
 
-// Кнопка «СХЕМА / АУДИОВИЗУАЛЬНОГО ИЗУЧЕНИЯ ЧАСОВ».
-// На iOS — единственный способ зачитать время.
-// На десктопе — дополнительный способ (вместе с автоозвучкой после перетаскивания).
+// Кнопка «СХЕМА / АУДИОВИЗУАЛЬНОГО ИЗУЧЕНИЯ ЧАСОВ» — проигрывает время.
+// На iOS это единственный способ, на десктопе — дополнительный.
 const frameHead = document.getElementById('frameHead');
 if (frameHead) {
 frameHead.addEventListener('click', (e) => {
@@ -1465,7 +1462,7 @@ speakTime();
 });
 }
 // Десктоп: клик по любой части рамки часов тоже зачитывает время
-// (с защитой от «клика» после перетаскивания стрелок).
+// (с защитой от «клика-хвоста» после перетаскивания стрелок).
 if (!isIOS) {
 const clockFrameEl = document.querySelector('.clock-frame');
 if (clockFrameEl) {
