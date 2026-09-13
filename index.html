@@ -591,7 +591,7 @@ justify-content: center;
 .htl-cnum { position: absolute; top: 262px; transform: translateX(-50%); font-family: var(--font-display); font-size: 1.15rem; font-weight: 600; letter-spacing: 0.03em; color: var(--fg); background: var(--bg); padding: 0 6px; z-index: 7; line-height: 1; }
 
 /* ================= ЧАСЫ ================= */
-.clock-wrapper { padding: 40px 0 90px; width: 100%; display: flex; justify-content: center; }
+.clock-wrapper { padding: 40px 0 90px; width: 100%; display: flex; flex-direction: column; align-items: center; gap: 0; }
 .clock-frame {
 border: 3px solid var(--fg);
 padding: 18px;
@@ -599,9 +599,8 @@ background: var(--bg);
 box-shadow: 10px 10px 0 var(--accent);
 width: min(520px, 94vw);
 position: relative;
-overflow: hidden; /* Гарантирует, что сетка не вылезет за границы */
+overflow: hidden;
 }
-/* Мелкий квадратик (миллиметровка) строго внутри прямоугольника часов */
 .clock-frame::before {
 content: '';
 position: absolute;
@@ -615,7 +614,8 @@ pointer-events: none;
 z-index: 0;
 opacity: 0.3;
 }
-.frame-head { border: 2px solid var(--fg); margin-bottom: 18px; background: var(--bg); position: relative; z-index: 1; }
+.frame-head { border: 2px solid var(--fg); margin-bottom: 18px; background: var(--bg); position: relative; z-index: 1; cursor: pointer; -webkit-tap-highlight-color: transparent; transition: background 0.1s linear; }
+.frame-head:active { background: var(--bg-2); }
 .frame-head-top, .frame-head-bot { display: flex; justify-content: space-between; align-items: center; gap: 10px; padding: 6px 10px; font-family: var(--font-doc); font-size: 0.56rem; font-weight: 600; letter-spacing: 0.16em; text-transform: uppercase; color: var(--fg); background: var(--bg-2); }
 .frame-head-top { border-bottom: 1px solid var(--fg); }
 .frame-head-bot { border-top: 1px solid var(--fg); }
@@ -633,7 +633,8 @@ opacity: 0.3;
 .clock-view.view-scheme { cursor: pointer; }
 .watch-container { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
 .watch-container svg { width: 100%; height: 100%; display: block; overflow: visible; }
-#clk-hourHand, #clk-minuteHand { will-change: transform; }
+/* На iOS Safari will-change+rotate даёт артефакты.
+   Стрелки теперь рисуются через пересчёт path (см. JS render()). */
 .scheme-view { position: absolute; inset: 0; display: none; align-items: center; justify-content: center; color: var(--fg); }
 .scheme-view.active { display: flex; }
 .scheme-view svg { width: 100%; height: auto; max-height: 100%; display: block; overflow: visible; }
@@ -762,7 +763,7 @@ opacity: 0.3;
 <section id="clockSection" class="tab-section">
 <div class="clock-wrapper">
 <div class="clock-frame">
-<div class="frame-head">
+<div class="frame-head" id="frameHead">
 <div class="frame-head-top">
 <span class="frame-head-tag"> </span>
 <span class="frame-head-tag">СХЕМА</span>
@@ -779,32 +780,26 @@ opacity: 0.3;
 <radialGradient id="clk-caseGrad" cx="0.35" cy="0.28" r="0.9">
 <stop offset="0" stop-color="#f5f5f5"/><stop offset="0.15" stop-color="#d8d8d8"/><stop offset="0.4" stop-color="#a8a8a8"/><stop offset="0.7" stop-color="#787878"/><stop offset="0.9" stop-color="#585858"/><stop offset="1" stop-color="#3a3a3a"/>
 </radialGradient>
-<linearGradient id="clk-caseShine" x1="0.15" y1="0" x2="0.85" y2="1">
-<stop offset="0" stop-color="#ffffff" stop-opacity="0.5"/><stop offset="0.25" stop-color="#ffffff" stop-opacity="0.1"/><stop offset="0.5" stop-color="#ffffff" stop-opacity="0"/><stop offset="0.75" stop-color="#000000" stop-opacity="0.05"/><stop offset="1" stop-color="#000000" stop-opacity="0.3"/>
-</linearGradient>
 <linearGradient id="clk-bezelGrad" x1="0" y1="0" x2="0.25" y2="1">
 <stop offset="0" stop-color="#ffffff"/><stop offset="0.1" stop-color="#e8e8e8"/><stop offset="0.25" stop-color="#b0b0b0"/><stop offset="0.4" stop-color="#e0e0e0"/><stop offset="0.55" stop-color="#888888"/><stop offset="0.75" stop-color="#c0c0c0"/><stop offset="0.9" stop-color="#606060"/><stop offset="1" stop-color="#404040"/>
 </linearGradient>
 <linearGradient id="clk-bezelHighlight" x1="0.2" y1="0" x2="0.8" y2="1">
 <stop offset="0" stop-color="#ffffff" stop-opacity="0.65"/><stop offset="0.3" stop-color="#ffffff" stop-opacity="0"/><stop offset="0.7" stop-color="#ffffff" stop-opacity="0"/><stop offset="1" stop-color="#ffffff" stop-opacity="0.25"/>
 </linearGradient>
-<radialGradient id="clk-dialGrad" cx="0.45" cy="0.38" r="0.78">
-<stop offset="0" stop-color="#fefdf8"/><stop offset="0.55" stop-color="#f8f2e2"/><stop offset="1" stop-color="#e9dec3"/>
+<radialGradient id="clk-dialGrad" cx="0.45" cy="0.38" r="0.8">
+<stop offset="0" stop-color="#181c16"/><stop offset="0.55" stop-color="#0d100c"/><stop offset="1" stop-color="#050705"/>
 </radialGradient>
 <radialGradient id="clk-dialVignette" cx="0.5" cy="0.5" r="0.5">
-<stop offset="0.6" stop-color="#000000" stop-opacity="0"/><stop offset="0.88" stop-color="#000000" stop-opacity="0.06"/><stop offset="1" stop-color="#000000" stop-opacity="0.2"/>
+<stop offset="0.65" stop-color="#000000" stop-opacity="0"/><stop offset="0.9" stop-color="#000000" stop-opacity="0.15"/><stop offset="1" stop-color="#000000" stop-opacity="0.5"/>
 </radialGradient>
 <linearGradient id="clk-crystalGrad" x1="0" y1="0" x2="0.6" y2="0.6">
-<stop offset="0" stop-color="#ffffff" stop-opacity="0.4"/><stop offset="0.2" stop-color="#ffffff" stop-opacity="0"/><stop offset="0.5" stop-color="#ffffff" stop-opacity="0"/><stop offset="0.85" stop-color="#ffffff" stop-opacity="0"/><stop offset="1" stop-color="#ffffff" stop-opacity="0.15"/>
-</linearGradient>
-<linearGradient id="clk-handGrad" x1="0" y1="0" x2="1" y2="0">
-<stop offset="0" stop-color="#3a3a3a"/><stop offset="0.5" stop-color="#0d0d0d"/><stop offset="1" stop-color="#3a3a3a"/>
+<stop offset="0" stop-color="#ffffff" stop-opacity="0.2"/><stop offset="0.25" stop-color="#ffffff" stop-opacity="0"/><stop offset="0.6" stop-color="#ffffff" stop-opacity="0"/><stop offset="0.85" stop-color="#ffffff" stop-opacity="0"/><stop offset="1" stop-color="#ffffff" stop-opacity="0.07"/>
 </linearGradient>
 <linearGradient id="clk-strapGrad" x1="0" y1="0" x2="1" y2="0">
-<stop offset="0" stop-color="#2a1508"/><stop offset="0.18" stop-color="#4a2410"/><stop offset="0.5" stop-color="#6b3a18"/><stop offset="0.82" stop-color="#4a2410"/><stop offset="1" stop-color="#2a1508"/>
+<stop offset="0" stop-color="#050505"/><stop offset="0.18" stop-color="#161616"/><stop offset="0.5" stop-color="#262626"/><stop offset="0.82" stop-color="#161616"/><stop offset="1" stop-color="#050505"/>
 </linearGradient>
 <linearGradient id="clk-strapShine" x1="0" y1="0" x2="1" y2="0">
-<stop offset="0" stop-color="#ffffff" stop-opacity="0"/><stop offset="0.45" stop-color="#ffffff" stop-opacity="0.16"/><stop offset="0.55" stop-color="#ffffff" stop-opacity="0.16"/><stop offset="1" stop-color="#ffffff" stop-opacity="0"/>
+<stop offset="0" stop-color="#ffffff" stop-opacity="0"/><stop offset="0.45" stop-color="#ffffff" stop-opacity="0.1"/><stop offset="0.55" stop-color="#ffffff" stop-opacity="0.1"/><stop offset="1" stop-color="#ffffff" stop-opacity="0"/>
 </linearGradient>
 <linearGradient id="clk-crownGrad" x1="0" y1="0" x2="0" y2="1">
 <stop offset="0" stop-color="#b0b0b0"/><stop offset="0.25" stop-color="#e8e8e8"/><stop offset="0.5" stop-color="#ffffff"/><stop offset="0.75" stop-color="#d0d0d0"/><stop offset="1" stop-color="#888888"/>
@@ -813,28 +808,31 @@ opacity: 0.3;
 <stop offset="0" stop-color="#909090"/><stop offset="0.5" stop-color="#d0d0d0"/><stop offset="1" stop-color="#808080"/>
 </linearGradient>
 </defs>
-<!-- Ремешок верх -->
+
+<!-- Верхний ремешок -->
 <g>
 <path d="M 138 -10 L 262 -10 L 272 105 L 128 105 Z" fill="url(#clk-strapGrad)"/>
-<path d="M 138 -10 L 148 -10 L 138 105 L 128 105 Z" fill="rgba(0,0,0,0.3)"/>
-<path d="M 252 -10 L 262 -10 L 272 105 L 262 105 Z" fill="rgba(0,0,0,0.3)"/>
+<path d="M 138 -10 L 148 -10 L 138 105 L 128 105 Z" fill="rgba(0,0,0,0.45)"/>
+<path d="M 252 -10 L 262 -10 L 272 105 L 262 105 Z" fill="rgba(0,0,0,0.45)"/>
 <path d="M 170 -10 L 230 -10 L 235 105 L 165 105 Z" fill="url(#clk-strapShine)"/>
-<line x1="155" y1="-8" x2="146" y2="103" stroke="#c9a070" stroke-width="0.8" stroke-dasharray="3,4" opacity="0.55"/>
-<line x1="245" y1="-8" x2="254" y2="103" stroke="#c9a070" stroke-width="0.8" stroke-dasharray="3,4" opacity="0.55"/>
+<line x1="155" y1="-8" x2="146" y2="103" stroke="#7a7a7a" stroke-width="0.8" stroke-dasharray="3,4" opacity="0.7"/>
+<line x1="245" y1="-8" x2="254" y2="103" stroke="#7a7a7a" stroke-width="0.8" stroke-dasharray="3,4" opacity="0.7"/>
 </g>
-<!-- Ремешок низ -->
+<!-- Нижний ремешок -->
 <g>
 <path d="M 128 415 L 272 415 L 262 530 L 138 530 Z" fill="url(#clk-strapGrad)"/>
-<path d="M 128 415 L 138 415 L 148 530 L 138 530 Z" fill="rgba(0,0,0,0.3)"/>
-<path d="M 262 415 L 272 415 L 262 530 L 252 530 Z" fill="rgba(0,0,0,0.3)"/>
+<path d="M 128 415 L 138 415 L 148 530 L 138 530 Z" fill="rgba(0,0,0,0.45)"/>
+<path d="M 262 415 L 272 415 L 262 530 L 252 530 Z" fill="rgba(0,0,0,0.45)"/>
 <path d="M 165 415 L 235 415 L 230 530 L 170 530 Z" fill="url(#clk-strapShine)"/>
-<line x1="146" y1="417" x2="155" y2="528" stroke="#c9a070" stroke-width="0.8" stroke-dasharray="3,4" opacity="0.55"/>
-<line x1="254" y1="417" x2="245" y2="528" stroke="#c9a070" stroke-width="0.8" stroke-dasharray="3,4" opacity="0.55"/>
+<line x1="146" y1="417" x2="155" y2="528" stroke="#7a7a7a" stroke-width="0.8" stroke-dasharray="3,4" opacity="0.7"/>
+<line x1="254" y1="417" x2="245" y2="528" stroke="#7a7a7a" stroke-width="0.8" stroke-dasharray="3,4" opacity="0.7"/>
 </g>
+
 <!-- Ушки -->
 <rect x="122" y="76" width="156" height="38" rx="13" fill="url(#clk-caseGrad)"/>
 <rect x="122" y="406" width="156" height="38" rx="13" fill="url(#clk-caseGrad)"/>
-<!-- Заводная головка (горизонтальный бочонок с рифлением) -->
+
+<!-- Заводная головка -->
 <g id="clk-crown">
 <rect x="366" y="253" width="6" height="14" fill="url(#clk-crownStem)" stroke="#505050" stroke-width="0.4"/>
 <rect x="372" y="248" width="22" height="24" rx="3" fill="url(#clk-crownGrad)" stroke="#404040" stroke-width="0.7"/>
@@ -847,36 +845,49 @@ opacity: 0.3;
 </g>
 <rect x="373" y="249" width="20" height="3" rx="1" fill="#ffffff" opacity="0.5"/>
 </g>
+
 <!-- Корпус -->
 <circle cx="200" cy="260" r="170" fill="url(#clk-caseGrad)"/>
-<circle cx="200" cy="260" r="170" fill="url(#clk-caseShine)"/>
+<circle cx="200" cy="260" r="170" fill="url(#clk-bezelHighlight)"/>
 <circle cx="200" cy="260" r="159" fill="none" stroke="#2a2a2a" stroke-width="1.2" opacity="0.85"/>
 <circle cx="200" cy="260" r="158" fill="url(#clk-bezelGrad)"/>
 <circle cx="200" cy="260" r="158" fill="url(#clk-bezelHighlight)"/>
 <circle cx="200" cy="260" r="156" fill="none" stroke="#808080" stroke-width="0.4" opacity="0.5"/>
 <circle cx="200" cy="260" r="154" fill="none" stroke="#a0a0a0" stroke-width="0.4" opacity="0.4"/>
 <circle cx="200" cy="260" r="152" fill="none" stroke="#707070" stroke-width="0.4" opacity="0.4"/>
-<circle cx="200" cy="260" r="151" fill="#1a1a1a"/>
-<!-- Циферблат -->
+<circle cx="200" cy="260" r="151" fill="#050705"/>
+
+<!-- Чёрный циферблат -->
 <circle cx="200" cy="260" r="147" fill="url(#clk-dialGrad)"/>
 <circle cx="200" cy="260" r="147" fill="url(#clk-dialVignette)"/>
+
 <g id="clk-ticksGroup"></g>
 <g id="clk-numbersGroup"></g>
-<text x="200" y="210" text-anchor="middle" font-family="Georgia, 'Times New Roman', serif" font-size="12" font-weight="700" letter-spacing="2.8" fill="#1a1a1a" pointer-events="none">ПОБЕДА</text>
-<text x="200" y="315" text-anchor="middle" font-family="Georgia, 'Times New Roman', serif" font-size="6.5" font-weight="700" letter-spacing="3" fill="#3a3a3a" pointer-events="none">СДЕЛАНО В СССР</text>
-<circle cx="200" cy="260" r="147" fill="url(#clk-crystalGrad)" pointer-events="none"/>
-<circle cx="200" cy="260" r="7" fill="url(#clk-caseGrad)"/>
-<!-- Стрелки -->
+
+<!-- Надпись ПОБЕДА между центром и верхом -->
+<text x="200" y="200" text-anchor="middle" font-family="Georgia, 'Times New Roman', serif" font-size="13" font-weight="700" letter-spacing="3.2" fill="#c9a227" pointer-events="none">ПОБЕДА</text>
+
+<!-- Малый секундный циферблат (позиция 6 часов) -->
+<g id="clk-subdial">
+<circle cx="200" cy="355" r="42" fill="#050705"/>
+<circle cx="200" cy="355" r="42" fill="none" stroke="#a8d878" stroke-width="0.5" opacity="0.5"/>
+<circle cx="200" cy="355" r="36" fill="none" stroke="#a8d878" stroke-width="0.3" opacity="0.35"/>
+<circle cx="200" cy="355" r="20" fill="none" stroke="#a8d878" stroke-width="0.3" opacity="0.22"/>
+<g id="clk-subTicks"></g>
+<line id="clk-secondHand" x1="200" y1="355" x2="200" y2="323" stroke="#c9a227" stroke-width="1.1" stroke-linecap="round"/>
+<circle cx="200" cy="355" r="2" fill="#c9a227"/>
+</g>
+
+<!-- Стрелки: d пересчитывается в JS во избежание артефактов iOS -->
 <g id="clk-hands">
-<g id="clk-hourHand">
-<path d="M 200 165 L 206 220 L 205 250 L 200 270 L 195 250 L 194 220 Z" fill="url(#clk-handGrad)"/>
+<path id="clk-hourHand" fill="#c9a227" d="M 200 195 L 204 235 L 205 255 L 205 264 L 195 264 L 195 255 L 196 235 Z"/>
+<path id="clk-minuteHand" fill="#c9a227" d="M 200 155 L 203 200 L 204 250 L 204 264 L 196 264 L 196 250 L 197 200 Z"/>
 </g>
-<g id="clk-minuteHand">
-<path d="M 200 115 L 204 200 L 203 250 L 200 272 L 197 250 L 196 200 Z" fill="url(#clk-handGrad)"/>
-</g>
-</g>
-<circle cx="200" cy="260" r="5" fill="url(#clk-bezelGrad)"/>
-<circle cx="200" cy="260" r="2.5" fill="#1a1a1a"/>
+
+<!-- Стекло -->
+<circle cx="200" cy="260" r="147" fill="url(#clk-crystalGrad)" pointer-events="none"/>
+<circle cx="200" cy="260" r="5" fill="#c9a227"/>
+<circle cx="200" cy="260" r="2" fill="#1a1a1a"/>
 </svg>
 </div>
 <div class="scheme-view" id="schemeView">
@@ -1031,8 +1042,9 @@ let sp = 'newsprint', si = 'kinovar'; try { sp = localStorage.getItem(STORAGE_PA
 (function () {
 const clockView = document.getElementById('clockView'), watchView = document.getElementById('watchView'), schemeView = document.getElementById('schemeView'), minuteScheme = document.getElementById('minuteScheme');
 if (!clockView || !watchView || !schemeView) return;
-const hourHandEl = document.getElementById('clk-hourHand'), minuteHandEl = document.getElementById('clk-minuteHand'), ticksGroup = document.getElementById('clk-ticksGroup'), numbersGroup = document.getElementById('clk-numbersGroup'), digital24El = document.getElementById('clockDigital24');
+const hourHandEl = document.getElementById('clk-hourHand'), minuteHandEl = document.getElementById('clk-minuteHand'), secondHandEl = document.getElementById('clk-secondHand'), ticksGroup = document.getElementById('clk-ticksGroup'), numbersGroup = document.getElementById('clk-numbersGroup'), digital24El = document.getElementById('clockDigital24');
 const NS = 'http://www.w3.org/2000/svg', CX = 200, CY = 260, VIEWBOX_W = 440;
+const SUBCX = 200, SUBCY = 355, SEC_RADIUS = 32;
 const MOVE_THRESHOLD = 5, TAP_MIN_DURATION = 400, TAP_MAX_DURATION = 1200, TAP_MAX_MOVE = 12, GRAB_RADIUS = 220;
 const AUDIO_DIR = 'clock_audio/';
 
@@ -1101,8 +1113,8 @@ minuteScheme.appendChild(t);
 buildMinuteScheme();
 
 const R_IN = 131, R_OUT = 138;
-const cO = document.createElementNS(NS, 'circle'); cO.setAttribute('cx', CX); cO.setAttribute('cy', CY); cO.setAttribute('r', R_OUT); cO.setAttribute('fill', 'none'); cO.setAttribute('stroke', '#1a1a1a'); cO.setAttribute('stroke-width', '0.9'); ticksGroup.appendChild(cO);
-const cI = document.createElementNS(NS, 'circle'); cI.setAttribute('cx', CX); cI.setAttribute('cy', CY); cI.setAttribute('r', R_IN); cI.setAttribute('fill', 'none'); cI.setAttribute('stroke', '#1a1a1a'); cI.setAttribute('stroke-width', '0.9'); ticksGroup.appendChild(cI);
+const cO = document.createElementNS(NS, 'circle'); cO.setAttribute('cx', CX); cO.setAttribute('cy', CY); cO.setAttribute('r', R_OUT); cO.setAttribute('fill', 'none'); cO.setAttribute('stroke', '#c9a227'); cO.setAttribute('stroke-width', '0.9'); cO.setAttribute('opacity', '0.8'); ticksGroup.appendChild(cO);
+const cI = document.createElementNS(NS, 'circle'); cI.setAttribute('cx', CX); cI.setAttribute('cy', CY); cI.setAttribute('r', R_IN); cI.setAttribute('fill', 'none'); cI.setAttribute('stroke', '#c9a227'); cI.setAttribute('stroke-width', '0.9'); cI.setAttribute('opacity', '0.8'); ticksGroup.appendChild(cI);
 for (let i = 0; i < 60; i++) {
 const a = (i * 6 - 90) * Math.PI / 180;
 const b = i % 5 === 0;
@@ -1110,28 +1122,47 @@ const l = document.createElementNS(NS, 'line');
 if (b) {
 l.setAttribute('x1', CX + (R_IN - 3) * Math.cos(a)); l.setAttribute('y1', CY + (R_IN - 3) * Math.sin(a));
 l.setAttribute('x2', CX + (R_OUT + 4) * Math.cos(a)); l.setAttribute('y2', CY + (R_OUT + 4) * Math.sin(a));
-l.setAttribute('stroke', '#1a1a1a'); l.setAttribute('stroke-width', '1.6');
+l.setAttribute('stroke', '#c9a227'); l.setAttribute('stroke-width', '1.6');
 } else {
 l.setAttribute('x1', CX + R_IN * Math.cos(a)); l.setAttribute('y1', CY + R_IN * Math.sin(a));
 l.setAttribute('x2', CX + R_OUT * Math.cos(a)); l.setAttribute('y2', CY + R_OUT * Math.sin(a));
-l.setAttribute('stroke', '#1a1a1a'); l.setAttribute('stroke-width', '0.55');
+l.setAttribute('stroke', '#c9a227'); l.setAttribute('stroke-width', '0.55');
+l.setAttribute('opacity', '0.55');
 }
 l.setAttribute('stroke-linecap', 'round');
 ticksGroup.appendChild(l);
 }
+const subTicksGroup = document.getElementById('clk-subTicks');
+if (subTicksGroup) {
+for (let i = 0; i < 60; i++) {
+const a = (i * 6 - 90) * Math.PI / 180;
+const big = i % 5 === 0;
+const r1 = big ? 32 : 36, r2 = 40;
+const l = document.createElementNS(NS, 'line');
+l.setAttribute('x1', SUBCX + r1 * Math.cos(a)); l.setAttribute('y1', SUBCY + r1 * Math.sin(a));
+l.setAttribute('x2', SUBCX + r2 * Math.cos(a)); l.setAttribute('y2', SUBCY + r2 * Math.sin(a));
+l.setAttribute('stroke', '#a8d878');
+l.setAttribute('stroke-width', big ? '1' : '0.5');
+l.setAttribute('opacity', big ? '0.9' : '0.5');
+l.setAttribute('stroke-linecap', 'round');
+subTicksGroup.appendChild(l);
+}
+}
 const R_NUM = 110;
 for (let i = 1; i <= 12; i++) {
+if (i === 6) continue; // на позиции 6 размещён секундный субциферблат
 const a = (i * 30 - 90) * Math.PI / 180;
 const t = document.createElementNS(NS, 'text');
 t.setAttribute('x', CX + R_NUM * Math.cos(a)); t.setAttribute('y', CY + R_NUM * Math.sin(a));
 t.setAttribute('text-anchor', 'middle'); t.setAttribute('dominant-baseline', 'central');
-t.setAttribute('font-family', "Georgia,'Times New Roman',serif"); t.setAttribute('font-size', '26'); t.setAttribute('font-weight', '700');
-t.setAttribute('fill', i === 12 ? '#b81e1e' : '#1a1a1a');
+t.setAttribute('font-family', "Georgia,'Times New Roman',serif");
+t.setAttribute('font-size', '26'); t.setAttribute('font-weight', '700');
+t.setAttribute('fill', '#a8d878');
 t.textContent = i;
 numbersGroup.appendChild(t);
 }
 
-let hour = 3, minute = 0, totalMinutes = (hour % 12) * 60 + minute, currentView = 'watch';
+let hour = 3, minute = 0, seconds = 0, totalMinutes = (hour % 12) * 60 + minute, currentView = 'watch';
 let lastDragTime = 0;
 
 function stopClockAudio() {
@@ -1177,12 +1208,52 @@ let h = Math.floor(rounded / 60) % 12;
 h = ((h % 12) + 12) % 12;
 hour = h === 0 ? 12 : h;
 }
+
+// Точки стрелок в локальных координатах относительно центра (CX, CY), кончик вверх.
+const HOUR_HAND_POINTS   = [[0,-65],[4,-25],[5,-5],[5,4],[-5,4],[-5,-5],[-4,-25]];
+const MINUTE_HAND_POINTS = [[0,-105],[3,-60],[4,-10],[4,4],[-4,4],[-4,-10],[-3,-60]];
+function rotatePoints(points, deg) {
+const rad = deg * Math.PI / 180, c = Math.cos(rad), s = Math.sin(rad);
+return points.map(([x, y]) => [x * c - y * s, x * s + y * c]);
+}
+function setHandPath(el, points) {
+let d = '';
+for (let i = 0; i < points.length; i++) {
+d += (i === 0 ? 'M ' : 'L ') +
+(CX + points[i][0]).toFixed(2) + ' ' +
+(CY + points[i][1]).toFixed(2) + ' ';
+}
+el.setAttribute('d', d + 'Z');
+}
+function renderSecondHand() {
+const deg = seconds * 6;
+const rad = (deg - 90) * Math.PI / 180;
+const x2 = SUBCX + SEC_RADIUS * Math.cos(rad);
+const y2 = SUBCY + SEC_RADIUS * Math.sin(rad);
+secondHandEl.setAttribute('x1', SUBCX);
+secondHandEl.setAttribute('y1', SUBCY);
+secondHandEl.setAttribute('x2', x2.toFixed(2));
+secondHandEl.setAttribute('y2', y2.toFixed(2));
+}
 function render() {
 const hourDeg = (hour % 12) * 30 + minute * 0.5, minuteDeg = minute * 6;
-hourHandEl.setAttribute('transform', `rotate(${hourDeg} ${CX} ${CY})`);
-minuteHandEl.setAttribute('transform', `rotate(${minuteDeg} ${CX} ${CY})`);
+setHandPath(hourHandEl,   rotatePoints(HOUR_HAND_POINTS,   hourDeg));
+setHandPath(minuteHandEl, rotatePoints(MINUTE_HAND_POINTS, minuteDeg));
 digital24El.textContent = `${String(hour).padStart(2, '0')}:${String(minute).padStart(2, '0')}`;
 }
+
+// Секундная стрелка: тикает каждую секунду, по достижении 60 — двигает минуты.
+function tickSeconds() {
+seconds = (seconds + 1) % 60;
+if (seconds === 0) {
+totalMinutes = Math.round(totalMinutes) + 1;
+applyTotal();
+render();
+}
+renderSecondHand();
+}
+setInterval(tickSeconds, 1000);
+
 function getPoint(e) {
 if (e.touches && e.touches.length > 0) return { x: e.touches[0].clientX, y: e.touches[0].clientY };
 if (e.changedTouches && e.changedTouches.length > 0) return { x: e.changedTouches[0].clientX, y: e.changedTouches[0].clientY };
@@ -1222,7 +1293,7 @@ clockView.classList.add('dragging');
 } else { gesture.mode = 'other'; }
 }
 if (gesture.mode === 'drag') {
-lastDragTime = Date.now(); // Отмечаем время перетаскивания
+lastDragTime = Date.now();
 if (e.cancelable !== false) { try { e.preventDefault(); } catch (err) { } }
 const ang = angleFromPoint(point);
 if (gesture.pointer === 'minute') {
@@ -1244,7 +1315,6 @@ const duration = Date.now() - gesture.startTime;
 const wasDrag = gesture.mode === 'drag', wasScroll = gesture.mode === 'scroll', wasOther = gesture.mode === 'other';
 if (wasDrag) {
 clockView.classList.remove('dragging');
-// АВТОМАТИЧЕСКОЕ ПРОИГРЫВАНИЕ УБРАНО ОТСЮДА
 } else if (!wasScroll && !wasOther && point && duration >= TAP_MIN_DURATION && duration < TAP_MAX_DURATION) {
 const ddx = Math.abs(point.x - gesture.startX), ddy = Math.abs(point.y - gesture.startY);
 if (ddx < TAP_MAX_MOVE && ddy < TAP_MAX_MOVE) {
@@ -1263,18 +1333,19 @@ clockView.addEventListener('mousedown', e => { if (e.button !== 0) return; start
 window.addEventListener('mousemove', e => { if (!gesture || gesture.source !== 'mouse') return; moveGesture(e, getPoint(e)); });
 window.addEventListener('mouseup', e => { if (!gesture || gesture.source !== 'mouse') return; endGesture(getPoint(e)); });
 
-// НОВОЕ: проигрывание по клику на любой части прямоугольника часов (без анимации и цвета)
-const clockFrame = document.querySelector('.clock-frame');
-if (clockFrame) {
-clockFrame.addEventListener('click', (e) => {
-// Игнорируем клик, если он произошел сразу после перетаскивания
-if (Date.now() - lastDragTime < 300) return;
+// Звук времени проигрывается по нажатию на надпись
+// "СХЕМА АУДИОВИЗУАЛЬНОГО ИЗУЧЕНИЯ ЧАСОВ" (frame-head).
+const frameHead = document.getElementById('frameHead');
+if (frameHead) {
+frameHead.addEventListener('click', (e) => {
+e.preventDefault();
+e.stopPropagation();
 speakTime();
 });
 }
 
 window.clockSpeakCancel = () => { clockAudioPlayer.pause(); clockAudioPlayer.currentTime = 0; };
-render(); setView('watch');
+render(); renderSecondHand(); setView('watch');
 })();
 </script>
 </body>
