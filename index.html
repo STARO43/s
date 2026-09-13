@@ -1473,7 +1473,14 @@ if (frameHead) {
 frameHead.addEventListener('click', (e) => {
 e.preventDefault();
 e.stopPropagation();
+if (isIOS) {
+// На iOS: если shared-плеер ещё не разбужен — сначала разбудить,
+// затем проиграть время. Всё в одном и том же user-gesture.
+if (_sharedAudioWarmed) speakTime();
+else warmUpSharedForIOS(() => speakTime());
+} else {
 speakTime();
+}
 });
 }
 // Десктоп: клик по любой части рамки часов тоже зачитывает время
