@@ -950,7 +950,7 @@ body.is-ios #watchSvgIOS { display: block; }
 <circle cx="200" cy="260" r="147" fill="url(#clkI-dialVignette)"/>
 <g id="clkI-ticksGroup"></g>
 <g id="clkI-numbersGroup"></g>
-<text x="200" y="182" text-anchor="middle" font-family="Georgia, 'Times New Roman', serif" font-size="13" font-weight="700" letter-spacing="3.2" fill="#c9a227" pointer-events="none">ПОБЕДА</text>
+<text x="200" y="168" text-anchor="middle" font-family="Georgia, 'Times New Roman', serif" font-size="13" font-weight="700" letter-spacing="3.2" fill="#c9a227" pointer-events="none">ПОБЕДА</text>
 <g id="clkI-subdial">
 <circle cx="200" cy="355" r="42" fill="#050705"/>
 <circle cx="200" cy="355" r="42" fill="none" stroke="#a8d878" stroke-width="0.5" opacity="0.5"/>
@@ -1142,40 +1142,98 @@ const numbersGroup = activeSvg.querySelector('#' + prefix + '-numbersGroup');
 const subTicksGroup = isIOS ? activeSvg.querySelector('#' + prefix + '-subTicks') : null;
 const digital24El = document.getElementById('clockDigital24');
 
-// Единственный <audio> для воспроизведения времени (общий для платформ).
-const clockAudioPlayer = new Audio();
-clockAudioPlayer.preload = 'auto';
-clockAudioPlayer.setAttribute('playsinline', 'true');
-clockAudioPlayer.setAttribute('webkit-playsinline', 'true');
+// ============ АУДИО ВРЕМЕНИ (Web Audio API) ============
+// Один AudioContext. Буферы декодируются в память, куски играются
+// подряд через AudioBufferSourceNode — без зазора между часами и минутами.
+const AC_CTOR = window.AudioContext || window.webkitAudioContext;
+const audioCtx = AC_CTOR ? new AC_CTOR() : null;
+const audioBuffers = new Map();      // name -> AudioBuffer
+const decodePromises = new Map();    // name -> Promise
+let playSession = 0;                 // токен сессии: новый speakTime() делает старые источники «протухшими»
+let audioUnlocked = false;
 
-// iOS: тот же самый <audio> нужно один раз проиграть внутри user-gesture,
-// иначе Safari блокирует все последующие play() на этом элементе.
-let _sharedAudioWarmed = false;
-function warmUpSharedForIOS(onDone) {
-  if (!isIOS || _sharedAudioWarmed) { if (onDone) onDone(); return; }
-  _sharedAudioWarmed = true;
-  try {
-    clockAudioPlayer.src = AUDIO_DIR + 'h_00.mp3';
-    clockAudioPlayer.volume = 0.001;
-    let finished = false;
-    const finish = (ok) => {
-      if (finished) return;
-      finished = true;
-      try { clockAudioPlayer.pause(); clockAudioPlayer.currentTime = 0; } catch (e) {}
-      clockAudioPlayer.volume = 1;
-      if (!ok) _sharedAudioWarmed = false;
-      if (onDone) onDone();
-    };
-    const p = clockAudioPlayer.play();
-    clockAudioPlayer.addEventListener('playing', () => finish(true), { once: true });
-    setTimeout(() => finish(true), 300);
-    if (p && p.catch) p.catch(() => finish(false));
-  } catch (e) {
-    clockAudioPlayer.volume = 1;
-    _sharedAudioWarmed = false;
-    if (onDone) onDone();
-  }
+function fetchBuffer(name) {
+  if (!audioCtx) return Promise.resolve(null);
+  if (audioBuffers.has(name)) return Promise.resolve(audioBuffers.get(name));
+  if (decodePromises.has(name)) return decodePromises.get(name);
+  const p = fetch(AUDIO_DIR + name)
+    .then(r => r.arrayBuffer())
+    .then(buf => new Promise((resolve, reject) => {
+      audioCtx.decodeAudioData(buf, resolve, reject);
+    }))
+    .then(decoded => {
+      audioBuffers.set(name, decoded);
+      decodePromises.delete(name);
+      return decoded;
+    })
+    .catch(err => {
+      decodePromises.delete(name);
+      console.warn('Не удалось загрузить', name, err);
+      return null;
+    });
+  decodePromises.set(name, p);
+  return p;
 }
+
+function preloadAllClockAudio() {
+  if (!audioCtx) return;
+  for (let h = 1; h <= 12; h++) fetchBuffer(`h_${String(h).padStart(2, '0')}.mp3`);
+  for (let m = 0; m <= 59; m++) fetchBuffer(`m_${String(m).padStart(2, '0')}.mp3`);
+  fetchBuffer('rovno.mp3');
+}
+
+// iOS Safari: AudioContext просыпается только внутри user-gesture.
+function unlockAudioContext() {
+  if (!audioCtx || audioUnlocked) return;
+  try {
+    if (audioCtx.state === 'suspended') audioCtx.resume();
+    audioUnlocked = audioCtx.state === 'running';
+  } catch (e) { /* ignore */ }
+}
+
+// Совместимость с прежним кодом.
+function warmUpSharedForIOS(onDone) {
+  unlockAudioContext();
+  if (onDone) onDone();
+}
+
+function stopClockAudio() {
+  playSession++; // инвалидируем все «хвосты» предыдущего воспроизведения
+}
+
+function speakTime() {
+  if (!audioCtx) return;
+  unlockAudioContext();
+  const myToken = ++playSession;
+  const isStale = () => myToken !== playSession;
+
+  const seq = [`h_${String(hour).padStart(2, '0')}.mp3`];
+  if (minute === 0) seq.push('rovno.mp3');
+  else seq.push(`m_${String(minute).padStart(2, '0')}.mp3`);
+
+  Promise.all(seq.map(fetchBuffer)).then(() => {
+    if (isStale()) return;
+    const playChain = () => {
+      if (isStale()) return;
+      const name = seq.shift();
+      if (!name) return;
+      const buf = audioBuffers.get(name);
+      if (!buf) { playChain(); return; }
+      const src = audioCtx.createBufferSource();
+      src.buffer = buf;
+      src.connect(audioCtx.destination);
+      src.onended = () => {
+        if (isStale()) return;
+        playChain();
+      };
+      src.start(0);
+    };
+    playChain();
+  });
+}
+
+// Прогреваем буферы заранее.
+preloadAllClockAudio();
 
 function buildMinuteScheme() {
 if (!minuteScheme) return;
@@ -1277,44 +1335,6 @@ numbersGroup.appendChild(t);
 let hour = 3, minute = 0, seconds = 0, totalMinutes = (hour % 12) * 60 + minute, currentView = 'watch';
 let lastDragTime = 0;
 
-function stopClockAudio() {
-try { clockAudioPlayer.pause(); clockAudioPlayer.currentTime = 0; } catch (e) { }
-}
-
-// Токен сессии: защищает от того, что старые колбэки (onended/onerror/catch)
-// от предыдущего speakTime() помешают текущему воспроизведению.
-let speakSessionToken = 0;
-
-function speakTime() {
-  const myToken = ++speakSessionToken;
-  stopClockAudio();
-  const queue = [`h_${String(hour).padStart(2, '0')}.mp3`];
-  if (minute === 0) queue.push('rovno.mp3');
-  else queue.push(`m_${String(minute).padStart(2, '0')}.mp3`);
-
-  let idx = 0;
-  const isStale = () => myToken !== speakSessionToken;
-
-  const playNext = () => {
-    if (isStale()) return;
-    if (idx >= queue.length) return;
-    clockAudioPlayer.src = AUDIO_DIR + queue[idx];
-    const p = clockAudioPlayer.play();
-    if (p && p.catch) {
-      p.catch(() => {
-        if (isStale()) return;
-        idx++;
-        setTimeout(() => { if (!isStale()) playNext(); }, 80);
-      });
-    }
-  };
-
-  clockAudioPlayer.onended = () => { if (isStale()) return; idx++; playNext(); };
-  clockAudioPlayer.onerror = () => { if (isStale()) return; idx++; playNext(); };
-
-  playNext();
-}
-
 function setView(view) {
 currentView = view;
 if (view === 'watch') {
@@ -1401,7 +1421,7 @@ return Math.hypot(p.x - cx, p.y - cy) <= GRAB_RADIUS * scale;
 let gesture = null;
 function startGesture(point, source) {
 if (gesture) return;
-if (isIOS) warmUpSharedForIOS();
+unlockAudioContext();
 gesture = { startX: point.x, startY: point.y, startTime: Date.now(), mode: null, pointer: null, angle: 0, source: source };
 }
 function moveGesture(e, point) {
@@ -1443,7 +1463,6 @@ const wasDrag = gesture.mode === 'drag', wasScroll = gesture.mode === 'scroll', 
 if (wasDrag) {
 clockView.classList.remove('dragging');
 // Автоозвучка после перетаскивания — только на десктопе.
-// На iOS перетаскивание не должно озвучиваться, там только кнопка.
 if (!isIOS) {
 lastDragTime = Date.now();
 speakTime();
@@ -1466,24 +1485,18 @@ clockView.addEventListener('mousedown', e => { if (e.button !== 0) return; start
 window.addEventListener('mousemove', e => { if (!gesture || gesture.source !== 'mouse') return; moveGesture(e, getPoint(e)); });
 window.addEventListener('mouseup', e => { if (!gesture || gesture.source !== 'mouse') return; endGesture(getPoint(e)); });
 
-// Кнопка «СХЕМА / АУДИОВИЗУАЛЬНОГО ИЗУЧЕНИЯ ЧАСОВ» — проигрывает время.
-// На iOS это единственный способ, на десктопе — дополнительный.
+// Кнопка «СХЕМА / АУДИОВИЗУАЛЬНОГО ИЗУЧЕНИЯ ЧАСОВ» — читает время.
+// На iOS это единственный способ воспроизведения.
 const frameHead = document.getElementById('frameHead');
 if (frameHead) {
 frameHead.addEventListener('click', (e) => {
 e.preventDefault();
 e.stopPropagation();
-if (isIOS) {
-// На iOS: если shared-плеер ещё не разбужен — сначала разбудить,
-// затем проиграть время. Всё в одном и том же user-gesture.
-if (_sharedAudioWarmed) speakTime();
-else warmUpSharedForIOS(() => speakTime());
-} else {
+unlockAudioContext();
 speakTime();
-}
 });
 }
-// Десктоп: клик по любой части рамки часов тоже зачитывает время
+// Десктоп: клик по любой части рамки часов тоже читает время
 // (с защитой от «клика-хвоста» после перетаскивания стрелок).
 if (!isIOS) {
 const clockFrameEl = document.querySelector('.clock-frame');
@@ -1495,7 +1508,7 @@ speakTime();
 }
 }
 
-window.clockSpeakCancel = () => { clockAudioPlayer.pause(); clockAudioPlayer.currentTime = 0; };
+window.clockSpeakCancel = () => { stopClockAudio(); };
 render(); renderSecondHand(); setView('watch');
 })();
 </script>
