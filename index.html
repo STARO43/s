@@ -614,8 +614,8 @@ pointer-events: none;
 z-index: 0;
 opacity: 0.3;
 }
-.frame-head { border: 2px solid var(--fg); margin-bottom: 18px; background: var(--bg); position: relative; z-index: 1; cursor: pointer; -webkit-tap-highlight-color: transparent; transition: background 0.1s linear; }
-.frame-head:active { background: var(--bg-2); }
+/* Кнопка «СХЕМА / АУДИОВИЗУАЛЬНОГО ИЗУЧЕНИЯ ЧАСОВ» — без анимаций. */
+.frame-head { border: 2px solid var(--fg); margin-bottom: 18px; background: var(--bg); position: relative; z-index: 1; cursor: pointer; -webkit-tap-highlight-color: transparent; }
 .frame-head-top, .frame-head-bot { display: flex; justify-content: space-between; align-items: center; gap: 10px; padding: 6px 10px; font-family: var(--font-doc); font-size: 0.56rem; font-weight: 600; letter-spacing: 0.16em; text-transform: uppercase; color: var(--fg); background: var(--bg-2); }
 .frame-head-top { border-bottom: 1px solid var(--fg); }
 .frame-head-bot { border-top: 1px solid var(--fg); }
@@ -636,7 +636,6 @@ opacity: 0.3;
 
 /* По умолчанию (десктоп) — только классический SVG. iOS-версия скрыта. */
 #watchSvgIOS { display: none; }
-/* На iOS показываем чёрно-золотые часы, классические — скрываем. */
 body.is-ios #watchSvgDesktop { display: none; }
 body.is-ios #watchSvgIOS { display: block; }
 
@@ -821,7 +820,6 @@ body.is-ios #watchSvgIOS { display: block; }
 <stop offset="0" stop-color="#909090"/><stop offset="0.5" stop-color="#d0d0d0"/><stop offset="1" stop-color="#808080"/>
 </linearGradient>
 </defs>
-<!-- Верхний ремешок -->
 <g>
 <path d="M 138 -10 L 262 -10 L 272 105 L 128 105 Z" fill="url(#clkD-strapGrad)"/>
 <path d="M 138 -10 L 148 -10 L 138 105 L 128 105 Z" fill="rgba(0,0,0,0.3)"/>
@@ -830,7 +828,6 @@ body.is-ios #watchSvgIOS { display: block; }
 <line x1="155" y1="-8" x2="146" y2="103" stroke="#c9a070" stroke-width="0.8" stroke-dasharray="3,4" opacity="0.55"/>
 <line x1="245" y1="-8" x2="254" y2="103" stroke="#c9a070" stroke-width="0.8" stroke-dasharray="3,4" opacity="0.55"/>
 </g>
-<!-- Нижний ремешок -->
 <g>
 <path d="M 128 415 L 272 415 L 262 530 L 138 530 Z" fill="url(#clkD-strapGrad)"/>
 <path d="M 128 415 L 138 415 L 148 530 L 138 530 Z" fill="rgba(0,0,0,0.3)"/>
@@ -839,10 +836,8 @@ body.is-ios #watchSvgIOS { display: block; }
 <line x1="146" y1="417" x2="155" y2="528" stroke="#c9a070" stroke-width="0.8" stroke-dasharray="3,4" opacity="0.55"/>
 <line x1="254" y1="417" x2="245" y2="528" stroke="#c9a070" stroke-width="0.8" stroke-dasharray="3,4" opacity="0.55"/>
 </g>
-<!-- Ушки -->
 <rect x="122" y="76" width="156" height="38" rx="13" fill="url(#clkD-caseGrad)"/>
 <rect x="122" y="406" width="156" height="38" rx="13" fill="url(#clkD-caseGrad)"/>
-<!-- Заводная головка -->
 <g id="clkD-crown">
 <rect x="366" y="253" width="6" height="14" fill="url(#clkD-crownStem)" stroke="#505050" stroke-width="0.4"/>
 <rect x="372" y="248" width="22" height="24" rx="3" fill="url(#clkD-crownGrad)" stroke="#404040" stroke-width="0.7"/>
@@ -855,7 +850,6 @@ body.is-ios #watchSvgIOS { display: block; }
 </g>
 <rect x="373" y="249" width="20" height="3" rx="1" fill="#ffffff" opacity="0.5"/>
 </g>
-<!-- Корпус -->
 <circle cx="200" cy="260" r="170" fill="url(#clkD-caseGrad)"/>
 <circle cx="200" cy="260" r="170" fill="url(#clkD-caseShine)"/>
 <circle cx="200" cy="260" r="159" fill="none" stroke="#2a2a2a" stroke-width="1.2" opacity="0.85"/>
@@ -865,7 +859,6 @@ body.is-ios #watchSvgIOS { display: block; }
 <circle cx="200" cy="260" r="154" fill="none" stroke="#a0a0a0" stroke-width="0.4" opacity="0.4"/>
 <circle cx="200" cy="260" r="152" fill="none" stroke="#707070" stroke-width="0.4" opacity="0.4"/>
 <circle cx="200" cy="260" r="151" fill="#1a1a1a"/>
-<!-- Кремовый циферблат -->
 <circle cx="200" cy="260" r="147" fill="url(#clkD-dialGrad)"/>
 <circle cx="200" cy="260" r="147" fill="url(#clkD-dialVignette)"/>
 <g id="clkD-ticksGroup"></g>
@@ -874,7 +867,6 @@ body.is-ios #watchSvgIOS { display: block; }
 <text x="200" y="315" text-anchor="middle" font-family="Georgia, 'Times New Roman', serif" font-size="6.5" font-weight="700" letter-spacing="3" fill="#3a3a3a" pointer-events="none">СДЕЛАНО В СССР</text>
 <circle cx="200" cy="260" r="147" fill="url(#clkD-crystalGrad)" pointer-events="none"/>
 <circle cx="200" cy="260" r="7" fill="url(#clkD-caseGrad)"/>
-<!-- Стрелки (вращаются через transform) -->
 <g id="clkD-hands">
 <g id="clkD-hourHand">
 <path d="M 200 165 L 206 220 L 205 250 L 200 270 L 195 250 L 194 220 Z" fill="url(#clkD-handGrad)"/>
@@ -887,7 +879,7 @@ body.is-ios #watchSvgIOS { display: block; }
 <circle cx="200" cy="260" r="2.5" fill="#1a1a1a"/>
 </svg>
 
-<!-- ==================== iOS: часы «Победа» чёрно-золотые ==================== -->
+<!-- ==================== iOS: чёрно-золотые часы ==================== -->
 <svg id="watchSvgIOS" class="watch-svg" viewBox="-20 0 440 520" xmlns="http://www.w3.org/2000/svg">
 <defs>
 <radialGradient id="clkI-caseGrad" cx="0.35" cy="0.28" r="0.9">
@@ -921,7 +913,6 @@ body.is-ios #watchSvgIOS { display: block; }
 <stop offset="0" stop-color="#909090"/><stop offset="0.5" stop-color="#d0d0d0"/><stop offset="1" stop-color="#808080"/>
 </linearGradient>
 </defs>
-<!-- Верхний ремешок -->
 <g>
 <path d="M 138 -10 L 262 -10 L 272 105 L 128 105 Z" fill="url(#clkI-strapGrad)"/>
 <path d="M 138 -10 L 148 -10 L 138 105 L 128 105 Z" fill="rgba(0,0,0,0.45)"/>
@@ -930,7 +921,6 @@ body.is-ios #watchSvgIOS { display: block; }
 <line x1="155" y1="-8" x2="146" y2="103" stroke="#7a7a7a" stroke-width="0.8" stroke-dasharray="3,4" opacity="0.7"/>
 <line x1="245" y1="-8" x2="254" y2="103" stroke="#7a7a7a" stroke-width="0.8" stroke-dasharray="3,4" opacity="0.7"/>
 </g>
-<!-- Нижний ремешок -->
 <g>
 <path d="M 128 415 L 272 415 L 262 530 L 138 530 Z" fill="url(#clkI-strapGrad)"/>
 <path d="M 128 415 L 138 415 L 148 530 L 138 530 Z" fill="rgba(0,0,0,0.45)"/>
@@ -939,10 +929,8 @@ body.is-ios #watchSvgIOS { display: block; }
 <line x1="146" y1="417" x2="155" y2="528" stroke="#7a7a7a" stroke-width="0.8" stroke-dasharray="3,4" opacity="0.7"/>
 <line x1="254" y1="417" x2="245" y2="528" stroke="#7a7a7a" stroke-width="0.8" stroke-dasharray="3,4" opacity="0.7"/>
 </g>
-<!-- Ушки -->
 <rect x="122" y="76" width="156" height="38" rx="13" fill="url(#clkI-caseGrad)"/>
 <rect x="122" y="406" width="156" height="38" rx="13" fill="url(#clkI-caseGrad)"/>
-<!-- Заводная головка -->
 <g id="clkI-crown">
 <rect x="366" y="253" width="6" height="14" fill="url(#clkI-crownStem)" stroke="#505050" stroke-width="0.4"/>
 <rect x="372" y="248" width="22" height="24" rx="3" fill="url(#clkI-crownGrad)" stroke="#404040" stroke-width="0.7"/>
@@ -955,7 +943,6 @@ body.is-ios #watchSvgIOS { display: block; }
 </g>
 <rect x="373" y="249" width="20" height="3" rx="1" fill="#ffffff" opacity="0.5"/>
 </g>
-<!-- Корпус -->
 <circle cx="200" cy="260" r="170" fill="url(#clkI-caseGrad)"/>
 <circle cx="200" cy="260" r="170" fill="url(#clkI-bezelHighlight)"/>
 <circle cx="200" cy="260" r="159" fill="none" stroke="#2a2a2a" stroke-width="1.2" opacity="0.85"/>
@@ -965,13 +952,11 @@ body.is-ios #watchSvgIOS { display: block; }
 <circle cx="200" cy="260" r="154" fill="none" stroke="#a0a0a0" stroke-width="0.4" opacity="0.4"/>
 <circle cx="200" cy="260" r="152" fill="none" stroke="#707070" stroke-width="0.4" opacity="0.4"/>
 <circle cx="200" cy="260" r="151" fill="#050705"/>
-<!-- Чёрный циферблат -->
 <circle cx="200" cy="260" r="147" fill="url(#clkI-dialGrad)"/>
 <circle cx="200" cy="260" r="147" fill="url(#clkI-dialVignette)"/>
 <g id="clkI-ticksGroup"></g>
 <g id="clkI-numbersGroup"></g>
 <text x="200" y="182" text-anchor="middle" font-family="Georgia, 'Times New Roman', serif" font-size="13" font-weight="700" letter-spacing="3.2" fill="#c9a227" pointer-events="none">ПОБЕДА</text>
-<!-- Малый секундный циферблат (позиция 6 часов) -->
 <g id="clkI-subdial">
 <circle cx="200" cy="355" r="42" fill="#050705"/>
 <circle cx="200" cy="355" r="42" fill="none" stroke="#a8d878" stroke-width="0.5" opacity="0.5"/>
@@ -981,7 +966,6 @@ body.is-ios #watchSvgIOS { display: block; }
 <line id="clkI-secondHand" x1="200" y1="355" x2="200" y2="323" stroke="#c9a227" stroke-width="1.1" stroke-linecap="round"/>
 <circle cx="200" cy="355" r="2" fill="#c9a227"/>
 </g>
-<!-- Стрелки: d пересчитывается в JS во избежание артефактов iOS -->
 <g id="clkI-hands">
 <path id="clkI-hourHand" fill="#c9a227" d="M 200 195 L 204 235 L 205 255 L 205 264 L 195 264 L 195 255 L 196 235 Z"/>
 <path id="clkI-minuteHand" fill="#c9a227" d="M 200 155 L 203 200 L 204 250 L 204 264 L 196 264 L 196 250 L 197 200 Z"/>
@@ -1145,7 +1129,7 @@ let sp = 'newsprint', si = 'kinovar'; try { sp = localStorage.getItem(STORAGE_PA
 const clockView = document.getElementById('clockView'), watchView = document.getElementById('watchView'), schemeView = document.getElementById('schemeView'), minuteScheme = document.getElementById('minuteScheme');
 if (!clockView || !watchView || !schemeView) return;
 
-// Определяем iOS (iPhone/iPad/iPod, включая iPad с MacIntel + touch).
+// Определяем iOS (iPhone/iPad/iPod, включая iPadOS 13+ с MacIntel + touch).
 const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) ||
               (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
 if (isIOS) document.body.classList.add('is-ios');
@@ -1155,7 +1139,6 @@ const SUBCX = 200, SUBCY = 355, SEC_RADIUS = 32;
 const MOVE_THRESHOLD = 5, TAP_MIN_DURATION = 400, TAP_MAX_DURATION = 1200, TAP_MAX_MOVE = 12, GRAB_RADIUS = 220;
 const AUDIO_DIR = 'clock_audio/';
 
-// Выбираем активный SVG и его элементы в зависимости от платформы.
 const activeSvg = document.getElementById(isIOS ? 'watchSvgIOS' : 'watchSvgDesktop');
 const prefix = isIOS ? 'clkI' : 'clkD';
 const hourHandEl   = activeSvg.querySelector('#' + prefix + '-hourHand');
@@ -1230,7 +1213,6 @@ minuteScheme.appendChild(t);
 }
 buildMinuteScheme();
 
-// --- Генерация делений и цифр для активного SVG ---
 const R_IN = 131, R_OUT = 138;
 const tickColor = isIOS ? '#c9a227' : '#1a1a1a';
 const cO = document.createElementNS(NS, 'circle');
@@ -1275,7 +1257,7 @@ l.setAttribute('stroke-linecap', 'round');
 subTicksGroup.appendChild(l);
 }
 }
-const R_NUM = isIOS ? 110 : 110;
+const R_NUM = 110;
 const numColor = isIOS ? '#a8d878' : '#1a1a1a';
 for (let i = 1; i <= 12; i++) {
 if (isIOS && i === 6) continue;
@@ -1337,9 +1319,6 @@ h = ((h % 12) + 12) % 12;
 hour = h === 0 ? 12 : h;
 }
 
-// --- Рендер стрелок ---
-// Для iOS: пересчёт path (d), чтобы избежать артефактов.
-// Для десктопа: transform rotate, как в оригинале.
 const HOUR_HAND_POINTS   = [[0,-65],[4,-25],[5,-5],[5,4],[-5,4],[-5,-5],[-4,-25]];
 const MINUTE_HAND_POINTS = [[0,-105],[3,-60],[4,-10],[4,4],[-4,4],[-4,-10],[-3,-60]];
 function rotatePoints(points, deg) {
@@ -1378,7 +1357,7 @@ minuteHandEl.setAttribute('transform', `rotate(${minuteDeg} ${CX} ${CY})`);
 digital24El.textContent = `${String(hour).padStart(2, '0')}:${String(minute).padStart(2, '0')}`;
 }
 
-// Секундная стрелка: тикает каждую секунду, по достижении 60 — двигает минуты.
+// Секундная стрелка (только на iOS-версии SVG). При 60с — двигает минуту.
 function tickSeconds() {
 seconds = (seconds + 1) % 60;
 if (seconds === 0) {
@@ -1451,6 +1430,11 @@ const duration = Date.now() - gesture.startTime;
 const wasDrag = gesture.mode === 'drag', wasScroll = gesture.mode === 'scroll', wasOther = gesture.mode === 'other';
 if (wasDrag) {
 clockView.classList.remove('dragging');
+// НЕ на iOS: после перетаскивания стрелок автоматически зачитываем время.
+if (!isIOS) {
+lastDragTime = Date.now();
+speakTime();
+}
 } else if (!wasScroll && !wasOther && point && duration >= TAP_MIN_DURATION && duration < TAP_MAX_DURATION) {
 const ddx = Math.abs(point.x - gesture.startX), ddy = Math.abs(point.y - gesture.startY);
 if (ddx < TAP_MAX_MOVE && ddy < TAP_MAX_MOVE) {
@@ -1469,8 +1453,9 @@ clockView.addEventListener('mousedown', e => { if (e.button !== 0) return; start
 window.addEventListener('mousemove', e => { if (!gesture || gesture.source !== 'mouse') return; moveGesture(e, getPoint(e)); });
 window.addEventListener('mouseup', e => { if (!gesture || gesture.source !== 'mouse') return; endGesture(getPoint(e)); });
 
-// Звук времени — по нажатию на надпись "СХЕМА АУДИОВИЗУАЛЬНОГО ИЗУЧЕНИЯ ЧАСОВ".
-if (isIOS) {
+// Кнопка «СХЕМА / АУДИОВИЗУАЛЬНОГО ИЗУЧЕНИЯ ЧАСОВ».
+// На iOS — единственный способ зачитать время.
+// На десктопе — дополнительный способ (вместе с автоозвучкой после перетаскивания).
 const frameHead = document.getElementById('frameHead');
 if (frameHead) {
 frameHead.addEventListener('click', (e) => {
@@ -1479,11 +1464,12 @@ e.stopPropagation();
 speakTime();
 });
 }
-} else {
+// Десктоп: клик по любой части рамки часов тоже зачитывает время
+// (с защитой от «клика» после перетаскивания стрелок).
+if (!isIOS) {
 const clockFrameEl = document.querySelector('.clock-frame');
 if (clockFrameEl) {
 clockFrameEl.addEventListener('click', (e) => {
-// Игнорируем клик, который является завершением перетаскивания стрелок.
 if (Date.now() - lastDragTime < 300) return;
 speakTime();
 });
