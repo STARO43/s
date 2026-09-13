@@ -1470,6 +1470,7 @@ window.addEventListener('mousemove', e => { if (!gesture || gesture.source !== '
 window.addEventListener('mouseup', e => { if (!gesture || gesture.source !== 'mouse') return; endGesture(getPoint(e)); });
 
 // Звук времени — по нажатию на надпись "СХЕМА АУДИОВИЗУАЛЬНОГО ИЗУЧЕНИЯ ЧАСОВ".
+if (isIOS) {
 const frameHead = document.getElementById('frameHead');
 if (frameHead) {
 frameHead.addEventListener('click', (e) => {
@@ -1477,6 +1478,16 @@ e.preventDefault();
 e.stopPropagation();
 speakTime();
 });
+}
+} else {
+const clockFrameEl = document.querySelector('.clock-frame');
+if (clockFrameEl) {
+clockFrameEl.addEventListener('click', (e) => {
+// Игнорируем клик, который является завершением перетаскивания стрелок.
+if (Date.now() - lastDragTime < 300) return;
+speakTime();
+});
+}
 }
 
 window.clockSpeakCancel = () => { clockAudioPlayer.pause(); clockAudioPlayer.currentTime = 0; };
