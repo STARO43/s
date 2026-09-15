@@ -792,7 +792,6 @@ body.is-ios #watchSvgIOS { display: block; }
 .poetry-card:hover .poetry-card-num{color:var(--accent)}
 .poetry-card:hover .poetry-card-arrow{opacity:1;transform:translateX(0);color:var(--accent)}
 
-/* газетный */
 body:not([data-skin="minimal"]) .poetry-list{
   border-top:2px solid var(--fg);
 }
@@ -806,7 +805,6 @@ body:not([data-skin="minimal"]) .poetry-card-title{
   line-height:1.18;
 }
 
-/* минимал */
 body[data-skin="minimal"] .poetry-list{
   padding-top:12px;
 }
@@ -1850,8 +1848,12 @@ body[data-skin="minimal"] .stamp-opt-swatch{border-radius:50%;border-width:1px}
 <button id="randomBtn" data-tooltip="Случайно">⇄</button>
 <button id="hideLearnedBtn" data-tooltip="Скрыть/показать">◐</button>
 <button id="clearLearnedBtn" data-tooltip="Очистить">✕</button>
-<button id="examBtn" data-tooltip="Викторина">?</button>
-<button id="dictationBtn" data-tooltip="Диктант">⌨</button>
+<button id="examBtn" data-tooltip="Викторина">
+  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 21V4a1 1 0 0 1 1-1h11l-2 4h7l-2 4h2l-2 4H8"/><path d="M4 21l4-4"/></svg>
+</button>
+<button id="dictationBtn" data-tooltip="Диктант">
+  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19l7-7 3 3-7 7-3-3z"/><path d="M18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5z"/><path d="M2 2l7.586 7.586"/><circle cx="11" cy="11" r="2"/></svg>
+</button>
 </div>
 <div class="grid-container"><div class="syllable-grid" id="syllableGrid"></div></div>
 </section>
@@ -2125,6 +2127,12 @@ body[data-skin="minimal"] .stamp-opt-swatch{border-radius:50%;border-width:1px}
       <path d="M19.07 4.93a10 10 0 0 1 0 14.14"/>
     </svg>
   </button>
+  <button class="dictation-speaker dictation-next" id="dictationNextBtn" type="button" aria-label="Далее" style="display:none;">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <line x1="5" y1="12" x2="19" y2="12"/>
+      <polyline points="12 5 19 12 12 19"/>
+    </svg>
+  </button>
   <div class="dictation-answer" id="dictationAnswer"></div>
   <div class="dictation-layout-switch" id="dictationLayoutSwitch">
     <button type="button" data-layout="alpha" class="active">Алфавит</button>
@@ -2246,6 +2254,7 @@ function showToast(m, t = 'info') { const toast = document.createElement('div');
 const dictationOverlay = document.getElementById('dictationOverlay');
 const dictationProgress = document.getElementById('dictationProgress');
 const dictationSpeaker = document.getElementById('dictationSpeaker');
+const dictationNextBtn = document.getElementById('dictationNextBtn');
 const dictationAnswer = document.getElementById('dictationAnswer');
 const dictationKeyboard = document.getElementById('dictationKeyboard');
 const dictationExit = document.getElementById('dictationExit');
@@ -2289,6 +2298,8 @@ function showDictationTask() {
   dictationCurrent = dictationQuestions[dictationIndex];
   dictationInput = [];
   dictationProgress.textContent = `Задание ${dictationIndex + 1} из ${dictationQuestions.length}`;
+  dictationNextBtn.style.display = 'none';
+  dictationSpeaker.style.display = 'flex';
   renderDictationAnswer();
   setTimeout(() => playDictationAudio(), 250);
 }
@@ -2359,20 +2370,20 @@ function checkDictationAnswer() {
   if (typed === correct) {
     dictationScore++;
     slots.forEach(slot => slot.classList.add('correct'));
-    setTimeout(() => {
-      dictationIndex++;
-      showDictationTask();
-    }, 950);
   } else {
     slots.forEach(slot => slot.classList.remove('filled'));
     slots.forEach(slot => slot.classList.add('wrong'));
-    // Показать правильный ответ
     slots.forEach((slot, i) => { slot.textContent = correct[i] || ''; });
-    setTimeout(() => {
-      dictationIndex++;
-      showDictationTask();
-    }, 1500);
   }
+  // Показываем кнопку «Далее», скрываем динамик
+  dictationSpeaker.style.display = 'none';
+  dictationNextBtn.style.display = 'flex';
+  dictationNextBtn.focus();
+}
+
+function nextDictationTask() {
+  dictationIndex++;
+  showDictationTask();
 }
 
 function endDictation() {
@@ -2405,6 +2416,7 @@ function exitDictation() {
 if (dictationBtn) dictationBtn.addEventListener('click', startDictation);
 if (dictationExit) dictationExit.addEventListener('click', exitDictation);
 if (dictationSpeaker) dictationSpeaker.addEventListener('click', playDictationAudio);
+if (dictationNextBtn) dictationNextBtn.addEventListener('click', nextDictationTask);
 if (dictationLayoutSwitch) {
   dictationLayoutSwitch.querySelectorAll('button').forEach(btn => {
     btn.addEventListener('click', () => {
@@ -2529,7 +2541,7 @@ const minuteHandEl = activeSvg.querySelector('#' + prefix + '-minuteHand');
 const secondHandEl = isIOS ? activeSvg.querySelector('#' + prefix + '-secondHand') : null;
 const ticksGroup   = activeSvg.querySelector('#' + prefix + '-ticksGroup');
 const numbersGroup = activeSvg.querySelector('#' + prefix + '-numbersGroup');
-const subTicksGroup = isIOS ? activeSvg.querySelector('#' + prefix + '-subTicks') : null;
+const subTicksGroup = isIOS ? activeSvg.querySelector('#clkI-subTicks') : null;
 const digital24El = document.getElementById('clockDigital24');
 
 const AC_CTOR = window.AudioContext || window.webkitAudioContext;
@@ -2996,16 +3008,19 @@ render(); renderSecondHand(); setView('watch');
 /* ============================================================ */
 (function () {
   const videos = [
-    { title: 'Жди меня',                              id: 'dc08664f71952500f4bc0440947fc491' },
-    { title: 'Лермонтов',                             id: 'b634ebd5bfead10073766860d83c5ed9' },
-    { title: 'Письмо Татьяны',                        id: 'b8c412a92afc0422b921253fbe2e0c55' },
-    { title: 'Некрасов',                              id: '8ca305e0e8a8a4eabbdf76a6c9ffd111' },
-    { title: 'Ты меня не любишь',                     id: '099eb1da530d476cc58887631ec26a3b' },
-    { title: 'Глобус',                                id: 'b8b7fe121bba74e8379c5c72f1562d84' },
-    { title: 'Бросай филфак',                         id: '0b6686b4ac680ab139f8b7347ef4fbf6' },
-    { title: 'Спасибо всем, кто нам мешает',          id: '85af9336e91b8bfff7b440bc034c5403' },
-    { title: 'Как всё сложилось',                     id: '8aad257df3edbc8ea9691765455b5f38' },
-    { title: 'Папа',                                  id: '35f3e4547d8fda4788da95386a2d5c22' }
+    { title: 'Сергей Есенин — «Письмо к женщине»',            id: 'dc08664f71952500f4bc0440947fc491' },
+    { title: 'Константин Симонов — «Жди меня»',                 id: 'dc08664f71952500f4bc0440947fc491' },
+    { title: 'Александр Пушкин — «Письмо Татьяны»',            id: 'b8c412a92afc0422b921253fbe2e0c55' },
+    { title: 'Михаил Лермонтов — «К *** (Я не унижусь пред тобою)»', id: 'b634ebd5bfead10073766860d83c5ed9' },
+    { title: 'Николай Некрасов — «Ты всегда хороша несравненно…»', id: '8ca305e0e8a8a4eabbdf76a6c9ffd111' },
+    { title: 'Сергей Есенин — «Ты меня не любишь, не жалеешь...»', id: '099eb1da530d476cc58887631ec26a3b' },
+    { title: 'Светлана Бондарь — «Ночью я чинила глобус»',      id: 'b8b7fe121bba74e8379c5c72f1562d84' },
+    { title: 'Константин Симонов — «Открытое письмо»',         id: '999594c3ae9cf70edefdf7f5de918b1e' },
+    { title: 'Яна Мкр — «Папа, смотри...»',                    id: '35f3e4547d8fda4788da95386a2d5c22' },
+    { title: 'Злата Маркина — «Как всё сложилось?»',            id: '8aad257df3edbc8ea9691765455b5f38' },
+    { title: 'Наталья Дроздова — «Спасибо всем, кто нам мешает»', id: '85af9336e91b8bfff7b440bc034c5403' },
+    { title: 'Андрей Гоголев — «Бросай филфак»',                id: '0b6686b4ac680ab139f8b7347ef4fbf6' },
+    { title: '«Как работал Маяковский» (документальный фильм, 1947)', id: '999594c3ae9cf70edefdf7f5de918b1e' }
   ];
 
   const list  = document.getElementById('poetryList');
@@ -3075,7 +3090,6 @@ render(); renderSecondHand(); setView('watch');
     modal.classList.remove('show');
     modal.setAttribute('aria-hidden', 'true');
     document.body.style.overflow = '';
-    // очищаем iframe после анимации, чтобы не играл в фоне
     setTimeout(() => { frame.src = 'about:blank'; }, 400);
   }
   function closeAndClearHash() {
