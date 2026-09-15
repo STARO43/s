@@ -7,7 +7,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=IBM+Plex+Mono:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=IBM+Plex+Mono:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Inter:wght@300;400;500;600;700&family=PT+Serif:ital,wght@0,400;0,700;1,400;1,700&family=Lora:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,400&display=swap" rel="stylesheet">
 <title>Грамотиньо</title>
 <style>
 * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -84,6 +84,9 @@ body[data-paper="carbon"][data-ink="berlin"] {
 --font-display: 'Oswald', 'Arial Narrow', sans-serif;
 --font-doc:     'IBM Plex Mono', 'Courier New', monospace;
 --font-ui:      'Inter', system-ui, sans-serif;
+--font-serif:   'PT Serif', Georgia, 'Times New Roman', serif;
+--font-serif-display: 'Playfair Display', 'PT Serif', Georgia, serif;
+--font-serif-body:    'Lora', 'PT Serif', Georgia, serif;
 --ease: cubic-bezier(0.16, 1, 0.3, 1);
 --snap: cubic-bezier(0.4, 0, 0.2, 1);
 }
@@ -713,6 +716,548 @@ body.is-ios #watchSvgIOS { display: block; }
 .clock-frame { width: min(480px, 96vw); }
 }
 
+/* ================= PARENTS SECTION ================= */
+.parents-wrapper{max-width:960px;margin:0 auto;padding:32px 20px 100px;width:100%}
+.parents-toolbar{display:flex;justify-content:flex-end;margin-bottom:24px}
+.parents-publish-btn{
+  display:inline-flex;align-items:center;gap:10px;
+  background:var(--bg);border:2px solid var(--fg);color:var(--fg);
+  padding:14px 22px;font-family:var(--font-display);font-weight:600;
+  font-size:.8rem;letter-spacing:.14em;text-transform:uppercase;
+  cursor:pointer;transition:all .1s linear;
+}
+.parents-publish-btn:hover{background:var(--fg);color:var(--bg);transform:translate(-3px,-3px);box-shadow:6px 6px 0 var(--accent)}
+.parents-publish-btn span{font-size:1rem}
+
+.parents-list{
+  display:flex;flex-direction:column;
+  border-top:2px solid var(--fg);
+}
+.parents-empty{
+  padding:60px 20px;text-align:center;
+  font-family:var(--font-doc);font-size:.72rem;
+  letter-spacing:.16em;text-transform:uppercase;color:var(--fg-3);
+  border-bottom:2px solid var(--fg);
+}
+.parents-card{
+  display:flex;align-items:center;gap:16px;
+  padding:22px 6px;
+  border-bottom:1px solid var(--rule-soft);
+  cursor:pointer;
+  transition:padding .15s ease, background .15s ease;
+  background:transparent;
+}
+.parents-card:hover{background:var(--bg-2);padding-left:16px;padding-right:0}
+.parents-card-title{
+  font-family:var(--font-serif);
+  font-weight:400;
+  font-size:clamp(1.1rem, 2.4vw, 1.4rem);
+  line-height:1.3;
+  color:var(--fg);
+  letter-spacing:0;
+  text-transform:none;
+  flex:1;
+  min-width:0;
+  overflow-wrap:anywhere;
+}
+.parents-card-arrow{
+  flex-shrink:0;
+  font-family:var(--font-ui);
+  font-size:1.1rem;
+  color:var(--fg-3);
+  transition:transform .15s ease, color .15s ease;
+}
+.parents-card:hover .parents-card-arrow{color:var(--accent);transform:translateX(4px)}
+.parents-card-actions{display:flex;gap:8px;flex-shrink:0}
+.parents-card-actions button{
+  background:transparent;border:1.5px solid var(--fg);color:var(--fg);
+  padding:5px 9px;font-family:var(--font-doc);font-size:.55rem;font-weight:700;
+  letter-spacing:.14em;text-transform:uppercase;cursor:pointer;transition:all .1s linear;
+}
+.parents-card-actions button:hover{background:var(--fg);color:var(--bg)}
+.parents-card-actions button.danger{border-color:var(--accent);color:var(--accent)}
+.parents-card-actions button.danger:hover{background:var(--accent);color:var(--accent-fg)}
+
+/* ---------- модалки auth/editor ---------- */
+.parents-modal{
+  position:fixed;inset:0;background:rgba(20,20,20,.55);z-index:4500;
+  display:none;align-items:center;justify-content:center;padding:20px;
+  animation:tabIn .18s var(--snap);
+}
+.parents-modal.show{display:flex}
+.parents-modal-box{
+  background:var(--bg);border:3px solid var(--fg);box-shadow:10px 10px 0 var(--accent);
+  width:min(480px,100%);max-height:92vh;display:flex;flex-direction:column;overflow:hidden;
+}
+.parents-modal-wide .parents-modal-box{width:min(760px,100%)}
+.parents-modal-head{
+  display:flex;justify-content:space-between;align-items:center;
+  padding:12px 16px;background:var(--fg);color:var(--bg);
+  font-family:var(--font-doc);font-size:.66rem;font-weight:700;
+  letter-spacing:.2em;text-transform:uppercase;gap:12px;
+}
+.parents-modal-close{
+  background:transparent;border:none;color:inherit;font-size:1.6rem;line-height:1;
+  cursor:pointer;padding:0 4px;transition:color .1s linear;font-family:var(--font-ui);
+}
+.parents-modal-close:hover{color:var(--accent)}
+.parents-modal-body{padding:22px 20px;overflow-y:auto;display:flex;flex-direction:column}
+.parents-field-label{font-family:var(--font-doc);font-size:.62rem;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:var(--fg-2);margin-bottom:8px}
+.parents-input,.parents-textarea{
+  width:100%;background:var(--bg-2);border:2px solid var(--fg);color:var(--fg);
+  padding:12px 14px;font-family:var(--font-ui);font-size:.95rem;
+  outline:none;transition:border-color .1s linear,background .1s linear;
+}
+.parents-input:focus,.parents-textarea:focus{border-color:var(--accent);background:var(--bg)}
+.parents-textarea{font-family:var(--font-doc);font-size:.86rem;line-height:1.55;resize:vertical;min-height:320px}
+.parents-hint{font-family:var(--font-doc);font-size:.58rem;color:var(--fg-3);letter-spacing:.08em;margin-top:6px}
+.parents-modal-actions{display:flex;justify-content:flex-end;gap:10px;margin-top:20px;flex-wrap:wrap}
+.parents-btn-primary,.parents-btn-secondary,.parents-btn-danger{
+  padding:12px 22px;font-family:var(--font-display);font-weight:600;font-size:.75rem;
+  letter-spacing:.14em;text-transform:uppercase;cursor:pointer;transition:all .1s linear;
+  border:2px solid var(--fg);
+}
+.parents-btn-primary{background:var(--fg);color:var(--bg)}
+.parents-btn-primary:hover{background:var(--accent);border-color:var(--accent);color:var(--accent-fg)}
+.parents-btn-secondary{background:var(--bg);color:var(--fg)}
+.parents-btn-secondary:hover{background:var(--bg-2)}
+.parents-btn-danger{background:var(--bg);color:var(--accent);border-color:var(--accent)}
+.parents-btn-danger:hover{background:var(--accent);color:var(--accent-fg)}
+.parents-auth-shake{animation:parentsShake .35s}
+@keyframes parentsShake{0%,100%{transform:translateX(0)}20%,60%{transform:translateX(-6px)}40%,80%{transform:translateX(6px)}}
+
+/* ============================================================= */
+/* ============ PARENTS READER — FULLSCREEN OVERLAY ============= */
+/* ============================================================= */
+.parents-reader-overlay{
+  position:fixed;
+  inset:0;
+  z-index:4600;
+  background:rgba(10,10,10,.5);
+  backdrop-filter:blur(10px) saturate(115%);
+  -webkit-backdrop-filter:blur(10px) saturate(115%);
+  opacity:0;
+  visibility:hidden;
+  transition:opacity .35s ease, visibility 0s linear .35s;
+  overflow:hidden;
+}
+.parents-reader-overlay.show{
+  opacity:1;
+  visibility:visible;
+  transition:opacity .35s ease, visibility 0s linear 0s;
+}
+
+.parents-reader-surface{
+  position:absolute;
+  inset:0;
+  overflow-y:auto;
+  overflow-x:hidden;
+  padding:clamp(20px,3.5vh,56px) clamp(14px,3vw,48px) clamp(60px,10vh,120px);
+  display:flex;
+  justify-content:center;
+  align-items:flex-start;
+  scrollbar-width:none;
+  -ms-overflow-style:none;
+  overscroll-behavior:contain;
+  -webkit-overflow-scrolling:touch;
+}
+.parents-reader-surface::-webkit-scrollbar{display:none;width:0;height:0}
+
+.parents-reader-sheet{
+  position:relative;
+  width:100%;
+  max-width:760px;
+  margin:0 auto;
+  background:var(--bg);
+  color:var(--fg);
+  padding:clamp(36px,6vw,80px) clamp(24px,6.5vw,80px) clamp(44px,7vw,88px);
+  transform:translateY(40px) scale(.965);
+  opacity:0;
+  transition:transform .45s cubic-bezier(.4,0,.2,1), opacity .35s ease;
+  will-change:transform, opacity;
+  box-shadow:
+    0 1px 0 rgba(255,255,255,.55) inset,
+    0 44px 100px -32px rgba(0,0,0,.42),
+    0 12px 34px -12px rgba(0,0,0,.28);
+}
+.parents-reader-overlay.show .parents-reader-sheet{
+  transform:translateY(0) scale(1);
+  opacity:1;
+  transition:transform .58s cubic-bezier(.16,1,.3,1), opacity .42s ease;
+}
+
+/* крестик */
+.parents-reader-close{
+  position:fixed;
+  top:clamp(14px,2.2vw,26px);
+  right:clamp(14px,2.2vw,26px);
+  z-index:5;
+  width:clamp(44px,5vw,52px);
+  height:clamp(44px,5vw,52px);
+  border-radius:50%;
+  border:none;
+  background:rgba(255,255,255,.94);
+  color:#101010;
+  font-family:var(--font-ui);
+  font-size:1.65rem;
+  font-weight:300;
+  line-height:1;
+  cursor:pointer;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:0 0 4px;
+  box-shadow:
+    0 8px 26px rgba(0,0,0,.3),
+    0 1px 0 rgba(255,255,255,.6) inset;
+  backdrop-filter:blur(8px) saturate(140%);
+  -webkit-backdrop-filter:blur(8px) saturate(140%);
+  -webkit-tap-highlight-color:transparent;
+  opacity:0;
+  transform:scale(.6) rotate(-90deg);
+  transition:
+    opacity .3s ease .1s,
+    transform .5s cubic-bezier(.16,1,.3,1) .1s,
+    background .18s ease,
+    color .18s ease,
+    box-shadow .18s ease;
+}
+.parents-reader-overlay.show .parents-reader-close{
+  opacity:1;
+  transform:scale(1) rotate(0deg);
+  transition:
+    opacity .3s ease .12s,
+    transform .55s cubic-bezier(.16,1,.3,1) .12s,
+    background .18s ease,
+    color .18s ease,
+    box-shadow .18s ease;
+}
+.parents-reader-close:hover{
+  background:#ffffff;
+  color:#000;
+  box-shadow:
+    0 10px 32px rgba(0,0,0,.38),
+    0 1px 0 rgba(255,255,255,.7) inset;
+  transform:scale(1.08) rotate(0deg);
+}
+.parents-reader-close:active{transform:scale(.94) rotate(0deg)}
+
+/* ============== ТИПОГРАФИКА СТАТЬИ ============== */
+.parents-reader-title{
+  font-family:var(--font-serif-display);
+  font-weight:700;
+  font-size:clamp(1.9rem,5.4vw,3.2rem);
+  line-height:1.14;
+  letter-spacing:-.012em;
+  margin:0 0 .75em;
+  color:var(--fg);
+  padding-bottom:.55em;
+  border-bottom:1px solid var(--rule-soft);
+  font-feature-settings:"kern" 1,"liga" 1;
+}
+.parents-reader-content{
+  font-family:var(--font-serif-body);
+  font-size:clamp(1.15rem,1.55vw,1.35rem);
+  line-height:1.75;
+  color:var(--fg);
+  font-weight:400;
+  letter-spacing:.003em;
+  text-rendering:optimizeLegibility;
+  font-feature-settings:"liga" 1,"kern" 1;
+  hyphens:auto;
+  -webkit-hyphens:auto;
+  overflow-wrap:break-word;
+}
+.parents-reader-content p{
+  margin:0 0 1.25em;
+}
+.parents-reader-content p:last-child{
+  margin-bottom:0;
+}
+
+.parents-reader-content h1,
+.parents-reader-content h2,
+.parents-reader-content h3,
+.parents-reader-content h4,
+.parents-reader-content h5,
+.parents-reader-content h6{
+  font-family:var(--font-serif-display);
+  font-weight:700;
+  line-height:1.2;
+  letter-spacing:-.008em;
+  margin-top:1.7em;
+  margin-bottom:.55em;
+  color:var(--fg);
+}
+.parents-reader-content h1{font-size:1.9em}
+.parents-reader-content h2{font-size:1.5em}
+.parents-reader-content h3{font-size:1.25em}
+.parents-reader-content h4{font-size:1.1em}
+.parents-reader-content h5,
+.parents-reader-content h6{
+  font-family:var(--font-ui);
+  font-size:.95em;
+  font-weight:600;
+  letter-spacing:.08em;
+  text-transform:uppercase;
+  color:var(--fg-2);
+}
+.parents-reader-content strong{font-weight:700;color:var(--fg)}
+.parents-reader-content em{font-style:italic}
+
+.parents-reader-content a{
+  color:var(--accent);
+  text-decoration:underline;
+  text-decoration-thickness:1px;
+  text-underline-offset:3px;
+  text-decoration-color:color-mix(in srgb, var(--accent) 45%, transparent);
+  transition:text-decoration-color .15s ease;
+}
+.parents-reader-content a:hover{
+  text-decoration-color:var(--accent);
+}
+
+.parents-reader-content ul,
+.parents-reader-content ol{
+  padding-left:1.35em;
+  margin:0 0 1.25em;
+}
+.parents-reader-content ul:last-child,
+.parents-reader-content ol:last-child{
+  margin-bottom:0;
+}
+.parents-reader-content li{
+  margin:.42em 0;
+  padding-left:.15em;
+}
+.parents-reader-content li::marker{
+  color:var(--accent);
+}
+
+.parents-reader-content blockquote{
+  margin:1.6em 0;
+  padding:.15em 0 .15em 1.5em;
+  border-left:3px solid var(--accent);
+  font-style:italic;
+  color:var(--fg-2);
+  font-size:1.03em;
+}
+
+.parents-reader-content code{
+  font-family:var(--font-doc);
+  font-size:.84em;
+  background:var(--bg-2);
+  padding:.1em .42em;
+  border-radius:3px;
+  color:var(--fg);
+  white-space:nowrap;
+}
+.parents-reader-content pre{
+  font-family:var(--font-doc);
+  font-size:.82em;
+  line-height:1.55;
+  background:var(--bg-2);
+  border:1px solid var(--rule-soft);
+  border-radius:6px;
+  padding:1.15em 1.35em;
+  overflow-x:auto;
+  margin:1.5em 0;
+  -webkit-overflow-scrolling:touch;
+}
+.parents-reader-content pre::-webkit-scrollbar{height:6px}
+.parents-reader-content pre::-webkit-scrollbar-thumb{background:var(--rule-soft);border-radius:3px}
+.parents-reader-content pre code{
+  background:transparent;
+  padding:0;
+  border-radius:0;
+  font-size:1em;
+  white-space:pre;
+}
+
+.parents-reader-content hr{
+  border:none;
+  height:1px;
+  background:var(--rule-soft);
+  margin:2.4em auto;
+  width:50%;
+}
+
+.parents-reader-content img{
+  max-width:100%;
+  height:auto;
+  display:block;
+  margin:1.5em auto;
+  border-radius:4px;
+}
+
+/* drop cap только для «газетного» режима */
+body:not([data-skin="minimal"]) .parents-reader-content > p:first-of-type::first-letter{
+  font-family:var(--font-serif-display);
+  font-weight:700;
+  float:left;
+  font-size:3.7em;
+  line-height:.82;
+  margin:.05em .12em .02em 0;
+  color:var(--accent);
+}
+
+/* футер с действиями — внутри листа */
+.parents-reader-actions{
+  display:flex;
+  justify-content:flex-end;
+  gap:12px;
+  margin-top:clamp(40px,6vh,72px);
+  padding-top:24px;
+  border-top:1px solid var(--rule-soft);
+  flex-wrap:wrap;
+}
+
+/* ================= NEWSPAPER (default) ТЮНИНГ ================= */
+body:not([data-skin="minimal"]) .parents-reader-sheet{
+  border-radius:0;
+}
+body:not([data-skin="minimal"]) .parents-reader-overlay{
+  background:rgba(15,12,8,.55);
+}
+
+/* ================= MINIMAL СКИН ================= */
+body[data-skin="minimal"] .parents-reader-overlay{
+  background:rgba(20,20,20,.32);
+  backdrop-filter:blur(14px) saturate(130%);
+  -webkit-backdrop-filter:blur(14px) saturate(130%);
+}
+body[data-skin="minimal"][data-mintone="dark"] .parents-reader-overlay{
+  background:rgba(0,0,0,.6);
+}
+body[data-skin="minimal"] .parents-reader-sheet{
+  border-radius:22px;
+  box-shadow:
+    0 40px 100px -30px rgba(0,0,0,.28),
+    0 12px 40px -14px rgba(0,0,0,.15),
+    0 1px 0 rgba(255,255,255,.5) inset;
+}
+body[data-skin="minimal"][data-mintone="dark"] .parents-reader-sheet{
+  box-shadow:
+    0 40px 100px -30px rgba(0,0,0,.6),
+    0 12px 40px -14px rgba(0,0,0,.4),
+    0 1px 0 rgba(255,255,255,.05) inset;
+}
+body[data-skin="minimal"] .parents-reader-title{
+  font-family:var(--font-ui);
+  font-weight:300;
+  font-size:clamp(1.7rem,4.6vw,2.75rem);
+  letter-spacing:-.005em;
+  border-bottom:none;
+  padding-bottom:0;
+  margin-bottom:.6em;
+}
+body[data-skin="minimal"] .parents-reader-content h1,
+body[data-skin="minimal"] .parents-reader-content h2,
+body[data-skin="minimal"] .parents-reader-content h3,
+body[data-skin="minimal"] .parents-reader-content h4,
+body[data-skin="minimal"] .parents-reader-content h5,
+body[data-skin="minimal"] .parents-reader-content h6{
+  font-family:var(--font-ui);
+  font-weight:500;
+  letter-spacing:-.005em;
+  text-transform:none;
+}
+body[data-skin="minimal"] .parents-reader-close{
+  background:#101010;
+  color:#ffffff;
+  box-shadow:
+    0 10px 30px rgba(0,0,0,.28),
+    0 1px 0 rgba(255,255,255,.1) inset;
+}
+body[data-skin="minimal"] .parents-reader-close:hover{
+  background:#000;
+  color:#fff;
+}
+body[data-skin="minimal"][data-mintone="dark"] .parents-reader-close{
+  background:#ededeb;
+  color:#0d0d0e;
+}
+body[data-skin="minimal"][data-mintone="dark"] .parents-reader-close:hover{
+  background:#fff;
+  color:#000;
+}
+body[data-skin="minimal"] .parents-reader-actions{
+  border-top:1px solid var(--m-line);
+}
+body[data-skin="minimal"] .parents-btn-primary,
+body[data-skin="minimal"] .parents-btn-secondary,
+body[data-skin="minimal"] .parents-btn-danger{
+  border-radius:999px;font-family:var(--font-ui);font-weight:500;font-size:.68rem;
+  letter-spacing:.22em;
+}
+body[data-skin="minimal"] .parents-btn-primary{background:var(--accent);border-color:var(--accent);color:var(--accent-fg)}
+body[data-skin="minimal"] .parents-btn-primary:hover{opacity:.85;background:var(--accent);color:var(--accent-fg)}
+body[data-skin="minimal"] .parents-btn-secondary{border-color:var(--m-line-strong);background:transparent}
+body[data-skin="minimal"] .parents-btn-secondary:hover{background:var(--bg-2)}
+
+/* минимал-скин для остального списка */
+body[data-skin="minimal"] .parents-publish-btn{
+  border:1px solid var(--m-line-strong);font-family:var(--font-ui);font-weight:500;
+  font-size:.68rem;letter-spacing:.24em;border-radius:999px;padding:12px 24px;
+}
+body[data-skin="minimal"] .parents-publish-btn:hover{
+  background:transparent;color:var(--accent);border-color:var(--accent);
+  transform:none;box-shadow:none;
+}
+body[data-skin="minimal"] .parents-list{border-top:1px solid var(--m-line)}
+body[data-skin="minimal"] .parents-empty{border-bottom:1px solid var(--m-line)}
+body[data-skin="minimal"] .parents-card{
+  padding:24px 0;border-bottom:1px solid var(--m-line);background:transparent;border-radius:0;
+}
+body[data-skin="minimal"] .parents-card:hover{background:transparent;padding-left:12px;padding-right:0}
+body[data-skin="minimal"] .parents-card-title{
+  font-family:var(--font-ui);
+  font-weight:400;
+  font-size:clamp(1rem,2.2vw,1.25rem);
+}
+body[data-skin="minimal"] .parents-card-actions button{
+  border:1px solid var(--m-line-strong);border-radius:999px;font-family:var(--font-ui);
+  font-weight:500;letter-spacing:.18em;
+}
+body[data-skin="minimal"] .parents-modal-box{
+  border:1px solid var(--m-line-strong);border-radius:14px;box-shadow:none;
+}
+body[data-skin="minimal"] .parents-modal-head{
+  background:transparent;color:var(--fg-3);border-bottom:1px solid var(--m-line);
+  font-weight:500;letter-spacing:.28em;
+}
+body[data-skin="minimal"] .parents-input,
+body[data-skin="minimal"] .parents-textarea{
+  border:1px solid var(--m-line-strong);border-radius:10px;background:var(--bg);
+}
+body[data-skin="minimal"] .parents-input:focus,
+body[data-skin="minimal"] .parents-textarea:focus{border-color:var(--accent);background:var(--bg)}
+
+@media (max-width:640px){
+  .parents-wrapper{padding:20px 14px 80px}
+  .parents-toolbar{justify-content:stretch}
+  .parents-publish-btn{width:100%;justify-content:center}
+  .parents-card{padding:18px 4px;gap:10px}
+  .parents-card:hover{padding-left:8px}
+  .parents-card-actions button{padding:4px 7px;font-size:.5rem}
+  .parents-modal{padding:10px}
+  .parents-modal-box{box-shadow:6px 6px 0 var(--accent);max-height:96vh}
+  .parents-textarea{min-height:240px}
+  .parents-modal-actions{flex-direction:column-reverse}
+  .parents-modal-actions button{width:100%}
+  .parents-reader-surface{padding:64px 12px 60px}
+  .parents-reader-sheet{padding:28px 20px 36px;border-radius:16px}
+  body:not([data-skin="minimal"]) .parents-reader-sheet{border-radius:0}
+  .parents-reader-close{top:12px;right:12px;width:44px;height:44px;font-size:1.4rem}
+  .parents-reader-title{font-size:1.55rem}
+  .parents-reader-content{font-size:1.12rem;line-height:1.7}
+  .parents-reader-actions{flex-direction:column;gap:8px}
+  .parents-reader-actions button{width:100%}
+  body:not([data-skin="minimal"]) .parents-reader-content > p:first-of-type::first-letter{
+    font-size:3em;
+  }
+}
+
 /* ================= MINIMAL SKIN ================= */
 body[data-skin="minimal"]{
   --m-bg:#fafaf9; --m-bg-2:#f2f2f0; --m-bg-3:#e9e9e6;
@@ -729,7 +1274,6 @@ body[data-skin="minimal"][data-mintone="dark"]{
   --m-line:rgba(237,237,235,.10); --m-line-strong:rgba(237,237,235,.24);
   --m-ok:#4ade80; --accent-fg:#0d0d0e;
 }
-/* акценты «краски» в минимале */
 body[data-skin="minimal"][data-ink="kinovar"]     {--accent:#e30613}
 body[data-skin="minimal"][data-ink="ultramarine"] {--accent:#2447b8}
 body[data-skin="minimal"][data-ink="berlin"]      {--accent:#12507e}
@@ -750,7 +1294,6 @@ body[data-skin="minimal"][data-mintone="dark"][data-ink="cadmium"]     {--accent
 body[data-skin="minimal"]::before{display:none}
 body[data-skin="minimal"] .header{padding:20px 22px 0}
 
-/* --- шапка --- */
 body[data-skin="minimal"] .header-masthead{
   border-bottom:1px solid var(--m-line); padding:14px 0; margin-bottom:0;
   font-size:.56rem; font-weight:500; letter-spacing:.22em; color:var(--fg-3);
@@ -770,7 +1313,6 @@ body[data-skin="minimal"] .header h1{
 }
 body[data-skin="minimal"] .header h1::after{color:var(--accent)}
 
-/* --- табы --- */
 body[data-skin="minimal"] .section-switch{border-top:1px solid var(--m-line);border-bottom:1px solid var(--m-line)}
 body[data-skin="minimal"] .section-switch-btn{
   border-right:1px solid var(--m-line); padding:24px 10px;
@@ -793,7 +1335,6 @@ body[data-skin="minimal"] .section-cycle-btn{
 }
 body[data-skin="minimal"] .section-cycle-btn:active{background:var(--bg-2);color:var(--accent)}
 
-/* --- контролы --- */
 body[data-skin="minimal"] .controls{gap:10px;padding:36px 20px 30px}
 body[data-skin="minimal"] .controls button{
   width:44px;height:44px;margin-left:0;border-radius:50%;
@@ -805,7 +1346,6 @@ body[data-skin="minimal"] .controls button.active{background:transparent;border-
 body[data-skin="minimal"] .controls button.active:hover{background:transparent;color:var(--accent)}
 body[data-skin="minimal"] .controls button::after{background:var(--fg);color:var(--bg);border-radius:4px;font-weight:500}
 
-/* --- сетка слогов --- */
 body[data-skin="minimal"] .grid-container{padding:0 20px 110px}
 body[data-skin="minimal"] .syllable-grid{border-top:1px solid var(--m-line);border-left:1px solid var(--m-line)}
 body[data-skin="minimal"] .syllable-card{
@@ -821,7 +1361,6 @@ body[data-skin="minimal"] .learn-dot{width:12px;height:12px;top:10px;right:10px;
 body[data-skin="minimal"] .syllable-card:not(.learned):hover .learn-dot{border-color:var(--fg)}
 body[data-skin="minimal"] .syllable-card.learned .learn-dot{background:var(--accent);border-color:var(--accent)}
 
-/* --- прогресс / вверх --- */
 body[data-skin="minimal"] .progress-container{background:var(--bg);color:var(--fg);border-top:1px solid var(--m-line);padding:16px 24px 20px}
 body[data-skin="minimal"] .progress-label{color:var(--fg-3);font-weight:500;letter-spacing:.24em}
 body[data-skin="minimal"] .progress-bar{height:2px;background:var(--m-line)}
@@ -832,7 +1371,6 @@ body[data-skin="minimal"] .scroll-top-btn{
 }
 body[data-skin="minimal"] .scroll-top-btn:hover{background:var(--bg-2);color:var(--fg);transform:none;box-shadow:none}
 
-/* --- экзамен --- */
 body[data-skin="minimal"] .exam-overlay{background:var(--bg)}
 body[data-skin="minimal"] .exam-question{color:var(--fg-3);font-weight:500;letter-spacing:.28em}
 body[data-skin="minimal"] .exam-repeat-btn,
@@ -849,7 +1387,6 @@ body[data-skin="minimal"] .exam-option.correct{background:transparent;border-col
 body[data-skin="minimal"] .exam-option.wrong{background:transparent;border-color:var(--accent);color:var(--accent)}
 body[data-skin="minimal"] .exam-result{font-size:1.8rem;color:var(--fg-2)}
 
-/* --- поздравление / тост --- */
 body[data-skin="minimal"] .celebration-box{background:var(--bg);border:1px solid var(--m-line-strong);border-radius:16px;box-shadow:none;padding:28px}
 body[data-skin="minimal"] .celebration-box h2{font-family:var(--font-ui);font-weight:300;font-size:1.4rem;letter-spacing:.16em}
 body[data-skin="minimal"] .celebration-box img{border:1px solid var(--m-line);border-radius:8px}
@@ -861,7 +1398,6 @@ body[data-skin="minimal"] .celebration-close:hover{background:var(--accent);bord
 body[data-skin="minimal"] .toast{background:var(--fg);color:var(--bg);border-radius:999px;padding:11px 22px;font-weight:500;letter-spacing:.22em;font-size:.62rem}
 body[data-skin="minimal"] .footer{border-top:1px solid var(--m-line);color:var(--fg-3);font-weight:500;letter-spacing:.28em;font-size:.58rem;padding:30px 20px}
 
-/* --- герои --- */
 body[data-skin="minimal"] .heroes-timeline{padding:44px 0 90px}
 body[data-skin="minimal"] .century-header{
   background:transparent;color:var(--fg-3);text-align:left;
@@ -896,7 +1432,6 @@ body[data-skin="minimal"] .hero-modal-years{font-weight:400;font-size:.78rem;let
 body[data-skin="minimal"] .hero-nav{border:1px solid var(--m-line-strong);border-radius:50%;background:var(--bg);color:var(--fg-2)}
 body[data-skin="minimal"] .hero-nav:hover{background:var(--bg-2);color:var(--fg)}
 
-/* --- таймлайн --- */
 body[data-skin="minimal"] .htl-panel{border:1px solid var(--m-line);border-radius:12px;overflow:hidden}
 body[data-skin="minimal"] .htl-head{border-bottom:1px solid var(--m-line);background:transparent}
 body[data-skin="minimal"] .htl-head-cell:last-child{border-left:1px solid var(--m-line)}
@@ -912,7 +1447,6 @@ body[data-skin="minimal"] .htl-war-year,
 body[data-skin="minimal"] .htl-other-year{color:var(--accent);font-weight:500}
 body[data-skin="minimal"] .htl-cnum{font-family:var(--font-ui);font-weight:300;font-size:1rem;letter-spacing:.06em;color:var(--fg-3)}
 
-/* --- часы --- */
 body[data-skin="minimal"] .clock-wrapper{padding:40px 0 100px}
 body[data-skin="minimal"] .clock-frame{border:none;box-shadow:none;background:transparent;padding:0;width:min(520px,92vw)}
 body[data-skin="minimal"] .clock-frame::before{display:none}
@@ -927,7 +1461,6 @@ body[data-skin="minimal"] #watchSvgDesktop,
 body[data-skin="minimal"] #watchSvgIOS{display:none}
 #watchSvgMinimal #clkM-secondHand{stroke:var(--accent)}
 
-/* --- штамп выбора --- */
 body[data-skin="minimal"] .masthead-stamp{border:1px solid var(--m-line-strong);border-radius:12px;box-shadow:none;background:var(--bg);overflow:hidden}
 body[data-skin="minimal"] .stamp-head{background:transparent;border-bottom:1px solid var(--m-line);font-weight:500;letter-spacing:.26em;font-size:.52rem;color:var(--fg-3)}
 body[data-skin="minimal"] .stamp-opt{font-family:var(--font-ui);font-weight:400;font-size:.72rem;letter-spacing:.08em;border-radius:8px;border:1px solid transparent;color:var(--fg-2)}
@@ -962,6 +1495,7 @@ body[data-skin="minimal"] .stamp-opt-swatch{border-radius:50%;border-width:1px}
 <button class="section-switch-btn active" data-section="syllables">УЧИ СЛОГИ</button>
 <button class="section-switch-btn" data-section="clock">ЗНАЙ ВРЕМЯ</button>
 <button class="section-switch-btn" data-section="heroes">ЧТИ ВЕЛИКИХ</button>
+<button class="section-switch-btn" data-section="parents">РОДИТЕЛЯМ</button>
 </div>
 <button class="section-cycle-btn" id="sectionCycleBtn" type="button">
 <span class="section-cycle-label">УЧИ СЛОГИ</span>
@@ -971,6 +1505,7 @@ body[data-skin="minimal"] .stamp-opt-swatch{border-radius:50%;border-width:1px}
 <div class="section-subtitle active" data-section="syllables">ЖМИ · СЛУШАЙ · ЗАПОМИНАЙ</div>
 <div class="section-subtitle" data-section="clock"><span class="digital-clock-inline" id="clockDigital24">03:00</span></div>
 <div class="section-subtitle" data-section="heroes">ВЕЛИКИЕ ЛИЧНОСТИ ОТЕЧЕСТВА</div>
+<div class="section-subtitle" data-section="parents">СТАТЬИ И МАТЕРИАЛЫ ДЛЯ РОДИТЕЛЕЙ</div>
 </div>
 </header>
 <div class="masthead-stamp" id="mastheadStamp" role="dialog" aria-hidden="true">
@@ -1223,7 +1758,73 @@ body[data-skin="minimal"] .stamp-opt-swatch{border-radius:50%;border-width:1px}
 <section id="heroesSection" class="tab-section">
 <div class="heroes-timeline" id="heroesTimeline"></div>
 </section>
+
+<section id="parentsSection" class="tab-section">
+<div class="parents-wrapper">
+  <div class="parents-toolbar">
+    <button class="parents-publish-btn" id="parentsPublishBtn" type="button">
+      <span>✎</span> ОПУБЛИКОВАТЬ 
+    </button>
+  </div>
+  <div class="parents-list" id="parentsList"></div>
 </div>
+</section>
+</div>
+
+<!-- МОДАЛКА: пароль -->
+<div class="parents-modal" id="parentsAuthModal" aria-hidden="true">
+  <div class="parents-modal-box" id="parentsAuthBox">
+    <div class="parents-modal-head">
+      <span>ДОСТУП К РЕДАКТОРУ</span>
+      <button class="parents-modal-close" id="parentsAuthClose" type="button" aria-label="Закрыть">×</button>
+    </div>
+    <div class="parents-modal-body">
+      <label class="parents-field-label" for="parentsPasswordInput">Пароль</label>
+      <input type="password" class="parents-input" id="parentsPasswordInput" autocomplete="off" inputmode="numeric">
+      <div class="parents-modal-actions">
+        <button class="parents-btn-secondary" id="parentsAuthCancel" type="button">Отмена</button>
+        <button class="parents-btn-primary" id="parentsAuthSubmit" type="button">Войти</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- МОДАЛКА: редактор -->
+<div class="parents-modal parents-modal-wide" id="parentsEditorModal" aria-hidden="true">
+  <div class="parents-modal-box">
+    <div class="parents-modal-head">
+      <span id="parentsEditorHead">НОВАЯ СТАТЬЯ</span>
+      <button class="parents-modal-close" id="parentsEditorClose" type="button" aria-label="Закрыть">×</button>
+    </div>
+    <div class="parents-modal-body">
+      <label class="parents-field-label" for="parentsTitleInput">Заголовок</label>
+      <input type="text" class="parents-input" id="parentsTitleInput" placeholder="Например: Как учить слоги дома">
+      <label class="parents-field-label" for="parentsContentInput" style="margin-top:16px">Текст (Markdown)</label>
+      <textarea class="parents-textarea" id="parentsContentInput" placeholder="# Заголовок&#10;&#10;Обычный текст с **жирным** и *курсивом*.&#10;&#10;- список&#10;- список&#10;&#10;> цитата&#10;&#10;[ссылка](https://example.com)"></textarea>
+      <div class="parents-hint">Поддержка: # заголовки, **жирный**, *курсив*, `код`, ```блок кода```, &gt; цитата, - и 1. списки, [ссылка](url)</div>
+      <div class="parents-modal-actions">
+        <button class="parents-btn-secondary" id="parentsEditorCancel" type="button">Отмена</button>
+        <button class="parents-btn-primary" id="parentsEditorSave" type="button">Опубликовать</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ПЛАВАЮЩИЙ ЛИСТ СТАТЬИ -->
+<div class="parents-reader-overlay" id="parentsReaderModal" aria-hidden="true">
+  <button class="parents-reader-close" id="parentsReaderClose" type="button" aria-label="Закрыть">×</button>
+  <div class="parents-reader-surface">
+    <article class="parents-reader-sheet">
+      <h1 class="parents-reader-title" id="parentsReaderTitle"></h1>
+      <div class="parents-reader-content" id="parentsReaderContent"></div>
+      <div class="parents-reader-actions" id="parentsReaderActions" style="display:none">
+        <button class="parents-btn-secondary" id="parentsEditBtn" type="button">Редактировать</button>
+        <button class="parents-btn-danger" id="parentsDeleteBtn" type="button">Удалить</button>
+      </div>
+    </article>
+  </div>
+</div>
+
 <div class="progress-container" id="progressContainer">
 <div class="progress-label" id="progressLabel">Отмечено: 0 из 0</div>
 <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
@@ -1279,16 +1880,17 @@ const sectionCycleBtn = document.getElementById('sectionCycleBtn');
 const syllablesSection = document.getElementById('syllablesSection');
 const clockSection = document.getElementById('clockSection');
 const heroesSection = document.getElementById('heroesSection');
+const parentsSection = document.getElementById('parentsSection');
 const heroesTimeline = document.getElementById('heroesTimeline');
 let currentMode = 'all'; let randomItems = []; let currentAudio = null; let examQuestions = []; let examIndex = 0; let examScore = 0; let currentExamCorrect = ''; let currentSection = 'syllables'; let progressTimer = null;
-const SECTION_ORDER = ['syllables', 'clock', 'heroes'];
-const SECTION_LABELS = { syllables: 'Учи слоги', clock: 'Знай время', heroes: 'Чти великих' };
+const SECTION_ORDER = ['syllables', 'clock', 'heroes', 'parents'];
+const SECTION_LABELS = { syllables: 'Учи слоги', clock: 'Знай время', heroes: 'Чти великих', parents: 'Родителям' };
 function updateCycleBtn() { if (!sectionCycleBtn) return; const l = sectionCycleBtn.querySelector('.section-cycle-label'); if (l) l.textContent = SECTION_LABELS[currentSection]; }
 if (sectionCycleBtn) { sectionCycleBtn.addEventListener('click', () => { const i = SECTION_ORDER.indexOf(currentSection); switchSection(SECTION_ORDER[(i + 1) % SECTION_ORDER.length]); }); }
 function loadLearnedSet() { try { return new Set(JSON.parse(localStorage.getItem('learned_syllables') || '[]')); } catch { return new Set(); } }
 function saveLearnedSet(s) { localStorage.setItem('learned_syllables', JSON.stringify(Array.from(s))); }
 let learnedSet = loadLearnedSet();
-function switchSection(s) { if (s === currentSection) return; currentSection = s; syllablesSection.classList.toggle('active', s === 'syllables'); clockSection.classList.toggle('active', s === 'clock'); heroesSection.classList.toggle('active', s === 'heroes'); sectionBtns.forEach(b => b.classList.toggle('active', b.dataset.section === s)); sectionSubtitleEls.forEach(e => e.classList.toggle('active', e.dataset.section === s)); updateCycleBtn(); if (s !== 'clock' && window.clockSpeakCancel) window.clockSpeakCancel(); if (s !== 'syllables') progressContainer.classList.remove('show'); }
+function switchSection(s) { if (s === currentSection) return; currentSection = s; syllablesSection.classList.toggle('active', s === 'syllables'); clockSection.classList.toggle('active', s === 'clock'); heroesSection.classList.toggle('active', s === 'heroes'); if (parentsSection) parentsSection.classList.toggle('active', s === 'parents'); sectionBtns.forEach(b => b.classList.toggle('active', b.dataset.section === s)); sectionSubtitleEls.forEach(e => e.classList.toggle('active', e.dataset.section === s)); updateCycleBtn(); if (s !== 'clock' && window.clockSpeakCancel) window.clockSpeakCancel(); if (s !== 'syllables') progressContainer.classList.remove('show'); }
 sectionBtns.forEach(b => b.addEventListener('click', () => switchSection(b.dataset.section)));
 window.addEventListener('scroll', () => scrollTopBtn.classList.toggle('visible', window.scrollY > 300));
 scrollTopBtn.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
@@ -1426,14 +2028,11 @@ const numbersGroup = activeSvg.querySelector('#' + prefix + '-numbersGroup');
 const subTicksGroup = isIOS ? activeSvg.querySelector('#' + prefix + '-subTicks') : null;
 const digital24El = document.getElementById('clockDigital24');
 
-// ============ АУДИО ВРЕМЕНИ (Web Audio API) ============
-// Один AudioContext. Буферы декодируются в память, куски играются
-// подряд через AudioBufferSourceNode — без зазора между часами и минутами.
 const AC_CTOR = window.AudioContext || window.webkitAudioContext;
 const audioCtx = AC_CTOR ? new AC_CTOR() : null;
-const audioBuffers = new Map();      // name -> AudioBuffer
-const decodePromises = new Map();    // name -> Promise
-let playSession = 0;                 // токен сессии: новый speakTime() делает старые источники «протухшими»
+const audioBuffers = new Map();
+const decodePromises = new Map();
+let playSession = 0;
 let audioUnlocked = false;
 
 function fetchBuffer(name) {
@@ -1466,23 +2065,21 @@ function preloadAllClockAudio() {
   fetchBuffer('rovno.mp3');
 }
 
-// iOS Safari: AudioContext просыпается только внутри user-gesture.
 function unlockAudioContext() {
   if (!audioCtx || audioUnlocked) return;
   try {
     if (audioCtx.state === 'suspended') audioCtx.resume();
     audioUnlocked = audioCtx.state === 'running';
-  } catch (e) { /* ignore */ }
+  } catch (e) { }
 }
 
-// Совместимость с прежним кодом.
 function warmUpSharedForIOS(onDone) {
   unlockAudioContext();
   if (onDone) onDone();
 }
 
 function stopClockAudio() {
-  playSession++; // инвалидируем все «хвосты» предыдущего воспроизведения
+  playSession++;
 }
 
 function speakTime() {
@@ -1516,7 +2113,6 @@ function speakTime() {
   });
 }
 
-// Прогреваем буферы заранее.
 preloadAllClockAudio();
 
 function buildMinuteScheme() {
@@ -1616,7 +2212,6 @@ t.textContent = i;
 numbersGroup.appendChild(t);
 }
 
-/* --- Схематичный (минимальный) циферблат --- */
 const minimalSvg      = document.getElementById('watchSvgMinimal');
 const minTicksGroup   = minimalSvg ? minimalSvg.querySelector('#clkM-ticksGroup')   : null;
 const minNumbersGroup = minimalSvg ? minimalSvg.querySelector('#clkM-numbersGroup') : null;
@@ -1792,7 +2387,6 @@ const duration = Date.now() - gesture.startTime;
 const wasDrag = gesture.mode === 'drag', wasScroll = gesture.mode === 'scroll', wasOther = gesture.mode === 'other';
 if (wasDrag) {
 clockView.classList.remove('dragging');
-// Автоозвучка после перетаскивания — только на десктопе.
 if (!isIOS) {
 lastDragTime = Date.now();
 speakTime();
@@ -1815,8 +2409,6 @@ clockView.addEventListener('mousedown', e => { if (e.button !== 0) return; start
 window.addEventListener('mousemove', e => { if (!gesture || gesture.source !== 'mouse') return; moveGesture(e, getPoint(e)); });
 window.addEventListener('mouseup', e => { if (!gesture || gesture.source !== 'mouse') return; endGesture(getPoint(e)); });
 
-// Кнопка «СХЕМА / АУДИОВИЗУАЛЬНОГО ИЗУЧЕНИЯ ЧАСОВ» — читает время.
-// На iOS это единственный способ воспроизведения.
 const frameHead = document.getElementById('frameHead');
 if (frameHead) {
 frameHead.addEventListener('click', (e) => {
@@ -1826,8 +2418,6 @@ unlockAudioContext();
 speakTime();
 });
 }
-// Десктоп: клик по любой части рамки часов тоже читает время
-// (с защитой от «клика-хвоста» после перетаскивания стрелок).
 if (!isIOS) {
 const clockFrameEl = document.querySelector('.clock-frame');
 if (clockFrameEl) {
@@ -1872,13 +2462,384 @@ render(); renderSecondHand(); setView('watch');
     e.preventDefault();
     const s = body.dataset.skin || 'minimal';
     const t = body.dataset.mintone || 'light';
-    // Цикл: минимал-светлый → минимал-тёмный → газетный → минимал-светлый
     if (s === 'minimal' && t === 'light')      { apply('minimal', 'dark');  toast('Минимализм · тёмный'); }
     else if (s === 'minimal' && t === 'dark')  { apply('classic', 'light'); toast('Газетный стиль'); }
     else                                       { apply('minimal', 'light'); toast('Минимализм · светлый'); }
   });
 
   if (typeof window.__syncSkinControls === 'function') window.__syncSkinControls();
+})();
+</script>
+<script>
+(function () {
+  const STORAGE_KEY = 'gramotino_parents_articles';
+  const AUTH_KEY    = 'gramotino_parents_auth';
+  const PASSWORD    = '1917';
+  const HASH_PREFIX = '#article/';
+
+  const $ = id => document.getElementById(id);
+  const list          = $('parentsList');
+  const publishBtn    = $('parentsPublishBtn');
+
+  const authModal     = $('parentsAuthModal');
+  const authBox       = $('parentsAuthBox');
+  const authInput     = $('parentsPasswordInput');
+  const authSubmit    = $('parentsAuthSubmit');
+  const authCancel    = $('parentsAuthCancel');
+  const authClose     = $('parentsAuthClose');
+
+  const editorModal   = $('parentsEditorModal');
+  const editorHead    = $('parentsEditorHead');
+  const titleInput    = $('parentsTitleInput');
+  const contentInput  = $('parentsContentInput');
+  const editorSave    = $('parentsEditorSave');
+  const editorCancel  = $('parentsEditorCancel');
+  const editorClose   = $('parentsEditorClose');
+
+  const readerModal   = $('parentsReaderModal');
+  const readerTitle   = $('parentsReaderTitle');
+  const readerContent = $('parentsReaderContent');
+  const readerActions = $('parentsReaderActions');
+  const readerClose   = $('parentsReaderClose');
+  const editBtn       = $('parentsEditBtn');
+  const deleteBtn     = $('parentsDeleteBtn');
+
+  if (!list) return;
+
+  let editingId = null;
+  let readingId = null;
+  let authed = false;
+  try { authed = sessionStorage.getItem(AUTH_KEY) === '1'; } catch (e) {}
+
+  function toast(msg) {
+    const c = document.getElementById('toastContainer');
+    if (!c) return;
+    const el = document.createElement('div');
+    el.className = 'toast';
+    el.textContent = msg;
+    c.appendChild(el);
+    setTimeout(() => el.remove(), 2200);
+  }
+
+  function loadArticles() {
+    try { return JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]'); }
+    catch (e) { return []; }
+  }
+  function saveArticles(arr) {
+    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(arr)); }
+    catch (e) { toast('Не удалось сохранить'); }
+  }
+
+  function esc(s) {
+    return String(s)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;');
+  }
+  function inline(text) {
+    return esc(text)
+      .replace(/`([^`]+?)`/g, '<code>$1</code>')
+      .replace(/\*\*([^*]+?)\*\*/g, '<strong>$1</strong>')
+      .replace(/(^|[^*])\*([^*\n]+?)\*/g, '$1<em>$2</em>')
+      .replace(/\[([^\]]+)\]\(([^)\s]+)\)/g, '<a href="$2" target="_blank" rel="noopener">$1</a>');
+  }
+  function mdToHtml(src) {
+    src = String(src || '').replace(/\r\n?/g, '\n');
+    const codeBlocks = [];
+    src = src.replace(/```([\s\S]*?)```/g, (_, code) => {
+      codeBlocks.push(code.replace(/^\n/, ''));
+      return `\u0000CB${codeBlocks.length - 1}\u0000`;
+    });
+    const lines = src.split('\n');
+    const out = [];
+    let para = [];
+    const flush = () => {
+      if (!para.length) return;
+      out.push('<p>' + para.map(inline).join('<br>') + '</p>');
+      para = [];
+    };
+    let i = 0;
+    while (i < lines.length) {
+      const line = lines[i];
+      const cb = line.match(/^\u0000CB(\d+)\u0000\s*$/);
+      if (cb) {
+        flush();
+        out.push('<pre><code>' + esc(codeBlocks[+cb[1]]) + '</code></pre>');
+        i++; continue;
+      }
+      if (/^\s*$/.test(line)) { flush(); i++; continue; }
+      if (/^#{1,6}\s+/.test(line)) {
+        flush();
+        const m = line.match(/^(#{1,6})\s+(.*)$/);
+        const lvl = m[1].length;
+        out.push(`<h${lvl}>${inline(m[2])}</h${lvl}>`);
+        i++; continue;
+      }
+      if (/^(-{3,}|\*{3,}|_{3,})\s*$/.test(line)) {
+        flush(); out.push('<hr>'); i++; continue;
+      }
+      if (/^>\s?/.test(line)) {
+        flush();
+        const buf = [];
+        while (i < lines.length && /^>\s?/.test(lines[i])) {
+          buf.push(lines[i].replace(/^>\s?/, ''));
+          i++;
+        }
+        out.push('<blockquote>' + buf.map(inline).join('<br>') + '</blockquote>');
+        continue;
+      }
+      if (/^[-*+]\s+/.test(line)) {
+        flush();
+        const items = [];
+        while (i < lines.length && /^[-*+]\s+/.test(lines[i])) {
+          items.push('<li>' + inline(lines[i].replace(/^[-*+]\s+/, '')) + '</li>');
+          i++;
+        }
+        out.push('<ul>' + items.join('') + '</ul>');
+        continue;
+      }
+      if (/^\d+\.\s+/.test(line)) {
+        flush();
+        const items = [];
+        while (i < lines.length && /^\d+\.\s+/.test(lines[i])) {
+          items.push('<li>' + inline(lines[i].replace(/^\d+\.\s+/, '')) + '</li>');
+          i++;
+        }
+        out.push('<ol>' + items.join('') + '</ol>');
+        continue;
+      }
+      para.push(line);
+      i++;
+    }
+    flush();
+    return out.join('\n');
+  }
+
+  function uid() {
+    return Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
+  }
+
+  /* ---------- список ---------- */
+  function renderList() {
+    const articles = loadArticles().sort((a, b) => b.updated - a.updated);
+    list.innerHTML = '';
+    if (!articles.length) {
+      const empty = document.createElement('div');
+      empty.className = 'parents-empty';
+      empty.textContent = 'Пока нет статей';
+      list.appendChild(empty);
+      return;
+    }
+    articles.forEach(a => {
+      const card = document.createElement('div');
+      card.className = 'parents-card';
+
+      const title = document.createElement('div');
+      title.className = 'parents-card-title';
+      title.textContent = a.title || 'Без названия';
+      card.appendChild(title);
+
+      
+
+      const arrow = document.createElement('span');
+      arrow.className = 'parents-card-arrow';
+      arrow.textContent = '→';
+      card.appendChild(arrow);
+
+      card.addEventListener('click', () => {
+        const targetHash = HASH_PREFIX + encodeURIComponent(a.id);
+        if (window.location.hash === targetHash) {
+          showReader(a.id);
+        } else {
+          window.location.hash = targetHash;
+        }
+      });
+      list.appendChild(card);
+    });
+  }
+
+  /* ---------- reader ---------- */
+  function showReader(id) {
+    const a = loadArticles().find(x => x.id === id);
+    if (!a) {
+      if (window.location.hash.startsWith(HASH_PREFIX)) {
+        history.replaceState('', document.title, window.location.pathname + window.location.search);
+      }
+      toast('Статья не найдена');
+      readingId = null;
+      return;
+    }
+    readingId = id;
+    readerTitle.textContent = a.title || 'Без названия';
+    readerContent.innerHTML = mdToHtml(a.content);
+    readerActions.style.display = authed ? 'flex' : 'none';
+    readerModal.classList.add('show');
+    readerModal.setAttribute('aria-hidden', 'false');
+    document.body.style.overflow = 'hidden';
+  }
+  function hideReader() {
+    readerModal.classList.remove('show');
+    readerModal.setAttribute('aria-hidden', 'true');
+    readingId = null;
+    document.body.style.overflow = '';
+  }
+  function closeArticle() {
+    if (window.location.hash.startsWith(HASH_PREFIX)) {
+      history.pushState('', document.title, window.location.pathname + window.location.search);
+      hideReader();
+    } else {
+      hideReader();
+    }
+  }
+
+  function handleHash() {
+    const hash = window.location.hash;
+    if (hash.startsWith(HASH_PREFIX)) {
+      const id = decodeURIComponent(hash.slice(HASH_PREFIX.length));
+      if (readingId !== id) showReader(id);
+    } else {
+      if (readingId) hideReader();
+    }
+  }
+  window.addEventListener('hashchange', handleHash);
+
+  /* ---------- auth ---------- */
+  function openAuth() {
+    authInput.value = '';
+    authBox.classList.remove('parents-auth-shake');
+    authModal.classList.add('show');
+    authModal.setAttribute('aria-hidden', 'false');
+    setTimeout(() => authInput.focus(), 40);
+  }
+  function closeAuth() {
+    authModal.classList.remove('show');
+    authModal.setAttribute('aria-hidden', 'true');
+  }
+  function tryAuth() {
+    if (authInput.value.trim() === PASSWORD) {
+      authed = true;
+      try { sessionStorage.setItem(AUTH_KEY, '1'); } catch (e) {}
+      closeAuth();
+      toast('Доступ разрешён');
+      renderList();
+      openEditor(null);
+    } else {
+      authBox.classList.remove('parents-auth-shake');
+      void authBox.offsetWidth;
+      authBox.classList.add('parents-auth-shake');
+      toast('Неверный пароль');
+      authInput.select();
+    }
+  }
+
+  /* ---------- editor ---------- */
+  function openEditor(id) {
+    editingId = id || null;
+    if (id) {
+      const a = loadArticles().find(x => x.id === id);
+      if (!a) return;
+      editorHead.textContent = 'РЕДАКТИРОВАТЬ СТАТЬЮ';
+      titleInput.value = a.title || '';
+      contentInput.value = a.content || '';
+      editorSave.textContent = 'Сохранить';
+    } else {
+      editorHead.textContent = 'НОВАЯ СТАТЬЯ';
+      titleInput.value = '';
+      contentInput.value = '';
+      editorSave.textContent = 'Опубликовать';
+    }
+    editorModal.classList.add('show');
+    editorModal.setAttribute('aria-hidden', 'false');
+    setTimeout(() => titleInput.focus(), 40);
+  }
+  function closeEditor() {
+    editorModal.classList.remove('show');
+    editorModal.setAttribute('aria-hidden', 'true');
+    editingId = null;
+  }
+  function saveEditor() {
+    const title = titleInput.value.trim();
+    const content = contentInput.value.trim();
+    if (!title) { toast('Введите заголовок'); titleInput.focus(); return; }
+    if (!content) { toast('Введите текст'); contentInput.focus(); return; }
+
+    const arr = loadArticles();
+    const now = Date.now();
+    if (editingId) {
+      const idx = arr.findIndex(x => x.id === editingId);
+      if (idx >= 0) {
+        arr[idx].title = title;
+        arr[idx].content = content;
+        arr[idx].updated = now;
+      }
+      saveArticles(arr);
+      renderList();
+      closeEditor();
+      toast('Сохранено');
+    } else {
+      const newId = uid();
+      arr.push({ id: newId, title, content, created: now, updated: now });
+      saveArticles(arr);
+      renderList();
+      closeEditor();
+      toast('Опубликовано');
+    }
+  }
+
+  function deleteArticle(id) {
+    if (!confirm('Удалить статью?')) return;
+    const arr = loadArticles().filter(x => x.id !== id);
+    saveArticles(arr);
+    renderList();
+    if (readingId === id) closeArticle();
+    toast('Удалено');
+  }
+
+  /* ---------- события ---------- */
+  publishBtn.addEventListener('click', () => {
+    if (authed) openEditor(null);
+    else openAuth();
+  });
+
+  authSubmit.addEventListener('click', tryAuth);
+  authCancel.addEventListener('click', closeAuth);
+  authClose.addEventListener('click', closeAuth);
+  authInput.addEventListener('keydown', e => {
+    if (e.key === 'Enter') { e.preventDefault(); tryAuth(); }
+    if (e.key === 'Escape') closeAuth();
+  });
+  authModal.addEventListener('click', e => {
+    if (e.target === authModal) closeAuth();
+  });
+
+  editorSave.addEventListener('click', saveEditor);
+  editorCancel.addEventListener('click', closeEditor);
+  editorClose.addEventListener('click', closeEditor);
+  document.addEventListener('keydown', e => {
+    if (editorModal.classList.contains('show') && e.key === 'Escape') closeEditor();
+  });
+
+  readerClose.addEventListener('click', closeArticle);
+  // клик по размытому фону (но не по «листу») — закрывает
+  readerModal.addEventListener('click', e => {
+    if (e.target.classList.contains('parents-reader-surface')) closeArticle();
+  });
+  document.addEventListener('keydown', e => {
+    if (readerModal.classList.contains('show') && e.key === 'Escape') closeArticle();
+  });
+  editBtn.addEventListener('click', () => {
+    if (!readingId) return;
+    const id = readingId;
+    closeArticle();
+    openEditor(id);
+  });
+  deleteBtn.addEventListener('click', () => {
+    if (!readingId) return;
+    deleteArticle(readingId);
+  });
+
+  renderList();
+  handleHash();
 })();
 </script>
 </body>
