@@ -1431,6 +1431,9 @@ body[data-skin="minimal"] .stamp-opt-swatch{border-radius:50%;border-width:1px}
 <span class="masthead-sep">·</span>
 <span>Краска:</span>
 <button class="masthead-switch" id="inkSwitch" type="button" title="Краска">киноварь</button>
+<span class="masthead-sep">·</span>
+<span>Стиль:</span>
+<button class="masthead-switch" id="skinSwitch" type="button" title="Стиль">минимализм</button>
 </div>
 </div>
 <div class="header-kicker">УЧИТЬСЯ, УЧИТЬСЯ И ЕЩЁ РАЗ УЧИТЬСЯ</div>
@@ -1895,6 +1898,8 @@ window.addEventListener('resize', () => { if (openMode) closeStamp(); });
 window.addEventListener('scroll', () => { if (openMode) closeStamp(); }, { passive: true });
 let sp = 'newsprint', si = 'kinovar'; try { sp = localStorage.getItem(STORAGE_PAPER) || 'newsprint'; si = localStorage.getItem(STORAGE_INK) || 'kinovar'; } catch (e) { } applyPaper(sp, true); applyInk(si, true);
 window.__syncSkinControls = function(){
+  const ss = document.getElementById('skinSwitch');
+  if (ss) ss.textContent = (body.dataset.skin === 'minimal') ? 'минимализм' : 'газета';
   if (!paperSwitch) return;
   paperSwitch.textContent = (body.dataset.skin === 'minimal') ? toneLabel() : findPaper(currentPaperKey).label;
   if (openMode) renderStampList(openMode);
@@ -2354,7 +2359,21 @@ render(); renderSecondHand(); setView('watch');
     } catch (e) {}
     if (typeof window.__syncSkinControls === 'function') window.__syncSkinControls();
   }
-
+  // — переключатель стиля —
+  const skinSwitch = document.getElementById('skinSwitch');
+  if (skinSwitch) {
+    skinSwitch.addEventListener('click', function (e) {
+      e.preventDefault();
+      const s = body.dataset.skin || 'minimal';
+      if (s === 'minimal') {
+        apply('classic', body.dataset.mintone || 'light');
+        toast('Газетный стиль');
+      } else {
+        apply('minimal', body.dataset.mintone || 'light');
+        toast('Минимализм');
+      }
+    });
+  }
   h1.setAttribute('title', 'Двойной клик — сменить оформление');
   h1.addEventListener('dblclick', function (e) {
     e.preventDefault();
