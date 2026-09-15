@@ -504,6 +504,72 @@ justify-content: center;
 .scroll-top-btn { position: fixed; bottom: 24px; right: 24px; width: 52px; height: 52px; background: var(--bg); border: 2px solid var(--fg); color: var(--fg); font-size: 1.25rem; font-family: var(--font-ui); font-weight: 900; cursor: pointer; display: none; align-items: center; justify-content: center; transition: all 0.1s linear; z-index: 1001; }
 .scroll-top-btn.visible { display: flex; }
 .scroll-top-btn:hover { background: var(--fg); color: var(--bg); transform: translate(-3px, -3px); box-shadow: 4px 4px 0 var(--accent); }
+
+/* ================================================================= */
+/* ==================== DICTATION OVERLAY ========================== */
+/* ================================================================= */
+.dictation-overlay { 
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
+    background: var(--bg); z-index: 2000; display: none; 
+    flex-direction: column; align-items: center; justify-content: center; 
+    padding: 24px; gap: 24px; 
+}
+.dictation-overlay.show { display: flex; animation: tabIn 0.25s var(--snap); }
+.dictation-header { display: flex; align-items: center; gap: 14px; }
+.dictation-input-wrap { 
+    display: flex; align-items: center; gap: 12px; 
+    margin: 10px 0;
+}
+.dictation-input { 
+    display: flex; gap: 8px; 
+}
+.dictation-slot { 
+    width: 60px; height: 80px; 
+    border: 2px solid var(--fg); 
+    background: var(--bg);
+    display: flex; align-items: center; justify-content: center;
+    font-family: var(--font-display); font-size: 2.4rem; font-weight: 600; 
+    text-transform: uppercase; color: var(--fg);
+    transition: all 0.15s linear;
+}
+.dictation-slot.filled { background: var(--bg-2); }
+.dictation-slot.correct { background: #2a6b3f; border-color: #2a6b3f; color: #fff; }
+.dictation-slot.wrong { background: var(--accent); border-color: var(--accent); color: var(--accent-fg); }
+
+.dictation-backspace {
+    width: 50px; height: 50px;
+    background: var(--bg); border: 2px solid var(--fg); color: var(--fg);
+    font-size: 1.5rem; cursor: pointer; display: flex; align-items: center; justify-content: center;
+    transition: all 0.1s linear;
+}
+.dictation-backspace:hover { background: var(--fg); color: var(--bg); }
+
+.dictation-feedback { 
+    font-family: var(--font-doc); font-size: 0.8rem; font-weight: 700; 
+    letter-spacing: 0.2em; text-transform: uppercase; 
+    min-height: 1.2em; text-align: center;
+}
+
+.dictation-keyboard { 
+    display: grid; 
+    grid-template-columns: repeat(auto-fill, minmax(48px, 1fr)); 
+    gap: 8px; max-width: 600px; width: 100%; 
+    margin-top: 10px;
+}
+.dictation-key { 
+    aspect-ratio: 1; 
+    background: var(--bg); border: 2px solid var(--fg); color: var(--fg);
+    font-family: var(--font-display); font-size: 1.2rem; font-weight: 600; 
+    cursor: pointer; transition: all 0.1s linear;
+    display: flex; align-items: center; justify-content: center;
+    text-transform: uppercase;
+}
+.dictation-key:hover { 
+    background: var(--fg); color: var(--bg); 
+    transform: translate(-2px, -2px); box-shadow: 4px 4px 0 var(--accent); 
+}
+.dictation-key:active { transform: translate(0, 0); box-shadow: none; }
+
 .exam-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--bg); z-index: 2000; display: none; flex-direction: column; align-items: center; justify-content: center; padding: 24px; gap: 32px; }
 .exam-overlay.show { display: flex; animation: tabIn 0.25s var(--snap); }
 .exam-header { display: flex; align-items: center; gap: 14px; }
@@ -592,7 +658,6 @@ justify-content: center;
 .htl-other-year { font-family: var(--font-doc); font-size: 0.7rem; font-weight: 700; color: var(--accent); letter-spacing: 0.02em; line-height: 1; margin-bottom: 3px; }
 .htl-other-name { font-family: var(--font-display); font-size: 0.54rem; font-weight: 600; color: var(--fg); text-transform: uppercase; letter-spacing: 0.02em; line-height: 1.14; }
 .htl-cnum { position: absolute; top: 262px; transform: translateX(-50%); font-family: var(--font-display); font-size: 1.15rem; font-weight: 600; letter-spacing: 0.03em; color: var(--fg); background: var(--bg); padding: 0 6px; z-index: 7; line-height: 1; }
-
 .clock-wrapper { padding: 40px 0 90px; width: 100%; display: flex; flex-direction: column; align-items: center; gap: 0; }
 .clock-frame {
 border: 3px solid var(--fg);
@@ -634,15 +699,37 @@ opacity: 0.3;
 .clock-view.view-scheme { cursor: pointer; }
 .watch-container { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
 .watch-svg { width: 100%; height: 100%; display: block; overflow: visible; }
-
 #watchSvgIOS { display: none; }
 body.is-ios #watchSvgDesktop { display: none; }
 body.is-ios #watchSvgIOS { display: block; }
-
 .scheme-view { position: absolute; inset: 0; display: none; align-items: center; justify-content: center; color: var(--fg); }
 .scheme-view.active { display: flex; }
 .scheme-view svg { width: 100%; height: auto; max-height: 100%; display: block; overflow: visible; }
 .clock-view .watch-container.hidden { display: none; }
+
+/* ================================================================= */
+/* ==================== MINIMAL SKIN OVERRIDES ===================== */
+/* ================================================================= */
+body[data-skin="minimal"] .dictation-key {
+    border: 1px solid var(--m-line-strong); border-radius: 8px;
+    background: transparent; color: var(--fg);
+    font-family: var(--font-ui); font-weight: 400;
+}
+body[data-skin="minimal"] .dictation-key:hover {
+    background: var(--bg-2); color: var(--fg);
+    transform: none; box-shadow: none;
+}
+body[data-skin="minimal"] .dictation-slot {
+    border: 1px solid var(--m-line-strong); border-radius: 8px;
+    font-family: var(--font-ui); font-weight: 300;
+}
+body[data-skin="minimal"] .dictation-backspace {
+    border: 1px solid var(--m-line-strong); border-radius: 50%;
+    background: transparent; color: var(--fg-2);
+}
+body[data-skin="minimal"] .dictation-backspace:hover {
+    background: var(--bg-2); color: var(--fg);
+}
 
 @media (max-width: 1024px) { .syllable-grid { grid-template-columns: repeat(3, 1fr); } }
 @media (max-width: 640px) {
@@ -699,6 +786,10 @@ body.is-ios #watchSvgIOS { display: block; }
 .progress-container { padding: 14px 18px 16px; }
 .masthead-stamp { left: 50% !important; right: auto !important; top: auto !important; bottom: 20px !important; transform: translateX(-50%) translateY(8px); box-shadow: 6px 6px 0 var(--accent); max-width: calc(100vw - 24px); }
 .masthead-stamp.show { transform: translateX(-50%) translateY(0); }
+
+.dictation-slot { width: 48px; height: 64px; font-size: 1.8rem; }
+.dictation-keyboard { grid-template-columns: repeat(auto-fill, minmax(38px, 1fr)); gap: 6px; }
+.dictation-key { font-size: 1rem; }
 }
 @media (max-width: 420px) {
 .frame-head-top { justify-content: center; gap: 6px; padding: 6px 8px; }
@@ -715,318 +806,302 @@ body.is-ios #watchSvgIOS { display: block; }
 .hero-years { font-size: 0.58rem; }
 .clock-frame { width: min(480px, 96vw); }
 }
-
 /* ================================================================= */
 /* ==================== PARENTS SECTION ============================ */
 /* ================================================================= */
 .parents-wrapper{
-  max-width:780px;
-  margin:0 auto;
-  padding:40px 20px 120px;
-  width:100%;
+max-width:780px;
+margin:0 auto;
+padding:40px 20px 120px;
+width:100%;
 }
-
 .parents-list{
-  display:flex;
-  flex-direction:column;
+display:flex;
+flex-direction:column;
 }
-
 /* состояния загрузки / ошибки / пусто */
 .parents-state{
-  padding:80px 20px;
-  text-align:center;
-  font-family:var(--font-doc);
-  font-size:.7rem;
-  font-weight:500;
-  letter-spacing:.28em;
-  text-transform:uppercase;
-  color:var(--fg-3);
-  line-height:1.9;
-  animation:parentsPulse 1.8s ease-in-out infinite;
+padding:80px 20px;
+text-align:center;
+font-family:var(--font-doc);
+font-size:.7rem;
+font-weight:500;
+letter-spacing:.28em;
+text-transform:uppercase;
+color:var(--fg-3);
+line-height:1.9;
+animation:parentsPulse 1.8s ease-in-out infinite;
 }
 .parents-state.is-error{animation:none;color:var(--accent);letter-spacing:.16em}
 .parents-state small{
-  display:block;
-  margin-top:16px;
-  font-size:.62rem;
-  letter-spacing:.14em;
-  text-transform:none;
-  line-height:1.7;
-  opacity:.7;
-  font-family:var(--font-ui);
-  color:var(--fg-2);
+display:block;
+margin-top:16px;
+font-size:.62rem;
+letter-spacing:.14em;
+text-transform:none;
+line-height:1.7;
+opacity:.7;
+font-family:var(--font-ui);
+color:var(--fg-2);
 }
 @keyframes parentsPulse{
-  0%,100%{opacity:.45}
-  50%{opacity:1}
+0%,100%{opacity:.45}
+50%{opacity:1}
 }
-
 /* карточка статьи */
 .parents-card{
-  position:relative;
-  display:flex;
-  align-items:baseline;
-  gap:18px;
-  padding:24px 0;
-  cursor:pointer;
-  color:inherit;
-  text-decoration:none;
-  transition:padding .5s cubic-bezier(.16,1,.3,1);
-  -webkit-tap-highlight-color:transparent;
+position:relative;
+display:flex;
+align-items:baseline;
+gap:18px;
+padding:24px 0;
+cursor:pointer;
+color:inherit;
+text-decoration:none;
+transition:padding .5s cubic-bezier(.16,1,.3,1);
+-webkit-tap-highlight-color:transparent;
 }
-
 .parents-card-title{
-  flex:1;
-  min-width:0;
-  font-family:var(--font-serif-display);
-  font-weight:600;
-  font-size:clamp(1.25rem,2.7vw,1.7rem);
-  line-height:1.22;
-  letter-spacing:-.005em;
-  color:var(--fg);
-  overflow-wrap:anywhere;
-  transition:color .4s ease;
+flex:1;
+min-width:0;
+font-family:var(--font-serif-display);
+font-weight:600;
+font-size:clamp(1.25rem,2.7vw,1.7rem);
+line-height:1.22;
+letter-spacing:-.005em;
+color:var(--fg);
+overflow-wrap:anywhere;
+transition:color .4s ease;
 }
-
 .parents-card-arrow{
-  flex-shrink:0;
-  font-family:var(--font-ui);
-  font-size:.95rem;
-  color:var(--fg-3);
-  opacity:0;
-  transform:translateX(-10px);
-  transition:
-    opacity .5s cubic-bezier(.16,1,.3,1),
-    transform .5s cubic-bezier(.16,1,.3,1),
-    color .4s ease;
+flex-shrink:0;
+font-family:var(--font-ui);
+font-size:.95rem;
+color:var(--fg-3);
+opacity:0;
+transform:translateX(-10px);
+transition:
+opacity .5s cubic-bezier(.16,1,.3,1),
+transform .5s cubic-bezier(.16,1,.3,1),
+color .4s ease;
 }
-
 .parents-card:hover{padding-left:14px}
 .parents-card:hover .parents-card-title{color:var(--accent)}
 .parents-card:hover .parents-card-arrow{opacity:1;transform:translateX(0);color:var(--accent)}
-
 /* ---------- газетный стиль (по умолчанию) ---------- */
 body:not([data-skin="minimal"]) .parents-list{
-  border-top:2px solid var(--fg);
+border-top:2px solid var(--fg);
 }
 body:not([data-skin="minimal"]) .parents-card{
-  border-bottom:1px solid var(--rule-soft);
+border-bottom:1px solid var(--rule-soft);
 }
 body:not([data-skin="minimal"]) .parents-card-title{
-  font-family:var(--font-serif-display);
-  font-weight:700;
-  font-size:clamp(1.35rem,3vw,1.9rem);
-  line-height:1.18;
-  letter-spacing:-.01em;
+font-family:var(--font-serif-display);
+font-weight:700;
+font-size:clamp(1.35rem,3vw,1.9rem);
+line-height:1.18;
+letter-spacing:-.01em;
 }
 body:not([data-skin="minimal"]) .parents-card-arrow{
-  font-size:1.05rem;
+font-size:1.05rem;
 }
-
 /* ---------- минимализм ---------- */
 body[data-skin="minimal"] .parents-list{
-  padding-top:12px;
+padding-top:12px;
 }
 body[data-skin="minimal"] .parents-card{
-  padding:20px 0;
+padding:20px 0;
 }
 body[data-skin="minimal"] .parents-card-title{
-  font-family:var(--font-ui);
-  font-weight:300;
-  font-size:clamp(1.1rem,2.3vw,1.4rem);
-  line-height:1.28;
-  letter-spacing:-.012em;
+font-family:var(--font-ui);
+font-weight:300;
+font-size:clamp(1.1rem,2.3vw,1.4rem);
+line-height:1.28;
+letter-spacing:-.012em;
 }
 body[data-skin="minimal"] .parents-card:hover{padding-left:8px}
 body[data-skin="minimal"] .parents-card-arrow{
-  font-size:.85rem;
-  font-weight:300;
+font-size:.85rem;
+font-weight:300;
 }
-
 /* ================================================================= */
 /* ============ PARENTS READER — FLOATING OVERLAY =================== */
 /* ================================================================= */
 .parents-reader-overlay{
-  position:fixed;
-  inset:0;
-  z-index:4600;
-  background:rgba(15,12,8,.55);
-  backdrop-filter:blur(12px) saturate(120%);
-  -webkit-backdrop-filter:blur(12px) saturate(120%);
-  opacity:0;
-  visibility:hidden;
-  transition:opacity .5s cubic-bezier(.16,1,.3,1), visibility 0s linear .5s;
-  overflow:hidden;
+position:fixed;
+inset:0;
+z-index:4600;
+background:rgba(15,12,8,.55);
+backdrop-filter:blur(12px) saturate(120%);
+-webkit-backdrop-filter:blur(12px) saturate(120%);
+opacity:0;
+visibility:hidden;
+transition:opacity .5s cubic-bezier(.16,1,.3,1), visibility 0s linear .5s;
+overflow:hidden;
 }
 .parents-reader-overlay.show{
-  opacity:1;
-  visibility:visible;
-  transition:opacity .5s cubic-bezier(.16,1,.3,1), visibility 0s linear 0s;
+opacity:1;
+visibility:visible;
+transition:opacity .5s cubic-bezier(.16,1,.3,1), visibility 0s linear 0s;
 }
-
 .parents-reader-surface{
-  position:absolute;
-  inset:0;
-  overflow-y:auto;
-  overflow-x:hidden;
-  padding:clamp(20px,3.5vh,56px) clamp(12px,2.5vw,32px) clamp(60px,10vh,120px);
-  display:flex;
-  justify-content:center;
-  align-items:flex-start;
-  scrollbar-width:none;
-  -ms-overflow-style:none;
-  overscroll-behavior:contain;
-  -webkit-overflow-scrolling:touch;
+position:absolute;
+inset:0;
+overflow-y:auto;
+overflow-x:hidden;
+padding:clamp(20px,3.5vh,56px) clamp(12px,2.5vw,32px) clamp(60px,10vh,120px);
+display:flex;
+justify-content:center;
+align-items:flex-start;
+scrollbar-width:none;
+-ms-overflow-style:none;
+overscroll-behavior:contain;
+-webkit-overflow-scrolling:touch;
 }
 .parents-reader-surface::-webkit-scrollbar{display:none;width:0;height:0}
-
 .parents-reader-sheet{
-  position:relative;
-  width:100%;
-  max-width:960px;
-  margin:0 auto;
-  background:var(--bg);
-  color:var(--fg);
-  padding:clamp(36px,6vw,80px) clamp(24px,6.5vw,80px) clamp(44px,7vw,88px);
-  transform:translateY(60px) scale(.96);
-  opacity:0;
-  filter:blur(3px);
-  transition:
-    transform .55s cubic-bezier(.4,0,.2,1),
-    opacity .4s ease,
-    filter .4s ease;
-  will-change:transform, opacity, filter;
-  box-shadow:
-    0 1px 0 rgba(255,255,255,.55) inset,
-    0 44px 100px -32px rgba(0,0,0,.42),
-    0 12px 34px -12px rgba(0,0,0,.28);
+position:relative;
+width:100%;
+max-width:960px;
+margin:0 auto;
+background:var(--bg);
+color:var(--fg);
+padding:clamp(36px,6vw,80px) clamp(24px,6.5vw,80px) clamp(44px,7vw,88px);
+transform:translateY(60px) scale(.96);
+opacity:0;
+filter:blur(3px);
+transition:
+transform .55s cubic-bezier(.4,0,.2,1),
+opacity .4s ease,
+filter .4s ease;
+will-change:transform, opacity, filter;
+box-shadow:
+0 1px 0 rgba(255,255,255,.55) inset,
+0 44px 100px -32px rgba(0,0,0,.42),
+0 12px 34px -12px rgba(0,0,0,.28);
 }
 .parents-reader-overlay.show .parents-reader-sheet{
-  transform:translateY(0) scale(1);
-  opacity:1;
-  filter:blur(0);
-  transition:
-    transform .85s cubic-bezier(.16,1,.3,1),
-    opacity .6s cubic-bezier(.16,1,.3,1),
-    filter .6s cubic-bezier(.16,1,.3,1);
+transform:translateY(0) scale(1);
+opacity:1;
+filter:blur(0);
+transition:
+transform .85s cubic-bezier(.16,1,.3,1),
+opacity .6s cubic-bezier(.16,1,.3,1),
+filter .6s cubic-bezier(.16,1,.3,1);
 }
-
 /* крестик */
 .parents-reader-close{
-  position:fixed;
-  top:clamp(14px,2.2vw,26px);
-  right:clamp(14px,2.2vw,26px);
-  z-index:5;
-  width:clamp(44px,5vw,54px);
-  height:clamp(44px,5vw,54px);
-  border-radius:50%;
-  border:none;
-  background:rgba(255,255,255,.94);
-  color:#101010;
-  font-family:var(--font-ui);
-  font-size:1.7rem;
-  font-weight:300;
-  line-height:1;
-  cursor:pointer;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  padding:0 0 5px;
-  box-shadow:
-    0 8px 26px rgba(0,0,0,.28),
-    0 1px 0 rgba(255,255,255,.6) inset;
-  backdrop-filter:blur(8px) saturate(140%);
-  -webkit-backdrop-filter:blur(8px) saturate(140%);
-  -webkit-tap-highlight-color:transparent;
-  opacity:0;
-  transform:scale(.5) rotate(-120deg);
-  transition:
-    opacity .3s ease .05s,
-    transform .6s cubic-bezier(.16,1,.3,1) .05s,
-    background .25s ease,
-    color .25s ease,
-    box-shadow .25s ease;
+position:fixed;
+top:clamp(14px,2.2vw,26px);
+right:clamp(14px,2.2vw,26px);
+z-index:5;
+width:clamp(44px,5vw,54px);
+height:clamp(44px,5vw,54px);
+border-radius:50%;
+border:none;
+background:rgba(255,255,255,.94);
+color:#101010;
+font-family:var(--font-ui);
+font-size:1.7rem;
+font-weight:300;
+line-height:1;
+cursor:pointer;
+display:flex;
+align-items:center;
+justify-content:center;
+padding:0 0 5px;
+box-shadow:
+0 8px 26px rgba(0,0,0,.28),
+0 1px 0 rgba(255,255,255,.6) inset;
+backdrop-filter:blur(8px) saturate(140%);
+-webkit-backdrop-filter:blur(8px) saturate(140%);
+-webkit-tap-highlight-color:transparent;
+opacity:0;
+transform:scale(.5) rotate(-120deg);
+transition:
+opacity .3s ease .05s,
+transform .6s cubic-bezier(.16,1,.3,1) .05s,
+background .25s ease,
+color .25s ease,
+box-shadow .25s ease;
 }
 .parents-reader-overlay.show .parents-reader-close{
-  opacity:1;
-  transform:scale(1) rotate(0deg);
-  transition:
-    opacity .3s ease .15s,
-    transform .65s cubic-bezier(.16,1,.3,1) .15s,
-    background .25s ease,
-    color .25s ease,
-    box-shadow .25s ease;
+opacity:1;
+transform:scale(1) rotate(0deg);
+transition:
+opacity .3s ease .15s,
+transform .65s cubic-bezier(.16,1,.3,1) .15s,
+background .25s ease,
+color .25s ease,
+box-shadow .25s ease;
 }
 .parents-reader-close:hover{
-  background:#ffffff;
-  color:#000;
-  box-shadow:
-    0 10px 34px rgba(0,0,0,.4),
-    0 1px 0 rgba(255,255,255,.7) inset;
-  transform:scale(1.08) rotate(0deg);
+background:#ffffff;
+color:#000;
+box-shadow:
+0 10px 34px rgba(0,0,0,.4),
+0 1px 0 rgba(255,255,255,.7) inset;
+transform:scale(1.08) rotate(0deg);
 }
 .parents-reader-close:active{transform:scale(.94) rotate(0deg)}
-
 /* ============== ТИПОГРАФИКА СТАТЬИ ============== */
 .parents-reader-title{
-  font-family:var(--font-serif-display);
-  font-weight:700;
-  font-size:clamp(1.9rem,5.4vw,3.2rem);
-  line-height:1.14;
-  letter-spacing:-.012em;
-  margin:0 0 .75em;
-  color:var(--fg);
-  padding-bottom:.55em;
-  border-bottom:1px solid var(--rule-soft);
-  font-feature-settings:"kern" 1,"liga" 1;
-  opacity:0;
-  transform:translateY(14px);
-  transition:opacity .55s ease .25s, transform .7s cubic-bezier(.16,1,.3,1) .25s;
+font-family:var(--font-serif-display);
+font-weight:700;
+font-size:clamp(1.9rem,5.4vw,3.2rem);
+line-height:1.14;
+letter-spacing:-.012em;
+margin:0 0 .75em;
+color:var(--fg);
+padding-bottom:.55em;
+border-bottom:1px solid var(--rule-soft);
+font-feature-settings:"kern" 1,"liga" 1;
+opacity:0;
+transform:translateY(14px);
+transition:opacity .55s ease .25s, transform .7s cubic-bezier(.16,1,.3,1) .25s;
 }
 .parents-reader-overlay.show .parents-reader-title{
-  opacity:1;
-  transform:translateY(0);
+opacity:1;
+transform:translateY(0);
 }
-
 .parents-reader-content{
-  font-family:var(--font-serif-body);
-  font-size:clamp(1.15rem,1.55vw,1.35rem);
-  line-height:1.78;
-  color:var(--fg);
-  font-weight:400;
-  letter-spacing:.003em;
-  text-rendering:optimizeLegibility;
-  font-feature-settings:"liga" 1,"kern" 1;
-  hyphens:auto;
-  -webkit-hyphens:auto;
-  overflow-wrap:break-word;
-  text-align:justify;
-  text-justify:inter-word;
-  text-align-last:left;
-  opacity:0;
-  transform:translateY(20px);
-  transition:opacity .6s ease .35s, transform .8s cubic-bezier(.16,1,.3,1) .35s;
+font-family:var(--font-serif-body);
+font-size:clamp(1.15rem,1.55vw,1.35rem);
+line-height:1.78;
+color:var(--fg);
+font-weight:400;
+letter-spacing:.003em;
+text-rendering:optimizeLegibility;
+font-feature-settings:"liga" 1,"kern" 1;
+hyphens:auto;
+-webkit-hyphens:auto;
+overflow-wrap:break-word;
+text-align:justify;
+text-justify:inter-word;
+text-align-last:left;
+opacity:0;
+transform:translateY(20px);
+transition:opacity .6s ease .35s, transform .8s cubic-bezier(.16,1,.3,1) .35s;
 }
 .parents-reader-overlay.show .parents-reader-content{
-  opacity:1;
-  transform:translateY(0);
+opacity:1;
+transform:translateY(0);
 }
 .parents-reader-content p{margin:0 0 1.3em}
 .parents-reader-content p:last-child{margin-bottom:0}
-
 .parents-reader-content h1,
 .parents-reader-content h2,
 .parents-reader-content h3,
 .parents-reader-content h4,
 .parents-reader-content h5,
 .parents-reader-content h6{
-  font-family:var(--font-serif-display);
-  font-weight:700;
-  line-height:1.2;
-  letter-spacing:-.008em;
-  margin-top:1.75em;
-  margin-bottom:.55em;
-  color:var(--fg);
+font-family:var(--font-serif-display);
+font-weight:700;
+line-height:1.2;
+letter-spacing:-.008em;
+margin-top:1.75em;
+margin-bottom:.55em;
+color:var(--fg);
 }
 .parents-reader-content h1{font-size:1.9em}
 .parents-reader-content h2{font-size:1.5em}
@@ -1034,132 +1109,124 @@ body[data-skin="minimal"] .parents-card-arrow{
 .parents-reader-content h4{font-size:1.1em}
 .parents-reader-content h5,
 .parents-reader-content h6{
-  font-family:var(--font-ui);
-  font-size:.95em;
-  font-weight:600;
-  letter-spacing:.08em;
-  text-transform:uppercase;
-  color:var(--fg-2);
+font-family:var(--font-ui);
+font-size:.95em;
+font-weight:600;
+letter-spacing:.08em;
+text-transform:uppercase;
+color:var(--fg-2);
 }
 .parents-reader-content strong{font-weight:700;color:var(--fg)}
 .parents-reader-content em{font-style:italic}
-
 .parents-reader-content a{
-  color:var(--accent);
-  text-decoration:underline;
-  text-decoration-thickness:1px;
-  text-underline-offset:3px;
-  text-decoration-color:color-mix(in srgb, var(--accent) 45%, transparent);
-  transition:text-decoration-color .2s ease;
+color:var(--accent);
+text-decoration:underline;
+text-decoration-thickness:1px;
+text-underline-offset:3px;
+text-decoration-color:color-mix(in srgb, var(--accent) 45%, transparent);
+transition:text-decoration-color .2s ease;
 }
 .parents-reader-content a:hover{text-decoration-color:var(--accent)}
-
 .parents-reader-content ul,
 .parents-reader-content ol{
-  padding-left:1.35em;
-  margin:0 0 1.3em;
+padding-left:1.35em;
+margin:0 0 1.3em;
 }
 .parents-reader-content ul:last-child,
 .parents-reader-content ol:last-child{margin-bottom:0}
 .parents-reader-content li{margin:.42em 0;padding-left:.15em}
 .parents-reader-content li::marker{color:var(--accent)}
-
 .parents-reader-content blockquote{
-  margin:1.7em 0;
-  padding:.15em 0 .15em 1.5em;
-  border-left:3px solid var(--accent);
-  font-style:italic;
-  color:var(--fg-2);
-  font-size:1.03em;
+margin:1.7em 0;
+padding:.15em 0 .15em 1.5em;
+border-left:3px solid var(--accent);
+font-style:italic;
+color:var(--fg-2);
+font-size:1.03em;
 }
-
 .parents-reader-content code{
-  font-family:var(--font-doc);
-  font-size:.84em;
-  background:var(--bg-2);
-  padding:.1em .42em;
-  border-radius:3px;
-  color:var(--fg);
-  white-space:nowrap;
+font-family:var(--font-doc);
+font-size:.84em;
+background:var(--bg-2);
+padding:.1em .42em;
+border-radius:3px;
+color:var(--fg);
+white-space:nowrap;
 }
 .parents-reader-content pre{
-  font-family:var(--font-doc);
-  font-size:.82em;
-  line-height:1.55;
-  background:var(--bg-2);
-  border:1px solid var(--rule-soft);
-  border-radius:6px;
-  padding:1.15em 1.35em;
-  overflow-x:auto;
-  margin:1.5em 0;
-  -webkit-overflow-scrolling:touch;
+font-family:var(--font-doc);
+font-size:.82em;
+line-height:1.55;
+background:var(--bg-2);
+border:1px solid var(--rule-soft);
+border-radius:6px;
+padding:1.15em 1.35em;
+overflow-x:auto;
+margin:1.5em 0;
+-webkit-overflow-scrolling:touch;
 }
 .parents-reader-content pre::-webkit-scrollbar{height:6px}
 .parents-reader-content pre::-webkit-scrollbar-thumb{background:var(--rule-soft);border-radius:3px}
 .parents-reader-content pre code{
-  background:transparent;padding:0;border-radius:0;font-size:1em;white-space:pre;
+background:transparent;padding:0;border-radius:0;font-size:1em;white-space:pre;
 }
-
 .parents-reader-content hr{
-  border:none;
-  height:1px;
-  background:var(--rule-soft);
-  margin:2.4em auto;
-  width:50%;
+border:none;
+height:1px;
+background:var(--rule-soft);
+margin:2.4em auto;
+width:50%;
 }
 .parents-reader-content img{
-  max-width:100%;
-  height:auto;
-  display:block;
-  margin:1.5em auto;
-  border-radius:4px;
+max-width:100%;
+height:auto;
+display:block;
+margin:1.5em auto;
+border-radius:4px;
 }
-
 /* буквица в газетном режиме */
 body:not([data-skin="minimal"]) .parents-reader-content > p:first-of-type::first-letter{
-  font-family:var(--font-serif-display);
-  font-weight:700;
-  float:left;
-  font-size:3.7em;
-  line-height:.82;
-  margin:.05em .12em .02em 0;
-  color:var(--accent);
+font-family:var(--font-serif-display);
+font-weight:700;
+float:left;
+font-size:3.7em;
+line-height:.82;
+margin:.05em .12em .02em 0;
+color:var(--accent);
 }
-
 /* ================= NEWSPAPER ТЮНИНГ ================= */
 body:not([data-skin="minimal"]) .parents-reader-sheet{border-radius:0}
 body:not([data-skin="minimal"]) .parents-reader-overlay{background:rgba(15,12,8,.55)}
-
 /* ================= MINIMAL СКИН ================= */
 body[data-skin="minimal"] .parents-reader-overlay{
-  background:rgba(20,20,20,.28);
-  backdrop-filter:blur(18px) saturate(140%);
-  -webkit-backdrop-filter:blur(18px) saturate(140%);
+background:rgba(20,20,20,.28);
+backdrop-filter:blur(18px) saturate(140%);
+-webkit-backdrop-filter:blur(18px) saturate(140%);
 }
 body[data-skin="minimal"][data-mintone="dark"] .parents-reader-overlay{
-  background:rgba(0,0,0,.55);
+background:rgba(0,0,0,.55);
 }
 body[data-skin="minimal"] .parents-reader-sheet{
-  border-radius:24px;
-  box-shadow:
-    0 40px 100px -30px rgba(0,0,0,.28),
-    0 12px 40px -14px rgba(0,0,0,.14),
-    0 1px 0 rgba(255,255,255,.5) inset;
+border-radius:24px;
+box-shadow:
+0 40px 100px -30px rgba(0,0,0,.28),
+0 12px 40px -14px rgba(0,0,0,.14),
+0 1px 0 rgba(255,255,255,.5) inset;
 }
 body[data-skin="minimal"][data-mintone="dark"] .parents-reader-sheet{
-  box-shadow:
-    0 40px 100px -30px rgba(0,0,0,.6),
-    0 12px 40px -14px rgba(0,0,0,.4),
-    0 1px 0 rgba(255,255,255,.05) inset;
+box-shadow:
+0 40px 100px -30px rgba(0,0,0,.6),
+0 12px 40px -14px rgba(0,0,0,.4),
+0 1px 0 rgba(255,255,255,.05) inset;
 }
 body[data-skin="minimal"] .parents-reader-title{
-  font-family:var(--font-ui);
-  font-weight:300;
-  font-size:clamp(1.7rem,4.6vw,2.75rem);
-  letter-spacing:-.008em;
-  border-bottom:none;
-  padding-bottom:0;
-  margin-bottom:.6em;
+font-family:var(--font-ui);
+font-weight:300;
+font-size:clamp(1.7rem,4.6vw,2.75rem);
+letter-spacing:-.008em;
+border-bottom:none;
+padding-bottom:0;
+margin-bottom:.6em;
 }
 body[data-skin="minimal"] .parents-reader-content h1,
 body[data-skin="minimal"] .parents-reader-content h2,
@@ -1167,56 +1234,54 @@ body[data-skin="minimal"] .parents-reader-content h3,
 body[data-skin="minimal"] .parents-reader-content h4,
 body[data-skin="minimal"] .parents-reader-content h5,
 body[data-skin="minimal"] .parents-reader-content h6{
-  font-family:var(--font-ui);
-  font-weight:500;
-  letter-spacing:-.008em;
-  text-transform:none;
+font-family:var(--font-ui);
+font-weight:500;
+letter-spacing:-.008em;
+text-transform:none;
 }
 body[data-skin="minimal"] .parents-reader-close{
-  background:#101010;
-  color:#ffffff;
-  box-shadow:0 10px 30px rgba(0,0,0,.28), 0 1px 0 rgba(255,255,255,.1) inset;
+background:#101010;
+color:#ffffff;
+box-shadow:0 10px 30px rgba(0,0,0,.28), 0 1px 0 rgba(255,255,255,.1) inset;
 }
 body[data-skin="minimal"] .parents-reader-close:hover{background:#000;color:#fff}
 body[data-skin="minimal"][data-mintone="dark"] .parents-reader-close{
-  background:#ededeb;color:#0d0d0e;
+background:#ededeb;color:#0d0d0e;
 }
 body[data-skin="minimal"][data-mintone="dark"] .parents-reader-close:hover{
-  background:#fff;color:#000;
+background:#fff;color:#000;
 }
-
 @media (max-width:640px){
-  .parents-wrapper{padding:24px 18px 90px}
- .parents-reader-surface{padding:60px 0 40px}
+.parents-wrapper{padding:24px 18px 90px}
+.parents-reader-surface{padding:60px 0 40px}
 .parents-reader-sheet{
-  padding:32px 20px 44px;
-  border-radius:0;
-  max-width:none;
-  width:100%;
-  box-shadow:none;
+padding:32px 20px 44px;
+border-radius:0;
+max-width:none;
+width:100%;
+box-shadow:none;
 }
-  body:not([data-skin="minimal"]) .parents-reader-sheet{border-radius:0}
-  .parents-reader-close{top:12px;right:12px;width:44px;height:44px;font-size:1.45rem}
-  .parents-reader-title{font-size:1.6rem}
-  .parents-reader-content{font-size:1.14rem;line-height:1.72}
-  body:not([data-skin="minimal"]) .parents-reader-content > p:first-of-type::first-letter{font-size:3em}
+body:not([data-skin="minimal"]) .parents-reader-sheet{border-radius:0}
+.parents-reader-close{top:12px;right:12px;width:44px;height:44px;font-size:1.45rem}
+.parents-reader-title{font-size:1.6rem}
+.parents-reader-content{font-size:1.14rem;line-height:1.72}
+body:not([data-skin="minimal"]) .parents-reader-content > p:first-of-type::first-letter{font-size:3em}
 }
-
 /* ================= MINIMAL SKIN ================= */
 body[data-skin="minimal"]{
-  --m-bg:#fafaf9; --m-bg-2:#f2f2f0; --m-bg-3:#e9e9e6;
-  --m-fg:#101010; --m-fg-2:#565656; --m-fg-3:#9b9b96;
-  --m-line:rgba(16,16,16,.10); --m-line-strong:rgba(16,16,16,.22);
-  --m-ok:#1f7a4d;
-  --bg:var(--m-bg); --bg-2:var(--m-bg-2); --bg-3:var(--m-bg-3);
-  --fg:var(--m-fg); --fg-2:var(--m-fg-2); --fg-3:var(--m-fg-3);
-  --rule-soft:transparent; --accent-fg:#ffffff;
+--m-bg:#fafaf9; --m-bg-2:#f2f2f0; --m-bg-3:#e9e9e6;
+--m-fg:#101010; --m-fg-2:#565656; --m-fg-3:#9b9b96;
+--m-line:rgba(16,16,16,.10); --m-line-strong:rgba(16,16,16,.22);
+--m-ok:#1f7a4d;
+--bg:var(--m-bg); --bg-2:var(--m-bg-2); --bg-3:var(--m-bg-3);
+--fg:var(--m-fg); --fg-2:var(--m-fg-2); --fg-3:var(--m-fg-3);
+--rule-soft:transparent; --accent-fg:#ffffff;
 }
 body[data-skin="minimal"][data-mintone="dark"]{
-  --m-bg:#0d0d0e; --m-bg-2:#151517; --m-bg-3:#1e1e21;
-  --m-fg:#ededeb; --m-fg-2:#9a9a98; --m-fg-3:#5f5f5e;
-  --m-line:rgba(237,237,235,.10); --m-line-strong:rgba(237,237,235,.24);
-  --m-ok:#4ade80; --accent-fg:#0d0d0e;
+--m-bg:#0d0d0e; --m-bg-2:#151517; --m-bg-3:#1e1e21;
+--m-fg:#ededeb; --m-fg-2:#9a9a98; --m-fg-3:#5f5f5e;
+--m-line:rgba(237,237,235,.10); --m-line-strong:rgba(237,237,235,.24);
+--m-ok:#4ade80; --accent-fg:#0d0d0e;
 }
 body[data-skin="minimal"][data-ink="kinovar"]     {--accent:#e30613}
 body[data-skin="minimal"][data-ink="ultramarine"] {--accent:#2447b8}
@@ -1234,68 +1299,63 @@ body[data-skin="minimal"][data-mintone="dark"][data-ink="sepia"]       {--accent
 body[data-skin="minimal"][data-mintone="dark"][data-ink="emerald"]     {--accent:#45c96a}
 body[data-skin="minimal"][data-mintone="dark"][data-ink="purpur"]      {--accent:#c977ff}
 body[data-skin="minimal"][data-mintone="dark"][data-ink="cadmium"]     {--accent:#ff9147}
-
 body[data-skin="minimal"]::before{display:none}
 body[data-skin="minimal"] .header{padding:20px 22px 0}
-
 body[data-skin="minimal"] .header-masthead{
-  border-bottom:1px solid var(--m-line); padding:14px 0; margin-bottom:0;
-  font-size:.56rem; font-weight:500; letter-spacing:.22em; color:var(--fg-3);
+border-bottom:1px solid var(--m-line); padding:14px 0; margin-bottom:0;
+font-size:.56rem; font-weight:500; letter-spacing:.22em; color:var(--fg-3);
 }
 body[data-skin="minimal"] .masthead-switch{font-weight:500;color:var(--fg-2)}
 body[data-skin="minimal"] .masthead-switch::after{display:none}
 body[data-skin="minimal"] .masthead-switch:hover{color:var(--accent)}
 body[data-skin="minimal"] .header-kicker{
-  border:none; padding:26px 0 0; margin-bottom:0;
-  font-size:.6rem; font-weight:500; letter-spacing:.42em; color:var(--fg-3);
+border:none; padding:26px 0 0; margin-bottom:0;
+font-size:.6rem; font-weight:500; letter-spacing:.42em; color:var(--fg-3);
 }
 body[data-skin="minimal"] .header h1{
-  font-family:var(--font-ui); font-weight:200;
-  font-size:clamp(1.9rem,10.5vw,5.4rem); line-height:1; letter-spacing:.06em;
-  text-transform:uppercase; margin:22px 0 40px; cursor:pointer;
-  user-select:none; -webkit-user-select:none; -webkit-tap-highlight-color:transparent;
+font-family:var(--font-ui); font-weight:200;
+font-size:clamp(1.9rem,10.5vw,5.4rem); line-height:1; letter-spacing:.06em;
+text-transform:uppercase; margin:22px 0 40px; cursor:pointer;
+user-select:none; -webkit-user-select:none; -webkit-tap-highlight-color:transparent;
 }
 body[data-skin="minimal"] .header h1::after{color:var(--accent)}
-
 body[data-skin="minimal"] .section-switch{border-top:1px solid var(--m-line);border-bottom:1px solid var(--m-line)}
 body[data-skin="minimal"] .section-switch-btn{
-  border-right:1px solid var(--m-line); padding:24px 10px;
-  font-family:var(--font-ui); font-weight:500; font-size:.66rem;
-  letter-spacing:.24em; color:var(--fg-3); position:relative;
+border-right:1px solid var(--m-line); padding:24px 10px;
+font-family:var(--font-ui); font-weight:500; font-size:.66rem;
+letter-spacing:.24em; color:var(--fg-3); position:relative;
 }
 body[data-skin="minimal"] .section-switch-btn.active{background:transparent;color:var(--fg)}
 body[data-skin="minimal"] .section-switch-btn.active::before{
-  content:''; position:absolute; left:50%; bottom:14px; transform:translateX(-50%);
-  width:16px; height:2px; border-radius:2px; background:var(--accent);
+content:''; position:absolute; left:50%; bottom:14px; transform:translateX(-50%);
+width:16px; height:2px; border-radius:2px; background:var(--accent);
 }
 body[data-skin="minimal"] .section-switch-btn:hover:not(.active){background:transparent;color:var(--fg)}
 body[data-skin="minimal"] .section-subtitles{border-bottom:1px solid var(--m-line);background:transparent;min-height:42px}
 body[data-skin="minimal"] .section-subtitle{font-size:.56rem;letter-spacing:.3em;color:var(--fg-3);font-weight:500}
 body[data-skin="minimal"] .digital-clock-inline{color:var(--accent);font-weight:400;letter-spacing:.2em}
 body[data-skin="minimal"] .section-cycle-btn{
-  background:transparent; color:var(--fg);
-  border-top:1px solid var(--m-line); border-bottom:1px solid var(--m-line);
-  font-family:var(--font-ui); font-weight:500; font-size:.68rem; letter-spacing:.26em;
+background:transparent; color:var(--fg);
+border-top:1px solid var(--m-line); border-bottom:1px solid var(--m-line);
+font-family:var(--font-ui); font-weight:500; font-size:.68rem; letter-spacing:.26em;
 }
 body[data-skin="minimal"] .section-cycle-btn:active{background:var(--bg-2);color:var(--accent)}
-
 body[data-skin="minimal"] .controls{gap:10px;padding:36px 20px 30px}
 body[data-skin="minimal"] .controls button{
-  width:44px;height:44px;margin-left:0;border-radius:50%;
-  border:1px solid var(--m-line-strong);background:transparent;
-  color:var(--fg-2);font-size:.95rem;font-weight:400;
+width:44px;height:44px;margin-left:0;border-radius:50%;
+border:1px solid var(--m-line-strong);background:transparent;
+color:var(--fg-2);font-size:.95rem;font-weight:400;
 }
 body[data-skin="minimal"] .controls button:hover{background:transparent;color:var(--fg);border-color:var(--fg)}
 body[data-skin="minimal"] .controls button.active{background:transparent;border-color:var(--accent);color:var(--accent)}
 body[data-skin="minimal"] .controls button.active:hover{background:transparent;color:var(--accent)}
 body[data-skin="minimal"] .controls button::after{background:var(--fg);color:var(--bg);border-radius:4px;font-weight:500}
-
 body[data-skin="minimal"] .grid-container{padding:0 20px 110px}
 body[data-skin="minimal"] .syllable-grid{border-top:1px solid var(--m-line);border-left:1px solid var(--m-line)}
 body[data-skin="minimal"] .syllable-card{
-  border-right:1px solid var(--m-line);border-bottom:1px solid var(--m-line);
-  background:transparent;color:var(--fg);font-family:var(--font-ui);
-  font-weight:400;font-size:clamp(.9rem,1.6vw,1.05rem);letter-spacing:.1em;min-height:86px;
+border-right:1px solid var(--m-line);border-bottom:1px solid var(--m-line);
+background:transparent;color:var(--fg);font-family:var(--font-ui);
+font-weight:400;font-size:clamp(.9rem,1.6vw,1.05rem);letter-spacing:.1em;min-height:86px;
 }
 body[data-skin="minimal"] .syllable-card:not(.learned):hover{background:var(--bg-2);color:var(--fg);transform:none;box-shadow:none}
 body[data-skin="minimal"] .syllable-card.playing{background:transparent;color:var(--accent);box-shadow:inset 0 0 0 1px var(--accent)}
@@ -1304,17 +1364,15 @@ body[data-skin="minimal"] .syllable-card.learned .syllable-text{text-decoration-
 body[data-skin="minimal"] .learn-dot{width:12px;height:12px;top:10px;right:10px;border-radius:50%;border:1px solid var(--m-line-strong);opacity:.9}
 body[data-skin="minimal"] .syllable-card:not(.learned):hover .learn-dot{border-color:var(--fg)}
 body[data-skin="minimal"] .syllable-card.learned .learn-dot{background:var(--accent);border-color:var(--accent)}
-
 body[data-skin="minimal"] .progress-container{background:var(--bg);color:var(--fg);border-top:1px solid var(--m-line);padding:16px 24px 20px}
 body[data-skin="minimal"] .progress-label{color:var(--fg-3);font-weight:500;letter-spacing:.24em}
 body[data-skin="minimal"] .progress-bar{height:2px;background:var(--m-line)}
 body[data-skin="minimal"] .progress-fill{background:var(--accent)}
 body[data-skin="minimal"] .scroll-top-btn{
-  width:46px;height:46px;border-radius:50%;border:1px solid var(--m-line-strong);
-  background:var(--bg);color:var(--fg-2);font-size:1rem;font-weight:400;
+width:46px;height:46px;border-radius:50%;border:1px solid var(--m-line-strong);
+background:var(--bg);color:var(--fg-2);font-size:1rem;font-weight:400;
 }
 body[data-skin="minimal"] .scroll-top-btn:hover{background:var(--bg-2);color:var(--fg);transform:none;box-shadow:none}
-
 body[data-skin="minimal"] .exam-overlay{background:var(--bg)}
 body[data-skin="minimal"] .exam-question{color:var(--fg-3);font-weight:500;letter-spacing:.28em}
 body[data-skin="minimal"] .exam-repeat-btn,
@@ -1323,29 +1381,27 @@ body[data-skin="minimal"] .exam-repeat-btn:hover{background:var(--bg-2);color:va
 body[data-skin="minimal"] .exam-next-btn{border-color:var(--accent);color:var(--accent)}
 body[data-skin="minimal"] .exam-next-btn:hover{background:var(--accent);color:var(--accent-fg);transform:none;box-shadow:none}
 body[data-skin="minimal"] .exam-option{
-  border:1px solid var(--m-line-strong);border-radius:10px;background:transparent;
-  color:var(--fg);font-family:var(--font-ui);font-weight:400;font-size:1rem;letter-spacing:.1em;
+border:1px solid var(--m-line-strong);border-radius:10px;background:transparent;
+color:var(--fg);font-family:var(--font-ui);font-weight:400;font-size:1rem;letter-spacing:.1em;
 }
 body[data-skin="minimal"] .exam-option:hover:not(:disabled){background:var(--bg-2);color:var(--fg);transform:none;box-shadow:none;border-color:var(--fg)}
 body[data-skin="minimal"] .exam-option.correct{background:transparent;border-color:var(--m-ok);color:var(--m-ok)}
 body[data-skin="minimal"] .exam-option.wrong{background:transparent;border-color:var(--accent);color:var(--accent)}
 body[data-skin="minimal"] .exam-result{font-size:1.8rem;color:var(--fg-2)}
-
 body[data-skin="minimal"] .celebration-box{background:var(--bg);border:1px solid var(--m-line-strong);border-radius:16px;box-shadow:none;padding:28px}
 body[data-skin="minimal"] .celebration-box h2{font-family:var(--font-ui);font-weight:300;font-size:1.4rem;letter-spacing:.16em}
 body[data-skin="minimal"] .celebration-box img{border:1px solid var(--m-line);border-radius:8px}
 body[data-skin="minimal"] .celebration-close{
-  background:transparent;border:1px solid var(--m-line-strong);color:var(--fg);
-  border-radius:999px;font-family:var(--font-ui);font-weight:500;font-size:.7rem;letter-spacing:.24em;
+background:transparent;border:1px solid var(--m-line-strong);color:var(--fg);
+border-radius:999px;font-family:var(--font-ui);font-weight:500;font-size:.7rem;letter-spacing:.24em;
 }
 body[data-skin="minimal"] .celebration-close:hover{background:var(--accent);border-color:var(--accent);color:var(--accent-fg)}
 body[data-skin="minimal"] .toast{background:var(--fg);color:var(--bg);border-radius:999px;padding:11px 22px;font-weight:500;letter-spacing:.22em;font-size:.62rem}
 body[data-skin="minimal"] .footer{border-top:1px solid var(--m-line);color:var(--fg-3);font-weight:500;letter-spacing:.28em;font-size:.58rem;padding:30px 20px}
-
 body[data-skin="minimal"] .heroes-timeline{padding:44px 0 90px}
 body[data-skin="minimal"] .century-header{
-  background:transparent;color:var(--fg-3);text-align:left;
-  padding:0 0 14px;border-bottom:1px solid var(--m-line);margin:0 0 28px;
+background:transparent;color:var(--fg-3);text-align:left;
+padding:0 0 14px;border-bottom:1px solid var(--m-line);margin:0 0 28px;
 }
 body[data-skin="minimal"] .century-header:not(:first-child){margin-top:64px}
 body[data-skin="minimal"] .century-title{font-family:var(--font-ui);font-weight:400;font-size:.68rem;letter-spacing:.36em}
@@ -1360,9 +1416,9 @@ body[data-skin="minimal"] .hero-name{font-family:var(--font-ui);font-weight:500;
 body[data-skin="minimal"] .hero-years{font-size:.66rem;font-weight:400;color:var(--fg-3);letter-spacing:.04em}
 body[data-skin="minimal"] .hero-age{color:var(--accent);font-weight:500}
 body[data-skin="minimal"] .soviet-band{
-  background:transparent;color:var(--fg-3);font-family:var(--font-ui);font-weight:400;
-  font-size:.62rem;letter-spacing:.4em;padding:0 0 14px;margin:40px 0 28px;
-  border-bottom:1px solid var(--m-line);justify-content:flex-start;
+background:transparent;color:var(--fg-3);font-family:var(--font-ui);font-weight:400;
+font-size:.62rem;letter-spacing:.4em;padding:0 0 14px;margin:40px 0 28px;
+border-bottom:1px solid var(--m-line);justify-content:flex-start;
 }
 body[data-skin="minimal"] .hero-modal{background:var(--bg);padding:64px 10px 16px}
 body[data-skin="minimal"] .hero-modal-close,
@@ -1375,7 +1431,6 @@ body[data-skin="minimal"] .hero-modal-info h3{font-family:var(--font-ui);font-we
 body[data-skin="minimal"] .hero-modal-years{font-weight:400;font-size:.78rem;letter-spacing:.24em;color:var(--accent);margin-top:10px}
 body[data-skin="minimal"] .hero-nav{border:1px solid var(--m-line-strong);border-radius:50%;background:var(--bg);color:var(--fg-2)}
 body[data-skin="minimal"] .hero-nav:hover{background:var(--bg-2);color:var(--fg)}
-
 body[data-skin="minimal"] .htl-panel{border:1px solid var(--m-line);border-radius:12px;overflow:hidden}
 body[data-skin="minimal"] .htl-head{border-bottom:1px solid var(--m-line);background:transparent}
 body[data-skin="minimal"] .htl-head-cell:last-child{border-left:1px solid var(--m-line)}
@@ -1390,7 +1445,6 @@ body[data-skin="minimal"] .htl-other-name{font-family:var(--font-ui);font-weight
 body[data-skin="minimal"] .htl-war-year,
 body[data-skin="minimal"] .htl-other-year{color:var(--accent);font-weight:500}
 body[data-skin="minimal"] .htl-cnum{font-family:var(--font-ui);font-weight:300;font-size:1rem;letter-spacing:.06em;color:var(--fg-3)}
-
 body[data-skin="minimal"] .clock-wrapper{padding:40px 0 100px}
 body[data-skin="minimal"] .clock-frame{border:none;box-shadow:none;background:transparent;padding:0;width:min(520px,92vw)}
 body[data-skin="minimal"] .clock-frame::before{display:none}
@@ -1398,13 +1452,11 @@ body[data-skin="minimal"] .frame-head{border:none;border-bottom:1px solid var(--
 body[data-skin="minimal"] .frame-head-top,
 body[data-skin="minimal"] .frame-head-bot{display:none}
 body[data-skin="minimal"] .frame-head-title{font-family:var(--font-ui);font-weight:400;font-size:.6rem;letter-spacing:.2em;color:var(--fg-3);padding:0}
-
 #watchSvgMinimal{display:none}
 body[data-skin="minimal"] #watchSvgMinimal{display:block;color:var(--fg)}
 body[data-skin="minimal"] #watchSvgDesktop,
 body[data-skin="minimal"] #watchSvgIOS{display:none}
 #watchSvgMinimal #clkM-secondHand{stroke:var(--accent)}
-
 body[data-skin="minimal"] .masthead-stamp{border:1px solid var(--m-line-strong);border-radius:12px;box-shadow:none;background:var(--bg);overflow:hidden}
 body[data-skin="minimal"] .stamp-head{background:transparent;border-bottom:1px solid var(--m-line);font-weight:500;letter-spacing:.26em;font-size:.52rem;color:var(--fg-3)}
 body[data-skin="minimal"] .stamp-opt{font-family:var(--font-ui);font-weight:400;font-size:.72rem;letter-spacing:.08em;border-radius:8px;border:1px solid transparent;color:var(--fg-2)}
@@ -1416,8 +1468,8 @@ body[data-skin="minimal"] .stamp-opt-swatch{border-radius:50%;border-width:1px}
 <body data-paper="newsprint" data-ink="kinovar" data-skin="minimal" data-mintone="light">
 <script>
 (function(){try{
-  document.body.dataset.skin    = localStorage.getItem('gramotino_skin')    || 'minimal';
-  document.body.dataset.mintone = localStorage.getItem('gramotino_mintone') || 'light';
+document.body.dataset.skin    = localStorage.getItem('gramotino_skin')    || 'minimal';
+document.body.dataset.mintone = localStorage.getItem('gramotino_mintone') || 'light';
 }catch(e){}})();
 </script>
 <header class="header">
@@ -1467,6 +1519,7 @@ body[data-skin="minimal"] .stamp-opt-swatch{border-radius:50%;border-width:1px}
 <button id="hideLearnedBtn" data-tooltip="Скрыть/показать">👁</button>
 <button id="clearLearnedBtn" data-tooltip="Очистить">✕</button>
 <button id="examBtn" data-tooltip="Викторина">⚑</button>
+<button id="dictationBtn" data-tooltip="Диктант">✎</button>
 </div>
 <div class="grid-container"><div class="syllable-grid" id="syllableGrid"></div></div>
 </section>
@@ -1485,7 +1538,6 @@ body[data-skin="minimal"] .stamp-opt-swatch{border-radius:50%;border-width:1px}
 <div class="clock-stack">
 <div class="clock-view view-watch" id="clockView">
 <div class="watch-container" id="watchView">
-
 <svg id="watchSvgDesktop" class="watch-svg" viewBox="-20 0 440 520" xmlns="http://www.w3.org/2000/svg">
 <defs>
 <radialGradient id="clkD-caseGrad" cx="0.35" cy="0.28" r="0.9">
@@ -1583,7 +1635,6 @@ body[data-skin="minimal"] .stamp-opt-swatch{border-radius:50%;border-width:1px}
 <circle cx="200" cy="260" r="5" fill="url(#clkD-bezelGrad)"/>
 <circle cx="200" cy="260" r="2.5" fill="#1a1a1a"/>
 </svg>
-
 <svg id="watchSvgIOS" class="watch-svg" viewBox="-20 0 440 520" xmlns="http://www.w3.org/2000/svg">
 <defs>
 <radialGradient id="clkI-caseGrad" cx="0.35" cy="0.28" r="0.9">
@@ -1678,21 +1729,19 @@ body[data-skin="minimal"] .stamp-opt-swatch{border-radius:50%;border-width:1px}
 <circle cx="200" cy="260" r="5" fill="#c9a227"/>
 <circle cx="200" cy="260" r="2" fill="#1a1a1a"/>
 </svg>
-
 <svg id="watchSvgMinimal" class="watch-svg" viewBox="-20 0 440 520" xmlns="http://www.w3.org/2000/svg">
-  <g fill="none" stroke="currentColor" stroke-linecap="round">
-    <circle cx="200" cy="260" r="158" stroke-width="1" opacity="0.16"/>
-    <circle cx="200" cy="260" r="131" stroke-width="1" opacity="0.16"/>
-  </g>
-  <g id="clkM-ticksGroup"></g>
-  <g id="clkM-numbersGroup"></g>
-  <line id="clkM-hourHand"   x1="200" y1="288" x2="200" y2="194" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
-  <line id="clkM-minuteHand" x1="200" y1="296" x2="200" y2="158" stroke="currentColor" stroke-width="1.1" stroke-linecap="round"/>
-  <line id="clkM-secondHand" x1="200" y1="290" x2="200" y2="134" stroke="currentColor" stroke-width="0.6" opacity="0.7" stroke-linecap="round"/>
-  <circle cx="200" cy="260" r="4.5" fill="none" stroke="currentColor" stroke-width="1"/>
-  <circle cx="200" cy="260" r="1.6" fill="currentColor"/>
+<g fill="none" stroke="currentColor" stroke-linecap="round">
+<circle cx="200" cy="260" r="158" stroke-width="1" opacity="0.16"/>
+<circle cx="200" cy="260" r="131" stroke-width="1" opacity="0.16"/>
+</g>
+<g id="clkM-ticksGroup"></g>
+<g id="clkM-numbersGroup"></g>
+<line id="clkM-hourHand"   x1="200" y1="288" x2="200" y2="194" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+<line id="clkM-minuteHand" x1="200" y1="296" x2="200" y2="158" stroke="currentColor" stroke-width="1.1" stroke-linecap="round"/>
+<line id="clkM-secondHand" x1="200" y1="290" x2="200" y2="134" stroke="currentColor" stroke-width="0.6" opacity="0.7" stroke-linecap="round"/>
+<circle cx="200" cy="260" r="4.5" fill="none" stroke="currentColor" stroke-width="1"/>
+<circle cx="200" cy="260" r="1.6" fill="currentColor"/>
 </svg>
-
 </div>
 <div class="scheme-view" id="schemeView">
 <svg viewBox="0 0 200 200" id="minuteScheme" aria-hidden="true"></svg>
@@ -1705,32 +1754,45 @@ body[data-skin="minimal"] .stamp-opt-swatch{border-radius:50%;border-width:1px}
 <section id="heroesSection" class="tab-section">
 <div class="heroes-timeline" id="heroesTimeline"></div>
 </section>
-
 <section id="parentsSection" class="tab-section">
-  <div class="parents-wrapper">
-    <div class="parents-list" id="parentsList">
-      <div class="parents-state">Загрузка…</div>
-    </div>
-  </div>
+<div class="parents-wrapper">
+<div class="parents-list" id="parentsList">
+<div class="parents-state">Загрузка…</div>
+</div>
+</div>
 </section>
 </div>
-
 <!-- ПЛАВАЮЩИЙ ЛИСТ СТАТЬИ -->
 <div class="parents-reader-overlay" id="parentsReaderModal" aria-hidden="true">
-  <button class="parents-reader-close" id="parentsReaderClose" type="button" aria-label="Закрыть">×</button>
-  <div class="parents-reader-surface">
-    <article class="parents-reader-sheet">
-      <h1 class="parents-reader-title" id="parentsReaderTitle"></h1>
-      <div class="parents-reader-content" id="parentsReaderContent"></div>
-    </article>
-  </div>
+<button class="parents-reader-close" id="parentsReaderClose" type="button" aria-label="Закрыть">×</button>
+<div class="parents-reader-surface">
+<article class="parents-reader-sheet">
+<h1 class="parents-reader-title" id="parentsReaderTitle"></h1>
+<div class="parents-reader-content" id="parentsReaderContent"></div>
+</article>
 </div>
-
+</div>
 <div class="progress-container" id="progressContainer">
 <div class="progress-label" id="progressLabel">Отмечено: 0 из 0</div>
 <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
 </div>
 <button class="scroll-top-btn" id="scrollTopBtn" title="Наверх">↑</button>
+
+<!-- DICTATION OVERLAY -->
+<div class="dictation-overlay" id="dictationOverlay">
+    <button class="exam-exit-btn" id="dictationExitBtn" title="Выйти">✕</button>
+    <div class="dictation-header">
+        <div class="exam-question" id="dictationQuestion">Слог 1 из 10</div>
+        <button class="exam-repeat-btn" id="dictationRepeatBtn" title="Повторить">♪</button>
+    </div>
+    <div class="dictation-input-wrap">
+        <div class="dictation-input" id="dictationInput"></div>
+        <button class="dictation-backspace" id="dictationBackspace" title="Удалить">⌫</button>
+    </div>
+    <div class="dictation-feedback" id="dictationFeedback"></div>
+    <div class="dictation-keyboard" id="dictationKeyboard"></div>
+</div>
+
 <div class="exam-overlay" id="examOverlay">
 <button class="exam-exit-btn" id="examExitBtn" title="Выйти">✕</button>
 <div class="exam-header">
@@ -1761,6 +1823,7 @@ const randomBtn = document.getElementById('randomBtn');
 const hideLearnedBtn = document.getElementById('hideLearnedBtn');
 const clearLearnedBtn = document.getElementById('clearLearnedBtn');
 const examBtn = document.getElementById('examBtn');
+const dictationBtn = document.getElementById('dictationBtn');
 const progressContainer = document.getElementById('progressContainer');
 const progressLabel = document.getElementById('progressLabel');
 const progressFill = document.getElementById('progressFill');
@@ -1783,7 +1846,27 @@ const clockSection = document.getElementById('clockSection');
 const heroesSection = document.getElementById('heroesSection');
 const parentsSection = document.getElementById('parentsSection');
 const heroesTimeline = document.getElementById('heroesTimeline');
+
+// Dictation elements
+const dictationOverlay = document.getElementById('dictationOverlay');
+const dictationQuestion = document.getElementById('dictationQuestion');
+const dictationInput = document.getElementById('dictationInput');
+const dictationFeedback = document.getElementById('dictationFeedback');
+const dictationKeyboard = document.getElementById('dictationKeyboard');
+const dictationRepeatBtn = document.getElementById('dictationRepeatBtn');
+const dictationExitBtn = document.getElementById('dictationExitBtn');
+const dictationBackspace = document.getElementById('dictationBackspace');
+
 let currentMode = 'all'; let randomItems = []; let currentAudio = null; let examQuestions = []; let examIndex = 0; let examScore = 0; let currentExamCorrect = ''; let currentSection = 'syllables'; let progressTimer = null;
+
+// Dictation state
+const dictationPool = syllables.filter(s => s.length === 2);
+let dictationQueue = [];
+let dictationIndex = 0;
+let currentDictationTarget = '';
+let currentDictationInput = '';
+let currentDictationAudioSrc = '';
+
 const SECTION_ORDER = ['syllables', 'clock', 'heroes', 'parents'];
 const SECTION_LABELS = { syllables: 'Учи слоги', clock: 'Знай время', heroes: 'Чти великих', parents: 'Родителям' };
 function updateCycleBtn() { if (!sectionCycleBtn) return; const l = sectionCycleBtn.querySelector('.section-cycle-label'); if (l) l.textContent = SECTION_LABELS[currentSection]; }
@@ -1807,6 +1890,133 @@ function generateRandomItems() { const s = syllables.slice().sort(() => Math.ran
 hideLearnedBtn.addEventListener('click', () => { hideLearnedBtn.classList.toggle('active'); grid.classList.toggle('hide-learned', hideLearnedBtn.classList.contains('active')); });
 clearLearnedBtn.addEventListener('click', () => { learnedSet.clear(); saveLearnedSet(learnedSet); renderGrid(); flashProgress(); showToast('Очищено', 'success'); });
 examBtn.addEventListener('click', startExam);
+
+// ==================== DICTATION LOGIC ====================
+function startDictation() {
+    if (dictationPool.length === 0) {
+        showToast('Нет подходящих слогов', 'error');
+        return;
+    }
+    dictationQueue = dictationPool.slice().sort(() => Math.random() - 0.5).slice(0, 10);
+    dictationIndex = 0;
+    dictationOverlay.classList.add('show');
+    showNextDictation();
+}
+
+function showNextDictation() {
+    if (dictationIndex >= dictationQueue.length) {
+        dictationOverlay.classList.remove('show');
+        showToast('Диктант окончен!', 'success');
+        return;
+    }
+    currentDictationAudioSrc = dictationQueue[dictationIndex];
+    currentDictationTarget = currentDictationAudioSrc.toUpperCase();
+    currentDictationInput = '';
+    
+    dictationQuestion.textContent = `Слог ${dictationIndex + 1} из ${dictationQueue.length}`;
+    dictationFeedback.textContent = '';
+    dictationFeedback.style.color = '';
+    
+    renderDictationInput();
+    playAudio(currentDictationAudioSrc);
+}
+
+function renderDictationInput() {
+    dictationInput.innerHTML = '';
+    for (let i = 0; i < currentDictationTarget.length; i++) {
+        const slot = document.createElement('span');
+        slot.className = 'dictation-slot';
+        slot.textContent = currentDictationInput[i] || '';
+        if (i < currentDictationInput.length) {
+            slot.classList.add('filled');
+        }
+        dictationInput.appendChild(slot);
+    }
+}
+
+function handleDictationKey(letter) {
+    if (currentDictationInput.length >= currentDictationTarget.length) return;
+    currentDictationInput += letter;
+    renderDictationInput();
+    
+    if (currentDictationInput.length === currentDictationTarget.length) {
+        checkDictationAnswer();
+    }
+}
+
+function handleDictationBackspace() {
+    if (currentDictationInput.length === 0) return;
+    currentDictationInput = currentDictationInput.slice(0, -1);
+    renderDictationInput();
+    dictationFeedback.textContent = '';
+    dictationFeedback.style.color = '';
+    
+    // Remove correct/wrong classes from slots
+    document.querySelectorAll('.dictation-slot').forEach(s => {
+        s.classList.remove('correct', 'wrong');
+    });
+}
+
+function checkDictationAnswer() {
+    const slots = document.querySelectorAll('.dictation-slot');
+    let isCorrect = true;
+
+    for (let i = 0; i < currentDictationTarget.length; i++) {
+        if (currentDictationInput[i] === currentDictationTarget[i]) {
+            slots[i].classList.add('correct');
+        } else {
+            slots[i].classList.add('wrong');
+            isCorrect = false;
+        }
+    }
+
+    if (isCorrect) {
+        dictationFeedback.textContent = 'ВЕРНО!';
+        dictationFeedback.style.color = 'var(--m-ok, #2a6b3f)';
+        setTimeout(() => {
+            dictationIndex++;
+            showNextDictation();
+        }, 1200);
+    } else {
+        dictationFeedback.textContent = 'ОШИБКА. ПОВТОРИ';
+        dictationFeedback.style.color = 'var(--accent)';
+        setTimeout(() => {
+            currentDictationInput = '';
+            renderDictationInput();
+            dictationFeedback.textContent = '';
+            dictationFeedback.style.color = '';
+            document.querySelectorAll('.dictation-slot').forEach(s => {
+                s.classList.remove('correct', 'wrong');
+            });
+        }, 1500);
+    }
+}
+
+function buildDictationKeyboard() {
+    const letters = 'АБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯ'.split('');
+    dictationKeyboard.innerHTML = '';
+    letters.forEach(l => {
+        const btn = document.createElement('button');
+        btn.className = 'dictation-key';
+        btn.textContent = l;
+        btn.addEventListener('click', () => handleDictationKey(l));
+        dictationKeyboard.appendChild(btn);
+    });
+}
+
+dictationBtn.addEventListener('click', startDictation);
+dictationRepeatBtn.addEventListener('click', () => {
+    if (currentDictationAudioSrc) playAudio(currentDictationAudioSrc);
+});
+dictationExitBtn.addEventListener('click', () => {
+    dictationOverlay.classList.remove('show');
+    if (currentAudio) { currentAudio.pause(); currentAudio.src = ''; currentAudio = null; }
+});
+dictationBackspace.addEventListener('click', handleDictationBackspace);
+
+buildDictationKeyboard();
+// =============================================================
+
 function startExam() { examOverlay.classList.add('show'); examNextBtn.classList.remove('show'); examRepeatBtn.style.display = 'flex'; examQuestions = getRandomExamQuestions(10); examIndex = 0; examScore = 0; showNextExamQuestion(); }
 function getRandomExamQuestions(c) { const s = syllables.slice().sort(() => Math.random() - 0.5); return s.slice(0, Math.min(c, s.length)); }
 function showNextExamQuestion() { if (examIndex >= examQuestions.length) { examOverlay.classList.remove('show'); if (examScore === 10) showCelebration(); else showToast(`Верно ${examScore} из 10`, 'info'); return; } const correct = examQuestions[examIndex]; currentExamCorrect = correct; examQuestion.textContent = `Вопрос ${examIndex + 1} из ${examQuestions.length}`; examResult.textContent = ''; examNextBtn.classList.remove('show'); examRepeatBtn.style.display = 'flex'; const variants = new Set([correct]); const fl = correct.charAt(0).toUpperCase(); const slp = syllables.filter(i => i !== correct && i.charAt(0).toUpperCase() === fl); const msl = Math.min(5, slp.length); const ss = slp.sort(() => Math.random() - 0.5).slice(0, msl); ss.forEach(i => variants.add(i)); const fp = syllables.filter(i => !variants.has(i)); while (variants.size < 6 && fp.length > 0) { const ri = fp[Math.floor(Math.random() * fp.length)]; variants.add(ri); fp.splice(fp.indexOf(ri), 1); } const va = [...variants].sort(() => Math.random() - 0.5); examOptions.innerHTML = ''; va.forEach(v => { const b = document.createElement('button'); b.className = 'exam-option'; b.textContent = v.toUpperCase(); b.addEventListener('click', () => handleExamAnswer(b, v, correct)); examOptions.appendChild(b); }); playAudio(correct); }
@@ -1849,43 +2059,43 @@ function cyclePaper() { const i = PAPERS.findIndex(p => p.key === currentPaperKe
 function cycleInk() { const i = INKS.findIndex(p => p.key === currentInkKey); applyInk(INKS[(i + 1) % INKS.length].key); }
 function toneLabel(){ return body.dataset.mintone === 'dark' ? 'тёмная' : 'светлая'; }
 function renderToneList() {
-  const tones = [{ key:'light', label:'светлая', sw:'#fafaf9' }, { key:'dark', label:'тёмная', sw:'#0d0d0e' }];
-  const ck = body.dataset.mintone === 'dark' ? 'dark' : 'light';
-  const ci = tones.findIndex(t => t.key === ck);
-  stampTitle.textContent = 'Выбор фона';
-  stampCount.textContent = `${pad2(ci + 1)} / ${pad2(tones.length)}`;
-  stampList.classList.remove('single-col');
-  stampList.innerHTML = '';
-  tones.forEach(item => {
-    const btn = document.createElement('button');
-    btn.type = 'button';
-    btn.className = 'stamp-opt' + (item.key === ck ? ' active' : '');
-    const sw = document.createElement('span'); sw.className = 'stamp-opt-swatch'; sw.style.background = item.sw;
-    const lb = document.createElement('span'); lb.className = 'stamp-opt-label'; lb.textContent = item.label;
-    const ch = document.createElement('span'); ch.className = 'stamp-opt-check'; ch.textContent = '✓';
-    btn.appendChild(sw); btn.appendChild(lb); btn.appendChild(ch);
-    btn.addEventListener('click', () => {
-      body.dataset.mintone = item.key;
-      try { localStorage.setItem('gramotino_mintone', item.key); } catch(e){}
-      if (paperSwitch) paperSwitch.textContent = toneLabel();
-      renderStampList('paper');
-    });
-    stampList.appendChild(btn);
-  });
+const tones = [{ key:'light', label:'светлая', sw:'#fafaf9' }, { key:'dark', label:'тёмная', sw:'#0d0d0e' }];
+const ck = body.dataset.mintone === 'dark' ? 'dark' : 'light';
+const ci = tones.findIndex(t => t.key === ck);
+stampTitle.textContent = 'Выбор фона';
+stampCount.textContent = `${pad2(ci + 1)} / ${pad2(tones.length)}`;
+stampList.classList.remove('single-col');
+stampList.innerHTML = '';
+tones.forEach(item => {
+const btn = document.createElement('button');
+btn.type = 'button';
+btn.className = 'stamp-opt' + (item.key === ck ? ' active' : '');
+const sw = document.createElement('span'); sw.className = 'stamp-opt-swatch'; sw.style.background = item.sw;
+const lb = document.createElement('span'); lb.className = 'stamp-opt-label'; lb.textContent = item.label;
+const ch = document.createElement('span'); ch.className = 'stamp-opt-check'; ch.textContent = '✓';
+btn.appendChild(sw); btn.appendChild(lb); btn.appendChild(ch);
+btn.addEventListener('click', () => {
+body.dataset.mintone = item.key;
+try { localStorage.setItem('gramotino_mintone', item.key); } catch(e){}
+if (paperSwitch) paperSwitch.textContent = toneLabel();
+renderStampList('paper');
+});
+stampList.appendChild(btn);
+});
 }
 function renderStampList(mode) { if (mode === 'paper' && body.dataset.skin === 'minimal') { renderToneList(); return; } const list = mode === 'paper' ? PAPERS : INKS; const ck = mode === 'paper' ? currentPaperKey : currentInkKey; const ci = list.findIndex(i => i.key === ck); stampTitle.textContent = mode === 'paper' ? 'Выбор бумаги' : 'Выбор краски'; stampCount.textContent = `${pad2(ci + 1)} / ${pad2(list.length)}`; stampList.classList.toggle('single-col', mode === 'paper'); stampList.innerHTML = ''; list.forEach(item => { const btn = document.createElement('button'); btn.type = 'button'; btn.className = 'stamp-opt' + (item.key === ck ? ' active' : ''); if (mode === 'paper') btn.setAttribute('data-paper-opt', item.key); else btn.setAttribute('data-ink-opt', item.key); const sw = document.createElement('span'); sw.className = 'stamp-opt-swatch'; const lb = document.createElement('span'); lb.className = 'stamp-opt-label'; lb.textContent = item.label; const ch = document.createElement('span'); ch.className = 'stamp-opt-check'; ch.textContent = '✓'; btn.appendChild(sw); btn.appendChild(lb); btn.appendChild(ch); btn.addEventListener('click', () => { if (mode === 'paper') applyPaper(item.key); else applyInk(item.key); }); stampList.appendChild(btn); }); }
 function openStamp(mode, anchor) { openMode = mode; renderStampList(mode); const r = anchor.getBoundingClientRect(); if (window.innerWidth > 640) { let l = r.left; if (l + 260 > window.innerWidth - 12) l = window.innerWidth - 272; if (l < 12) l = 12; stamp.style.left = l + 'px'; stamp.style.right = 'auto'; stamp.style.top = (r.bottom + 8) + 'px'; stamp.style.bottom = 'auto'; stamp.style.transform = ''; } stamp.classList.add('show'); stamp.setAttribute('aria-hidden', 'false'); }
 function closeStamp() { openMode = null; stamp.classList.remove('show'); stamp.setAttribute('aria-hidden', 'true'); }
 paperSwitch.addEventListener('click', () => {
-  if (openMode) { closeStamp(); return; }
-  if (body.dataset.skin === 'minimal') {
-    const t = body.dataset.mintone === 'dark' ? 'light' : 'dark';
-    body.dataset.mintone = t;
-    try { localStorage.setItem('gramotino_mintone', t); } catch(e){}
-    paperSwitch.textContent = toneLabel();
-    return;
-  }
-  cyclePaper();
+if (openMode) { closeStamp(); return; }
+if (body.dataset.skin === 'minimal') {
+const t = body.dataset.mintone === 'dark' ? 'light' : 'dark';
+body.dataset.mintone = t;
+try { localStorage.setItem('gramotino_mintone', t); } catch(e){}
+paperSwitch.textContent = toneLabel();
+return;
+}
+cyclePaper();
 });
 inkSwitch.addEventListener('click', () => { if (openMode) { closeStamp(); return; } cycleInk(); });
 paperSwitch.addEventListener('contextmenu', e => { e.preventDefault(); if (openMode === 'paper') closeStamp(); else openStamp('paper', paperSwitch); });
@@ -1898,11 +2108,11 @@ window.addEventListener('resize', () => { if (openMode) closeStamp(); });
 window.addEventListener('scroll', () => { if (openMode) closeStamp(); }, { passive: true });
 let sp = 'newsprint', si = 'kinovar'; try { sp = localStorage.getItem(STORAGE_PAPER) || 'newsprint'; si = localStorage.getItem(STORAGE_INK) || 'kinovar'; } catch (e) { } applyPaper(sp, true); applyInk(si, true);
 window.__syncSkinControls = function(){
-  const ss = document.getElementById('skinSwitch');
-  if (ss) ss.textContent = (body.dataset.skin === 'minimal') ? 'минимализм' : 'газета';
-  if (!paperSwitch) return;
-  paperSwitch.textContent = (body.dataset.skin === 'minimal') ? toneLabel() : findPaper(currentPaperKey).label;
-  if (openMode) renderStampList(openMode);
+const ss = document.getElementById('skinSwitch');
+if (ss) ss.textContent = (body.dataset.skin === 'minimal') ? 'минимализм' : 'газета';
+if (!paperSwitch) return;
+paperSwitch.textContent = (body.dataset.skin === 'minimal') ? toneLabel() : findPaper(currentPaperKey).label;
+if (openMode) renderStampList(openMode);
 };
 window.__syncSkinControls();
 })();
@@ -1911,16 +2121,13 @@ window.__syncSkinControls();
 (function () {
 const clockView = document.getElementById('clockView'), watchView = document.getElementById('watchView'), schemeView = document.getElementById('schemeView'), minuteScheme = document.getElementById('minuteScheme');
 if (!clockView || !watchView || !schemeView) return;
-
 const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) ||
-              (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+(navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
 if (isIOS) document.body.classList.add('is-ios');
-
 const NS = 'http://www.w3.org/2000/svg', CX = 200, CY = 260, VIEWBOX_W = 440;
 const SUBCX = 200, SUBCY = 355, SEC_RADIUS = 32;
 const MOVE_THRESHOLD = 5, TAP_MIN_DURATION = 400, TAP_MAX_DURATION = 1200, TAP_MAX_MOVE = 12, GRAB_RADIUS = 220;
 const AUDIO_DIR = 'clock_audio/';
-
 const activeSvg = document.getElementById(isIOS ? 'watchSvgIOS' : 'watchSvgDesktop');
 const prefix = isIOS ? 'clkI' : 'clkD';
 const hourHandEl   = activeSvg.querySelector('#' + prefix + '-hourHand');
@@ -1930,94 +2137,83 @@ const ticksGroup   = activeSvg.querySelector('#' + prefix + '-ticksGroup');
 const numbersGroup = activeSvg.querySelector('#' + prefix + '-numbersGroup');
 const subTicksGroup = isIOS ? activeSvg.querySelector('#' + prefix + '-subTicks') : null;
 const digital24El = document.getElementById('clockDigital24');
-
 const AC_CTOR = window.AudioContext || window.webkitAudioContext;
 const audioCtx = AC_CTOR ? new AC_CTOR() : null;
 const audioBuffers = new Map();
 const decodePromises = new Map();
 let playSession = 0;
 let audioUnlocked = false;
-
 function fetchBuffer(name) {
-  if (!audioCtx) return Promise.resolve(null);
-  if (audioBuffers.has(name)) return Promise.resolve(audioBuffers.get(name));
-  if (decodePromises.has(name)) return decodePromises.get(name);
-  const p = fetch(AUDIO_DIR + name)
-    .then(r => r.arrayBuffer())
-    .then(buf => new Promise((resolve, reject) => {
-      audioCtx.decodeAudioData(buf, resolve, reject);
-    }))
-    .then(decoded => {
-      audioBuffers.set(name, decoded);
-      decodePromises.delete(name);
-      return decoded;
-    })
-    .catch(err => {
-      decodePromises.delete(name);
-      console.warn('Не удалось загрузить', name, err);
-      return null;
-    });
-  decodePromises.set(name, p);
-  return p;
+if (!audioCtx) return Promise.resolve(null);
+if (audioBuffers.has(name)) return Promise.resolve(audioBuffers.get(name));
+if (decodePromises.has(name)) return decodePromises.get(name);
+const p = fetch(AUDIO_DIR + name)
+.then(r => r.arrayBuffer())
+.then(buf => new Promise((resolve, reject) => {
+audioCtx.decodeAudioData(buf, resolve, reject);
+}))
+.then(decoded => {
+audioBuffers.set(name, decoded);
+decodePromises.delete(name);
+return decoded;
+})
+.catch(err => {
+decodePromises.delete(name);
+console.warn('Не удалось загрузить', name, err);
+return null;
+});
+decodePromises.set(name, p);
+return p;
 }
-
 function preloadAllClockAudio() {
-  if (!audioCtx) return;
-  for (let h = 1; h <= 12; h++) fetchBuffer(`h_${String(h).padStart(2, '0')}.mp3`);
-  for (let m = 0; m <= 59; m++) fetchBuffer(`m_${String(m).padStart(2, '0')}.mp3`);
-  fetchBuffer('rovno.mp3');
+if (!audioCtx) return;
+for (let h = 1; h <= 12; h++) fetchBuffer(`h_${String(h).padStart(2, '0')}.mp3`);
+for (let m = 0; m <= 59; m++) fetchBuffer(`m_${String(m).padStart(2, '0')}.mp3`);
+fetchBuffer('rovno.mp3');
 }
-
 function unlockAudioContext() {
-  if (!audioCtx || audioUnlocked) return;
-  try {
-    if (audioCtx.state === 'suspended') audioCtx.resume();
-    audioUnlocked = audioCtx.state === 'running';
-  } catch (e) { }
+if (!audioCtx || audioUnlocked) return;
+try {
+if (audioCtx.state === 'suspended') audioCtx.resume();
+audioUnlocked = audioCtx.state === 'running';
+} catch (e) { }
 }
-
 function warmUpSharedForIOS(onDone) {
-  unlockAudioContext();
-  if (onDone) onDone();
+unlockAudioContext();
+if (onDone) onDone();
 }
-
 function stopClockAudio() {
-  playSession++;
+playSession++;
 }
-
 function speakTime() {
-  if (!audioCtx) return;
-  unlockAudioContext();
-  const myToken = ++playSession;
-  const isStale = () => myToken !== playSession;
-
-  const seq = [`h_${String(hour).padStart(2, '0')}.mp3`];
-  if (minute === 0) seq.push('rovno.mp3');
-  else seq.push(`m_${String(minute).padStart(2, '0')}.mp3`);
-
-  Promise.all(seq.map(fetchBuffer)).then(() => {
-    if (isStale()) return;
-    const playChain = () => {
-      if (isStale()) return;
-      const name = seq.shift();
-      if (!name) return;
-      const buf = audioBuffers.get(name);
-      if (!buf) { playChain(); return; }
-      const src = audioCtx.createBufferSource();
-      src.buffer = buf;
-      src.connect(audioCtx.destination);
-      src.onended = () => {
-        if (isStale()) return;
-        playChain();
-      };
-      src.start(0);
-    };
-    playChain();
-  });
+if (!audioCtx) return;
+unlockAudioContext();
+const myToken = ++playSession;
+const isStale = () => myToken !== playSession;
+const seq = [`h_${String(hour).padStart(2, '0')}.mp3`];
+if (minute === 0) seq.push('rovno.mp3');
+else seq.push(`m_${String(minute).padStart(2, '0')}.mp3`);
+Promise.all(seq.map(fetchBuffer)).then(() => {
+if (isStale()) return;
+const playChain = () => {
+if (isStale()) return;
+const name = seq.shift();
+if (!name) return;
+const buf = audioBuffers.get(name);
+if (!buf) { playChain(); return; }
+const src = audioCtx.createBufferSource();
+src.buffer = buf;
+src.connect(audioCtx.destination);
+src.onended = () => {
+if (isStale()) return;
+playChain();
+};
+src.start(0);
+};
+playChain();
+});
 }
-
 preloadAllClockAudio();
-
 function buildMinuteScheme() {
 if (!minuteScheme) return;
 minuteScheme.innerHTML = '';
@@ -2031,7 +2227,8 @@ minuteScheme.appendChild(n);
 for (let i = 0; i < 12; i++) {
 const a = (i * 30 - 90) * Math.PI / 180;
 const l = document.createElementNS(NS, 'line');
-l.setAttribute('x1', S + 82 * Math.cos(a)); l.setAttribute('y1', S + 82 * Math.sin(a)); l.setAttribute('x2', S + 92 * Math.cos(a)); l.setAttribute('y2', S + 92 * Math.sin(a));
+l.setAttribute('x1', S + 82 * Math.cos(a)); l.setAttribute('y1', S + 82 * Math.sin(a));
+l.setAttribute('x2', S + 92 * Math.cos(a)); l.setAttribute('y2', S + 92 * Math.sin(a));
 l.setAttribute('stroke', 'currentColor'); l.setAttribute('stroke-width', '2'); l.setAttribute('stroke-linecap', 'round');
 minuteScheme.appendChild(l);
 }
@@ -2039,7 +2236,8 @@ for (let i = 0; i < 60; i++) {
 if (i % 5 === 0) continue;
 const a = (i * 6 - 90) * Math.PI / 180;
 const l = document.createElementNS(NS, 'line');
-l.setAttribute('x1', S + 88 * Math.cos(a)); l.setAttribute('y1', S + 88 * Math.sin(a)); l.setAttribute('x2', S + 92 * Math.cos(a)); l.setAttribute('y2', S + 92 * Math.sin(a));
+l.setAttribute('x1', S + 88 * Math.cos(a)); l.setAttribute('y1', S + 88 * Math.sin(a));
+l.setAttribute('x2', S + 92 * Math.cos(a)); l.setAttribute('y2', S + 92 * Math.sin(a));
 l.setAttribute('stroke', 'currentColor'); l.setAttribute('stroke-width', '0.7'); l.setAttribute('opacity', '0.4');
 minuteScheme.appendChild(l);
 }
@@ -2055,7 +2253,6 @@ minuteScheme.appendChild(t);
 }
 }
 buildMinuteScheme();
-
 const R_IN = 131, R_OUT = 138;
 const tickColor = isIOS ? '#c9a227' : '#1a1a1a';
 const cO = document.createElementNS(NS, 'circle');
@@ -2114,52 +2311,48 @@ t.setAttribute('fill', isIOS ? numColor : (i === 12 ? '#b81e1e' : numColor));
 t.textContent = i;
 numbersGroup.appendChild(t);
 }
-
 const minimalSvg      = document.getElementById('watchSvgMinimal');
 const minTicksGroup   = minimalSvg ? minimalSvg.querySelector('#clkM-ticksGroup')   : null;
 const minNumbersGroup = minimalSvg ? minimalSvg.querySelector('#clkM-numbersGroup') : null;
 const minHourHand     = minimalSvg ? minimalSvg.querySelector('#clkM-hourHand')     : null;
 const minMinuteHand   = minimalSvg ? minimalSvg.querySelector('#clkM-minuteHand')   : null;
 const minSecondHand   = minimalSvg ? minimalSvg.querySelector('#clkM-secondHand')   : null;
-
 if (minTicksGroup) {
-  for (let i = 0; i < 60; i++) {
-    const a = (i * 6 - 90) * Math.PI / 180;
-    const big = i % 5 === 0;
-    const r1 = big ? 130 : 137, r2 = 144;
-    const l = document.createElementNS(NS, 'line');
-    l.setAttribute('x1', (CX + r1 * Math.cos(a)).toFixed(2));
-    l.setAttribute('y1', (CY + r1 * Math.sin(a)).toFixed(2));
-    l.setAttribute('x2', (CX + r2 * Math.cos(a)).toFixed(2));
-    l.setAttribute('y2', (CY + r2 * Math.sin(a)).toFixed(2));
-    l.setAttribute('stroke', 'currentColor');
-    l.setAttribute('stroke-width', big ? '1.3' : '0.6');
-    l.setAttribute('opacity', big ? '0.85' : '0.32');
-    l.setAttribute('stroke-linecap', 'round');
-    minTicksGroup.appendChild(l);
-  }
+for (let i = 0; i < 60; i++) {
+const a = (i * 6 - 90) * Math.PI / 180;
+const big = i % 5 === 0;
+const r1 = big ? 130 : 137, r2 = 144;
+const l = document.createElementNS(NS, 'line');
+l.setAttribute('x1', (CX + r1 * Math.cos(a)).toFixed(2));
+l.setAttribute('y1', (CY + r1 * Math.sin(a)).toFixed(2));
+l.setAttribute('x2', (CX + r2 * Math.cos(a)).toFixed(2));
+l.setAttribute('y2', (CY + r2 * Math.sin(a)).toFixed(2));
+l.setAttribute('stroke', 'currentColor');
+l.setAttribute('stroke-width', big ? '1.3' : '0.6');
+l.setAttribute('opacity', big ? '0.85' : '0.32');
+l.setAttribute('stroke-linecap', 'round');
+minTicksGroup.appendChild(l);
+}
 }
 if (minNumbersGroup) {
-  for (let i = 1; i <= 12; i++) {
-    const a = (i * 30 - 90) * Math.PI / 180;
-    const t = document.createElementNS(NS, 'text');
-    t.setAttribute('x', (CX + 110 * Math.cos(a)).toFixed(2));
-    t.setAttribute('y', (CY + 110 * Math.sin(a)).toFixed(2));
-    t.setAttribute('text-anchor', 'middle');
-    t.setAttribute('dominant-baseline', 'central');
-    t.setAttribute('font-family', "Inter, system-ui, sans-serif");
-    t.setAttribute('font-size', '19');
-    t.setAttribute('font-weight', '300');
-    t.setAttribute('fill', 'currentColor');
-    t.setAttribute('opacity', '0.75');
-    t.textContent = i;
-    minNumbersGroup.appendChild(t);
-  }
+for (let i = 1; i <= 12; i++) {
+const a = (i * 30 - 90) * Math.PI / 180;
+const t = document.createElementNS(NS, 'text');
+t.setAttribute('x', (CX + 110 * Math.cos(a)).toFixed(2));
+t.setAttribute('y', (CY + 110 * Math.sin(a)).toFixed(2));
+t.setAttribute('text-anchor', 'middle');
+t.setAttribute('dominant-baseline', 'central');
+t.setAttribute('font-family', "Inter, system-ui, sans-serif");
+t.setAttribute('font-size', '19');
+t.setAttribute('font-weight', '300');
+t.setAttribute('fill', 'currentColor');
+t.setAttribute('opacity', '0.75');
+t.textContent = i;
+minNumbersGroup.appendChild(t);
 }
-
+}
 let hour = 3, minute = 0, seconds = 0, totalMinutes = (hour % 12) * 60 + minute, currentView = 'watch';
 let lastDragTime = 0;
-
 function setView(view) {
 currentView = view;
 if (view === 'watch') {
@@ -2176,7 +2369,6 @@ let h = Math.floor(rounded / 60) % 12;
 h = ((h % 12) + 12) % 12;
 hour = h === 0 ? 12 : h;
 }
-
 const HOUR_HAND_POINTS   = [[0,-65],[4,-25],[5,-5],[5,4],[-5,4],[-5,-5],[-4,-25]];
 const MINUTE_HAND_POINTS = [[0,-105],[3,-60],[4,-10],[4,4],[-4,4],[-4,-10],[-3,-60]];
 function rotatePoints(points, deg) {
@@ -2217,7 +2409,6 @@ if (minHourHand)   minHourHand.setAttribute('transform',   `rotate(${hourDeg} ${
 if (minMinuteHand) minMinuteHand.setAttribute('transform', `rotate(${minuteDeg} ${CX} ${CY})`);
 digital24El.textContent = `${String(hour).padStart(2, '0')}:${String(minute).padStart(2, '0')}`;
 }
-
 function tickSeconds() {
 seconds = (seconds + 1) % 60;
 if (seconds === 0) {
@@ -2228,7 +2419,6 @@ render();
 renderSecondHand();
 }
 setInterval(tickSeconds, 1000);
-
 function getPoint(e) {
 if (e.touches && e.touches.length > 0) return { x: e.touches[0].clientX, y: e.touches[0].clientY };
 if (e.changedTouches && e.changedTouches.length > 0) return { x: e.changedTouches[0].clientX, y: e.changedTouches[0].clientY };
@@ -2303,7 +2493,6 @@ if (currentView === 'scheme' || isPointInsideWatch(point)) { toggleView(); }
 gesture = null;
 }
 function cancelGesture() { if (!gesture) return; if (gesture.mode === 'drag') clockView.classList.remove('dragging'); gesture = null; }
-
 clockView.addEventListener('touchstart', e => { if (e.touches.length !== 1) return; startGesture(getPoint(e), 'touch'); }, { passive: true });
 clockView.addEventListener('touchmove', e => { if (!gesture || gesture.source !== 'touch') return; if (e.touches.length !== 1) { cancelGesture(); return; } moveGesture(e, getPoint(e)); }, { passive: false });
 clockView.addEventListener('touchend', e => { if (!gesture || gesture.source !== 'touch') return; endGesture(getPoint(e)); }, { passive: true });
@@ -2311,7 +2500,6 @@ clockView.addEventListener('touchcancel', () => { if (!gesture || gesture.source
 clockView.addEventListener('mousedown', e => { if (e.button !== 0) return; startGesture(getPoint(e), 'mouse'); });
 window.addEventListener('mousemove', e => { if (!gesture || gesture.source !== 'mouse') return; moveGesture(e, getPoint(e)); });
 window.addEventListener('mouseup', e => { if (!gesture || gesture.source !== 'mouse') return; endGesture(getPoint(e)); });
-
 const frameHead = document.getElementById('frameHead');
 if (frameHead) {
 frameHead.addEventListener('click', (e) => {
@@ -2330,61 +2518,58 @@ speakTime();
 });
 }
 }
-
 window.clockSpeakCancel = () => { stopClockAudio(); };
 render(); renderSecondHand(); setView('watch');
 })();
 </script>
 <script>
 (function () {
-  const body = document.body;
-  const h1 = document.querySelector('.header h1');
-  if (!h1) return;
-
-  function toast(msg) {
-    const c = document.getElementById('toastContainer');
-    if (!c) return;
-    const el = document.createElement('div');
-    el.className = 'toast';
-    el.textContent = msg;
-    c.appendChild(el);
-    setTimeout(() => el.remove(), 2600);
-  }
-  function apply(skin, tone) {
-    body.dataset.skin = skin;
-    body.dataset.mintone = tone;
-    try {
-      localStorage.setItem('gramotino_skin', skin);
-      localStorage.setItem('gramotino_mintone', tone);
-    } catch (e) {}
-    if (typeof window.__syncSkinControls === 'function') window.__syncSkinControls();
-  }
-  // — переключатель стиля —
-  const skinSwitch = document.getElementById('skinSwitch');
-  if (skinSwitch) {
-    skinSwitch.addEventListener('click', function (e) {
-      e.preventDefault();
-      const s = body.dataset.skin || 'minimal';
-      if (s === 'minimal') {
-        apply('classic', body.dataset.mintone || 'light');
-        toast('Газетный стиль');
-      } else {
-        apply('minimal', body.dataset.mintone || 'light');
-        toast('Минимализм');
-      }
-    });
-  }
-  h1.setAttribute('title', 'Двойной клик — сменить оформление');
-  h1.addEventListener('dblclick', function (e) {
-    e.preventDefault();
-    const s = body.dataset.skin || 'minimal';
-    const t = body.dataset.mintone || 'light';
-    if (s === 'minimal' && t === 'light')      { apply('minimal', 'dark');  toast('Минимализм · тёмный'); }
-    else if (s === 'minimal' && t === 'dark')  { apply('classic', 'light'); toast('Газетный стиль'); }
-    else                                       { apply('minimal', 'light'); toast('Минимализм · светлый'); }
-  });
-
-  if (typeof window.__syncSkinControls === 'function') window.__syncSkinControls();
+const body = document.body;
+const h1 = document.querySelector('.header h1');
+if (!h1) return;
+function toast(msg) {
+const c = document.getElementById('toastContainer');
+if (!c) return;
+const el = document.createElement('div');
+el.className = 'toast';
+el.textContent = msg;
+c.appendChild(el);
+setTimeout(() => el.remove(), 2600);
+}
+function apply(skin, tone) {
+body.dataset.skin = skin;
+body.dataset.mintone = tone;
+try {
+localStorage.setItem('gramotino_skin', skin);
+localStorage.setItem('gramotino_mintone', tone);
+} catch (e) {}
+if (typeof window.__syncSkinControls === 'function') window.__syncSkinControls();
+}
+// — переключатель стиля —
+const skinSwitch = document.getElementById('skinSwitch');
+if (skinSwitch) {
+skinSwitch.addEventListener('click', function (e) {
+e.preventDefault();
+const s = body.dataset.skin || 'minimal';
+if (s === 'minimal') {
+apply('classic', body.dataset.mintone || 'light');
+toast('Газетный стиль');
+} else {
+apply('minimal', body.dataset.mintone || 'light');
+toast('Минимализм');
+}
+});
+}
+h1.setAttribute('title', 'Двойной клик — сменить оформление');
+h1.addEventListener('dblclick', function (e) {
+e.preventDefault();
+const s = body.dataset.skin || 'minimal';
+const t = body.dataset.mintone || 'light';
+if (s === 'minimal' && t === 'light')      { apply('minimal', 'dark');  toast('Минимализм · тёмный'); }
+else if (s === 'minimal' && t === 'dark')  { apply('classic', 'light'); toast('Газетный стиль'); }
+else                                       { apply('minimal', 'light'); toast('Минимализм · светлый'); }
+});
+if (typeof window.__syncSkinControls === 'function') window.__syncSkinControls();
 })();
 </script>
 <script>
@@ -2392,291 +2577,269 @@ render(); renderSecondHand(); setView('watch');
 /* ============== РОДИТЕЛЯМ — статьи с GitHub ================= */
 /* ============================================================ */
 (function () {
-  const INDEX_URL      = 'articles/index.json';
-  const ARTICLE_DIR    = 'articles/';
-  const HASH_PREFIX    = '#article/';
-  const ARTICLE_SUFFIX = '.md';
-
-  const $ = id => document.getElementById(id);
-  const list          = $('parentsList');
-  const readerModal   = $('parentsReaderModal');
-  const readerTitle   = $('parentsReaderTitle');
-  const readerContent = $('parentsReaderContent');
-  const readerClose   = $('parentsReaderClose');
-
-  if (!list || !readerModal) return;
-
-  /* ---------- кэш в памяти сессии ---------- */
-  const indexCache    = { loaded: false, data: [] };
-  const articleCache  = new Map();   // slug -> md string
-
-  let readingSlug     = null;
-  let openAnimationTimer = null;
-
-  /* ---------- утилита: тост ---------- */
-  function toast(msg) {
-    const c = document.getElementById('toastContainer');
-    if (!c) return;
-    const el = document.createElement('div');
-    el.className = 'toast';
-    el.textContent = msg;
-    c.appendChild(el);
-    setTimeout(() => el.remove(), 2200);
-  }
-
-  /* ---------- markdown ---------- */
-  function esc(s) {
-    return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-  }
-  function inline(text) {
-    return esc(text)
-      .replace(/`([^`]+?)`/g, '<code>$1</code>')
-      .replace(/\*\*([^*]+?)\*\*/g, '<strong>$1</strong>')
-      .replace(/(^|[^*])\*([^*\n]+?)\*/g, '$1<em>$2</em>')
-      .replace(/\[([^\]]+)\]\(([^)\s]+)\)/g, '<a href="$2" target="_blank" rel="noopener">$1</a>');
-  }
-  function mdToHtml(src) {
-    src = String(src || '').replace(/\r\n?/g, '\n');
-    const codeBlocks = [];
-    src = src.replace(/```([\s\S]*?)```/g, (_, code) => {
-      codeBlocks.push(code.replace(/^\n/, ''));
-      return `\u0000CB${codeBlocks.length - 1}\u0000`;
-    });
-    const lines = src.split('\n');
-    const out = [];
-    let para = [];
-    const flush = () => {
-      if (!para.length) return;
+const INDEX_URL      = 'articles/index.json';
+const ARTICLE_DIR    = 'articles/';
+const HASH_PREFIX    = '#article/';
+const ARTICLE_SUFFIX = '.md';
+const $ = id => document.getElementById(id);
+const list          = $('parentsList');
+const readerModal   = $('parentsReaderModal');
+const readerTitle   = $('parentsReaderTitle');
+const readerContent = $('parentsReaderContent');
+const readerClose   = $('parentsReaderClose');
+if (!list || !readerModal) return;
+/* ---------- кэш в памяти сессии ---------- */
+const indexCache    = { loaded: false, data: [] };
+const articleCache  = new Map();   // slug -> md string
+let readingSlug     = null;
+let openAnimationTimer = null;
+/* ---------- утилита: тост ---------- */
+function toast(msg) {
+const c = document.getElementById('toastContainer');
+if (!c) return;
+const el = document.createElement('div');
+el.className = 'toast';
+el.textContent = msg;
+c.appendChild(el);
+setTimeout(() => el.remove(), 2200);
+}
+/* ---------- markdown ---------- */
+function esc(s) {
+return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+}
+function inline(text) {
+return esc(text)
+.replace(/`([^`]+?)`/g, '<code>$1</code>')
+.replace(/\*\*([^*]+?)\*\*/g, '<strong>$1</strong>')
+.replace(/(^|[^*])\*([^*
+]+?)\*/g, '$1<em>$2</em>')
+.replace(/\[([^\]]+)\]\(([^)\s]+)\)/g, '<a href="$2" target="_blank" rel="noopener">$1</a>');
+}
+function mdToHtml(src) {
+src = String(src || '').replace(/\r
+?/g, '
+');
+const codeBlocks = [];
+src = src.replace(/```([\s\S]*?)```/g, (_, code) => {
+codeBlocks.push(code.replace(/^
+/, ''));
+return `\u0000CB${codeBlocks.length - 1}\u0000`;
+});
+const lines = src.split('
+');
+const out = [];
+let para = [];
+const flush = () => {
+if (!para.length) return;
 out.push('<p>' + para.map(inline).join(' ') + '</p>');      para = [];
-    };
-    let i = 0;
-    while (i < lines.length) {
-      const line = lines[i];
-      const cb = line.match(/^\u0000CB(\d+)\u0000\s*$/);
-      if (cb) { flush(); out.push('<pre><code>' + esc(codeBlocks[+cb[1]]) + '</code></pre>'); i++; continue; }
-      if (/^\s*$/.test(line)) { flush(); i++; continue; }
-      if (/^#{1,6}\s+/.test(line)) {
-        flush();
-        const m = line.match(/^(#{1,6})\s+(.*)$/);
-        const lvl = m[1].length;
-        out.push(`<h${lvl}>${inline(m[2])}</h${lvl}>`);
-        i++; continue;
-      }
-      if (/^(-{3,}|\*{3,}|_{3,})\s*$/.test(line)) { flush(); out.push('<hr>'); i++; continue; }
-      if (/^>\s?/.test(line)) {
-        flush();
-        const buf = [];
-        while (i < lines.length && /^>\s?/.test(lines[i])) {
-          buf.push(lines[i].replace(/^>\s?/, ''));
-          i++;
-        }
-        out.push('<blockquote>' + buf.map(inline).join('<br>') + '</blockquote>');
-        continue;
-      }
-      if (/^[-*+]\s+/.test(line)) {
-        flush();
-        const items = [];
-        while (i < lines.length && /^[-*+]\s+/.test(lines[i])) {
-          items.push('<li>' + inline(lines[i].replace(/^[-*+]\s+/, '')) + '</li>');
-          i++;
-        }
-        out.push('<ul>' + items.join('') + '</ul>');
-        continue;
-      }
-      if (/^\d+\.\s+/.test(line)) {
-        flush();
-        const items = [];
-        while (i < lines.length && /^\d+\.\s+/.test(lines[i])) {
-          items.push('<li>' + inline(lines[i].replace(/^\d+\.\s+/, '')) + '</li>');
-          i++;
-        }
-        out.push('<ol>' + items.join('') + '</ol>');
-        continue;
-      }
-      para.push(line);
-      i++;
-    }
-    flush();
-    return out.join('\n');
-  }
-
-  /* ---------- загрузка с GitHub ---------- */
-  async function loadIndex(force) {
-    if (indexCache.loaded && !force) return indexCache.data;
-    const res = await fetch(INDEX_URL, { cache: 'no-cache' });
-    if (!res.ok) throw new Error('index.json: HTTP ' + res.status);
-    const data = await res.json();
-    if (!Array.isArray(data)) throw new Error('index.json должен быть массивом');
-    indexCache.data = data;
-    indexCache.loaded = true;
-    return data;
-  }
-  async function loadArticle(slug) {
-    if (articleCache.has(slug)) return articleCache.get(slug);
-    const res = await fetch(ARTICLE_DIR + encodeURIComponent(slug) + ARTICLE_SUFFIX, { cache: 'no-cache' });
-    if (!res.ok) throw new Error('Статья не найдена: ' + slug);
-    const text = await res.text();
-    articleCache.set(slug, text);
-    return text;
-  }
-
-  /* ---------- состояния ---------- */
-  function renderLoading() {
-    list.innerHTML = '<div class="parents-state">Загрузка…</div>';
-  }
-  function renderError(msg) {
-    list.innerHTML = '';
-    const div = document.createElement('div');
-    div.className = 'parents-state is-error';
-    div.innerHTML = 'Не удалось загрузить статьи' + '<small>' + esc(msg) + '<br>Убедитесь, что сайт открыт через веб-сервер (не file://), а файл articles/index.json существует.</small>';
-    list.appendChild(div);
-  }
-  function renderEmpty() {
-    list.innerHTML = '<div class="parents-state">Пока нет статей<small>Создайте articles/index.json и добавьте первый материал</small></div>';
-  }
-
-  /* ---------- список ---------- */
-  function renderList(items) {
-    list.innerHTML = '';
-    if (!items.length) { renderEmpty(); return; }
-
-    items.forEach((item, idx) => {
-      const slug  = String(item.slug || '').trim();
-      const title = String(item.title || slug || 'Без названия');
-      if (!slug) return;
-
-      const card = document.createElement('a');
-      card.className = 'parents-card';
-      card.href = HASH_PREFIX + encodeURIComponent(slug);
-      card.dataset.slug = slug;
-      // мягкая каскадная анимация появления
-      card.style.opacity = '0';
-      card.style.transform = 'translateY(14px)';
-      card.style.transition = `opacity .55s ease ${idx * 55}ms, transform .7s cubic-bezier(.16,1,.3,1) ${idx * 55}ms, padding .5s cubic-bezier(.16,1,.3,1)`;
-
-      const t = document.createElement('div');
-      t.className = 'parents-card-title';
-      t.textContent = title;
-
-      const a = document.createElement('span');
-      a.className = 'parents-card-arrow';
-      a.textContent = '→';
-
-      card.appendChild(t);
-      card.appendChild(a);
-      list.appendChild(card);
-
-      // запускаем появление на следующем кадре
-      requestAnimationFrame(() => {
-        requestAnimationFrame(() => {
-          card.style.opacity = '1';
-          card.style.transform = 'translateY(0)';
-        });
-      });
-
-      card.addEventListener('click', e => {
-        // если ссылка уже активна — просто открыть
-        if (window.location.hash === card.getAttribute('href')) {
-          e.preventDefault();
-          openBySlug(slug);
-        }
-        // иначе — стандартный переход по href, hashchange сам откроет
-      });
-    });
-  }
-
-  /* ---------- читалка ---------- */
-  async function openBySlug(slug) {
-    if (!slug) return;
-    if (readingSlug === slug && readerModal.classList.contains('show')) return;
-
-    // если что-то уже открыто — сначала закрыть без анимации
-    if (readerModal.classList.contains('show')) {
-      readerModal.classList.remove('show');
-      readerModal.setAttribute('aria-hidden', 'true');
-    }
-
-    let md;
-    try {
-      md = await loadArticle(slug);
-    } catch (err) {
-      toast('Статья не найдена');
-      // чистим hash
-      if (window.location.hash.startsWith(HASH_PREFIX)) {
-        history.replaceState('', document.title, window.location.pathname + window.location.search);
-      }
-      readingSlug = null;
-      return;
-    }
-
-    const meta = indexCache.data.find(x => x && x.slug === slug) || {};
-    const title = meta.title || slug;
-
-    readingSlug = slug;
-    readerTitle.textContent = title;
-    readerContent.innerHTML = mdToHtml(md);
-
-    document.body.style.overflow = 'hidden';
-    readerModal.setAttribute('aria-hidden', 'false');
-    // гарантируем перерисовку перед показом
-    void readerModal.offsetWidth;
-    readerModal.classList.add('show');
-  }
-
-  function closeReader() {
-    if (!readerModal.classList.contains('show')) return;
-    readerModal.classList.remove('show');
-    readerModal.setAttribute('aria-hidden', 'true');
-    readingSlug = null;
-    document.body.style.overflow = '';
-  }
-
-  function closeArticle() {
-    if (window.location.hash.startsWith(HASH_PREFIX)) {
-      // очищаем hash без перезагрузки
-      history.pushState('', document.title, window.location.pathname + window.location.search);
-      closeReader();
-    } else {
-      closeReader();
-    }
-  }
-
-  function handleHash() {
-    const hash = window.location.hash;
-    if (hash.startsWith(HASH_PREFIX)) {
-      const slug = decodeURIComponent(hash.slice(HASH_PREFIX.length));
-      if (readingSlug !== slug) openBySlug(slug);
-    } else {
-      if (readingSlug) closeReader();
-    }
-  }
-
-  window.addEventListener('hashchange', handleHash);
-
-  /* ---------- события закрытия ---------- */
-  readerClose.addEventListener('click', e => {
-    e.preventDefault();
-    closeArticle();
-  });
-  readerModal.addEventListener('click', e => {
-    if (e.target.classList.contains('parents-reader-surface')) closeArticle();
-  });
-  document.addEventListener('keydown', e => {
-    if (readerModal.classList.contains('show') && e.key === 'Escape') closeArticle();
-  });
-
-  /* ---------- старт ---------- */
-  renderLoading();
-  loadIndex()
-    .then(items => renderList(items))
-    .catch(err => {
-      console.warn('Parents:', err);
-      renderError(err.message || 'Ошибка загрузки');
-    })
-    .finally(() => {
-      // если открыли сразу со ссылкой на статью — откроем её
-      handleHash();
-    });
+};
+let i = 0;
+while (i < lines.length) {
+const line = lines[i];
+const cb = line.match(/^\u0000CB(\d+)\u0000\s*$/);
+if (cb) { flush(); out.push('<pre><code>' + esc(codeBlocks[+cb[1]]) + '</code></pre>'); i++; continue; }
+if (/^\s*$/.test(line)) { flush(); i++; continue; }
+if (/^#{1,6}\s+/.test(line)) {
+flush();
+const m = line.match(/^(#{1,6})\s+(.*)$/);
+const lvl = m[1].length;
+out.push(`<h${lvl}>${inline(m[2])}</h${lvl}>`);
+i++; continue;
+}
+if (/^(-{3,}|\*{3,}|_{3,})\s*$/.test(line)) { flush(); out.push('<hr>'); i++; continue; }
+if (/^>\s?/.test(line)) {
+flush();
+const buf = [];
+while (i < lines.length && /^>\s?/.test(lines[i])) {
+buf.push(lines[i].replace(/^>\s?/, ''));
+i++;
+}
+out.push('<blockquote>' + buf.map(inline).join('<br>') + '</blockquote>');
+continue;
+}
+if (/^[-*+]\s+/.test(line)) {
+flush();
+const items = [];
+while (i < lines.length && /^[-*+]\s+/.test(lines[i])) {
+items.push('<li>' + inline(lines[i].replace(/^[-*+]\s+/, '')) + '</li>');
+i++;
+}
+out.push('<ul>' + items.join('') + '</ul>');
+continue;
+}
+if (/^\d+\.\s+/.test(line)) {
+flush();
+const items = [];
+while (i < lines.length && /^\d+\.\s+/.test(lines[i])) {
+items.push('<li>' + inline(lines[i].replace(/^\d+\.\s+/, '')) + '</li>');
+i++;
+}
+out.push('<ol>' + items.join('') + '</ol>');
+continue;
+}
+para.push(line);
+i++;
+}
+flush();
+return out.join('
+');
+}
+/* ---------- загрузка с GitHub ---------- */
+async function loadIndex(force) {
+if (indexCache.loaded && !force) return indexCache.data;
+const res = await fetch(INDEX_URL, { cache: 'no-cache' });
+if (!res.ok) throw new Error('index.json: HTTP ' + res.status);
+const data = await res.json();
+if (!Array.isArray(data)) throw new Error('index.json должен быть массивом');
+indexCache.data = data;
+indexCache.loaded = true;
+return data;
+}
+async function loadArticle(slug) {
+if (articleCache.has(slug)) return articleCache.get(slug);
+const res = await fetch(ARTICLE_DIR + encodeURIComponent(slug) + ARTICLE_SUFFIX, { cache: 'no-cache' });
+if (!res.ok) throw new Error('Статья не найдена: ' + slug);
+const text = await res.text();
+articleCache.set(slug, text);
+return text;
+}
+/* ---------- состояния ---------- */
+function renderLoading() {
+list.innerHTML = '<div class="parents-state">Загрузка…</div>';
+}
+function renderError(msg) {
+list.innerHTML = '';
+const div = document.createElement('div');
+div.className = 'parents-state is-error';
+div.innerHTML = 'Не удалось загрузить статьи' + '<small>' + esc(msg) + '<br>Убедитесь, что сайт открыт через веб-сервер (не file://), а файл articles/index.json существует.</small>';
+list.appendChild(div);
+}
+function renderEmpty() {
+list.innerHTML = '<div class="parents-state">Пока нет статей<small>Создайте articles/index.json и добавьте первый материал</small></div>';
+}
+/* ---------- список ---------- */
+function renderList(items) {
+list.innerHTML = '';
+if (!items.length) { renderEmpty(); return; }
+items.forEach((item, idx) => {
+const slug  = String(item.slug || '').trim();
+const title = String(item.title || slug || 'Без названия');
+if (!slug) return;
+const card = document.createElement('a');
+card.className = 'parents-card';
+card.href = HASH_PREFIX + encodeURIComponent(slug);
+card.dataset.slug = slug;
+// мягкая каскадная анимация появления
+card.style.opacity = '0';
+card.style.transform = 'translateY(14px)';
+card.style.transition = `opacity .55s ease ${idx * 55}ms, transform .7s cubic-bezier(.16,1,.3,1) ${idx * 55}ms, padding .5s cubic-bezier(.16,1,.3,1)`;
+const t = document.createElement('div');
+t.className = 'parents-card-title';
+t.textContent = title;
+const a = document.createElement('span');
+a.className = 'parents-card-arrow';
+a.textContent = '→';
+card.appendChild(t);
+card.appendChild(a);
+list.appendChild(card);
+// запускаем появление на следующем кадре
+requestAnimationFrame(() => {
+requestAnimationFrame(() => {
+card.style.opacity = '1';
+card.style.transform = 'translateY(0)';
+});
+});
+card.addEventListener('click', e => {
+// если ссылка уже активна — просто открыть
+if (window.location.hash === card.getAttribute('href')) {
+e.preventDefault();
+openBySlug(slug);
+}
+// иначе — стандартный переход по href, hashchange сам откроет
+});
+});
+}
+/* ---------- читалка ---------- */
+async function openBySlug(slug) {
+if (!slug) return;
+if (readingSlug === slug && readerModal.classList.contains('show')) return;
+// если что-то уже открыто — сначала закрыть без анимации
+if (readerModal.classList.contains('show')) {
+readerModal.classList.remove('show');
+readerModal.setAttribute('aria-hidden', 'true');
+}
+let md;
+try {
+md = await loadArticle(slug);
+} catch (err) {
+toast('Статья не найдена');
+// чистим hash
+if (window.location.hash.startsWith(HASH_PREFIX)) {
+history.replaceState('', document.title, window.location.pathname + window.location.search);
+}
+readingSlug = null;
+return;
+}
+const meta = indexCache.data.find(x => x && x.slug === slug) || {};
+const title = meta.title || slug;
+readingSlug = slug;
+readerTitle.textContent = title;
+readerContent.innerHTML = mdToHtml(md);
+document.body.style.overflow = 'hidden';
+readerModal.setAttribute('aria-hidden', 'false');
+// гарантируем перерисовку перед показом
+void readerModal.offsetWidth;
+readerModal.classList.add('show');
+}
+function closeReader() {
+if (!readerModal.classList.contains('show')) return;
+readerModal.classList.remove('show');
+readerModal.setAttribute('aria-hidden', 'true');
+readingSlug = null;
+document.body.style.overflow = '';
+}
+function closeArticle() {
+if (window.location.hash.startsWith(HASH_PREFIX)) {
+// очищаем hash без перезагрузки
+history.pushState('', document.title, window.location.pathname + window.location.search);
+closeReader();
+} else {
+closeReader();
+}
+}
+function handleHash() {
+const hash = window.location.hash;
+if (hash.startsWith(HASH_PREFIX)) {
+const slug = decodeURIComponent(hash.slice(HASH_PREFIX.length));
+if (readingSlug !== slug) openBySlug(slug);
+} else {
+if (readingSlug) closeReader();
+}
+}
+window.addEventListener('hashchange', handleHash);
+/* ---------- события закрытия ---------- */
+readerClose.addEventListener('click', e => {
+e.preventDefault();
+closeArticle();
+});
+readerModal.addEventListener('click', e => {
+if (e.target.classList.contains('parents-reader-surface')) closeArticle();
+});
+document.addEventListener('keydown', e => {
+if (readerModal.classList.contains('show') && e.key === 'Escape') closeArticle();
+});
+/* ---------- старт ---------- */
+renderLoading();
+loadIndex()
+.then(items => renderList(items))
+.catch(err => {
+console.warn('Parents:', err);
+renderError(err.message || 'Ошибка загрузки');
+})
+.finally(() => {
+// если открыли сразу со ссылкой на статью — откроем её
+handleHash();
+});
 })();
 </script>
 </body>
