@@ -707,30 +707,6 @@ body.is-ios #watchSvgIOS { display: block; }
 .scheme-view svg { width: 100%; height: auto; max-height: 100%; display: block; overflow: visible; }
 .clock-view .watch-container.hidden { display: none; }
 
-/* ================================================================= */
-/* ==================== MINIMAL SKIN OVERRIDES ===================== */
-/* ================================================================= */
-body[data-skin="minimal"] .dictation-key {
-    border: 1px solid var(--m-line-strong); border-radius: 8px;
-    background: transparent; color: var(--fg);
-    font-family: var(--font-ui); font-weight: 400;
-}
-body[data-skin="minimal"] .dictation-key:hover {
-    background: var(--bg-2); color: var(--fg);
-    transform: none; box-shadow: none;
-}
-body[data-skin="minimal"] .dictation-slot {
-    border: 1px solid var(--m-line-strong); border-radius: 8px;
-    font-family: var(--font-ui); font-weight: 300;
-}
-body[data-skin="minimal"] .dictation-backspace {
-    border: 1px solid var(--m-line-strong); border-radius: 50%;
-    background: transparent; color: var(--fg-2);
-}
-body[data-skin="minimal"] .dictation-backspace:hover {
-    background: var(--bg-2); color: var(--fg);
-}
-
 @media (max-width: 1024px) { .syllable-grid { grid-template-columns: repeat(3, 1fr); } }
 @media (max-width: 640px) {
 .header { padding: 12px 14px 0; }
@@ -1498,7 +1474,7 @@ document.body.dataset.mintone = localStorage.getItem('gramotino_mintone') || 'li
 </div>
 <button class="section-cycle-btn" id="sectionCycleBtn" type="button">
 <span class="section-cycle-label">УЧИ СЛОГИ</span>
-<span class="section-cycle-arrow">➛</span>
+<span class="section-cycle-arrow"></span>
 </button>
 <div class="section-subtitles">
 <div class="section-subtitle active" data-section="syllables">ЖМИ · СЛУШАЙ · ЗАПОМИНАЙ</div>
@@ -1519,7 +1495,7 @@ document.body.dataset.mintone = localStorage.getItem('gramotino_mintone') || 'li
 <button id="hideLearnedBtn" data-tooltip="Скрыть/показать">👁</button>
 <button id="clearLearnedBtn" data-tooltip="Очистить">✕</button>
 <button id="examBtn" data-tooltip="Викторина">⚑</button>
-<button id="dictationBtn" data-tooltip="Диктант">✎</button>
+<button id="dictationBtn" data-tooltip="Диктант">📝</button>
 </div>
 <div class="grid-container"><div class="syllable-grid" id="syllableGrid"></div></div>
 </section>
@@ -1794,7 +1770,7 @@ document.body.dataset.mintone = localStorage.getItem('gramotino_mintone') || 'li
 </div>
 
 <div class="exam-overlay" id="examOverlay">
-<button class="exam-exit-btn" id="examExitBtn" title="Выйти">✕</button>
+<button class="exam-exit-btn" id="examExitBtn" title="Выйти"></button>
 <div class="exam-header">
 <div class="exam-question" id="examQuestion"></div>
 <button class="exam-repeat-btn" id="examRepeatBtn" title="Повторить">♪</button>
@@ -1906,7 +1882,7 @@ function startDictation() {
 function showNextDictation() {
     if (dictationIndex >= dictationQueue.length) {
         dictationOverlay.classList.remove('show');
-        showToast('Диктант окончен!', 'success');
+        showCelebration(); // Показываем GIF после успешного диктанта!
         return;
     }
     currentDictationAudioSrc = dictationQueue[dictationIndex];
@@ -2024,7 +2000,20 @@ function handleExamAnswer(btn, sel, correct) { const ao = examOptions.querySelec
 examNextBtn.addEventListener('click', () => { examIndex++; showNextExamQuestion(); });
 examExitBtn.addEventListener('click', () => { examOverlay.classList.remove('show'); if (currentAudio) { currentAudio.pause(); currentAudio.src = ''; currentAudio = null; } examNextBtn.classList.remove('show'); examRepeatBtn.style.display = 'flex'; showToast('Прервано', 'info'); });
 examRepeatBtn.addEventListener('click', () => { if (currentExamCorrect) playAudio(currentExamCorrect); });
-const gifUrls = ['https://media.gifs.ru/2158157ec6a1788936055b9e9911600c84c63e85_300.webp', 'https://media.gifs.ru/2771cc0c57b56e4c6cfa23d2d9d3f4eb1aab5aaa_300.webp', 'https://media.gifs.ru/2d609cd63a3ae5874298b500f9ab4b5871aabd16_300.webp', 'https://media.gifs.ru/3f25bc7fbec4825f63f6e619e0bd3c8819d80aa9_300.webp', 'https://media.gifs.ru/cbaddb0c4d7bea31ff48e153877a7cec628dcd22_300.webp', 'https://media.gifs.ru/a8e88e80cbecdfc6f34d261a843c82f8f6c2e42b_300.webp', 'https://media.gifs.ru/2640e63683ecae76864a3b8cc40cfe569bb188de_300.webp', 'https://media.gifs.ru/dea46c4e68cbe967d1044828093869737c0697391d7011fc3094a163248f53ff_300.webp', 'https://media.gifs.ru/e6eeccd12fe0d671a5e0f134daafcd7068cef5cf3c99affb72ca341eb9f43157_300.webp', 'https://media.gifs.ru/45256be700bbfc9f441b0ea62ed7069989ac7cda44f5ecdf2399deaf60954a58_300.webp', 'https://media.gifs.ru/f3e3b39148c45df671a433372b8b3cf4bdc997fa799bf8406d281ef593e97b10_300.webp'];
+const gifUrls = [
+    'https://media.gifs.ru/61cd26c8786364a1e4a76fd009763b661f85ca8f3e096bb43b17302498ca5c7f_500.webp',
+    'https://media.gifs.ru/9e787df4bab0b00a5374cfdfc5a918951ea6cb523928646908d34bb0685b593b_500.webp',
+    'https://media.gifs.ru/5700e33f2af3231daf8f83e6dcf723473861b17237bb4a70d22466d2e1d8783f_500.webp',
+    'https://media.gifs.ru/e7282289c8762f0c1e043e8de4c956744cf4825e61d3271df1c056165a94087a_500.webp',
+    'https://media.gifs.ru/ad5217762cb356685f294b05f44f14e4ea31bde96b34ab5e676915ad26fccd11_500.webp',
+    'https://media.gifs.ru/4803a42b623dcf59c8fbc9163c868b59cbaf347b7509fa7986894ff076939531_500.webp',
+    'https://media.gifs.ru/6eec639e732ad955153d25eb4dbbf13309483001d72d19a96d31f5e15bcde81a_500.webp',
+    'https://media.gifs.ru/e7e70d34d6bdca01c2c9d659eee9cbfcf24a0e30_500.webp',
+    'https://media.gifs.ru/79d7264b9d3f26b8440a715b510ba3a47254973085259ad2ecdcf79f6ea73854_500.webp',
+    'https://media.gifs.ru/c77544fec3f04d9cc911ae531a20fdb7bcd6541e4c48fab9acb3ae70780b4466_500.webp',
+    'https://media.gifs.ru/c9bc464c72197a908f063db7a6e48152e57c229706387d2a62ae2e69d957ac3e_500.webp',
+    'https://media.gifs.ru/9f4fc9e6a4ffc774c7e94d5bdf92bfed770e614cb06e7cfd1f686092451590a2_500.webp'
+];
 function showCelebration() { celebrationGif.src = gifUrls[Math.floor(Math.random() * gifUrls.length)]; celebrationOverlay.classList.add('show'); }
 celebrationClose.addEventListener('click', () => celebrationOverlay.classList.remove('show'));
 celebrationOverlay.addEventListener('click', e => { if (e.target === celebrationOverlay) celebrationOverlay.classList.remove('show'); });
@@ -2227,8 +2216,7 @@ minuteScheme.appendChild(n);
 for (let i = 0; i < 12; i++) {
 const a = (i * 30 - 90) * Math.PI / 180;
 const l = document.createElementNS(NS, 'line');
-l.setAttribute('x1', S + 82 * Math.cos(a)); l.setAttribute('y1', S + 82 * Math.sin(a));
-l.setAttribute('x2', S + 92 * Math.cos(a)); l.setAttribute('y2', S + 92 * Math.sin(a));
+l.setAttribute('x1', S + 82 * Math.cos(a)); l.setAttribute('y1', S + 82 * Math.sin(a)); l.setAttribute('x2', S + 92 * Math.cos(a)); l.setAttribute('y2', S + 92 * Math.sin(a));
 l.setAttribute('stroke', 'currentColor'); l.setAttribute('stroke-width', '2'); l.setAttribute('stroke-linecap', 'round');
 minuteScheme.appendChild(l);
 }
@@ -2236,8 +2224,7 @@ for (let i = 0; i < 60; i++) {
 if (i % 5 === 0) continue;
 const a = (i * 6 - 90) * Math.PI / 180;
 const l = document.createElementNS(NS, 'line');
-l.setAttribute('x1', S + 88 * Math.cos(a)); l.setAttribute('y1', S + 88 * Math.sin(a));
-l.setAttribute('x2', S + 92 * Math.cos(a)); l.setAttribute('y2', S + 92 * Math.sin(a));
+l.setAttribute('x1', S + 88 * Math.cos(a)); l.setAttribute('y1', S + 88 * Math.sin(a)); l.setAttribute('x2', S + 92 * Math.cos(a)); l.setAttribute('y2', S + 92 * Math.sin(a));
 l.setAttribute('stroke', 'currentColor'); l.setAttribute('stroke-width', '0.7'); l.setAttribute('opacity', '0.4');
 minuteScheme.appendChild(l);
 }
