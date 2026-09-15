@@ -2419,8 +2419,7 @@ render(); renderSecondHand(); setView('watch');
     let para = [];
     const flush = () => {
       if (!para.length) return;
-      out.push('<p>' + para.map(inline).join('<br>') + '</p>');
-      para = [];
+out.push('<p>' + para.map(inline).join(' ') + '</p>');      para = [];
     };
     let i = 0;
     while (i < lines.length) {
