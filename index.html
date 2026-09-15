@@ -1694,8 +1694,7 @@ body[data-skin="minimal"] .header-kicker{
 body[data-skin="minimal"] .header h1{
   font-family:var(--font-ui); font-weight:200;
   font-size:clamp(1.9rem,10.5vw,5.4rem); line-height:1; letter-spacing:.06em;
-  text-transform:uppercase; margin:22px 0 40px; cursor:pointer;
-  user-select:none; -webkit-user-select:none; -webkit-tap-highlight-color:transparent;
+    text-transform:uppercase; margin:22px 0 40px;
 }
 body[data-skin="minimal"] .header h1::after{color:var(--accent)}
 body[data-skin="minimal"] .section-switch{border-top:1px solid var(--m-line);border-bottom:1px solid var(--m-line)}
@@ -3042,16 +3041,7 @@ render(); renderSecondHand(); setView('watch');
     });
   }
 
-  h1.setAttribute('title', 'Двойной клик — сменить оформление');
-  h1.addEventListener('dblclick', function (e) {
-    e.preventDefault();
-    const s = body.dataset.skin || 'minimal';
-    const t = body.dataset.mintone || 'light';
-    if (s === 'minimal' && t === 'light')      { apply('minimal', 'dark');  toast('Минимализм · тёмный'); }
-    else if (s === 'minimal' && t === 'dark')  { apply('classic', 'light'); toast('Газетный стиль'); }
-    else                                       { apply('minimal', 'light'); toast('Минимализм · светлый'); }
-  });
-
+ 
   if (typeof window.__syncSkinControls === 'function') window.__syncSkinControls();
 })();
 </script>
