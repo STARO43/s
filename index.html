@@ -7,7 +7,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=IBM+Plex+Mono:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Inter:wght@300;400;500;600;700&family=PT+Serif:ital,wght@0,400;0,700;1,400;1,700&family=Lora:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,400&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=IBM+Plex+Mono:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Inter:wght@200;300;400;500;600;700&family=PT+Serif:ital,wght@0,400;0,700;1,400;1,700&family=Lora:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,400&display=swap" rel="stylesheet">
 <title>Грамотиньо</title>
 <style>
 * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -716,135 +716,152 @@ body.is-ios #watchSvgIOS { display: block; }
 .clock-frame { width: min(480px, 96vw); }
 }
 
-/* ================= PARENTS SECTION ================= */
-.parents-wrapper{max-width:960px;margin:0 auto;padding:32px 20px 100px;width:100%}
-.parents-toolbar{display:flex;justify-content:flex-end;margin-bottom:24px}
-.parents-publish-btn{
-  display:inline-flex;align-items:center;gap:10px;
-  background:var(--bg);border:2px solid var(--fg);color:var(--fg);
-  padding:14px 22px;font-family:var(--font-display);font-weight:600;
-  font-size:.8rem;letter-spacing:.14em;text-transform:uppercase;
-  cursor:pointer;transition:all .1s linear;
+/* ================================================================= */
+/* ==================== PARENTS SECTION ============================ */
+/* ================================================================= */
+.parents-wrapper{
+  max-width:780px;
+  margin:0 auto;
+  padding:40px 20px 120px;
+  width:100%;
 }
-.parents-publish-btn:hover{background:var(--fg);color:var(--bg);transform:translate(-3px,-3px);box-shadow:6px 6px 0 var(--accent)}
-.parents-publish-btn span{font-size:1rem}
 
 .parents-list{
-  display:flex;flex-direction:column;
-  border-top:2px solid var(--fg);
+  display:flex;
+  flex-direction:column;
 }
-.parents-empty{
-  padding:60px 20px;text-align:center;
-  font-family:var(--font-doc);font-size:.72rem;
-  letter-spacing:.16em;text-transform:uppercase;color:var(--fg-3);
-  border-bottom:2px solid var(--fg);
+
+/* состояния загрузки / ошибки / пусто */
+.parents-state{
+  padding:80px 20px;
+  text-align:center;
+  font-family:var(--font-doc);
+  font-size:.7rem;
+  font-weight:500;
+  letter-spacing:.28em;
+  text-transform:uppercase;
+  color:var(--fg-3);
+  line-height:1.9;
+  animation:parentsPulse 1.8s ease-in-out infinite;
 }
-.parents-card{
-  display:flex;align-items:center;gap:16px;
-  padding:22px 6px;
-  border-bottom:1px solid var(--rule-soft);
-  cursor:pointer;
-  transition:padding .15s ease, background .15s ease;
-  background:transparent;
-}
-.parents-card:hover{background:var(--bg-2);padding-left:16px;padding-right:0}
-.parents-card-title{
-  font-family:var(--font-serif);
-  font-weight:400;
-  font-size:clamp(1.1rem, 2.4vw, 1.4rem);
-  line-height:1.3;
-  color:var(--fg);
-  letter-spacing:0;
+.parents-state.is-error{animation:none;color:var(--accent);letter-spacing:.16em}
+.parents-state small{
+  display:block;
+  margin-top:16px;
+  font-size:.62rem;
+  letter-spacing:.14em;
   text-transform:none;
+  line-height:1.7;
+  opacity:.7;
+  font-family:var(--font-ui);
+  color:var(--fg-2);
+}
+@keyframes parentsPulse{
+  0%,100%{opacity:.45}
+  50%{opacity:1}
+}
+
+/* карточка статьи */
+.parents-card{
+  position:relative;
+  display:flex;
+  align-items:baseline;
+  gap:18px;
+  padding:24px 0;
+  cursor:pointer;
+  color:inherit;
+  text-decoration:none;
+  transition:padding .5s cubic-bezier(.16,1,.3,1);
+  -webkit-tap-highlight-color:transparent;
+}
+
+.parents-card-title{
   flex:1;
   min-width:0;
+  font-family:var(--font-serif-display);
+  font-weight:600;
+  font-size:clamp(1.25rem,2.7vw,1.7rem);
+  line-height:1.22;
+  letter-spacing:-.005em;
+  color:var(--fg);
   overflow-wrap:anywhere;
+  transition:color .4s ease;
 }
+
 .parents-card-arrow{
   flex-shrink:0;
   font-family:var(--font-ui);
-  font-size:1.1rem;
+  font-size:.95rem;
   color:var(--fg-3);
-  transition:transform .15s ease, color .15s ease;
+  opacity:0;
+  transform:translateX(-10px);
+  transition:
+    opacity .5s cubic-bezier(.16,1,.3,1),
+    transform .5s cubic-bezier(.16,1,.3,1),
+    color .4s ease;
 }
-.parents-card:hover .parents-card-arrow{color:var(--accent);transform:translateX(4px)}
-.parents-card-actions{display:flex;gap:8px;flex-shrink:0}
-.parents-card-actions button{
-  background:transparent;border:1.5px solid var(--fg);color:var(--fg);
-  padding:5px 9px;font-family:var(--font-doc);font-size:.55rem;font-weight:700;
-  letter-spacing:.14em;text-transform:uppercase;cursor:pointer;transition:all .1s linear;
-}
-.parents-card-actions button:hover{background:var(--fg);color:var(--bg)}
-.parents-card-actions button.danger{border-color:var(--accent);color:var(--accent)}
-.parents-card-actions button.danger:hover{background:var(--accent);color:var(--accent-fg)}
 
-/* ---------- модалки auth/editor ---------- */
-.parents-modal{
-  position:fixed;inset:0;background:rgba(20,20,20,.55);z-index:4500;
-  display:none;align-items:center;justify-content:center;padding:20px;
-  animation:tabIn .18s var(--snap);
-}
-.parents-modal.show{display:flex}
-.parents-modal-box{
-  background:var(--bg);border:3px solid var(--fg);box-shadow:10px 10px 0 var(--accent);
-  width:min(480px,100%);max-height:92vh;display:flex;flex-direction:column;overflow:hidden;
-}
-.parents-modal-wide .parents-modal-box{width:min(760px,100%)}
-.parents-modal-head{
-  display:flex;justify-content:space-between;align-items:center;
-  padding:12px 16px;background:var(--fg);color:var(--bg);
-  font-family:var(--font-doc);font-size:.66rem;font-weight:700;
-  letter-spacing:.2em;text-transform:uppercase;gap:12px;
-}
-.parents-modal-close{
-  background:transparent;border:none;color:inherit;font-size:1.6rem;line-height:1;
-  cursor:pointer;padding:0 4px;transition:color .1s linear;font-family:var(--font-ui);
-}
-.parents-modal-close:hover{color:var(--accent)}
-.parents-modal-body{padding:22px 20px;overflow-y:auto;display:flex;flex-direction:column}
-.parents-field-label{font-family:var(--font-doc);font-size:.62rem;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:var(--fg-2);margin-bottom:8px}
-.parents-input,.parents-textarea{
-  width:100%;background:var(--bg-2);border:2px solid var(--fg);color:var(--fg);
-  padding:12px 14px;font-family:var(--font-ui);font-size:.95rem;
-  outline:none;transition:border-color .1s linear,background .1s linear;
-}
-.parents-input:focus,.parents-textarea:focus{border-color:var(--accent);background:var(--bg)}
-.parents-textarea{font-family:var(--font-doc);font-size:.86rem;line-height:1.55;resize:vertical;min-height:320px}
-.parents-hint{font-family:var(--font-doc);font-size:.58rem;color:var(--fg-3);letter-spacing:.08em;margin-top:6px}
-.parents-modal-actions{display:flex;justify-content:flex-end;gap:10px;margin-top:20px;flex-wrap:wrap}
-.parents-btn-primary,.parents-btn-secondary,.parents-btn-danger{
-  padding:12px 22px;font-family:var(--font-display);font-weight:600;font-size:.75rem;
-  letter-spacing:.14em;text-transform:uppercase;cursor:pointer;transition:all .1s linear;
-  border:2px solid var(--fg);
-}
-.parents-btn-primary{background:var(--fg);color:var(--bg)}
-.parents-btn-primary:hover{background:var(--accent);border-color:var(--accent);color:var(--accent-fg)}
-.parents-btn-secondary{background:var(--bg);color:var(--fg)}
-.parents-btn-secondary:hover{background:var(--bg-2)}
-.parents-btn-danger{background:var(--bg);color:var(--accent);border-color:var(--accent)}
-.parents-btn-danger:hover{background:var(--accent);color:var(--accent-fg)}
-.parents-auth-shake{animation:parentsShake .35s}
-@keyframes parentsShake{0%,100%{transform:translateX(0)}20%,60%{transform:translateX(-6px)}40%,80%{transform:translateX(6px)}}
+.parents-card:hover{padding-left:14px}
+.parents-card:hover .parents-card-title{color:var(--accent)}
+.parents-card:hover .parents-card-arrow{opacity:1;transform:translateX(0);color:var(--accent)}
 
-/* ============================================================= */
-/* ============ PARENTS READER — FULLSCREEN OVERLAY ============= */
-/* ============================================================= */
+/* ---------- газетный стиль (по умолчанию) ---------- */
+body:not([data-skin="minimal"]) .parents-list{
+  border-top:2px solid var(--fg);
+}
+body:not([data-skin="minimal"]) .parents-card{
+  border-bottom:1px solid var(--rule-soft);
+}
+body:not([data-skin="minimal"]) .parents-card-title{
+  font-family:var(--font-serif-display);
+  font-weight:700;
+  font-size:clamp(1.35rem,3vw,1.9rem);
+  line-height:1.18;
+  letter-spacing:-.01em;
+}
+body:not([data-skin="minimal"]) .parents-card-arrow{
+  font-size:1.05rem;
+}
+
+/* ---------- минимализм ---------- */
+body[data-skin="minimal"] .parents-list{
+  padding-top:12px;
+}
+body[data-skin="minimal"] .parents-card{
+  padding:20px 0;
+}
+body[data-skin="minimal"] .parents-card-title{
+  font-family:var(--font-ui);
+  font-weight:300;
+  font-size:clamp(1.1rem,2.3vw,1.4rem);
+  line-height:1.28;
+  letter-spacing:-.012em;
+}
+body[data-skin="minimal"] .parents-card:hover{padding-left:8px}
+body[data-skin="minimal"] .parents-card-arrow{
+  font-size:.85rem;
+  font-weight:300;
+}
+
+/* ================================================================= */
+/* ============ PARENTS READER — FLOATING OVERLAY =================== */
+/* ================================================================= */
 .parents-reader-overlay{
   position:fixed;
   inset:0;
   z-index:4600;
-  background:rgba(10,10,10,.5);
-  backdrop-filter:blur(10px) saturate(115%);
-  -webkit-backdrop-filter:blur(10px) saturate(115%);
+  background:rgba(15,12,8,.55);
+  backdrop-filter:blur(12px) saturate(120%);
+  -webkit-backdrop-filter:blur(12px) saturate(120%);
   opacity:0;
   visibility:hidden;
-  transition:opacity .35s ease, visibility 0s linear .35s;
+  transition:opacity .5s cubic-bezier(.16,1,.3,1), visibility 0s linear .5s;
   overflow:hidden;
 }
 .parents-reader-overlay.show{
   opacity:1;
   visibility:visible;
-  transition:opacity .35s ease, visibility 0s linear 0s;
+  transition:opacity .5s cubic-bezier(.16,1,.3,1), visibility 0s linear 0s;
 }
 
 .parents-reader-surface{
@@ -871,10 +888,14 @@ body.is-ios #watchSvgIOS { display: block; }
   background:var(--bg);
   color:var(--fg);
   padding:clamp(36px,6vw,80px) clamp(24px,6.5vw,80px) clamp(44px,7vw,88px);
-  transform:translateY(40px) scale(.965);
+  transform:translateY(60px) scale(.96);
   opacity:0;
-  transition:transform .45s cubic-bezier(.4,0,.2,1), opacity .35s ease;
-  will-change:transform, opacity;
+  filter:blur(3px);
+  transition:
+    transform .55s cubic-bezier(.4,0,.2,1),
+    opacity .4s ease,
+    filter .4s ease;
+  will-change:transform, opacity, filter;
   box-shadow:
     0 1px 0 rgba(255,255,255,.55) inset,
     0 44px 100px -32px rgba(0,0,0,.42),
@@ -883,7 +904,11 @@ body.is-ios #watchSvgIOS { display: block; }
 .parents-reader-overlay.show .parents-reader-sheet{
   transform:translateY(0) scale(1);
   opacity:1;
-  transition:transform .58s cubic-bezier(.16,1,.3,1), opacity .42s ease;
+  filter:blur(0);
+  transition:
+    transform .85s cubic-bezier(.16,1,.3,1),
+    opacity .6s cubic-bezier(.16,1,.3,1),
+    filter .6s cubic-bezier(.16,1,.3,1);
 }
 
 /* крестик */
@@ -892,51 +917,51 @@ body.is-ios #watchSvgIOS { display: block; }
   top:clamp(14px,2.2vw,26px);
   right:clamp(14px,2.2vw,26px);
   z-index:5;
-  width:clamp(44px,5vw,52px);
-  height:clamp(44px,5vw,52px);
+  width:clamp(44px,5vw,54px);
+  height:clamp(44px,5vw,54px);
   border-radius:50%;
   border:none;
   background:rgba(255,255,255,.94);
   color:#101010;
   font-family:var(--font-ui);
-  font-size:1.65rem;
+  font-size:1.7rem;
   font-weight:300;
   line-height:1;
   cursor:pointer;
   display:flex;
   align-items:center;
   justify-content:center;
-  padding:0 0 4px;
+  padding:0 0 5px;
   box-shadow:
-    0 8px 26px rgba(0,0,0,.3),
+    0 8px 26px rgba(0,0,0,.28),
     0 1px 0 rgba(255,255,255,.6) inset;
   backdrop-filter:blur(8px) saturate(140%);
   -webkit-backdrop-filter:blur(8px) saturate(140%);
   -webkit-tap-highlight-color:transparent;
   opacity:0;
-  transform:scale(.6) rotate(-90deg);
+  transform:scale(.5) rotate(-120deg);
   transition:
-    opacity .3s ease .1s,
-    transform .5s cubic-bezier(.16,1,.3,1) .1s,
-    background .18s ease,
-    color .18s ease,
-    box-shadow .18s ease;
+    opacity .3s ease .05s,
+    transform .6s cubic-bezier(.16,1,.3,1) .05s,
+    background .25s ease,
+    color .25s ease,
+    box-shadow .25s ease;
 }
 .parents-reader-overlay.show .parents-reader-close{
   opacity:1;
   transform:scale(1) rotate(0deg);
   transition:
-    opacity .3s ease .12s,
-    transform .55s cubic-bezier(.16,1,.3,1) .12s,
-    background .18s ease,
-    color .18s ease,
-    box-shadow .18s ease;
+    opacity .3s ease .15s,
+    transform .65s cubic-bezier(.16,1,.3,1) .15s,
+    background .25s ease,
+    color .25s ease,
+    box-shadow .25s ease;
 }
 .parents-reader-close:hover{
   background:#ffffff;
   color:#000;
   box-shadow:
-    0 10px 32px rgba(0,0,0,.38),
+    0 10px 34px rgba(0,0,0,.4),
     0 1px 0 rgba(255,255,255,.7) inset;
   transform:scale(1.08) rotate(0deg);
 }
@@ -954,11 +979,19 @@ body.is-ios #watchSvgIOS { display: block; }
   padding-bottom:.55em;
   border-bottom:1px solid var(--rule-soft);
   font-feature-settings:"kern" 1,"liga" 1;
+  opacity:0;
+  transform:translateY(14px);
+  transition:opacity .55s ease .25s, transform .7s cubic-bezier(.16,1,.3,1) .25s;
 }
+.parents-reader-overlay.show .parents-reader-title{
+  opacity:1;
+  transform:translateY(0);
+}
+
 .parents-reader-content{
   font-family:var(--font-serif-body);
   font-size:clamp(1.15rem,1.55vw,1.35rem);
-  line-height:1.75;
+  line-height:1.78;
   color:var(--fg);
   font-weight:400;
   letter-spacing:.003em;
@@ -967,13 +1000,16 @@ body.is-ios #watchSvgIOS { display: block; }
   hyphens:auto;
   -webkit-hyphens:auto;
   overflow-wrap:break-word;
+  opacity:0;
+  transform:translateY(20px);
+  transition:opacity .6s ease .35s, transform .8s cubic-bezier(.16,1,.3,1) .35s;
 }
-.parents-reader-content p{
-  margin:0 0 1.25em;
+.parents-reader-overlay.show .parents-reader-content{
+  opacity:1;
+  transform:translateY(0);
 }
-.parents-reader-content p:last-child{
-  margin-bottom:0;
-}
+.parents-reader-content p{margin:0 0 1.3em}
+.parents-reader-content p:last-child{margin-bottom:0}
 
 .parents-reader-content h1,
 .parents-reader-content h2,
@@ -985,7 +1021,7 @@ body.is-ios #watchSvgIOS { display: block; }
   font-weight:700;
   line-height:1.2;
   letter-spacing:-.008em;
-  margin-top:1.7em;
+  margin-top:1.75em;
   margin-bottom:.55em;
   color:var(--fg);
 }
@@ -1011,31 +1047,22 @@ body.is-ios #watchSvgIOS { display: block; }
   text-decoration-thickness:1px;
   text-underline-offset:3px;
   text-decoration-color:color-mix(in srgb, var(--accent) 45%, transparent);
-  transition:text-decoration-color .15s ease;
+  transition:text-decoration-color .2s ease;
 }
-.parents-reader-content a:hover{
-  text-decoration-color:var(--accent);
-}
+.parents-reader-content a:hover{text-decoration-color:var(--accent)}
 
 .parents-reader-content ul,
 .parents-reader-content ol{
   padding-left:1.35em;
-  margin:0 0 1.25em;
+  margin:0 0 1.3em;
 }
 .parents-reader-content ul:last-child,
-.parents-reader-content ol:last-child{
-  margin-bottom:0;
-}
-.parents-reader-content li{
-  margin:.42em 0;
-  padding-left:.15em;
-}
-.parents-reader-content li::marker{
-  color:var(--accent);
-}
+.parents-reader-content ol:last-child{margin-bottom:0}
+.parents-reader-content li{margin:.42em 0;padding-left:.15em}
+.parents-reader-content li::marker{color:var(--accent)}
 
 .parents-reader-content blockquote{
-  margin:1.6em 0;
+  margin:1.7em 0;
   padding:.15em 0 .15em 1.5em;
   border-left:3px solid var(--accent);
   font-style:italic;
@@ -1067,11 +1094,7 @@ body.is-ios #watchSvgIOS { display: block; }
 .parents-reader-content pre::-webkit-scrollbar{height:6px}
 .parents-reader-content pre::-webkit-scrollbar-thumb{background:var(--rule-soft);border-radius:3px}
 .parents-reader-content pre code{
-  background:transparent;
-  padding:0;
-  border-radius:0;
-  font-size:1em;
-  white-space:pre;
+  background:transparent;padding:0;border-radius:0;font-size:1em;white-space:pre;
 }
 
 .parents-reader-content hr{
@@ -1081,7 +1104,6 @@ body.is-ios #watchSvgIOS { display: block; }
   margin:2.4em auto;
   width:50%;
 }
-
 .parents-reader-content img{
   max-width:100%;
   height:auto;
@@ -1090,7 +1112,7 @@ body.is-ios #watchSvgIOS { display: block; }
   border-radius:4px;
 }
 
-/* drop cap только для «газетного» режима */
+/* буквица в газетном режиме */
 body:not([data-skin="minimal"]) .parents-reader-content > p:first-of-type::first-letter{
   font-family:var(--font-serif-display);
   font-weight:700;
@@ -1101,39 +1123,24 @@ body:not([data-skin="minimal"]) .parents-reader-content > p:first-of-type::first
   color:var(--accent);
 }
 
-/* футер с действиями — внутри листа */
-.parents-reader-actions{
-  display:flex;
-  justify-content:flex-end;
-  gap:12px;
-  margin-top:clamp(40px,6vh,72px);
-  padding-top:24px;
-  border-top:1px solid var(--rule-soft);
-  flex-wrap:wrap;
-}
-
-/* ================= NEWSPAPER (default) ТЮНИНГ ================= */
-body:not([data-skin="minimal"]) .parents-reader-sheet{
-  border-radius:0;
-}
-body:not([data-skin="minimal"]) .parents-reader-overlay{
-  background:rgba(15,12,8,.55);
-}
+/* ================= NEWSPAPER ТЮНИНГ ================= */
+body:not([data-skin="minimal"]) .parents-reader-sheet{border-radius:0}
+body:not([data-skin="minimal"]) .parents-reader-overlay{background:rgba(15,12,8,.55)}
 
 /* ================= MINIMAL СКИН ================= */
 body[data-skin="minimal"] .parents-reader-overlay{
-  background:rgba(20,20,20,.32);
-  backdrop-filter:blur(14px) saturate(130%);
-  -webkit-backdrop-filter:blur(14px) saturate(130%);
+  background:rgba(20,20,20,.28);
+  backdrop-filter:blur(18px) saturate(140%);
+  -webkit-backdrop-filter:blur(18px) saturate(140%);
 }
 body[data-skin="minimal"][data-mintone="dark"] .parents-reader-overlay{
-  background:rgba(0,0,0,.6);
+  background:rgba(0,0,0,.55);
 }
 body[data-skin="minimal"] .parents-reader-sheet{
-  border-radius:22px;
+  border-radius:24px;
   box-shadow:
     0 40px 100px -30px rgba(0,0,0,.28),
-    0 12px 40px -14px rgba(0,0,0,.15),
+    0 12px 40px -14px rgba(0,0,0,.14),
     0 1px 0 rgba(255,255,255,.5) inset;
 }
 body[data-skin="minimal"][data-mintone="dark"] .parents-reader-sheet{
@@ -1146,7 +1153,7 @@ body[data-skin="minimal"] .parents-reader-title{
   font-family:var(--font-ui);
   font-weight:300;
   font-size:clamp(1.7rem,4.6vw,2.75rem);
-  letter-spacing:-.005em;
+  letter-spacing:-.008em;
   border-bottom:none;
   padding-bottom:0;
   margin-bottom:.6em;
@@ -1159,103 +1166,31 @@ body[data-skin="minimal"] .parents-reader-content h5,
 body[data-skin="minimal"] .parents-reader-content h6{
   font-family:var(--font-ui);
   font-weight:500;
-  letter-spacing:-.005em;
+  letter-spacing:-.008em;
   text-transform:none;
 }
 body[data-skin="minimal"] .parents-reader-close{
   background:#101010;
   color:#ffffff;
-  box-shadow:
-    0 10px 30px rgba(0,0,0,.28),
-    0 1px 0 rgba(255,255,255,.1) inset;
+  box-shadow:0 10px 30px rgba(0,0,0,.28), 0 1px 0 rgba(255,255,255,.1) inset;
 }
-body[data-skin="minimal"] .parents-reader-close:hover{
-  background:#000;
-  color:#fff;
-}
+body[data-skin="minimal"] .parents-reader-close:hover{background:#000;color:#fff}
 body[data-skin="minimal"][data-mintone="dark"] .parents-reader-close{
-  background:#ededeb;
-  color:#0d0d0e;
+  background:#ededeb;color:#0d0d0e;
 }
 body[data-skin="minimal"][data-mintone="dark"] .parents-reader-close:hover{
-  background:#fff;
-  color:#000;
+  background:#fff;color:#000;
 }
-body[data-skin="minimal"] .parents-reader-actions{
-  border-top:1px solid var(--m-line);
-}
-body[data-skin="minimal"] .parents-btn-primary,
-body[data-skin="minimal"] .parents-btn-secondary,
-body[data-skin="minimal"] .parents-btn-danger{
-  border-radius:999px;font-family:var(--font-ui);font-weight:500;font-size:.68rem;
-  letter-spacing:.22em;
-}
-body[data-skin="minimal"] .parents-btn-primary{background:var(--accent);border-color:var(--accent);color:var(--accent-fg)}
-body[data-skin="minimal"] .parents-btn-primary:hover{opacity:.85;background:var(--accent);color:var(--accent-fg)}
-body[data-skin="minimal"] .parents-btn-secondary{border-color:var(--m-line-strong);background:transparent}
-body[data-skin="minimal"] .parents-btn-secondary:hover{background:var(--bg-2)}
-
-/* минимал-скин для остального списка */
-body[data-skin="minimal"] .parents-publish-btn{
-  border:1px solid var(--m-line-strong);font-family:var(--font-ui);font-weight:500;
-  font-size:.68rem;letter-spacing:.24em;border-radius:999px;padding:12px 24px;
-}
-body[data-skin="minimal"] .parents-publish-btn:hover{
-  background:transparent;color:var(--accent);border-color:var(--accent);
-  transform:none;box-shadow:none;
-}
-body[data-skin="minimal"] .parents-list{border-top:1px solid var(--m-line)}
-body[data-skin="minimal"] .parents-empty{border-bottom:1px solid var(--m-line)}
-body[data-skin="minimal"] .parents-card{
-  padding:24px 0;border-bottom:1px solid var(--m-line);background:transparent;border-radius:0;
-}
-body[data-skin="minimal"] .parents-card:hover{background:transparent;padding-left:12px;padding-right:0}
-body[data-skin="minimal"] .parents-card-title{
-  font-family:var(--font-ui);
-  font-weight:400;
-  font-size:clamp(1rem,2.2vw,1.25rem);
-}
-body[data-skin="minimal"] .parents-card-actions button{
-  border:1px solid var(--m-line-strong);border-radius:999px;font-family:var(--font-ui);
-  font-weight:500;letter-spacing:.18em;
-}
-body[data-skin="minimal"] .parents-modal-box{
-  border:1px solid var(--m-line-strong);border-radius:14px;box-shadow:none;
-}
-body[data-skin="minimal"] .parents-modal-head{
-  background:transparent;color:var(--fg-3);border-bottom:1px solid var(--m-line);
-  font-weight:500;letter-spacing:.28em;
-}
-body[data-skin="minimal"] .parents-input,
-body[data-skin="minimal"] .parents-textarea{
-  border:1px solid var(--m-line-strong);border-radius:10px;background:var(--bg);
-}
-body[data-skin="minimal"] .parents-input:focus,
-body[data-skin="minimal"] .parents-textarea:focus{border-color:var(--accent);background:var(--bg)}
 
 @media (max-width:640px){
-  .parents-wrapper{padding:20px 14px 80px}
-  .parents-toolbar{justify-content:stretch}
-  .parents-publish-btn{width:100%;justify-content:center}
-  .parents-card{padding:18px 4px;gap:10px}
-  .parents-card:hover{padding-left:8px}
-  .parents-card-actions button{padding:4px 7px;font-size:.5rem}
-  .parents-modal{padding:10px}
-  .parents-modal-box{box-shadow:6px 6px 0 var(--accent);max-height:96vh}
-  .parents-textarea{min-height:240px}
-  .parents-modal-actions{flex-direction:column-reverse}
-  .parents-modal-actions button{width:100%}
+  .parents-wrapper{padding:24px 18px 90px}
   .parents-reader-surface{padding:64px 12px 60px}
-  .parents-reader-sheet{padding:28px 20px 36px;border-radius:16px}
+  .parents-reader-sheet{padding:30px 22px 40px;border-radius:18px}
   body:not([data-skin="minimal"]) .parents-reader-sheet{border-radius:0}
-  .parents-reader-close{top:12px;right:12px;width:44px;height:44px;font-size:1.4rem}
-  .parents-reader-title{font-size:1.55rem}
-  .parents-reader-content{font-size:1.12rem;line-height:1.7}
-  .parents-reader-actions{flex-direction:column;gap:8px}
-  .parents-reader-actions button{width:100%}
-  body:not([data-skin="minimal"]) .parents-reader-content > p:first-of-type::first-letter{
-    font-size:3em;
-  }
+  .parents-reader-close{top:12px;right:12px;width:44px;height:44px;font-size:1.45rem}
+  .parents-reader-title{font-size:1.6rem}
+  .parents-reader-content{font-size:1.14rem;line-height:1.72}
+  body:not([data-skin="minimal"]) .parents-reader-content > p:first-of-type::first-letter{font-size:3em}
 }
 
 /* ================= MINIMAL SKIN ================= */
@@ -1760,54 +1695,12 @@ body[data-skin="minimal"] .stamp-opt-swatch{border-radius:50%;border-width:1px}
 </section>
 
 <section id="parentsSection" class="tab-section">
-<div class="parents-wrapper">
-  <div class="parents-toolbar">
-    <button class="parents-publish-btn" id="parentsPublishBtn" type="button">
-      <span>✎</span> ОПУБЛИКОВАТЬ 
-    </button>
+  <div class="parents-wrapper">
+    <div class="parents-list" id="parentsList">
+      <div class="parents-state">Загрузка…</div>
+    </div>
   </div>
-  <div class="parents-list" id="parentsList"></div>
-</div>
 </section>
-</div>
-
-<!-- МОДАЛКА: пароль -->
-<div class="parents-modal" id="parentsAuthModal" aria-hidden="true">
-  <div class="parents-modal-box" id="parentsAuthBox">
-    <div class="parents-modal-head">
-      <span>ДОСТУП К РЕДАКТОРУ</span>
-      <button class="parents-modal-close" id="parentsAuthClose" type="button" aria-label="Закрыть">×</button>
-    </div>
-    <div class="parents-modal-body">
-      <label class="parents-field-label" for="parentsPasswordInput">Пароль</label>
-      <input type="password" class="parents-input" id="parentsPasswordInput" autocomplete="off" inputmode="numeric">
-      <div class="parents-modal-actions">
-        <button class="parents-btn-secondary" id="parentsAuthCancel" type="button">Отмена</button>
-        <button class="parents-btn-primary" id="parentsAuthSubmit" type="button">Войти</button>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- МОДАЛКА: редактор -->
-<div class="parents-modal parents-modal-wide" id="parentsEditorModal" aria-hidden="true">
-  <div class="parents-modal-box">
-    <div class="parents-modal-head">
-      <span id="parentsEditorHead">НОВАЯ СТАТЬЯ</span>
-      <button class="parents-modal-close" id="parentsEditorClose" type="button" aria-label="Закрыть">×</button>
-    </div>
-    <div class="parents-modal-body">
-      <label class="parents-field-label" for="parentsTitleInput">Заголовок</label>
-      <input type="text" class="parents-input" id="parentsTitleInput" placeholder="Например: Как учить слоги дома">
-      <label class="parents-field-label" for="parentsContentInput" style="margin-top:16px">Текст (Markdown)</label>
-      <textarea class="parents-textarea" id="parentsContentInput" placeholder="# Заголовок&#10;&#10;Обычный текст с **жирным** и *курсивом*.&#10;&#10;- список&#10;- список&#10;&#10;> цитата&#10;&#10;[ссылка](https://example.com)"></textarea>
-      <div class="parents-hint">Поддержка: # заголовки, **жирный**, *курсив*, `код`, ```блок кода```, &gt; цитата, - и 1. списки, [ссылка](url)</div>
-      <div class="parents-modal-actions">
-        <button class="parents-btn-secondary" id="parentsEditorCancel" type="button">Отмена</button>
-        <button class="parents-btn-primary" id="parentsEditorSave" type="button">Опубликовать</button>
-      </div>
-    </div>
-  </div>
 </div>
 
 <!-- ПЛАВАЮЩИЙ ЛИСТ СТАТЬИ -->
@@ -1817,10 +1710,6 @@ body[data-skin="minimal"] .stamp-opt-swatch{border-radius:50%;border-width:1px}
     <article class="parents-reader-sheet">
       <h1 class="parents-reader-title" id="parentsReaderTitle"></h1>
       <div class="parents-reader-content" id="parentsReaderContent"></div>
-      <div class="parents-reader-actions" id="parentsReaderActions" style="display:none">
-        <button class="parents-btn-secondary" id="parentsEditBtn" type="button">Редактировать</button>
-        <button class="parents-btn-danger" id="parentsDeleteBtn" type="button">Удалить</button>
-      </div>
     </article>
   </div>
 </div>
@@ -2471,46 +2360,32 @@ render(); renderSecondHand(); setView('watch');
 })();
 </script>
 <script>
+/* ============================================================ */
+/* ============== РОДИТЕЛЯМ — статьи с GitHub ================= */
+/* ============================================================ */
 (function () {
-  const STORAGE_KEY = 'gramotino_parents_articles';
-  const AUTH_KEY    = 'gramotino_parents_auth';
-  const PASSWORD    = '1917';
-  const HASH_PREFIX = '#article/';
+  const INDEX_URL      = 'articles/index.json';
+  const ARTICLE_DIR    = 'articles/';
+  const HASH_PREFIX    = '#article/';
+  const ARTICLE_SUFFIX = '.md';
 
   const $ = id => document.getElementById(id);
   const list          = $('parentsList');
-  const publishBtn    = $('parentsPublishBtn');
-
-  const authModal     = $('parentsAuthModal');
-  const authBox       = $('parentsAuthBox');
-  const authInput     = $('parentsPasswordInput');
-  const authSubmit    = $('parentsAuthSubmit');
-  const authCancel    = $('parentsAuthCancel');
-  const authClose     = $('parentsAuthClose');
-
-  const editorModal   = $('parentsEditorModal');
-  const editorHead    = $('parentsEditorHead');
-  const titleInput    = $('parentsTitleInput');
-  const contentInput  = $('parentsContentInput');
-  const editorSave    = $('parentsEditorSave');
-  const editorCancel  = $('parentsEditorCancel');
-  const editorClose   = $('parentsEditorClose');
-
   const readerModal   = $('parentsReaderModal');
   const readerTitle   = $('parentsReaderTitle');
   const readerContent = $('parentsReaderContent');
-  const readerActions = $('parentsReaderActions');
   const readerClose   = $('parentsReaderClose');
-  const editBtn       = $('parentsEditBtn');
-  const deleteBtn     = $('parentsDeleteBtn');
 
-  if (!list) return;
+  if (!list || !readerModal) return;
 
-  let editingId = null;
-  let readingId = null;
-  let authed = false;
-  try { authed = sessionStorage.getItem(AUTH_KEY) === '1'; } catch (e) {}
+  /* ---------- кэш в памяти сессии ---------- */
+  const indexCache    = { loaded: false, data: [] };
+  const articleCache  = new Map();   // slug -> md string
 
+  let readingSlug     = null;
+  let openAnimationTimer = null;
+
+  /* ---------- утилита: тост ---------- */
   function toast(msg) {
     const c = document.getElementById('toastContainer');
     if (!c) return;
@@ -2521,20 +2396,9 @@ render(); renderSecondHand(); setView('watch');
     setTimeout(() => el.remove(), 2200);
   }
 
-  function loadArticles() {
-    try { return JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]'); }
-    catch (e) { return []; }
-  }
-  function saveArticles(arr) {
-    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(arr)); }
-    catch (e) { toast('Не удалось сохранить'); }
-  }
-
+  /* ---------- markdown ---------- */
   function esc(s) {
-    return String(s)
-      .replace(/&/g, '&amp;')
-      .replace(/</g, '&lt;')
-      .replace(/>/g, '&gt;');
+    return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
   }
   function inline(text) {
     return esc(text)
@@ -2562,11 +2426,7 @@ render(); renderSecondHand(); setView('watch');
     while (i < lines.length) {
       const line = lines[i];
       const cb = line.match(/^\u0000CB(\d+)\u0000\s*$/);
-      if (cb) {
-        flush();
-        out.push('<pre><code>' + esc(codeBlocks[+cb[1]]) + '</code></pre>');
-        i++; continue;
-      }
+      if (cb) { flush(); out.push('<pre><code>' + esc(codeBlocks[+cb[1]]) + '</code></pre>'); i++; continue; }
       if (/^\s*$/.test(line)) { flush(); i++; continue; }
       if (/^#{1,6}\s+/.test(line)) {
         flush();
@@ -2575,9 +2435,7 @@ render(); renderSecondHand(); setView('watch');
         out.push(`<h${lvl}>${inline(m[2])}</h${lvl}>`);
         i++; continue;
       }
-      if (/^(-{3,}|\*{3,}|_{3,})\s*$/.test(line)) {
-        flush(); out.push('<hr>'); i++; continue;
-      }
+      if (/^(-{3,}|\*{3,}|_{3,})\s*$/.test(line)) { flush(); out.push('<hr>'); i++; continue; }
       if (/^>\s?/.test(line)) {
         flush();
         const buf = [];
@@ -2615,231 +2473,183 @@ render(); renderSecondHand(); setView('watch');
     return out.join('\n');
   }
 
-  function uid() {
-    return Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
+  /* ---------- загрузка с GitHub ---------- */
+  async function loadIndex(force) {
+    if (indexCache.loaded && !force) return indexCache.data;
+    const res = await fetch(INDEX_URL, { cache: 'no-cache' });
+    if (!res.ok) throw new Error('index.json: HTTP ' + res.status);
+    const data = await res.json();
+    if (!Array.isArray(data)) throw new Error('index.json должен быть массивом');
+    indexCache.data = data;
+    indexCache.loaded = true;
+    return data;
+  }
+  async function loadArticle(slug) {
+    if (articleCache.has(slug)) return articleCache.get(slug);
+    const res = await fetch(ARTICLE_DIR + encodeURIComponent(slug) + ARTICLE_SUFFIX, { cache: 'no-cache' });
+    if (!res.ok) throw new Error('Статья не найдена: ' + slug);
+    const text = await res.text();
+    articleCache.set(slug, text);
+    return text;
+  }
+
+  /* ---------- состояния ---------- */
+  function renderLoading() {
+    list.innerHTML = '<div class="parents-state">Загрузка…</div>';
+  }
+  function renderError(msg) {
+    list.innerHTML = '';
+    const div = document.createElement('div');
+    div.className = 'parents-state is-error';
+    div.innerHTML = 'Не удалось загрузить статьи' + '<small>' + esc(msg) + '<br>Убедитесь, что сайт открыт через веб-сервер (не file://), а файл articles/index.json существует.</small>';
+    list.appendChild(div);
+  }
+  function renderEmpty() {
+    list.innerHTML = '<div class="parents-state">Пока нет статей<small>Создайте articles/index.json и добавьте первый материал</small></div>';
   }
 
   /* ---------- список ---------- */
-  function renderList() {
-    const articles = loadArticles().sort((a, b) => b.updated - a.updated);
+  function renderList(items) {
     list.innerHTML = '';
-    if (!articles.length) {
-      const empty = document.createElement('div');
-      empty.className = 'parents-empty';
-      empty.textContent = 'Пока нет статей';
-      list.appendChild(empty);
-      return;
-    }
-    articles.forEach(a => {
-      const card = document.createElement('div');
+    if (!items.length) { renderEmpty(); return; }
+
+    items.forEach((item, idx) => {
+      const slug  = String(item.slug || '').trim();
+      const title = String(item.title || slug || 'Без названия');
+      if (!slug) return;
+
+      const card = document.createElement('a');
       card.className = 'parents-card';
+      card.href = HASH_PREFIX + encodeURIComponent(slug);
+      card.dataset.slug = slug;
+      // мягкая каскадная анимация появления
+      card.style.opacity = '0';
+      card.style.transform = 'translateY(14px)';
+      card.style.transition = `opacity .55s ease ${idx * 55}ms, transform .7s cubic-bezier(.16,1,.3,1) ${idx * 55}ms, padding .5s cubic-bezier(.16,1,.3,1)`;
 
-      const title = document.createElement('div');
-      title.className = 'parents-card-title';
-      title.textContent = a.title || 'Без названия';
-      card.appendChild(title);
+      const t = document.createElement('div');
+      t.className = 'parents-card-title';
+      t.textContent = title;
 
-      
+      const a = document.createElement('span');
+      a.className = 'parents-card-arrow';
+      a.textContent = '→';
 
-      const arrow = document.createElement('span');
-      arrow.className = 'parents-card-arrow';
-      arrow.textContent = '→';
-      card.appendChild(arrow);
-
-      card.addEventListener('click', () => {
-        const targetHash = HASH_PREFIX + encodeURIComponent(a.id);
-        if (window.location.hash === targetHash) {
-          showReader(a.id);
-        } else {
-          window.location.hash = targetHash;
-        }
-      });
+      card.appendChild(t);
+      card.appendChild(a);
       list.appendChild(card);
+
+      // запускаем появление на следующем кадре
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          card.style.opacity = '1';
+          card.style.transform = 'translateY(0)';
+        });
+      });
+
+      card.addEventListener('click', e => {
+        // если ссылка уже активна — просто открыть
+        if (window.location.hash === card.getAttribute('href')) {
+          e.preventDefault();
+          openBySlug(slug);
+        }
+        // иначе — стандартный переход по href, hashchange сам откроет
+      });
     });
   }
 
-  /* ---------- reader ---------- */
-  function showReader(id) {
-    const a = loadArticles().find(x => x.id === id);
-    if (!a) {
+  /* ---------- читалка ---------- */
+  async function openBySlug(slug) {
+    if (!slug) return;
+    if (readingSlug === slug && readerModal.classList.contains('show')) return;
+
+    // если что-то уже открыто — сначала закрыть без анимации
+    if (readerModal.classList.contains('show')) {
+      readerModal.classList.remove('show');
+      readerModal.setAttribute('aria-hidden', 'true');
+    }
+
+    let md;
+    try {
+      md = await loadArticle(slug);
+    } catch (err) {
+      toast('Статья не найдена');
+      // чистим hash
       if (window.location.hash.startsWith(HASH_PREFIX)) {
         history.replaceState('', document.title, window.location.pathname + window.location.search);
       }
-      toast('Статья не найдена');
-      readingId = null;
+      readingSlug = null;
       return;
     }
-    readingId = id;
-    readerTitle.textContent = a.title || 'Без названия';
-    readerContent.innerHTML = mdToHtml(a.content);
-    readerActions.style.display = authed ? 'flex' : 'none';
-    readerModal.classList.add('show');
-    readerModal.setAttribute('aria-hidden', 'false');
+
+    const meta = indexCache.data.find(x => x && x.slug === slug) || {};
+    const title = meta.title || slug;
+
+    readingSlug = slug;
+    readerTitle.textContent = title;
+    readerContent.innerHTML = mdToHtml(md);
+
     document.body.style.overflow = 'hidden';
+    readerModal.setAttribute('aria-hidden', 'false');
+    // гарантируем перерисовку перед показом
+    void readerModal.offsetWidth;
+    readerModal.classList.add('show');
   }
-  function hideReader() {
+
+  function closeReader() {
+    if (!readerModal.classList.contains('show')) return;
     readerModal.classList.remove('show');
     readerModal.setAttribute('aria-hidden', 'true');
-    readingId = null;
+    readingSlug = null;
     document.body.style.overflow = '';
   }
+
   function closeArticle() {
     if (window.location.hash.startsWith(HASH_PREFIX)) {
+      // очищаем hash без перезагрузки
       history.pushState('', document.title, window.location.pathname + window.location.search);
-      hideReader();
+      closeReader();
     } else {
-      hideReader();
+      closeReader();
     }
   }
 
   function handleHash() {
     const hash = window.location.hash;
     if (hash.startsWith(HASH_PREFIX)) {
-      const id = decodeURIComponent(hash.slice(HASH_PREFIX.length));
-      if (readingId !== id) showReader(id);
+      const slug = decodeURIComponent(hash.slice(HASH_PREFIX.length));
+      if (readingSlug !== slug) openBySlug(slug);
     } else {
-      if (readingId) hideReader();
+      if (readingSlug) closeReader();
     }
   }
+
   window.addEventListener('hashchange', handleHash);
 
-  /* ---------- auth ---------- */
-  function openAuth() {
-    authInput.value = '';
-    authBox.classList.remove('parents-auth-shake');
-    authModal.classList.add('show');
-    authModal.setAttribute('aria-hidden', 'false');
-    setTimeout(() => authInput.focus(), 40);
-  }
-  function closeAuth() {
-    authModal.classList.remove('show');
-    authModal.setAttribute('aria-hidden', 'true');
-  }
-  function tryAuth() {
-    if (authInput.value.trim() === PASSWORD) {
-      authed = true;
-      try { sessionStorage.setItem(AUTH_KEY, '1'); } catch (e) {}
-      closeAuth();
-      toast('Доступ разрешён');
-      renderList();
-      openEditor(null);
-    } else {
-      authBox.classList.remove('parents-auth-shake');
-      void authBox.offsetWidth;
-      authBox.classList.add('parents-auth-shake');
-      toast('Неверный пароль');
-      authInput.select();
-    }
-  }
-
-  /* ---------- editor ---------- */
-  function openEditor(id) {
-    editingId = id || null;
-    if (id) {
-      const a = loadArticles().find(x => x.id === id);
-      if (!a) return;
-      editorHead.textContent = 'РЕДАКТИРОВАТЬ СТАТЬЮ';
-      titleInput.value = a.title || '';
-      contentInput.value = a.content || '';
-      editorSave.textContent = 'Сохранить';
-    } else {
-      editorHead.textContent = 'НОВАЯ СТАТЬЯ';
-      titleInput.value = '';
-      contentInput.value = '';
-      editorSave.textContent = 'Опубликовать';
-    }
-    editorModal.classList.add('show');
-    editorModal.setAttribute('aria-hidden', 'false');
-    setTimeout(() => titleInput.focus(), 40);
-  }
-  function closeEditor() {
-    editorModal.classList.remove('show');
-    editorModal.setAttribute('aria-hidden', 'true');
-    editingId = null;
-  }
-  function saveEditor() {
-    const title = titleInput.value.trim();
-    const content = contentInput.value.trim();
-    if (!title) { toast('Введите заголовок'); titleInput.focus(); return; }
-    if (!content) { toast('Введите текст'); contentInput.focus(); return; }
-
-    const arr = loadArticles();
-    const now = Date.now();
-    if (editingId) {
-      const idx = arr.findIndex(x => x.id === editingId);
-      if (idx >= 0) {
-        arr[idx].title = title;
-        arr[idx].content = content;
-        arr[idx].updated = now;
-      }
-      saveArticles(arr);
-      renderList();
-      closeEditor();
-      toast('Сохранено');
-    } else {
-      const newId = uid();
-      arr.push({ id: newId, title, content, created: now, updated: now });
-      saveArticles(arr);
-      renderList();
-      closeEditor();
-      toast('Опубликовано');
-    }
-  }
-
-  function deleteArticle(id) {
-    if (!confirm('Удалить статью?')) return;
-    const arr = loadArticles().filter(x => x.id !== id);
-    saveArticles(arr);
-    renderList();
-    if (readingId === id) closeArticle();
-    toast('Удалено');
-  }
-
-  /* ---------- события ---------- */
-  publishBtn.addEventListener('click', () => {
-    if (authed) openEditor(null);
-    else openAuth();
+  /* ---------- события закрытия ---------- */
+  readerClose.addEventListener('click', e => {
+    e.preventDefault();
+    closeArticle();
   });
-
-  authSubmit.addEventListener('click', tryAuth);
-  authCancel.addEventListener('click', closeAuth);
-  authClose.addEventListener('click', closeAuth);
-  authInput.addEventListener('keydown', e => {
-    if (e.key === 'Enter') { e.preventDefault(); tryAuth(); }
-    if (e.key === 'Escape') closeAuth();
-  });
-  authModal.addEventListener('click', e => {
-    if (e.target === authModal) closeAuth();
-  });
-
-  editorSave.addEventListener('click', saveEditor);
-  editorCancel.addEventListener('click', closeEditor);
-  editorClose.addEventListener('click', closeEditor);
-  document.addEventListener('keydown', e => {
-    if (editorModal.classList.contains('show') && e.key === 'Escape') closeEditor();
-  });
-
-  readerClose.addEventListener('click', closeArticle);
-  // клик по размытому фону (но не по «листу») — закрывает
   readerModal.addEventListener('click', e => {
     if (e.target.classList.contains('parents-reader-surface')) closeArticle();
   });
   document.addEventListener('keydown', e => {
     if (readerModal.classList.contains('show') && e.key === 'Escape') closeArticle();
   });
-  editBtn.addEventListener('click', () => {
-    if (!readingId) return;
-    const id = readingId;
-    closeArticle();
-    openEditor(id);
-  });
-  deleteBtn.addEventListener('click', () => {
-    if (!readingId) return;
-    deleteArticle(readingId);
-  });
 
-  renderList();
-  handleHash();
+  /* ---------- старт ---------- */
+  renderLoading();
+  loadIndex()
+    .then(items => renderList(items))
+    .catch(err => {
+      console.warn('Parents:', err);
+      renderError(err.message || 'Ошибка загрузки');
+    })
+    .finally(() => {
+      // если открыли сразу со ссылкой на статью — откроем её
+      handleHash();
+    });
 })();
 </script>
 </body>
