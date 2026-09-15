@@ -570,6 +570,9 @@ justify-content: center;
 }
 .dictation-key:active { transform: translate(0, 0); box-shadow: none; }
 
+/* ================================================================= */
+/* ==================== EXAM OVERLAY =============================== */
+/* ================================================================= */
 .exam-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--bg); z-index: 2000; display: none; flex-direction: column; align-items: center; justify-content: center; padding: 24px; gap: 32px; }
 .exam-overlay.show { display: flex; animation: tabIn 0.25s var(--snap); }
 .exam-header { display: flex; align-items: center; gap: 14px; }
@@ -587,6 +590,10 @@ justify-content: center;
 .exam-result { font-size: 2.6rem; text-align: center; min-height: 2.6rem; line-height: 1; }
 .exam-exit-btn { position: absolute; top: 24px; left: 24px; background: transparent; border: none; color: var(--fg); width: 48px; height: 48px; cursor: pointer; font-size: 2.6rem; font-weight: 300; display: flex; align-items: center; justify-content: center; transition: transform 0.12s linear, color 0.12s linear; z-index: 10; padding: 0; line-height: 1; border-radius: 50%; font-family: var(--font-ui); -webkit-tap-highlight-color: transparent; }
 .exam-exit-btn:hover { color: var(--accent); transform: scale(1.12); }
+
+/* ================================================================= */
+/* ==================== CELEBRATION OVERLAY ======================== */
+/* ================================================================= */
 .celebration-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(20, 20, 20, 0.82); z-index: 3000; display: none; align-items: center; justify-content: center; padding: 20px; }
 .celebration-overlay.show { display: flex; }
 .celebration-box { background: var(--bg); border: 4px solid var(--fg); padding: 32px; text-align: center; max-width: 90vw; max-height: 90vh; box-shadow: 12px 12px 0 var(--accent); }
@@ -594,6 +601,59 @@ justify-content: center;
 .celebration-box img { max-width: 300px; max-height: 240px; border: 3px solid var(--fg); }
 .celebration-close { margin-top: 22px; padding: 14px 36px; background: var(--fg); color: var(--bg); border: 2px solid var(--fg); cursor: pointer; font-family: var(--font-display); font-weight: 600; font-size: 0.9rem; letter-spacing: 0.14em; text-transform: uppercase; transition: all 0.1s linear; }
 .celebration-close:hover { background: var(--accent); border-color: var(--accent); color: var(--accent-fg); }
+
+/* ================================================================= */
+/* ==================== POETRY SECTION ============================= */
+/* ================================================================= */
+.poetry-wrapper {
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 40px 20px 100px;
+    width: 100%;
+}
+.poetry-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 24px;
+    margin-top: 30px;
+}
+.poetry-item {
+    background: var(--bg);
+    border: 2px solid var(--fg);
+    overflow: hidden;
+    transition: transform 0.2s var(--snap), box-shadow 0.2s var(--snap);
+}
+.poetry-item:hover {
+    transform: translate(-3px, -3px);
+    box-shadow: 6px 6px 0 var(--accent);
+}
+.poetry-video-container {
+    position: relative;
+    padding-bottom: 56.25%;
+    height: 0;
+    overflow: hidden;
+    background: var(--bg-2);
+}
+.poetry-video-container iframe {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    border: none;
+}
+.poetry-title {
+    padding: 16px;
+    font-family: var(--font-display);
+    font-size: 1.05rem;
+    font-weight: 600;
+    letter-spacing: 0.03em;
+    text-transform: uppercase;
+    color: var(--fg);
+    text-align: center;
+    border-top: 2px solid var(--fg);
+}
+
 .toast-container { position: fixed; bottom: 100px; left: 50%; transform: translateX(-50%); z-index: 4000; display: flex; flex-direction: column; align-items: center; gap: 8px; pointer-events: none; }
 .toast { background: var(--fg); color: var(--bg); padding: 13px 24px; font-family: var(--font-doc); font-size: 0.7rem; font-weight: 600; letter-spacing: 0.16em; text-transform: uppercase; animation: toastIn 0.18s linear, toastOut 0.18s linear 2.5s forwards; pointer-events: auto; }
 @keyframes toastIn { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
@@ -707,7 +767,7 @@ body.is-ios #watchSvgIOS { display: block; }
 .scheme-view svg { width: 100%; height: auto; max-height: 100%; display: block; overflow: visible; }
 .clock-view .watch-container.hidden { display: none; }
 
-@media (max-width: 1024px) { .syllable-grid { grid-template-columns: repeat(3, 1fr); } }
+@media (max-width: 1024px) { .syllable-grid { grid-template-columns: repeat(3, 1fr); } .poetry-grid { grid-template-columns: repeat(2, 1fr); } }
 @media (max-width: 640px) {
 .header { padding: 12px 14px 0; }
 .header-masthead { padding: 8px 0; font-size: 0.3rem; letter-spacing: 0.12em; gap: 4px 10px; flex-wrap: wrap; justify-content: center; margin-bottom: 2px; }
@@ -766,6 +826,7 @@ body.is-ios #watchSvgIOS { display: block; }
 .dictation-slot { width: 48px; height: 64px; font-size: 1.8rem; }
 .dictation-keyboard { grid-template-columns: repeat(auto-fill, minmax(38px, 1fr)); gap: 6px; }
 .dictation-key { font-size: 1rem; }
+.poetry-grid { grid-template-columns: 1fr; }
 }
 @media (max-width: 420px) {
 .frame-head-top { justify-content: center; gap: 6px; padding: 6px 8px; }
@@ -782,6 +843,7 @@ body.is-ios #watchSvgIOS { display: block; }
 .hero-years { font-size: 0.58rem; }
 .clock-frame { width: min(480px, 96vw); }
 }
+
 /* ================================================================= */
 /* ==================== PARENTS SECTION ============================ */
 /* ================================================================= */
@@ -1470,16 +1532,18 @@ document.body.dataset.mintone = localStorage.getItem('gramotino_mintone') || 'li
 <button class="section-switch-btn active" data-section="syllables">УЧИ СЛОГИ</button>
 <button class="section-switch-btn" data-section="clock">ЗНАЙ ВРЕМЯ</button>
 <button class="section-switch-btn" data-section="heroes">ЧТИ ВЕЛИКИХ</button>
+<button class="section-switch-btn" data-section="poetry">ПОЭЗИЯ</button>
 <button class="section-switch-btn" data-section="parents">РОДИТЕЛЯМ</button>
 </div>
 <button class="section-cycle-btn" id="sectionCycleBtn" type="button">
 <span class="section-cycle-label">УЧИ СЛОГИ</span>
-<span class="section-cycle-arrow"></span>
+<span class="section-cycle-arrow">➛</span>
 </button>
 <div class="section-subtitles">
 <div class="section-subtitle active" data-section="syllables">ЖМИ · СЛУШАЙ · ЗАПОМИНАЙ</div>
 <div class="section-subtitle" data-section="clock"><span class="digital-clock-inline" id="clockDigital24">03:00</span></div>
 <div class="section-subtitle" data-section="heroes">ВЕЛИКИЕ ЛИЧНОСТИ ОТЕЧЕСТВА</div>
+<div class="section-subtitle" data-section="poetry">СТИХИ И БАСНИ</div>
 <div class="section-subtitle" data-section="parents">СТАТЬИ И МАТЕРИАЛЫ ДЛЯ РОДИТЕЛЕЙ</div>
 </div>
 </header>
@@ -1492,10 +1556,10 @@ document.body.dataset.mintone = localStorage.getItem('gramotino_mintone') || 'li
 <div class="controls">
 <button id="normalBtn" class="active" data-tooltip="Все">▦</button>
 <button id="randomBtn" data-tooltip="Случайно">⇄</button>
-<button id="hideLearnedBtn" data-tooltip="Скрыть/показать">👁</button>
+<button id="hideLearnedBtn" data-tooltip="Скрыть/показать"></button>
 <button id="clearLearnedBtn" data-tooltip="Очистить">✕</button>
 <button id="examBtn" data-tooltip="Викторина">⚑</button>
-<button id="dictationBtn" data-tooltip="Диктант">✎</button>
+<button id="dictationBtn" data-tooltip="Диктант">📝</button>
 </div>
 <div class="grid-container"><div class="syllable-grid" id="syllableGrid"></div></div>
 </section>
@@ -1730,6 +1794,12 @@ document.body.dataset.mintone = localStorage.getItem('gramotino_mintone') || 'li
 <section id="heroesSection" class="tab-section">
 <div class="heroes-timeline" id="heroesTimeline"></div>
 </section>
+<section id="poetrySection" class="tab-section">
+<div class="poetry-wrapper">
+<div class="header-kicker" style="margin-bottom: 20px; border: none; padding: 0;">СТИХИ И БАСНИ</div>
+<div class="poetry-grid" id="poetryGrid"></div>
+</div>
+</section>
 <section id="parentsSection" class="tab-section">
 <div class="parents-wrapper">
 <div class="parents-list" id="parentsList">
@@ -1760,6 +1830,7 @@ document.body.dataset.mintone = localStorage.getItem('gramotino_mintone') || 'li
     <div class="dictation-header">
         <div class="exam-question" id="dictationQuestion">Слог 1 из 10</div>
         <button class="exam-repeat-btn" id="dictationRepeatBtn" title="Повторить">♪</button>
+        <button class="exam-next-btn" id="dictationNextBtn" title="Далее">→</button>
     </div>
     <div class="dictation-input-wrap">
         <div class="dictation-input" id="dictationInput"></div>
@@ -1770,7 +1841,7 @@ document.body.dataset.mintone = localStorage.getItem('gramotino_mintone') || 'li
 </div>
 
 <div class="exam-overlay" id="examOverlay">
-<button class="exam-exit-btn" id="examExitBtn" title="Выйти"></button>
+<button class="exam-exit-btn" id="examExitBtn" title="Выйти">✕</button>
 <div class="exam-header">
 <div class="exam-question" id="examQuestion"></div>
 <button class="exam-repeat-btn" id="examRepeatBtn" title="Повторить">♪</button>
@@ -1820,6 +1891,7 @@ const sectionCycleBtn = document.getElementById('sectionCycleBtn');
 const syllablesSection = document.getElementById('syllablesSection');
 const clockSection = document.getElementById('clockSection');
 const heroesSection = document.getElementById('heroesSection');
+const poetrySection = document.getElementById('poetrySection');
 const parentsSection = document.getElementById('parentsSection');
 const heroesTimeline = document.getElementById('heroesTimeline');
 
@@ -1830,6 +1902,7 @@ const dictationInput = document.getElementById('dictationInput');
 const dictationFeedback = document.getElementById('dictationFeedback');
 const dictationKeyboard = document.getElementById('dictationKeyboard');
 const dictationRepeatBtn = document.getElementById('dictationRepeatBtn');
+const dictationNextBtn = document.getElementById('dictationNextBtn');
 const dictationExitBtn = document.getElementById('dictationExitBtn');
 const dictationBackspace = document.getElementById('dictationBackspace');
 
@@ -1842,15 +1915,16 @@ let dictationIndex = 0;
 let currentDictationTarget = '';
 let currentDictationInput = '';
 let currentDictationAudioSrc = '';
+let dictationAnswerSubmitted = false;
 
-const SECTION_ORDER = ['syllables', 'clock', 'heroes', 'parents'];
-const SECTION_LABELS = { syllables: 'Учи слоги', clock: 'Знай время', heroes: 'Чти великих', parents: 'Родителям' };
+const SECTION_ORDER = ['syllables', 'clock', 'heroes', 'poetry', 'parents'];
+const SECTION_LABELS = { syllables: 'Учи слоги', clock: 'Знай время', heroes: 'Чти великих', poetry: 'Поэзия', parents: 'Родителям' };
 function updateCycleBtn() { if (!sectionCycleBtn) return; const l = sectionCycleBtn.querySelector('.section-cycle-label'); if (l) l.textContent = SECTION_LABELS[currentSection]; }
 if (sectionCycleBtn) { sectionCycleBtn.addEventListener('click', () => { const i = SECTION_ORDER.indexOf(currentSection); switchSection(SECTION_ORDER[(i + 1) % SECTION_ORDER.length]); }); }
 function loadLearnedSet() { try { return new Set(JSON.parse(localStorage.getItem('learned_syllables') || '[]')); } catch { return new Set(); } }
 function saveLearnedSet(s) { localStorage.setItem('learned_syllables', JSON.stringify(Array.from(s))); }
 let learnedSet = loadLearnedSet();
-function switchSection(s) { if (s === currentSection) return; currentSection = s; syllablesSection.classList.toggle('active', s === 'syllables'); clockSection.classList.toggle('active', s === 'clock'); heroesSection.classList.toggle('active', s === 'heroes'); if (parentsSection) parentsSection.classList.toggle('active', s === 'parents'); sectionBtns.forEach(b => b.classList.toggle('active', b.dataset.section === s)); sectionSubtitleEls.forEach(e => e.classList.toggle('active', e.dataset.section === s)); updateCycleBtn(); if (s !== 'clock' && window.clockSpeakCancel) window.clockSpeakCancel(); if (s !== 'syllables') progressContainer.classList.remove('show'); }
+function switchSection(s) { if (s === currentSection) return; currentSection = s; syllablesSection.classList.toggle('active', s === 'syllables'); clockSection.classList.toggle('active', s === 'clock'); heroesSection.classList.toggle('active', s === 'heroes'); poetrySection.classList.toggle('active', s === 'poetry'); if (parentsSection) parentsSection.classList.toggle('active', s === 'parents'); sectionBtns.forEach(b => b.classList.toggle('active', b.dataset.section === s)); sectionSubtitleEls.forEach(e => e.classList.toggle('active', e.dataset.section === s)); updateCycleBtn(); if (s !== 'clock' && window.clockSpeakCancel) window.clockSpeakCancel(); if (s !== 'syllables') progressContainer.classList.remove('show'); }
 sectionBtns.forEach(b => b.addEventListener('click', () => switchSection(b.dataset.section)));
 window.addEventListener('scroll', () => scrollTopBtn.classList.toggle('visible', window.scrollY > 300));
 scrollTopBtn.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
@@ -1882,16 +1956,21 @@ function startDictation() {
 function showNextDictation() {
     if (dictationIndex >= dictationQueue.length) {
         dictationOverlay.classList.remove('show');
-        showCelebration(); // Показываем GIF после успешного диктанта!
+        showCelebration();
         return;
     }
     currentDictationAudioSrc = dictationQueue[dictationIndex];
     currentDictationTarget = currentDictationAudioSrc.toUpperCase();
     currentDictationInput = '';
+    dictationAnswerSubmitted = false;
     
     dictationQuestion.textContent = `Слог ${dictationIndex + 1} из ${dictationQueue.length}`;
     dictationFeedback.textContent = '';
     dictationFeedback.style.color = '';
+    
+    // Сброс кнопок
+    dictationRepeatBtn.style.display = 'flex';
+    dictationNextBtn.classList.remove('show');
     
     renderDictationInput();
     playAudio(currentDictationAudioSrc);
@@ -1911,6 +1990,7 @@ function renderDictationInput() {
 }
 
 function handleDictationKey(letter) {
+    if (dictationAnswerSubmitted) return;
     if (currentDictationInput.length >= currentDictationTarget.length) return;
     currentDictationInput += letter;
     renderDictationInput();
@@ -1921,19 +2001,20 @@ function handleDictationKey(letter) {
 }
 
 function handleDictationBackspace() {
+    if (dictationAnswerSubmitted) return;
     if (currentDictationInput.length === 0) return;
     currentDictationInput = currentDictationInput.slice(0, -1);
     renderDictationInput();
     dictationFeedback.textContent = '';
     dictationFeedback.style.color = '';
     
-    // Remove correct/wrong classes from slots
     document.querySelectorAll('.dictation-slot').forEach(s => {
         s.classList.remove('correct', 'wrong');
     });
 }
 
 function checkDictationAnswer() {
+    dictationAnswerSubmitted = true;
     const slots = document.querySelectorAll('.dictation-slot');
     let isCorrect = true;
 
@@ -1949,23 +2030,14 @@ function checkDictationAnswer() {
     if (isCorrect) {
         dictationFeedback.textContent = 'ВЕРНО!';
         dictationFeedback.style.color = 'var(--m-ok, #2a6b3f)';
-        setTimeout(() => {
-            dictationIndex++;
-            showNextDictation();
-        }, 1200);
     } else {
-        dictationFeedback.textContent = 'ОШИБКА. ПОВТОРИ';
+        dictationFeedback.textContent = 'ОШИБКА';
         dictationFeedback.style.color = 'var(--accent)';
-        setTimeout(() => {
-            currentDictationInput = '';
-            renderDictationInput();
-            dictationFeedback.textContent = '';
-            dictationFeedback.style.color = '';
-            document.querySelectorAll('.dictation-slot').forEach(s => {
-                s.classList.remove('correct', 'wrong');
-            });
-        }, 1500);
     }
+    
+    // Показываем кнопку "Далее" и скрываем "Повторить"
+    dictationRepeatBtn.style.display = 'none';
+    dictationNextBtn.classList.add('show');
 }
 
 function buildDictationKeyboard() {
@@ -1984,6 +2056,10 @@ dictationBtn.addEventListener('click', startDictation);
 dictationRepeatBtn.addEventListener('click', () => {
     if (currentDictationAudioSrc) playAudio(currentDictationAudioSrc);
 });
+dictationNextBtn.addEventListener('click', () => {
+    dictationIndex++;
+    showNextDictation();
+});
 dictationExitBtn.addEventListener('click', () => {
     dictationOverlay.classList.remove('show');
     if (currentAudio) { currentAudio.pause(); currentAudio.src = ''; currentAudio = null; }
@@ -2000,20 +2076,7 @@ function handleExamAnswer(btn, sel, correct) { const ao = examOptions.querySelec
 examNextBtn.addEventListener('click', () => { examIndex++; showNextExamQuestion(); });
 examExitBtn.addEventListener('click', () => { examOverlay.classList.remove('show'); if (currentAudio) { currentAudio.pause(); currentAudio.src = ''; currentAudio = null; } examNextBtn.classList.remove('show'); examRepeatBtn.style.display = 'flex'; showToast('Прервано', 'info'); });
 examRepeatBtn.addEventListener('click', () => { if (currentExamCorrect) playAudio(currentExamCorrect); });
-const gifUrls = [
-    'https://media.gifs.ru/61cd26c8786364a1e4a76fd009763b661f85ca8f3e096bb43b17302498ca5c7f_500.webp',
-    'https://media.gifs.ru/9e787df4bab0b00a5374cfdfc5a918951ea6cb523928646908d34bb0685b593b_500.webp',
-    'https://media.gifs.ru/5700e33f2af3231daf8f83e6dcf723473861b17237bb4a70d22466d2e1d8783f_500.webp',
-    'https://media.gifs.ru/e7282289c8762f0c1e043e8de4c956744cf4825e61d3271df1c056165a94087a_500.webp',
-    'https://media.gifs.ru/ad5217762cb356685f294b05f44f14e4ea31bde96b34ab5e676915ad26fccd11_500.webp',
-    'https://media.gifs.ru/4803a42b623dcf59c8fbc9163c868b59cbaf347b7509fa7986894ff076939531_500.webp',
-    'https://media.gifs.ru/6eec639e732ad955153d25eb4dbbf13309483001d72d19a96d31f5e15bcde81a_500.webp',
-    'https://media.gifs.ru/e7e70d34d6bdca01c2c9d659eee9cbfcf24a0e30_500.webp',
-    'https://media.gifs.ru/79d7264b9d3f26b8440a715b510ba3a47254973085259ad2ecdcf79f6ea73854_500.webp',
-    'https://media.gifs.ru/c77544fec3f04d9cc911ae531a20fdb7bcd6541e4c48fab9acb3ae70780b4466_500.webp',
-    'https://media.gifs.ru/c9bc464c72197a908f063db7a6e48152e57c229706387d2a62ae2e69d957ac3e_500.webp',
-    'https://media.gifs.ru/9f4fc9e6a4ffc774c7e94d5bdf92bfed770e614cb06e7cfd1f686092451590a2_500.webp'
-];
+const gifUrls = ['https://media.gifs.ru/61cd26c8786364a1e4a76fd009763b661f85ca8f3e096bb43b17302498ca5c7f_500.webp', 'https://media.gifs.ru/9e787df4bab0b00a5374cfdfc5a918951ea6cb523928646908d34bb0685b593b_500.webp', 'https://media.gifs.ru/5700e33f2af3231daf8f83e6dcf723473861b17237bb4a70d22466d2e1d8783f_500.webp', 'https://media.gifs.ru/e7282289c8762f0c1e043e8de4c956744cf4825e61d3271df1c056165a94087a_500.webp', 'https://media.gifs.ru/ad5217762cb356685f294b05f44f14e4ea31bde96b34ab5e676915ad26fccd11_500.webp', 'https://media.gifs.ru/4803a42b623dcf59c8fbc9163c868b59cbaf347b7509fa7986894ff076939531_500.webp', 'https://media.gifs.ru/6eec639e732ad955153d25eb4dbbf13309483001d72d19a96d31f5e15bcde81a_500.webp', 'https://media.gifs.ru/e7e70d34d6bdca01c2c9d659eee9cbfcf24a0e30_500.webp', 'https://media.gifs.ru/79d7264b9d3f26b8440a715b510ba3a47254973085259ad2ecdcf79f6ea73854_500.webp', 'https://media.gifs.ru/c77544fec3f04d9cc911ae531a20fdb7bcd6541e4c48fab9acb3ae70780b4466_500.webp', 'https://media.gifs.ru/c9bc464c72197a908f063db7a6e48152e57c229706387d2a62ae2e69d957ac3e_500.webp', 'https://media.gifs.ru/9f4fc9e6a4ffc774c7e94d5bdf92bfed770e614cb06e7cfd1f686092451590a2_500.webp'];
 function showCelebration() { celebrationGif.src = gifUrls[Math.floor(Math.random() * gifUrls.length)]; celebrationOverlay.classList.add('show'); }
 celebrationClose.addEventListener('click', () => celebrationOverlay.classList.remove('show'));
 celebrationOverlay.addEventListener('click', e => { if (e.target === celebrationOverlay) celebrationOverlay.classList.remove('show'); });
@@ -2031,7 +2094,56 @@ function renderHeroesTimeline() { if (!heroesTimeline) return; const centuries =
 let heroModal = null, heroAudio = new Audio(), currentImageIndex = 0, currentImages = [];
 function openHeroModal(name, images, audioSrc, birthYear, deathYear) { if (heroModal) heroModal.remove(); currentImages = images; currentImageIndex = 0; const nH = images.length > 1 ? `<button class="hero-nav prev" type="button" aria-label="Предыдущий">‹</button><button class="hero-nav next" type="button" aria-label="Следующий">›</button>` : ''; const ini = name.split(/\s+/).map(w => w.charAt(0)).join('').slice(0, 2).toUpperCase(); heroModal = document.createElement('div'); heroModal.className = 'hero-modal'; heroModal.innerHTML = `<button class="hero-modal-repeat" type="button" aria-label="Повторить звук">♪</button><button class="hero-modal-close" type="button" aria-label="Закрыть">×</button><div class="hero-modal-portrait-wrap">${nH}<img class="hero-modal-portrait" src="${images[0]}" alt="${name}"></div><div class="hero-modal-info"><h3>${name}</h3><div class="hero-modal-years">${birthYear} — ${deathYear}</div></div><div class="hero-modal-timeline">${buildTimelineHTML(birthYear, deathYear)}</div>`; const imgEl = heroModal.querySelector('.hero-modal-portrait'); imgEl.addEventListener('error', () => { const p = document.createElement('div'); p.className = 'hero-portrait-placeholder'; p.textContent = ini; imgEl.replaceWith(p); }); document.body.appendChild(heroModal); playHeroAudio(audioSrc); heroModal.querySelector('.hero-modal-close').addEventListener('click', () => { heroModal.remove(); heroAudio.pause(); heroAudio.currentTime = 0; }); heroModal.querySelector('.hero-modal-repeat').addEventListener('click', () => playHeroAudio(audioSrc)); const pB = heroModal.querySelector('.hero-nav.prev'), nB = heroModal.querySelector('.hero-nav.next'); if (pB) pB.addEventListener('click', () => { currentImageIndex = (currentImageIndex - 1 + currentImages.length) % currentImages.length; const im = heroModal.querySelector('.hero-modal-portrait'); if (im) im.src = currentImages[currentImageIndex]; }); if (nB) nB.addEventListener('click', () => { currentImageIndex = (currentImageIndex + 1) % currentImages.length; const im = heroModal.querySelector('.hero-modal-portrait'); if (im) im.src = currentImages[currentImageIndex]; }); }
 function playHeroAudio(s) { heroAudio.src = s; heroAudio.play().catch(e => console.log('Ошибка воспроизведения', e)); }
-renderHeroesTimeline(); renderGrid(); updateCycleBtn();
+renderHeroesTimeline();
+
+// Poetry section
+const poetryVideos = [
+    { url: 'https://vkvideo.ru/video-217308936_456239206', title: 'Стихотворение 1' },
+    { url: 'https://dzen.ru/video/watch/5dd953ee1468c71cb2f9db72', title: 'Стихотворение 2' },
+    { url: 'https://dzen.ru/video/watch/5dcecb764eb2430b60f6feca', title: 'Стихотворение 3' },
+    { url: 'https://dzen.ru/video/watch/5dc433ede4f39fc27ba25511', title: 'Стихотворение 4' },
+    { url: 'https://vkvideo.ru/video-217308936_456239170', title: 'Стихотворение 5' },
+    { url: 'https://vkvideo.ru/video-217308936_456239114', title: 'Стихотворение 6' },
+    { url: 'https://dzen.ru/video/watch/674fb1ff011a2d7c77eba2e3', title: 'Стихотворение 7' },
+    { url: 'https://rutube.ru/video/999594c3ae9cf70edefdf7f5de918b1e/', title: 'Стихотворение 8' },
+    { url: 'https://vkvideo.ru/video-217308936_456239054', title: 'Стихотворение 9' },
+    { url: 'https://vkvideo.ru/video-217308936_456239056', title: 'Стихотворение 10' },
+    { url: 'https://vkvideo.ru/video-217308936_456239111', title: 'Стихотворение 11' },
+    { url: 'https://vkvideo.ru/video-218902116_456239049', title: 'Стихотворение 12' },
+    { url: 'https://vkvideo.ru/video-49427246_456239398', title: 'Стихотворение 13' }
+];
+
+function renderPoetry() {
+    const grid = document.getElementById('poetryGrid');
+    if (!grid) return;
+    
+    grid.innerHTML = '';
+    poetryVideos.forEach((video, index) => {
+        const item = document.createElement('div');
+        item.className = 'poetry-item';
+        
+        const videoContainer = document.createElement('div');
+        videoContainer.className = 'poetry-video-container';
+        
+        const iframe = document.createElement('iframe');
+        iframe.src = video.url;
+        iframe.allowFullscreen = true;
+        iframe.loading = 'lazy';
+        
+        videoContainer.appendChild(iframe);
+        
+        const title = document.createElement('div');
+        title.className = 'poetry-title';
+        title.textContent = video.title;
+        
+        item.appendChild(videoContainer);
+        item.appendChild(title);
+        grid.appendChild(item);
+    });
+}
+
+renderPoetry();
+renderGrid(); updateCycleBtn();
 })();
 (function () {
 const STORAGE_PAPER = 'gramotino_paper', STORAGE_INK = 'gramotino_ink';
