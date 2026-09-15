@@ -717,6 +717,477 @@ body.is-ios #watchSvgIOS { display: block; }
 }
 
 /* ================================================================= */
+/* ==================== POETRY SECTION ============================= */
+/* ================================================================= */
+.poetry-wrapper{
+  max-width:960px;
+  margin:0 auto;
+  padding:40px 20px 100px;
+  width:100%;
+}
+.poetry-list{
+  display:flex;
+  flex-direction:column;
+}
+.poetry-card{
+  position:relative;
+  display:flex;
+  align-items:center;
+  gap:clamp(14px,2.5vw,26px);
+  padding:24px 4px;
+  cursor:pointer;
+  color:inherit;
+  text-decoration:none;
+  transition:padding .5s cubic-bezier(.16,1,.3,1);
+  -webkit-tap-highlight-color:transparent;
+}
+.poetry-card-num{
+  flex-shrink:0;
+  font-family:var(--font-doc);
+  font-size:.7rem;
+  font-weight:600;
+  letter-spacing:.22em;
+  color:var(--fg-3);
+  min-width:34px;
+  transition:color .4s ease;
+}
+.poetry-card-title{
+  flex:1;
+  min-width:0;
+  font-family:var(--font-serif-display);
+  font-weight:600;
+  font-size:clamp(1.15rem,2.4vw,1.55rem);
+  line-height:1.22;
+  letter-spacing:-.005em;
+  color:var(--fg);
+  overflow-wrap:anywhere;
+  transition:color .4s ease;
+}
+.poetry-card-source{
+  flex-shrink:0;
+  font-family:var(--font-doc);
+  font-size:.55rem;
+  font-weight:700;
+  letter-spacing:.22em;
+  text-transform:uppercase;
+  color:var(--fg-3);
+  padding:4px 9px;
+  border:1px solid var(--rule-soft);
+  transition:all .4s ease;
+}
+.poetry-card-arrow{
+  flex-shrink:0;
+  font-family:var(--font-ui);
+  font-size:.95rem;
+  color:var(--fg-3);
+  opacity:0;
+  transform:translateX(-10px);
+  transition:
+    opacity .5s cubic-bezier(.16,1,.3,1),
+    transform .5s cubic-bezier(.16,1,.3,1),
+    color .4s ease;
+}
+.poetry-card:hover{padding-left:14px}
+.poetry-card:hover .poetry-card-title{color:var(--accent)}
+.poetry-card:hover .poetry-card-num{color:var(--accent)}
+.poetry-card:hover .poetry-card-arrow{opacity:1;transform:translateX(0);color:var(--accent)}
+
+/* газетный */
+body:not([data-skin="minimal"]) .poetry-list{
+  border-top:2px solid var(--fg);
+}
+body:not([data-skin="minimal"]) .poetry-card{
+  border-bottom:1px solid var(--rule-soft);
+}
+body:not([data-skin="minimal"]) .poetry-card-title{
+  font-family:var(--font-serif-display);
+  font-weight:700;
+  font-size:clamp(1.25rem,2.7vw,1.7rem);
+  line-height:1.18;
+}
+
+/* минимал */
+body[data-skin="minimal"] .poetry-list{
+  padding-top:12px;
+}
+body[data-skin="minimal"] .poetry-card{
+  padding:20px 0;
+}
+body[data-skin="minimal"] .poetry-card-title{
+  font-family:var(--font-ui);
+  font-weight:300;
+  font-size:clamp(1.05rem,2.1vw,1.35rem);
+  line-height:1.3;
+  letter-spacing:-.008em;
+}
+body[data-skin="minimal"] .poetry-card-num{
+  font-family:var(--font-ui);
+  font-weight:400;
+  font-size:.7rem;
+  letter-spacing:.1em;
+}
+body[data-skin="minimal"] .poetry-card-source{
+  border:none;
+  background:var(--bg-2);
+  font-family:var(--font-ui);
+  font-weight:500;
+  letter-spacing:.16em;
+  font-size:.52rem;
+  padding:3px 9px;
+  border-radius:999px;
+}
+body[data-skin="minimal"] .poetry-card:hover{padding-left:8px}
+body[data-skin="minimal"] .poetry-card-arrow{
+  font-size:.85rem;
+  font-weight:300;
+}
+
+/* ================================================================= */
+/* ==================== POETRY PLAYER MODAL ======================== */
+/* ================================================================= */
+.poetry-player-overlay{
+  position:fixed;
+  inset:0;
+  z-index:4700;
+  background:rgba(0,0,0,.92);
+  backdrop-filter:blur(10px) saturate(120%);
+  -webkit-backdrop-filter:blur(10px) saturate(120%);
+  opacity:0;
+  visibility:hidden;
+  transition:opacity .4s ease, visibility 0s linear .4s;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:clamp(50px,8vh,80px) clamp(16px,4vw,64px) clamp(16px,4vh,40px);
+}
+.poetry-player-overlay.show{
+  opacity:1;
+  visibility:visible;
+  transition:opacity .4s ease, visibility 0s linear 0s;
+}
+.poetry-player-stage{
+  width:100%;
+  max-width:1100px;
+  aspect-ratio:16/9;
+  background:#000;
+  transform:translateY(28px) scale(.96);
+  opacity:0;
+  transition:transform .6s cubic-bezier(.4,0,.2,1), opacity .4s ease;
+  border-radius:10px;
+  overflow:hidden;
+  box-shadow:0 30px 90px rgba(0,0,0,.65);
+}
+.poetry-player-overlay.show .poetry-player-stage{
+  transform:translateY(0) scale(1);
+  opacity:1;
+  transition:transform .8s cubic-bezier(.16,1,.3,1), opacity .5s cubic-bezier(.16,1,.3,1);
+}
+.poetry-player-stage iframe{
+  width:100%;height:100%;border:none;display:block;
+}
+.poetry-player-close{
+  position:fixed;
+  top:clamp(14px,2.2vw,26px);
+  right:clamp(14px,2.2vw,26px);
+  z-index:5;
+  width:clamp(44px,5vw,54px);
+  height:clamp(44px,5vw,54px);
+  border-radius:50%;
+  border:none;
+  background:rgba(255,255,255,.14);
+  color:#ffffff;
+  font-family:var(--font-ui);
+  font-size:1.7rem;
+  font-weight:300;
+  line-height:1;
+  cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  padding:0 0 5px;
+  backdrop-filter:blur(10px) saturate(140%);
+  -webkit-backdrop-filter:blur(10px) saturate(140%);
+  -webkit-tap-highlight-color:transparent;
+  opacity:0;
+  transform:scale(.5) rotate(-120deg);
+  transition:
+    opacity .3s ease .05s,
+    transform .6s cubic-bezier(.16,1,.3,1) .05s,
+    background .25s ease;
+}
+.poetry-player-overlay.show .poetry-player-close{
+  opacity:1;
+  transform:scale(1) rotate(0);
+  transition:
+    opacity .3s ease .15s,
+    transform .65s cubic-bezier(.16,1,.3,1) .15s,
+    background .25s ease;
+}
+.poetry-player-close:hover{background:rgba(255,255,255,.28)}
+.poetry-player-close:active{transform:scale(.94) rotate(0)}
+
+/* ================================================================= */
+/* ==================== DICTATION OVERLAY ========================== */
+/* ================================================================= */
+.dictation-overlay{
+  position:fixed;
+  inset:0;
+  z-index:2100;
+  background:var(--bg);
+  color:var(--fg);
+  display:none;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  padding:clamp(60px,8vh,90px) clamp(12px,3vw,32px) clamp(20px,4vh,40px);
+  gap:clamp(14px,2.5vh,26px);
+  overflow-y:auto;
+  scrollbar-width:none;
+  -ms-overflow-style:none;
+}
+.dictation-overlay::-webkit-scrollbar{display:none}
+.dictation-overlay.show{display:flex;animation:tabIn .25s var(--snap)}
+
+.dictation-exit{
+  position:absolute;
+  top:20px;left:20px;
+  background:transparent;border:none;color:var(--fg);
+  width:48px;height:48px;cursor:pointer;
+  font-size:2.6rem;font-weight:300;
+  display:flex;align-items:center;justify-content:center;
+  transition:transform .12s linear,color .12s linear;
+  padding:0;line-height:1;border-radius:50%;
+  -webkit-tap-highlight-color:transparent;
+}
+.dictation-exit:hover{color:var(--accent);transform:scale(1.12)}
+
+.dictation-progress{
+  font-family:var(--font-doc);
+  font-size:.72rem;font-weight:700;
+  letter-spacing:.24em;text-transform:uppercase;
+  color:var(--fg-2);
+  margin-top:6px;
+}
+
+.dictation-speaker{
+  width:clamp(88px,14vw,132px);
+  height:clamp(88px,14vw,132px);
+  border-radius:50%;
+  background:var(--bg);
+  border:3px solid var(--fg);
+  color:var(--fg);
+  cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  transition:all .15s cubic-bezier(.4,0,.2,1);
+  box-shadow:6px 6px 0 var(--accent);
+  padding:0;
+  -webkit-tap-highlight-color:transparent;
+  flex-shrink:0;
+}
+.dictation-speaker:hover{
+  background:var(--fg);color:var(--bg);
+  transform:translate(-2px,-2px);
+  box-shadow:8px 8px 0 var(--accent);
+}
+.dictation-speaker:active{transform:translate(0,0);box-shadow:3px 3px 0 var(--accent)}
+.dictation-speaker svg{width:44%;height:44%;display:block}
+.dictation-speaker.playing{
+  background:var(--accent);border-color:var(--accent);color:var(--accent-fg);
+  box-shadow:6px 6px 0 var(--fg);
+  animation:dictationSpeakerPulse .55s var(--snap);
+}
+@keyframes dictationSpeakerPulse{
+  0%,100%{transform:scale(1)}
+  40%{transform:scale(.94)}
+}
+
+.dictation-answer{
+  display:flex;
+  gap:clamp(10px,2vw,20px);
+  justify-content:center;
+  align-items:center;
+  min-height:clamp(80px,13vw,120px);
+  margin:clamp(6px,1vh,12px) 0;
+  flex-wrap:wrap;
+}
+.dictation-letter{
+  width:clamp(68px,11vw,104px);
+  height:clamp(68px,11vw,104px);
+  border:3px solid var(--fg);
+  background:var(--bg-2);
+  display:flex;align-items:center;justify-content:center;
+  font-family:var(--font-display);
+  font-size:clamp(2.2rem,6.5vw,3.6rem);
+  font-weight:700;
+  letter-spacing:.02em;
+  text-transform:uppercase;
+  color:var(--fg);
+  transition:
+    background .25s ease,
+    color .25s ease,
+    border-color .25s ease,
+    transform .35s cubic-bezier(.16,1,.3,1);
+}
+.dictation-letter.filled{
+  background:var(--bg);
+  color:var(--fg);
+  transform:translateY(-3px);
+}
+.dictation-letter.correct{
+  background:#2a6b3f;border-color:#2a6b3f;color:#ffffff;
+  transform:translateY(-3px) scale(1.05);
+}
+.dictation-letter.wrong{
+  background:var(--accent);border-color:var(--accent);color:var(--accent-fg);
+  animation:dictationShake .4s var(--snap);
+}
+@keyframes dictationShake{
+  0%,100%{transform:translateX(0)}
+  25%{transform:translateX(-6px)}
+  75%{transform:translateX(6px)}
+}
+
+.dictation-layout-switch{
+  display:flex;
+  border:2px solid var(--fg);
+  margin-bottom:4px;
+  flex-shrink:0;
+}
+.dictation-layout-switch button{
+  background:var(--bg);
+  border:none;color:var(--fg);
+  padding:9px 18px;
+  cursor:pointer;
+  font-family:var(--font-display);
+  font-weight:600;
+  font-size:.7rem;
+  letter-spacing:.14em;
+  text-transform:uppercase;
+  transition:all .1s linear;
+  border-right:2px solid var(--fg);
+  -webkit-tap-highlight-color:transparent;
+}
+.dictation-layout-switch button:last-child{border-right:none}
+.dictation-layout-switch button:hover:not(.active){background:var(--bg-2)}
+.dictation-layout-switch button.active{background:var(--fg);color:var(--bg)}
+
+.dictation-keyboard{
+  width:100%;
+  max-width:780px;
+  display:grid;
+  gap:6px;
+  padding:0 4px;
+}
+.dictation-keyboard.layout-alpha{grid-template-columns:repeat(11,1fr)}
+.dictation-keyboard.layout-qwerty{grid-template-columns:repeat(12,1fr)}
+
+.dictation-key{
+  aspect-ratio:1/1;
+  min-height:0;
+  border:2px solid var(--fg);
+  background:var(--bg);
+  color:var(--fg);
+  cursor:pointer;
+  font-family:var(--font-display);
+  font-weight:600;
+  font-size:clamp(.85rem,2.2vw,1.2rem);
+  letter-spacing:.02em;
+  text-transform:uppercase;
+  padding:0;
+  display:flex;align-items:center;justify-content:center;
+  transition:all .1s linear;
+  -webkit-tap-highlight-color:transparent;
+}
+.dictation-key:hover:not(:disabled){
+  background:var(--fg);color:var(--bg);
+  transform:translate(-2px,-2px);
+  box-shadow:3px 3px 0 var(--accent);
+}
+.dictation-key:active:not(:disabled){
+  transform:translate(0,0);
+  box-shadow:1px 1px 0 var(--accent);
+}
+.dictation-key:disabled{opacity:.28;cursor:not-allowed}
+
+/* минимал-скин для диктанта */
+body[data-skin="minimal"] .dictation-speaker{
+  border-width:1px;
+  border-color:var(--m-line-strong);
+  box-shadow:none;
+}
+body[data-skin="minimal"] .dictation-speaker:hover{
+  background:var(--bg-2);color:var(--fg);
+  transform:none;box-shadow:none;border-color:var(--fg);
+}
+body[data-skin="minimal"] .dictation-speaker.playing{
+  background:var(--accent);border-color:var(--accent);color:var(--accent-fg);
+  box-shadow:none;
+}
+body[data-skin="minimal"] .dictation-letter{
+  border-width:1px;
+  border-color:var(--m-line-strong);
+  background:transparent;
+  border-radius:12px;
+  font-family:var(--font-ui);
+  font-weight:300;
+}
+body[data-skin="minimal"] .dictation-letter.filled{
+  background:var(--bg-2);
+  border-color:var(--fg-3);
+}
+body[data-skin="minimal"] .dictation-letter.correct{
+  background:transparent;
+  border-color:var(--m-ok);
+  color:var(--m-ok);
+}
+body[data-skin="minimal"] .dictation-letter.wrong{
+  background:transparent;
+  border-color:var(--accent);
+  color:var(--accent);
+}
+body[data-skin="minimal"] .dictation-layout-switch{
+  border:1px solid var(--m-line-strong);
+  border-radius:999px;
+  overflow:hidden;
+}
+body[data-skin="minimal"] .dictation-layout-switch button{
+  border-right:1px solid var(--m-line-strong);
+  font-family:var(--font-ui);
+  font-weight:500;
+  font-size:.62rem;
+  letter-spacing:.22em;
+}
+body[data-skin="minimal"] .dictation-layout-switch button:last-child{border-right:none}
+body[data-skin="minimal"] .dictation-layout-switch button.active{
+  background:var(--accent);color:var(--accent-fg);
+}
+body[data-skin="minimal"] .dictation-key{
+  border-width:1px;
+  border-color:var(--m-line-strong);
+  border-radius:10px;
+  font-family:var(--font-ui);
+  font-weight:400;
+}
+body[data-skin="minimal"] .dictation-key:hover:not(:disabled){
+  background:var(--bg-2);color:var(--fg);
+  transform:none;box-shadow:none;border-color:var(--fg);
+}
+
+@media (max-width:640px){
+  .dictation-overlay{padding:64px 12px 20px;gap:12px}
+  .dictation-exit{top:12px;left:12px;width:42px;height:42px;font-size:1.4rem}
+  .dictation-keyboard.layout-alpha{grid-template-columns:repeat(8,1fr);gap:4px}
+  .dictation-keyboard.layout-qwerty{grid-template-columns:repeat(9,1fr);gap:4px}
+  .dictation-key{font-size:.72rem;border-width:1.5px}
+  .dictation-letter{width:54px;height:54px;font-size:1.9rem;border-width:2px}
+  .dictation-speaker{box-shadow:4px 4px 0 var(--accent)}
+  .poetry-wrapper{padding:24px 14px 80px}
+  .poetry-card{gap:12px;padding:18px 4px}
+  .poetry-card-source{display:none}
+  .poetry-card:hover{padding-left:8px}
+  .poetry-player-overlay{padding:60px 8px 20px}
+  .poetry-player-close{top:12px;right:12px;width:42px;height:42px;font-size:1.4rem}
+}
+
+/* ================================================================= */
 /* ==================== PARENTS SECTION ============================ */
 /* ================================================================= */
 .parents-wrapper{
@@ -725,13 +1196,10 @@ body.is-ios #watchSvgIOS { display: block; }
   padding:40px 20px 120px;
   width:100%;
 }
-
 .parents-list{
   display:flex;
   flex-direction:column;
 }
-
-/* состояния загрузки / ошибки / пусто */
 .parents-state{
   padding:80px 20px;
   text-align:center;
@@ -760,8 +1228,6 @@ body.is-ios #watchSvgIOS { display: block; }
   0%,100%{opacity:.45}
   50%{opacity:1}
 }
-
-/* карточка статьи */
 .parents-card{
   position:relative;
   display:flex;
@@ -774,7 +1240,6 @@ body.is-ios #watchSvgIOS { display: block; }
   transition:padding .5s cubic-bezier(.16,1,.3,1);
   -webkit-tap-highlight-color:transparent;
 }
-
 .parents-card-title{
   flex:1;
   min-width:0;
@@ -787,7 +1252,6 @@ body.is-ios #watchSvgIOS { display: block; }
   overflow-wrap:anywhere;
   transition:color .4s ease;
 }
-
 .parents-card-arrow{
   flex-shrink:0;
   font-family:var(--font-ui);
@@ -800,18 +1264,12 @@ body.is-ios #watchSvgIOS { display: block; }
     transform .5s cubic-bezier(.16,1,.3,1),
     color .4s ease;
 }
-
 .parents-card:hover{padding-left:14px}
 .parents-card:hover .parents-card-title{color:var(--accent)}
 .parents-card:hover .parents-card-arrow{opacity:1;transform:translateX(0);color:var(--accent)}
 
-/* ---------- газетный стиль (по умолчанию) ---------- */
-body:not([data-skin="minimal"]) .parents-list{
-  border-top:2px solid var(--fg);
-}
-body:not([data-skin="minimal"]) .parents-card{
-  border-bottom:1px solid var(--rule-soft);
-}
+body:not([data-skin="minimal"]) .parents-list{border-top:2px solid var(--fg)}
+body:not([data-skin="minimal"]) .parents-card{border-bottom:1px solid var(--rule-soft)}
 body:not([data-skin="minimal"]) .parents-card-title{
   font-family:var(--font-serif-display);
   font-weight:700;
@@ -819,17 +1277,10 @@ body:not([data-skin="minimal"]) .parents-card-title{
   line-height:1.18;
   letter-spacing:-.01em;
 }
-body:not([data-skin="minimal"]) .parents-card-arrow{
-  font-size:1.05rem;
-}
+body:not([data-skin="minimal"]) .parents-card-arrow{font-size:1.05rem}
 
-/* ---------- минимализм ---------- */
-body[data-skin="minimal"] .parents-list{
-  padding-top:12px;
-}
-body[data-skin="minimal"] .parents-card{
-  padding:20px 0;
-}
+body[data-skin="minimal"] .parents-list{padding-top:12px}
+body[data-skin="minimal"] .parents-card{padding:20px 0}
 body[data-skin="minimal"] .parents-card-title{
   font-family:var(--font-ui);
   font-weight:300;
@@ -838,14 +1289,9 @@ body[data-skin="minimal"] .parents-card-title{
   letter-spacing:-.012em;
 }
 body[data-skin="minimal"] .parents-card:hover{padding-left:8px}
-body[data-skin="minimal"] .parents-card-arrow{
-  font-size:.85rem;
-  font-weight:300;
-}
+body[data-skin="minimal"] .parents-card-arrow{font-size:.85rem;font-weight:300}
 
-/* ================================================================= */
-/* ============ PARENTS READER — FLOATING OVERLAY =================== */
-/* ================================================================= */
+/* ============ PARENTS READER ============ */
 .parents-reader-overlay{
   position:fixed;
   inset:0;
@@ -863,13 +1309,12 @@ body[data-skin="minimal"] .parents-card-arrow{
   visibility:visible;
   transition:opacity .5s cubic-bezier(.16,1,.3,1), visibility 0s linear 0s;
 }
-
 .parents-reader-surface{
   position:absolute;
   inset:0;
   overflow-y:auto;
   overflow-x:hidden;
-  padding:clamp(20px,3.5vh,56px) clamp(12px,2.5vw,32px) clamp(60px,10vh,120px);
+  padding:clamp(20px,3.5vh,56px) clamp(14px,3vw,48px) clamp(60px,10vh,120px);
   display:flex;
   justify-content:center;
   align-items:flex-start;
@@ -883,7 +1328,7 @@ body[data-skin="minimal"] .parents-card-arrow{
 .parents-reader-sheet{
   position:relative;
   width:100%;
-  max-width:960px;
+  max-width:900px;
   margin:0 auto;
   background:var(--bg);
   color:var(--fg);
@@ -911,7 +1356,6 @@ body[data-skin="minimal"] .parents-card-arrow{
     filter .6s cubic-bezier(.16,1,.3,1);
 }
 
-/* крестик */
 .parents-reader-close{
   position:fixed;
   top:clamp(14px,2.2vw,26px);
@@ -928,9 +1372,7 @@ body[data-skin="minimal"] .parents-card-arrow{
   font-weight:300;
   line-height:1;
   cursor:pointer;
-  display:flex;
-  align-items:center;
-  justify-content:center;
+  display:flex;align-items:center;justify-content:center;
   padding:0 0 5px;
   box-shadow:
     0 8px 26px rgba(0,0,0,.28),
@@ -949,7 +1391,7 @@ body[data-skin="minimal"] .parents-card-arrow{
 }
 .parents-reader-overlay.show .parents-reader-close{
   opacity:1;
-  transform:scale(1) rotate(0deg);
+  transform:scale(1) rotate(0);
   transition:
     opacity .3s ease .15s,
     transform .65s cubic-bezier(.16,1,.3,1) .15s,
@@ -958,16 +1400,12 @@ body[data-skin="minimal"] .parents-card-arrow{
     box-shadow .25s ease;
 }
 .parents-reader-close:hover{
-  background:#ffffff;
-  color:#000;
-  box-shadow:
-    0 10px 34px rgba(0,0,0,.4),
-    0 1px 0 rgba(255,255,255,.7) inset;
-  transform:scale(1.08) rotate(0deg);
+  background:#ffffff;color:#000;
+  box-shadow:0 10px 34px rgba(0,0,0,.4), 0 1px 0 rgba(255,255,255,.7) inset;
+  transform:scale(1.08) rotate(0);
 }
-.parents-reader-close:active{transform:scale(.94) rotate(0deg)}
+.parents-reader-close:active{transform:scale(.94) rotate(0)}
 
-/* ============== ТИПОГРАФИКА СТАТЬИ ============== */
 .parents-reader-title{
   font-family:var(--font-serif-display);
   font-weight:700;
@@ -983,10 +1421,7 @@ body[data-skin="minimal"] .parents-card-arrow{
   transform:translateY(14px);
   transition:opacity .55s ease .25s, transform .7s cubic-bezier(.16,1,.3,1) .25s;
 }
-.parents-reader-overlay.show .parents-reader-title{
-  opacity:1;
-  transform:translateY(0);
-}
+.parents-reader-overlay.show .parents-reader-title{opacity:1;transform:translateY(0)}
 
 .parents-reader-content{
   font-family:var(--font-serif-body);
@@ -1000,17 +1435,11 @@ body[data-skin="minimal"] .parents-card-arrow{
   hyphens:auto;
   -webkit-hyphens:auto;
   overflow-wrap:break-word;
-  text-align:justify;
-  text-justify:inter-word;
-  text-align-last:left;
   opacity:0;
   transform:translateY(20px);
   transition:opacity .6s ease .35s, transform .8s cubic-bezier(.16,1,.3,1) .35s;
 }
-.parents-reader-overlay.show .parents-reader-content{
-  opacity:1;
-  transform:translateY(0);
-}
+.parents-reader-overlay.show .parents-reader-content{opacity:1;transform:translateY(0)}
 .parents-reader-content p{margin:0 0 1.3em}
 .parents-reader-content p:last-child{margin-bottom:0}
 
@@ -1035,15 +1464,12 @@ body[data-skin="minimal"] .parents-card-arrow{
 .parents-reader-content h5,
 .parents-reader-content h6{
   font-family:var(--font-ui);
-  font-size:.95em;
-  font-weight:600;
-  letter-spacing:.08em;
-  text-transform:uppercase;
+  font-size:.95em;font-weight:600;
+  letter-spacing:.08em;text-transform:uppercase;
   color:var(--fg-2);
 }
 .parents-reader-content strong{font-weight:700;color:var(--fg)}
 .parents-reader-content em{font-style:italic}
-
 .parents-reader-content a{
   color:var(--accent);
   text-decoration:underline;
@@ -1053,17 +1479,12 @@ body[data-skin="minimal"] .parents-card-arrow{
   transition:text-decoration-color .2s ease;
 }
 .parents-reader-content a:hover{text-decoration-color:var(--accent)}
-
 .parents-reader-content ul,
-.parents-reader-content ol{
-  padding-left:1.35em;
-  margin:0 0 1.3em;
-}
+.parents-reader-content ol{padding-left:1.35em;margin:0 0 1.3em}
 .parents-reader-content ul:last-child,
 .parents-reader-content ol:last-child{margin-bottom:0}
 .parents-reader-content li{margin:.42em 0;padding-left:.15em}
 .parents-reader-content li::marker{color:var(--accent)}
-
 .parents-reader-content blockquote{
   margin:1.7em 0;
   padding:.15em 0 .15em 1.5em;
@@ -1072,14 +1493,12 @@ body[data-skin="minimal"] .parents-card-arrow{
   color:var(--fg-2);
   font-size:1.03em;
 }
-
 .parents-reader-content code{
   font-family:var(--font-doc);
   font-size:.84em;
   background:var(--bg-2);
   padding:.1em .42em;
-  border-radius:3px;
-  color:var(--fg);
+  border-radius:3px;color:var(--fg);
   white-space:nowrap;
 }
 .parents-reader-content pre{
@@ -1090,55 +1509,37 @@ body[data-skin="minimal"] .parents-card-arrow{
   border:1px solid var(--rule-soft);
   border-radius:6px;
   padding:1.15em 1.35em;
-  overflow-x:auto;
-  margin:1.5em 0;
+  overflow-x:auto;margin:1.5em 0;
   -webkit-overflow-scrolling:touch;
 }
 .parents-reader-content pre::-webkit-scrollbar{height:6px}
 .parents-reader-content pre::-webkit-scrollbar-thumb{background:var(--rule-soft);border-radius:3px}
-.parents-reader-content pre code{
-  background:transparent;padding:0;border-radius:0;font-size:1em;white-space:pre;
-}
-
+.parents-reader-content pre code{background:transparent;padding:0;border-radius:0;font-size:1em;white-space:pre}
 .parents-reader-content hr{
-  border:none;
-  height:1px;
+  border:none;height:1px;
   background:var(--rule-soft);
-  margin:2.4em auto;
-  width:50%;
+  margin:2.4em auto;width:50%;
 }
 .parents-reader-content img{
-  max-width:100%;
-  height:auto;
-  display:block;
-  margin:1.5em auto;
-  border-radius:4px;
+  max-width:100%;height:auto;display:block;
+  margin:1.5em auto;border-radius:4px;
 }
-
-/* буквица в газетном режиме */
 body:not([data-skin="minimal"]) .parents-reader-content > p:first-of-type::first-letter{
   font-family:var(--font-serif-display);
-  font-weight:700;
-  float:left;
-  font-size:3.7em;
-  line-height:.82;
+  font-weight:700;float:left;
+  font-size:3.7em;line-height:.82;
   margin:.05em .12em .02em 0;
   color:var(--accent);
 }
-
-/* ================= NEWSPAPER ТЮНИНГ ================= */
 body:not([data-skin="minimal"]) .parents-reader-sheet{border-radius:0}
 body:not([data-skin="minimal"]) .parents-reader-overlay{background:rgba(15,12,8,.55)}
 
-/* ================= MINIMAL СКИН ================= */
 body[data-skin="minimal"] .parents-reader-overlay{
   background:rgba(20,20,20,.28);
   backdrop-filter:blur(18px) saturate(140%);
   -webkit-backdrop-filter:blur(18px) saturate(140%);
 }
-body[data-skin="minimal"][data-mintone="dark"] .parents-reader-overlay{
-  background:rgba(0,0,0,.55);
-}
+body[data-skin="minimal"][data-mintone="dark"] .parents-reader-overlay{background:rgba(0,0,0,.55)}
 body[data-skin="minimal"] .parents-reader-sheet{
   border-radius:24px;
   box-shadow:
@@ -1173,8 +1574,7 @@ body[data-skin="minimal"] .parents-reader-content h6{
   text-transform:none;
 }
 body[data-skin="minimal"] .parents-reader-close{
-  background:#101010;
-  color:#ffffff;
+  background:#101010;color:#ffffff;
   box-shadow:0 10px 30px rgba(0,0,0,.28), 0 1px 0 rgba(255,255,255,.1) inset;
 }
 body[data-skin="minimal"] .parents-reader-close:hover{background:#000;color:#fff}
@@ -1187,14 +1587,8 @@ body[data-skin="minimal"][data-mintone="dark"] .parents-reader-close:hover{
 
 @media (max-width:640px){
   .parents-wrapper{padding:24px 18px 90px}
- .parents-reader-surface{padding:60px 0 40px}
-.parents-reader-sheet{
-  padding:32px 20px 44px;
-  border-radius:0;
-  max-width:none;
-  width:100%;
-  box-shadow:none;
-}
+  .parents-reader-surface{padding:64px 12px 60px}
+  .parents-reader-sheet{padding:30px 22px 40px;border-radius:18px}
   body:not([data-skin="minimal"]) .parents-reader-sheet{border-radius:0}
   .parents-reader-close{top:12px;right:12px;width:44px;height:44px;font-size:1.45rem}
   .parents-reader-title{font-size:1.6rem}
@@ -1237,7 +1631,6 @@ body[data-skin="minimal"][data-mintone="dark"][data-ink="cadmium"]     {--accent
 
 body[data-skin="minimal"]::before{display:none}
 body[data-skin="minimal"] .header{padding:20px 22px 0}
-
 body[data-skin="minimal"] .header-masthead{
   border-bottom:1px solid var(--m-line); padding:14px 0; margin-bottom:0;
   font-size:.56rem; font-weight:500; letter-spacing:.22em; color:var(--fg-3);
@@ -1256,12 +1649,11 @@ body[data-skin="minimal"] .header h1{
   user-select:none; -webkit-user-select:none; -webkit-tap-highlight-color:transparent;
 }
 body[data-skin="minimal"] .header h1::after{color:var(--accent)}
-
 body[data-skin="minimal"] .section-switch{border-top:1px solid var(--m-line);border-bottom:1px solid var(--m-line)}
 body[data-skin="minimal"] .section-switch-btn{
-  border-right:1px solid var(--m-line); padding:24px 10px;
-  font-family:var(--font-ui); font-weight:500; font-size:.66rem;
-  letter-spacing:.24em; color:var(--fg-3); position:relative;
+  border-right:1px solid var(--m-line); padding:24px 8px;
+  font-family:var(--font-ui); font-weight:500; font-size:.62rem;
+  letter-spacing:.2em; color:var(--fg-3); position:relative;
 }
 body[data-skin="minimal"] .section-switch-btn.active{background:transparent;color:var(--fg)}
 body[data-skin="minimal"] .section-switch-btn.active::before{
@@ -1278,7 +1670,6 @@ body[data-skin="minimal"] .section-cycle-btn{
   font-family:var(--font-ui); font-weight:500; font-size:.68rem; letter-spacing:.26em;
 }
 body[data-skin="minimal"] .section-cycle-btn:active{background:var(--bg-2);color:var(--accent)}
-
 body[data-skin="minimal"] .controls{gap:10px;padding:36px 20px 30px}
 body[data-skin="minimal"] .controls button{
   width:44px;height:44px;margin-left:0;border-radius:50%;
@@ -1289,7 +1680,6 @@ body[data-skin="minimal"] .controls button:hover{background:transparent;color:va
 body[data-skin="minimal"] .controls button.active{background:transparent;border-color:var(--accent);color:var(--accent)}
 body[data-skin="minimal"] .controls button.active:hover{background:transparent;color:var(--accent)}
 body[data-skin="minimal"] .controls button::after{background:var(--fg);color:var(--bg);border-radius:4px;font-weight:500}
-
 body[data-skin="minimal"] .grid-container{padding:0 20px 110px}
 body[data-skin="minimal"] .syllable-grid{border-top:1px solid var(--m-line);border-left:1px solid var(--m-line)}
 body[data-skin="minimal"] .syllable-card{
@@ -1304,7 +1694,6 @@ body[data-skin="minimal"] .syllable-card.learned .syllable-text{text-decoration-
 body[data-skin="minimal"] .learn-dot{width:12px;height:12px;top:10px;right:10px;border-radius:50%;border:1px solid var(--m-line-strong);opacity:.9}
 body[data-skin="minimal"] .syllable-card:not(.learned):hover .learn-dot{border-color:var(--fg)}
 body[data-skin="minimal"] .syllable-card.learned .learn-dot{background:var(--accent);border-color:var(--accent)}
-
 body[data-skin="minimal"] .progress-container{background:var(--bg);color:var(--fg);border-top:1px solid var(--m-line);padding:16px 24px 20px}
 body[data-skin="minimal"] .progress-label{color:var(--fg-3);font-weight:500;letter-spacing:.24em}
 body[data-skin="minimal"] .progress-bar{height:2px;background:var(--m-line)}
@@ -1314,7 +1703,6 @@ body[data-skin="minimal"] .scroll-top-btn{
   background:var(--bg);color:var(--fg-2);font-size:1rem;font-weight:400;
 }
 body[data-skin="minimal"] .scroll-top-btn:hover{background:var(--bg-2);color:var(--fg);transform:none;box-shadow:none}
-
 body[data-skin="minimal"] .exam-overlay{background:var(--bg)}
 body[data-skin="minimal"] .exam-question{color:var(--fg-3);font-weight:500;letter-spacing:.28em}
 body[data-skin="minimal"] .exam-repeat-btn,
@@ -1330,7 +1718,6 @@ body[data-skin="minimal"] .exam-option:hover:not(:disabled){background:var(--bg-
 body[data-skin="minimal"] .exam-option.correct{background:transparent;border-color:var(--m-ok);color:var(--m-ok)}
 body[data-skin="minimal"] .exam-option.wrong{background:transparent;border-color:var(--accent);color:var(--accent)}
 body[data-skin="minimal"] .exam-result{font-size:1.8rem;color:var(--fg-2)}
-
 body[data-skin="minimal"] .celebration-box{background:var(--bg);border:1px solid var(--m-line-strong);border-radius:16px;box-shadow:none;padding:28px}
 body[data-skin="minimal"] .celebration-box h2{font-family:var(--font-ui);font-weight:300;font-size:1.4rem;letter-spacing:.16em}
 body[data-skin="minimal"] .celebration-box img{border:1px solid var(--m-line);border-radius:8px}
@@ -1341,7 +1728,6 @@ body[data-skin="minimal"] .celebration-close{
 body[data-skin="minimal"] .celebration-close:hover{background:var(--accent);border-color:var(--accent);color:var(--accent-fg)}
 body[data-skin="minimal"] .toast{background:var(--fg);color:var(--bg);border-radius:999px;padding:11px 22px;font-weight:500;letter-spacing:.22em;font-size:.62rem}
 body[data-skin="minimal"] .footer{border-top:1px solid var(--m-line);color:var(--fg-3);font-weight:500;letter-spacing:.28em;font-size:.58rem;padding:30px 20px}
-
 body[data-skin="minimal"] .heroes-timeline{padding:44px 0 90px}
 body[data-skin="minimal"] .century-header{
   background:transparent;color:var(--fg-3);text-align:left;
@@ -1375,7 +1761,6 @@ body[data-skin="minimal"] .hero-modal-info h3{font-family:var(--font-ui);font-we
 body[data-skin="minimal"] .hero-modal-years{font-weight:400;font-size:.78rem;letter-spacing:.24em;color:var(--accent);margin-top:10px}
 body[data-skin="minimal"] .hero-nav{border:1px solid var(--m-line-strong);border-radius:50%;background:var(--bg);color:var(--fg-2)}
 body[data-skin="minimal"] .hero-nav:hover{background:var(--bg-2);color:var(--fg)}
-
 body[data-skin="minimal"] .htl-panel{border:1px solid var(--m-line);border-radius:12px;overflow:hidden}
 body[data-skin="minimal"] .htl-head{border-bottom:1px solid var(--m-line);background:transparent}
 body[data-skin="minimal"] .htl-head-cell:last-child{border-left:1px solid var(--m-line)}
@@ -1390,7 +1775,6 @@ body[data-skin="minimal"] .htl-other-name{font-family:var(--font-ui);font-weight
 body[data-skin="minimal"] .htl-war-year,
 body[data-skin="minimal"] .htl-other-year{color:var(--accent);font-weight:500}
 body[data-skin="minimal"] .htl-cnum{font-family:var(--font-ui);font-weight:300;font-size:1rem;letter-spacing:.06em;color:var(--fg-3)}
-
 body[data-skin="minimal"] .clock-wrapper{padding:40px 0 100px}
 body[data-skin="minimal"] .clock-frame{border:none;box-shadow:none;background:transparent;padding:0;width:min(520px,92vw)}
 body[data-skin="minimal"] .clock-frame::before{display:none}
@@ -1398,13 +1782,11 @@ body[data-skin="minimal"] .frame-head{border:none;border-bottom:1px solid var(--
 body[data-skin="minimal"] .frame-head-top,
 body[data-skin="minimal"] .frame-head-bot{display:none}
 body[data-skin="minimal"] .frame-head-title{font-family:var(--font-ui);font-weight:400;font-size:.6rem;letter-spacing:.2em;color:var(--fg-3);padding:0}
-
 #watchSvgMinimal{display:none}
 body[data-skin="minimal"] #watchSvgMinimal{display:block;color:var(--fg)}
 body[data-skin="minimal"] #watchSvgDesktop,
 body[data-skin="minimal"] #watchSvgIOS{display:none}
 #watchSvgMinimal #clkM-secondHand{stroke:var(--accent)}
-
 body[data-skin="minimal"] .masthead-stamp{border:1px solid var(--m-line-strong);border-radius:12px;box-shadow:none;background:var(--bg);overflow:hidden}
 body[data-skin="minimal"] .stamp-head{background:transparent;border-bottom:1px solid var(--m-line);font-weight:500;letter-spacing:.26em;font-size:.52rem;color:var(--fg-3)}
 body[data-skin="minimal"] .stamp-opt{font-family:var(--font-ui);font-weight:400;font-size:.72rem;letter-spacing:.08em;border-radius:8px;border:1px solid transparent;color:var(--fg-2)}
@@ -1442,6 +1824,7 @@ body[data-skin="minimal"] .stamp-opt-swatch{border-radius:50%;border-width:1px}
 <button class="section-switch-btn active" data-section="syllables">УЧИ СЛОГИ</button>
 <button class="section-switch-btn" data-section="clock">ЗНАЙ ВРЕМЯ</button>
 <button class="section-switch-btn" data-section="heroes">ЧТИ ВЕЛИКИХ</button>
+<button class="section-switch-btn" data-section="poetry">ПОЭЗИЯ</button>
 <button class="section-switch-btn" data-section="parents">РОДИТЕЛЯМ</button>
 </div>
 <button class="section-cycle-btn" id="sectionCycleBtn" type="button">
@@ -1452,6 +1835,7 @@ body[data-skin="minimal"] .stamp-opt-swatch{border-radius:50%;border-width:1px}
 <div class="section-subtitle active" data-section="syllables">ЖМИ · СЛУШАЙ · ЗАПОМИНАЙ</div>
 <div class="section-subtitle" data-section="clock"><span class="digital-clock-inline" id="clockDigital24">03:00</span></div>
 <div class="section-subtitle" data-section="heroes">ВЕЛИКИЕ ЛИЧНОСТИ ОТЕЧЕСТВА</div>
+<div class="section-subtitle" data-section="poetry">СТИХИ И ПРОЗА В ИСПОЛНЕНИИ МАСТЕРОВ</div>
 <div class="section-subtitle" data-section="parents">СТАТЬИ И МАТЕРИАЛЫ ДЛЯ РОДИТЕЛЕЙ</div>
 </div>
 </header>
@@ -1464,9 +1848,10 @@ body[data-skin="minimal"] .stamp-opt-swatch{border-radius:50%;border-width:1px}
 <div class="controls">
 <button id="normalBtn" class="active" data-tooltip="Все">▦</button>
 <button id="randomBtn" data-tooltip="Случайно">⇄</button>
-<button id="hideLearnedBtn" data-tooltip="Скрыть/показать">👁</button>
+<button id="hideLearnedBtn" data-tooltip="Скрыть/показать">◐</button>
 <button id="clearLearnedBtn" data-tooltip="Очистить">✕</button>
-<button id="examBtn" data-tooltip="Викторина">⚑</button>
+<button id="examBtn" data-tooltip="Викторина">?</button>
+<button id="dictationBtn" data-tooltip="Диктант">⌨</button>
 </div>
 <div class="grid-container"><div class="syllable-grid" id="syllableGrid"></div></div>
 </section>
@@ -1706,6 +2091,12 @@ body[data-skin="minimal"] .stamp-opt-swatch{border-radius:50%;border-width:1px}
 <div class="heroes-timeline" id="heroesTimeline"></div>
 </section>
 
+<section id="poetrySection" class="tab-section">
+  <div class="poetry-wrapper">
+    <div class="poetry-list" id="poetryList"></div>
+  </div>
+</section>
+
 <section id="parentsSection" class="tab-section">
   <div class="parents-wrapper">
     <div class="parents-list" id="parentsList">
@@ -1713,6 +2104,33 @@ body[data-skin="minimal"] .stamp-opt-swatch{border-radius:50%;border-width:1px}
     </div>
   </div>
 </section>
+</div>
+
+<!-- МОДАЛКА ПЛЕЕРА ПОЭЗИИ -->
+<div class="poetry-player-overlay" id="poetryPlayerModal" aria-hidden="true">
+  <button class="poetry-player-close" id="poetryPlayerClose" type="button" aria-label="Закрыть">×</button>
+  <div class="poetry-player-stage">
+    <iframe id="poetryPlayerFrame" allow="clipboard-write; autoplay; fullscreen; picture-in-picture" allowfullscreen frameborder="0"></iframe>
+  </div>
+</div>
+
+<!-- ОВЕРЛЕЙ ДИКТАНТА -->
+<div class="dictation-overlay" id="dictationOverlay">
+  <button class="dictation-exit" id="dictationExit" type="button" title="Выйти">✕</button>
+  <div class="dictation-progress" id="dictationProgress">Задание 1 из 10</div>
+  <button class="dictation-speaker" id="dictationSpeaker" type="button" aria-label="Прослушать слог">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" fill="currentColor" stroke="none"/>
+      <path d="M15.54 8.46a5 5 0 0 1 0 7.07"/>
+      <path d="M19.07 4.93a10 10 0 0 1 0 14.14"/>
+    </svg>
+  </button>
+  <div class="dictation-answer" id="dictationAnswer"></div>
+  <div class="dictation-layout-switch" id="dictationLayoutSwitch">
+    <button type="button" data-layout="alpha" class="active">Алфавит</button>
+    <button type="button" data-layout="qwerty">QWERTY</button>
+  </div>
+  <div class="dictation-keyboard layout-alpha" id="dictationKeyboard"></div>
 </div>
 
 <!-- ПЛАВАЮЩИЙ ЛИСТ СТАТЬИ -->
@@ -1752,7 +2170,7 @@ body[data-skin="minimal"] .stamp-opt-swatch{border-radius:50%;border-width:1px}
 <div class="toast-container" id="toastContainer"></div>
 <script>
 (function() {
-const rawItems = ['ЁЖ', 'ёлка', 'ЁН', 'АБ', 'АВ', 'АГ', 'АЖ', 'АЗ', 'АК', 'АЛ', 'Алла', 'АМ', 'АН', 'Анна', 'АП', 'арка', 'арфа', 'АС', 'АТ', 'АХ', 'АЧ', 'АШ', 'БА', 'БАК', 'БАЯН', 'БЕ', 'БИ', 'БО', 'БОК', 'БОР', 'Боря', 'БЫ', 'БЫК', 'БЭ', 'БЯ', 'ВА', 'Валя', 'ВЕ', 'ВЕЕР', 'ВИ', 'Витя', 'Вова', 'ВОЗ', 'ВОЛ', 'ВОЛК', 'ВУ', 'ВЫ', 'ВЭ', 'ВЮ', 'ГА', 'ГАЗ', 'Галя', 'ГЕ', 'Гена', 'ГИ', 'ГО', 'ГОД', 'ГЫ', 'ГЭ', 'ДА', 'ДИ', 'ДОМ', 'ДУ', 'ДУБ', 'ДУШ', 'ДЫ', 'ДЫМ', 'ДЭ', 'ДЮ', 'ДЯ', 'ЕГ', 'ЕЖ', 'ЕЛ', 'ЕМ', 'ЕН', 'ЕР', 'ЕС', 'если', 'ЕТ', 'ЕФ', 'ЕХ', 'ЕЦ', 'ЕЧ', 'ЕШ', 'ЖА', 'Женя', 'ЖИ', 'ЖО', 'ЖУ', 'ЖУК', 'ЖЭ', 'ЗА', 'ЗИ', 'Зина', 'ЗО', 'ЗУ', 'ЗЫ', 'ЗЭ', 'ЗЮ', 'ЗЯ', 'ИБ', 'ИВ', 'игра', 'ИЖ', 'ИК', 'икра', 'ИЛ', 'ИМ', 'ИН', 'ИР', 'ИС', 'ИТ', 'ИФ', 'ИЧ', 'ИШ', 'ЙОД', 'КА', 'Катя', 'КЕ', 'КИ', 'КИТ', 'КОЛ', 'Коля', 'КОМ', 'КОТ', 'КОФЕ', 'КРАЙ', 'КРАН', 'КУ', 'КЫ', 'КЭ', 'ЛЁ', 'Лёва', 'Лёша', 'ЛАК', 'ЛЕ', 'ЛЕВ', 'Лена', 'ЛЕС', 'ЛЕЩ', 'ЛИ', 'ЛИФТ', 'ЛО', 'ЛОМ', 'ЛУ', 'ЛЫ', 'ЛЫЖИ', 'ЛЭ', 'ЛЮ', 'Люба', 'Люда', 'ЛЮК', 'ЛЯ', 'МА', 'МАК', 'МЕ', 'МЕЛ', 'МЕХ', 'МЕЧ', 'МИ', 'Миша', 'МО', 'МОХ', 'МУ', 'МУХА', 'МЫ', 'МЫЛО', 'МЫС', 'МЭ', 'МЯ', 'МЯЧ', 'НЁ', 'НА', 'НЕ', 'Нина', 'НО', 'НОЖ', 'НОС', 'НУ', 'НЫ', 'НЭ', 'НЯ', 'одна', 'ОЖ', 'ОКНО', 'ОЛ', 'ОМ', 'ОН', 'ОП', 'ОР', 'ОС', 'ОФ', 'ОХ', 'ОЧ', 'очки', 'ОШ', 'ПА', 'ПАУК', 'ПЕРО', 'Петя', 'ПИ', 'ПУ', 'ПУХ', 'ПЫ', 'ПЭ', 'ПЯ', 'РА', 'РАК', 'РИ', 'РИС', 'РО', 'Рома', 'РОТ', 'РУ', 'РЫ', 'РЫБА', 'РЭ', 'РЮ', 'РЯ', 'СЁ', 'СА', 'Саша', 'СЕ', 'СИ', 'СОК', 'СОМ', 'СОР', 'СТУЛ', 'СУ', 'СУК', 'СУП', 'СЫ', 'СЫР', 'СЭ', 'СЮ', 'СЯ', 'Тёма', 'ТА', 'ТАЗ', 'Таня', 'ТЕ', 'ТИ', 'ТО', 'Толя', 'Тома', 'ТОРТ', 'ТРОС', 'ТУ', 'ТЫ', 'ТЭ', 'ТЮ', 'ТЯ', 'УБ', 'УГОЛ', 'УЖ', 'УЛ', 'УМ', 'УН', 'УР', 'урна', 'УС', 'УТ', 'утка', 'утро', 'УФ', 'УХ', 'УХО', 'УЧ', 'УШ', 'ушко', 'ФА', 'ФЕ', 'Федя', 'ФИ', 'ФО', 'ФУ', 'ФЫ', 'ФЭ', 'ХА', 'ХЕ', 'ХО', 'ХУ', 'ХЫ', 'ХЭ', 'ЦА', 'ЦЕ', 'ЦИ', 'ЦО', 'ЦУ', 'ЦЭ', 'ЧА', 'ЧАЙ', 'ЧЕК', 'ЧИ', 'ЧУ', 'ЧЭ', 'ША', 'ШАГ', 'ШЕ', 'ШИ', 'ШОВ', 'ШУ', 'ШЭ', 'ЩИ', 'ЩИТ', 'ЫВ', 'ЫК', 'ЫМ', 'ЫН', 'ЫС', 'ЫТ', 'ЫХ', 'ЭБ', 'ЭК', 'ЭЛ', 'ЭМ', 'ЭН', 'ЭП', 'ЭР', 'ЭС', 'ЭТ', 'ЭФ', 'ЭХ', 'ЭЦ', 'юбка', 'ЮГ', 'юнга', 'ЯБ', 'ЯВ', 'ЯК', 'ЯЛ', 'ЯМ', 'ЯН', 'ЯП', 'ЯР', 'ЯС', 'ЯТ', 'ЯХ', 'яхта', 'ЯЦ'];
+const rawItems = ['ЁЖ', 'ёлка', 'ЁН', 'АБ', 'АВ', 'АГ', 'АЖ', 'АЗ', 'АК', 'АЛ', 'Алла', 'АМ', 'АН', 'Анна', 'АП', 'арка', 'арфа', 'АС', 'АТ', 'АХ', 'АЧ', 'АШ', 'БА', 'БАК', 'БАЯН', 'БЕ', 'БИ', 'БО', 'БОК', 'БОР', 'Боря', 'БЫ', 'БЫК', 'БЭ', 'БЯ', 'ВА', 'Валя', 'ВЕ', 'ВЕЕР', 'ВИ', 'Витя', 'Вова', 'ВОЗ', 'ВОЛ', 'ВОЛК', 'ВУ', 'ВЫ', 'ВЭ', 'ВЮ', 'ГА', 'ГАЗ', 'Галя', 'ГЕ', 'Гена', 'ГИ', 'ГО', 'ГОД', 'ГЫ', 'ГЭ', 'ДА', 'ДИ', 'ДОМ', 'ДУ', 'ДУБ', 'ДУШ', 'ДЫ', 'ДЫМ', 'ДЭ', 'ДЮ', 'ДЯ', 'ЕГ', 'ЕЖ', 'ЕЛ', 'ЕМ', 'ЕН', 'ЕР', 'ЕС', 'если', 'ЕТ', 'ЕФ', 'ЕХ', 'ЕЦ', 'ЕЧ', 'ЕШ', 'ЖА', 'Женя', 'ЖИ', 'ЖО', 'ЖУ', 'ЖУК', 'ЖЭ', 'ЗА', 'ЗИ', 'Зина', 'ЗО', 'ЗУ', 'ЗЫ', 'ЗЭ', 'ЗЮ', 'ЗЯ', 'ИБ', 'ИВ', 'игра', 'ИЖ', 'ИК', 'икра', 'ИЛ', 'ИМ', 'ИН', 'ИР', 'ИС', 'ИТ', 'ИФ', 'ИЧ', 'ИШ', 'ЙОД', 'КА', 'Катя', 'КЕ', 'КИ', 'КИТ', 'КОЛ', 'Коля', 'КОМ', 'КОТ', 'КОФЕ', 'КРАЙ', 'КРАН', 'КУ', 'КЫ', 'КЭ', 'ЛЁ', 'Лёва', 'Лёша', 'ЛАК', 'ЛЕ', 'ЛЕВ', 'Лена', 'ЛЕС', 'ЛЕЩ', 'ЛИ', 'ЛИФТ', 'ЛО', 'ЛОМ', 'ЛУ', 'ЛЫ', 'ЛЫЖИ', 'ЛЭ', 'ЛЮ', 'Люба', 'Люда', 'ЛЮК', 'ЛЯ', 'МА', 'МАК', 'МЕ', 'МЕЛ', 'МЕХ', 'МЕЧ', 'МИ', 'Миша', 'МО', 'МОХ', 'МУ', 'МУХА', 'МЫ', 'МЫЛО', 'МЫС', 'МЭ', 'МЯ', 'МЯЧ', 'НЁ', 'НА', 'НЕ', 'Нина', 'НО', 'НОЖ', 'НОС', 'НУ', 'НЫ', 'НЭ', 'НЯ', 'одна', 'ОЖ', 'ОКНО', 'ОЛ', 'ОМ', 'ОН', 'ОП', 'ОР', 'ОС', 'ОФ', 'ОХ', 'ОЧ', 'очки', 'ОШ', 'ПА', 'ПАУК', 'ПЕРО', 'Петя', 'ПИ', 'ПУ', 'ПУХ', 'ПЫ', 'ПЭ', 'ПЯ', 'РА', 'РАК', 'РИ', 'РИС', 'РО', 'Рома', 'РОТ', 'РУ', 'РЫ', 'РЫБА', 'РЭ', 'РЮ', 'РЯ', 'СЁ', 'СА', 'Саша', 'СЕ', 'СИ', 'СОК', 'СОМ', 'СОР', 'СТУЛ', 'СУ', 'СУК', 'СУП', 'СЫ', 'СЫР', 'СЭ', 'СЮ', 'СЯ', 'Тёма', 'ТА', 'ТАЗ', 'Таня', 'ТЕ', 'ТИ', 'ТО', 'Толя', 'Тома', 'ТОРТ', 'ТРОС', 'ТУ', 'ТЫ', 'ТЭ', 'ТЮ', 'ТЯ', 'УБ', 'УГОЛ', 'УЖ', 'УЛ', 'УМ', 'УН', 'УР', 'урна', 'УС', 'УТ', 'утка', 'утро', 'УФ', 'УХ', 'УХО', 'УЧ', 'УШ', 'ушко', 'ФА', 'ФЕ', 'Федя', 'ФИ', 'ФО', 'ФУ', 'ФЫ', 'ФЭ', 'ХА', 'ХЕ', 'ХО', 'ХУ', 'ХЫ', 'ХЭ', 'ЦА', 'ЦЕ', 'ЦИ', 'ЦО', 'ЦУ', 'ЦЭ', 'ЧА', 'ЧАЙ', 'ЧЕК', 'ЧИ', 'ЧУ', 'ЧЭ', 'ША', 'ШАГ', 'ШЕ', 'ШИ', 'ШОВ', 'ШУ', 'ШЭ', 'ЩИ', 'ЩИТ', 'ЫВ', 'ЫК', 'ЫМ', 'ЫН', 'ЫС', 'ЫТ', 'ЫХ', 'ЭБ', 'ЭК', 'ЭЛ', 'ЭМ', 'ЭН', 'ЭП', 'ЭР', 'ЭС', 'ЭТ', 'ЭФ', 'ЭХ', 'ЭЦ', 'юбка', 'ЮГ', 'юнга', 'ЯБ', 'ЯВ', 'ЯД', 'ЯК', 'ЯЛ', 'ЯМ', 'ЯН', 'ЯП', 'ЯР', 'ЯС', 'ЯТ', 'ЯХ', 'яхта', 'ЯЦ'];
 const syllables = rawItems.sort((a, b) => { const l = a.length - b.length; if (l !== 0) return l; return a.localeCompare(b, 'ru', { sensitivity: 'base' }); });
 const grid = document.getElementById('syllableGrid');
 const toastContainer = document.getElementById('toastContainer');
@@ -1761,6 +2179,7 @@ const randomBtn = document.getElementById('randomBtn');
 const hideLearnedBtn = document.getElementById('hideLearnedBtn');
 const clearLearnedBtn = document.getElementById('clearLearnedBtn');
 const examBtn = document.getElementById('examBtn');
+const dictationBtn = document.getElementById('dictationBtn');
 const progressContainer = document.getElementById('progressContainer');
 const progressLabel = document.getElementById('progressLabel');
 const progressFill = document.getElementById('progressFill');
@@ -1781,17 +2200,18 @@ const sectionCycleBtn = document.getElementById('sectionCycleBtn');
 const syllablesSection = document.getElementById('syllablesSection');
 const clockSection = document.getElementById('clockSection');
 const heroesSection = document.getElementById('heroesSection');
+const poetrySection = document.getElementById('poetrySection');
 const parentsSection = document.getElementById('parentsSection');
 const heroesTimeline = document.getElementById('heroesTimeline');
 let currentMode = 'all'; let randomItems = []; let currentAudio = null; let examQuestions = []; let examIndex = 0; let examScore = 0; let currentExamCorrect = ''; let currentSection = 'syllables'; let progressTimer = null;
-const SECTION_ORDER = ['syllables', 'clock', 'heroes', 'parents'];
-const SECTION_LABELS = { syllables: 'Учи слоги', clock: 'Знай время', heroes: 'Чти великих', parents: 'Родителям' };
+const SECTION_ORDER = ['syllables', 'clock', 'heroes', 'poetry', 'parents'];
+const SECTION_LABELS = { syllables: 'Учи слоги', clock: 'Знай время', heroes: 'Чти великих', poetry: 'Поэзия', parents: 'Родителям' };
 function updateCycleBtn() { if (!sectionCycleBtn) return; const l = sectionCycleBtn.querySelector('.section-cycle-label'); if (l) l.textContent = SECTION_LABELS[currentSection]; }
 if (sectionCycleBtn) { sectionCycleBtn.addEventListener('click', () => { const i = SECTION_ORDER.indexOf(currentSection); switchSection(SECTION_ORDER[(i + 1) % SECTION_ORDER.length]); }); }
 function loadLearnedSet() { try { return new Set(JSON.parse(localStorage.getItem('learned_syllables') || '[]')); } catch { return new Set(); } }
 function saveLearnedSet(s) { localStorage.setItem('learned_syllables', JSON.stringify(Array.from(s))); }
 let learnedSet = loadLearnedSet();
-function switchSection(s) { if (s === currentSection) return; currentSection = s; syllablesSection.classList.toggle('active', s === 'syllables'); clockSection.classList.toggle('active', s === 'clock'); heroesSection.classList.toggle('active', s === 'heroes'); if (parentsSection) parentsSection.classList.toggle('active', s === 'parents'); sectionBtns.forEach(b => b.classList.toggle('active', b.dataset.section === s)); sectionSubtitleEls.forEach(e => e.classList.toggle('active', e.dataset.section === s)); updateCycleBtn(); if (s !== 'clock' && window.clockSpeakCancel) window.clockSpeakCancel(); if (s !== 'syllables') progressContainer.classList.remove('show'); }
+function switchSection(s) { if (s === currentSection) return; currentSection = s; syllablesSection.classList.toggle('active', s === 'syllables'); clockSection.classList.toggle('active', s === 'clock'); heroesSection.classList.toggle('active', s === 'heroes'); if (poetrySection) poetrySection.classList.toggle('active', s === 'poetry'); if (parentsSection) parentsSection.classList.toggle('active', s === 'parents'); sectionBtns.forEach(b => b.classList.toggle('active', b.dataset.section === s)); sectionSubtitleEls.forEach(e => e.classList.toggle('active', e.dataset.section === s)); updateCycleBtn(); if (s !== 'clock' && window.clockSpeakCancel) window.clockSpeakCancel(); if (s !== 'syllables') progressContainer.classList.remove('show'); }
 sectionBtns.forEach(b => b.addEventListener('click', () => switchSection(b.dataset.section)));
 window.addEventListener('scroll', () => scrollTopBtn.classList.toggle('visible', window.scrollY > 300));
 scrollTopBtn.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
@@ -1815,10 +2235,191 @@ examNextBtn.addEventListener('click', () => { examIndex++; showNextExamQuestion(
 examExitBtn.addEventListener('click', () => { examOverlay.classList.remove('show'); if (currentAudio) { currentAudio.pause(); currentAudio.src = ''; currentAudio = null; } examNextBtn.classList.remove('show'); examRepeatBtn.style.display = 'flex'; showToast('Прервано', 'info'); });
 examRepeatBtn.addEventListener('click', () => { if (currentExamCorrect) playAudio(currentExamCorrect); });
 const gifUrls = ['https://media.gifs.ru/2158157ec6a1788936055b9e9911600c84c63e85_300.webp', 'https://media.gifs.ru/2771cc0c57b56e4c6cfa23d2d9d3f4eb1aab5aaa_300.webp', 'https://media.gifs.ru/2d609cd63a3ae5874298b500f9ab4b5871aabd16_300.webp', 'https://media.gifs.ru/3f25bc7fbec4825f63f6e619e0bd3c8819d80aa9_300.webp', 'https://media.gifs.ru/cbaddb0c4d7bea31ff48e153877a7cec628dcd22_300.webp', 'https://media.gifs.ru/a8e88e80cbecdfc6f34d261a843c82f8f6c2e42b_300.webp', 'https://media.gifs.ru/2640e63683ecae76864a3b8cc40cfe569bb188de_300.webp', 'https://media.gifs.ru/dea46c4e68cbe967d1044828093869737c0697391d7011fc3094a163248f53ff_300.webp', 'https://media.gifs.ru/e6eeccd12fe0d671a5e0f134daafcd7068cef5cf3c99affb72ca341eb9f43157_300.webp', 'https://media.gifs.ru/45256be700bbfc9f441b0ea62ed7069989ac7cda44f5ecdf2399deaf60954a58_300.webp', 'https://media.gifs.ru/f3e3b39148c45df671a433372b8b3cf4bdc997fa799bf8406d281ef593e97b10_300.webp'];
+const dictationGifUrls = ['https://media.gifs.ru/61cd26c8786364a1e4a76fd009763b661f85ca8f3e096bb43b17302498ca5c7f_500.webp', 'https://media.gifs.ru/9e787df4bab0b00a5374cfdfc5a918951ea6cb523928646908d34bb0685b593b_500.webp', 'https://media.gifs.ru/5700e33f2af3231daf8f83e6dcf723473861b17237bb4a70d22466d2e1d8783f_500.webp', 'https://media.gifs.ru/e7282289c8762f0c1e043e8de4c956744cf4825e61d3271df1c056165a94087a_500.webp', 'https://media.gifs.ru/ad5217762cb356685f294b05f44f14e4ea31bde96b34ab5e676915ad26fccd11_500.webp', 'https://media.gifs.ru/4803a42b623dcf59c8fbc9163c868b59cbaf347b7509fa7986894ff076939531_500.webp', 'https://media.gifs.ru/6eec639e732ad955153d25eb4dbbf13309483001d72d19a96d31f5e15bcde81a_500.webp', 'https://media.gifs.ru/e7e70d34d6bdca01c2c9d659eee9cbfcf24a0e30_500.webp', 'https://media.gifs.ru/79d7264b9d3f26b8440a715b510ba3a47254973085259ad2ecdcf79f6ea73854_500.webp', 'https://media.gifs.ru/c77544fec3f04d9cc911ae531a20fdb7bcd6541e4c48fab9acb3ae70780b4466_500.webp', 'https://media.gifs.ru/c9bc464c72197a908f063db7a6e48152e57c229706387d2a62ae2e69d957ac3e_500.webp', 'https://media.gifs.ru/9f4fc9e6a4ffc774c7e94d5bdf92bfed770e614cb06e7cfd1f686092451590a2_500.webp'];
 function showCelebration() { celebrationGif.src = gifUrls[Math.floor(Math.random() * gifUrls.length)]; celebrationOverlay.classList.add('show'); }
+function showDictationCelebration() { celebrationGif.src = dictationGifUrls[Math.floor(Math.random() * dictationGifUrls.length)]; celebrationOverlay.classList.add('show'); }
 celebrationClose.addEventListener('click', () => celebrationOverlay.classList.remove('show'));
 celebrationOverlay.addEventListener('click', e => { if (e.target === celebrationOverlay) celebrationOverlay.classList.remove('show'); });
 function showToast(m, t = 'info') { const toast = document.createElement('div'); toast.className = 'toast'; if (t === 'error') toast.classList.add('error'); if (t === 'success') toast.classList.add('success'); toast.textContent = m; toastContainer.appendChild(toast); setTimeout(() => toast.remove(), 2000); }
+
+/* ============ ДИКТАНТ ============ */
+const dictationOverlay = document.getElementById('dictationOverlay');
+const dictationProgress = document.getElementById('dictationProgress');
+const dictationSpeaker = document.getElementById('dictationSpeaker');
+const dictationAnswer = document.getElementById('dictationAnswer');
+const dictationKeyboard = document.getElementById('dictationKeyboard');
+const dictationExit = document.getElementById('dictationExit');
+const dictationLayoutSwitch = document.getElementById('dictationLayoutSwitch');
+
+const DICTATION_TOTAL = 10;
+const ALPHA_LAYOUT = ['А','Б','В','Г','Д','Е','Ё','Ж','З','И','Й','К','Л','М','Н','О','П','Р','С','Т','У','Ф','Х','Ц','Ч','Ш','Щ','Ъ','Ы','Ь','Э','Ю','Я'];
+const QWERTY_LAYOUT = ['Й','Ц','У','К','Е','Н','Г','Ш','Щ','З','Х','Ъ','Ф','Ы','В','А','П','Р','О','Л','Д','Ж','Э','Я','Ч','С','М','И','Т','Ь','Б','Ю'];
+
+let dictationQuestions = [];
+let dictationIndex = 0;
+let dictationScore = 0;
+let dictationCurrent = '';
+let dictationInput = [];
+let dictationLocked = false;
+let dictationAudio = null;
+let dictationLayout = 'alpha';
+
+function getDictationQuestions(count) {
+  const pool = syllables.filter(s => /^[А-Яа-яЁё]{2,3}$/.test(s));
+  const shuffled = pool.slice().sort(() => Math.random() - 0.5);
+  return shuffled.slice(0, Math.min(count, shuffled.length));
+}
+
+function startDictation() {
+  dictationQuestions = getDictationQuestions(DICTATION_TOTAL);
+  dictationIndex = 0;
+  dictationScore = 0;
+  dictationOverlay.classList.add('show');
+  document.body.style.overflow = 'hidden';
+  renderDictationKeyboard();
+  showDictationTask();
+}
+
+function showDictationTask() {
+  if (dictationIndex >= dictationQuestions.length) {
+    endDictation();
+    return;
+  }
+  dictationLocked = false;
+  dictationCurrent = dictationQuestions[dictationIndex];
+  dictationInput = [];
+  dictationProgress.textContent = `Задание ${dictationIndex + 1} из ${dictationQuestions.length}`;
+  renderDictationAnswer();
+  setTimeout(() => playDictationAudio(), 250);
+}
+
+function renderDictationAnswer() {
+  dictationAnswer.innerHTML = '';
+  const n = dictationCurrent.length;
+  for (let i = 0; i < n; i++) {
+    const slot = document.createElement('div');
+    slot.className = 'dictation-letter' + (dictationInput[i] ? ' filled' : '');
+    slot.textContent = dictationInput[i] || '';
+    dictationAnswer.appendChild(slot);
+  }
+}
+
+function playDictationAudio() {
+  if (!dictationCurrent) return;
+  if (dictationAudio) {
+    dictationAudio.pause();
+    dictationAudio.src = '';
+    dictationAudio = null;
+  }
+  const a = new Audio('audio/' + dictationCurrent + '.mp3');
+  a.volume = 1;
+  dictationAudio = a;
+  dictationSpeaker.classList.add('playing');
+  a.addEventListener('ended', () => {
+    dictationAudio = null;
+    dictationSpeaker.classList.remove('playing');
+  });
+  a.play().catch(() => {
+    dictationSpeaker.classList.remove('playing');
+  });
+}
+
+function renderDictationKeyboard() {
+  dictationKeyboard.classList.remove('layout-alpha', 'layout-qwerty');
+  dictationKeyboard.classList.add('layout-' + dictationLayout);
+  dictationKeyboard.innerHTML = '';
+  const layout = dictationLayout === 'alpha' ? ALPHA_LAYOUT : QWERTY_LAYOUT;
+  layout.forEach(letter => {
+    const key = document.createElement('button');
+    key.type = 'button';
+    key.className = 'dictation-key';
+    key.textContent = letter;
+    key.addEventListener('click', () => pressDictationKey(letter));
+    dictationKeyboard.appendChild(key);
+  });
+}
+
+function pressDictationKey(letter) {
+  if (dictationLocked) return;
+  if (dictationInput.length >= dictationCurrent.length) return;
+  dictationInput.push(letter);
+  renderDictationAnswer();
+  if (dictationInput.length === dictationCurrent.length) {
+    setTimeout(checkDictationAnswer, 250);
+  }
+}
+
+function checkDictationAnswer() {
+  if (dictationLocked) return;
+  dictationLocked = true;
+  const typed = dictationInput.join('').toUpperCase();
+  const correct = dictationCurrent.toUpperCase();
+  const slots = dictationAnswer.querySelectorAll('.dictation-letter');
+
+  if (typed === correct) {
+    dictationScore++;
+    slots.forEach(slot => slot.classList.add('correct'));
+    setTimeout(() => {
+      dictationIndex++;
+      showDictationTask();
+    }, 950);
+  } else {
+    slots.forEach(slot => slot.classList.remove('filled'));
+    slots.forEach(slot => slot.classList.add('wrong'));
+    // Показать правильный ответ
+    slots.forEach((slot, i) => { slot.textContent = correct[i] || ''; });
+    setTimeout(() => {
+      dictationIndex++;
+      showDictationTask();
+    }, 1500);
+  }
+}
+
+function endDictation() {
+  dictationOverlay.classList.remove('show');
+  document.body.style.overflow = '';
+  if (dictationAudio) {
+    dictationAudio.pause();
+    dictationAudio.src = '';
+    dictationAudio = null;
+  }
+  if (dictationScore === DICTATION_TOTAL) {
+    setTimeout(() => showDictationCelebration(), 200);
+  } else {
+    showToast(`Верно ${dictationScore} из ${DICTATION_TOTAL}`, 'info');
+  }
+}
+
+function exitDictation() {
+  dictationOverlay.classList.remove('show');
+  document.body.style.overflow = '';
+  if (dictationAudio) {
+    dictationAudio.pause();
+    dictationAudio.src = '';
+    dictationAudio = null;
+  }
+  dictationLocked = true;
+  showToast('Прервано', 'info');
+}
+
+if (dictationBtn) dictationBtn.addEventListener('click', startDictation);
+if (dictationExit) dictationExit.addEventListener('click', exitDictation);
+if (dictationSpeaker) dictationSpeaker.addEventListener('click', playDictationAudio);
+if (dictationLayoutSwitch) {
+  dictationLayoutSwitch.querySelectorAll('button').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const newLayout = btn.dataset.layout;
+      if (newLayout === dictationLayout) return;
+      dictationLayout = newLayout;
+      dictationLayoutSwitch.querySelectorAll('button').forEach(b => b.classList.toggle('active', b === btn));
+      renderDictationKeyboard();
+    });
+  });
+}
+document.addEventListener('keydown', e => {
+  if (dictationOverlay && dictationOverlay.classList.contains('show') && e.key === 'Escape') exitDictation();
+});
+
 const heroesData = [{ name: "Александров", birthYear: 1905, deathYear: 1994, images: ["Александров.jpg"], audio: "Александров.mp3" }, { name: "Белинский", birthYear: 1811, deathYear: 1848, images: ["Белинский.jpg"], audio: "Белинский.mp3" }, { name: "Бородин", birthYear: 1833, deathYear: 1887, images: ["Бородин.jpg"], audio: "Бородин.mp3" }, { name: "Брежнев", birthYear: 1906, deathYear: 1982, images: ["Брежнев.jpg"], audio: "Брежнев.mp3" }, { name: "Ворошилов", birthYear: 1881, deathYear: 1969, images: ["Ворошилов.jpg", "Ворошилов2.jpg", "Ворошилов3.jpg"], audio: "Ворошилов.mp3" }, { name: "Гагарин", birthYear: 1934, deathYear: 1968, images: ["Гагарин.jpg"], audio: "Гагарин.mp3" }, { name: "Глинка", birthYear: 1804, deathYear: 1857, images: ["Глинка.jpg"], audio: "Глинка.mp3" }, { name: "Гоголь", birthYear: 1809, deathYear: 1852, images: ["Гоголь.jpg"], audio: "Гоголь.mp3" }, { name: "Горький", birthYear: 1868, deathYear: 1936, images: ["Горький.jpg", "Горький2.jpg", "Горький 3.jpg"], audio: "Горький.mp3" }, { name: "Даргомыжский", birthYear: 1813, deathYear: 1869, images: ["Даргомыжский.jpg"], audio: "Даргомыжский.mp3" }, { name: "Дзержинский", birthYear: 1877, deathYear: 1926, images: ["Дзержинский.jpg"], audio: "Дзержинский.mp3" }, { name: "Добролюбов", birthYear: 1836, deathYear: 1861, images: ["Добролюбов.jpg"], audio: "Добролюбов.mp3" }, { name: "Жуковский", birthYear: 1847, deathYear: 1921, images: ["Жуковский.jpg"], audio: "Жуковский.mp3" }, { name: "Карпинский", birthYear: 1846, deathYear: 1936, images: ["Карпинкий.jpg"], audio: "Карпинский.mp3" }, { name: "Курчатов", birthYear: 1902, deathYear: 1960, images: ["Курчатов.jpg"], audio: "Курчатов.mp3" }, { name: "Ленин", birthYear: 1870, deathYear: 1924, images: ["Ленин.jpg", "Ленин2.jpg", "Ленин3.jpg", "Ленин4.jpg", "Ленин5.jpg"], audio: "Ленин.mp3" }, { name: "Лермонтов", birthYear: 1814, deathYear: 1841, images: ["Лермонтов.jpg"], audio: "Лермонтов.mp3" }, { name: "Ломоносов", birthYear: 1711, deathYear: 1765, images: ["Ломоносов.jpeg"], audio: "Ломоносов.mp3" }, { name: "Макаренко", birthYear: 1888, deathYear: 1939, images: ["Макаренко.jpg"], audio: "Макаренко.mp3" }, { name: "Маяковский", birthYear: 1893, deathYear: 1930, images: ["Маяковский.jpg"], audio: "Маяковский.mp3" }, { name: "Менделеев", birthYear: 1834, deathYear: 1907, images: ["Менделеев.jpg"], audio: "Менделеев.mp3" }, { name: "Мечников", birthYear: 1845, deathYear: 1916, images: ["Мечников.jpg"], audio: "Мечников.mp3" }, { name: "Мичурин", birthYear: 1855, deathYear: 1935, images: ["Мичурин.jpg", "Мичурин2.jpg", "Мичурин3.jpg"], audio: "Мичурин.mp3" }, { name: "Молотов", birthYear: 1890, deathYear: 1986, images: ["Молотов.jpg"], audio: "Молотов.mp3" }, { name: "Мусоргский", birthYear: 1839, deathYear: 1881, images: ["Мусоргский.jpg"], audio: "Мусоргский.mp3" }, { name: "Некрасов", birthYear: 1821, deathYear: 1878, images: ["Некрасов.jpg"], audio: "Некрасов.mp3" }, { name: "Островский", birthYear: 1904, deathYear: 1936, images: ["Островский.jpg"], audio: "Островский.mp3" }, { name: "Павлов", birthYear: 1849, deathYear: 1936, images: ["Павлов.png"], audio: "Павлов.mp3" }, { name: "Папанин", birthYear: 1894, deathYear: 1986, images: ["Папанин.jpg"], audio: "Папанин.mp3" }, { name: "Пётр Великий", birthYear: 1672, deathYear: 1725, images: ["Петр.jpg", "Пётр2.jpg"], audio: "Первый.mp3" }, { name: "Писарев", birthYear: 1840, deathYear: 1868, images: ["Писарев.jpg"], audio: "Писарев.mp3" }, { name: "Попов", birthYear: 1859, deathYear: 1906, images: ["Попов.jpg"], audio: "Попов.mp3" }, { name: "Пушкин", birthYear: 1799, deathYear: 1837, images: ["Пушкин.jpg", "Пушкин3.jpg"], audio: "Пушкин.mp3" }, { name: "Репин", birthYear: 1844, deathYear: 1930, overrideCentury: 19, images: ["Репин.jpg"], audio: "Репин.mp3" }, { name: "Римский-Корсаков", birthYear: 1844, deathYear: 1908, images: ["Римский-Корсаков.jpg"], audio: "Римский-Корсаков.mp3" }, { name: "Салтыков-Щедрин", birthYear: 1826, deathYear: 1889, images: ["Салтыков-Щедрин.jpg"], audio: "Салтыков-Щедрин.mp3" }, { name: "Семашко", birthYear: 1874, deathYear: 1949, images: ["Семашко.jpg"], audio: "Семашко.mp3" }, { name: "Сеченов", birthYear: 1829, deathYear: 1905, images: ["Сеченов.jpg"], audio: "Сеченов.mp3" }, { name: "Сталин", birthYear: 1878, deathYear: 1953, images: ["Сталин.jpg", "Сталин2.jpg", "Сталин3.jpg", "Сталин4.jpg", "Сталин5.jpg", "Сталин6.jpg", "Сталин7.jpg", "Сталин8.jpg", "Сталин9.jpg"], audio: "Сталин.mp3" }, { name: "Суворов", birthYear: 1729, deathYear: 1800, images: ["Суворов.jpg"], audio: "Суворов.mp3" }, { name: "Толстой", birthYear: 1828, deathYear: 1910, images: ["Толстой.jpg", "Толстой2.jpg", "Толстой3.jpg", "Толстой4.jpg"], audio: "Толстой.mp3" }, { name: "Тургенев", birthYear: 1818, deathYear: 1883, images: ["Тургенев.jpg"], audio: "Тургенев.mp3" }, { name: "Фрунзе", birthYear: 1885, deathYear: 1925, images: ["Фрунзе.jpg"], audio: "Фрунзе.mp3" }, { name: "Циолковский", birthYear: 1857, deathYear: 1935, images: ["Циолковский.jpg"], audio: "Циолковский.mp3" }, { name: "Чайковский", birthYear: 1840, deathYear: 1893, images: ["Чайковский.jpg"], audio: "Чайковский.mp3" }, { name: "Чернышевский", birthYear: 1828, deathYear: 1889, images: ["Чернышевский.jpg"], audio: "Чернышевский.mp3" }, { name: "Чехов", birthYear: 1860, deathYear: 1904, images: ["Чехов.jpg"], audio: "Чехов.mp3" }, { name: "Шишкин", birthYear: 1832, deathYear: 1898, images: ["Шишкин.jpg"], audio: "Шишкин.mp3" }, { name: "Шолохов", birthYear: 1905, deathYear: 1984, images: ["Шолохов.jpg"], audio: "Шолохов.mp3" }];
 const TL_START = 1650, TL_END = 2010, TL_RANGE = TL_END - TL_START;
 const tlPos = y => ((y - TL_START) / TL_RANGE) * 100;
@@ -2359,6 +2960,7 @@ render(); renderSecondHand(); setView('watch');
     } catch (e) {}
     if (typeof window.__syncSkinControls === 'function') window.__syncSkinControls();
   }
+
   // — переключатель стиля —
   const skinSwitch = document.getElementById('skinSwitch');
   if (skinSwitch) {
@@ -2374,6 +2976,7 @@ render(); renderSecondHand(); setView('watch');
       }
     });
   }
+
   h1.setAttribute('title', 'Двойной клик — сменить оформление');
   h1.addEventListener('dblclick', function (e) {
     e.preventDefault();
@@ -2385,6 +2988,125 @@ render(); renderSecondHand(); setView('watch');
   });
 
   if (typeof window.__syncSkinControls === 'function') window.__syncSkinControls();
+})();
+</script>
+<script>
+/* ============================================================ */
+/* ============== ПОЭЗИЯ — видео с Rutube ==================== */
+/* ============================================================ */
+(function () {
+  const videos = [
+    { title: 'Жди меня',                              id: 'dc08664f71952500f4bc0440947fc491' },
+    { title: 'Лермонтов',                             id: 'b634ebd5bfead10073766860d83c5ed9' },
+    { title: 'Письмо Татьяны',                        id: 'b8c412a92afc0422b921253fbe2e0c55' },
+    { title: 'Некрасов',                              id: '8ca305e0e8a8a4eabbdf76a6c9ffd111' },
+    { title: 'Ты меня не любишь',                     id: '099eb1da530d476cc58887631ec26a3b' },
+    { title: 'Глобус',                                id: 'b8b7fe121bba74e8379c5c72f1562d84' },
+    { title: 'Бросай филфак',                         id: '0b6686b4ac680ab139f8b7347ef4fbf6' },
+    { title: 'Спасибо всем, кто нам мешает',          id: '85af9336e91b8bfff7b440bc034c5403' },
+    { title: 'Как всё сложилось',                     id: '8aad257df3edbc8ea9691765455b5f38' },
+    { title: 'Папа',                                  id: '35f3e4547d8fda4788da95386a2d5c22' }
+  ];
+
+  const list  = document.getElementById('poetryList');
+  const modal = document.getElementById('poetryPlayerModal');
+  const frame = document.getElementById('poetryPlayerFrame');
+  const close = document.getElementById('poetryPlayerClose');
+  if (!list || !modal || !frame) return;
+
+  function pad2(n) { return String(n).padStart(2, '0'); }
+
+  function render() {
+    list.innerHTML = '';
+    videos.forEach((v, i) => {
+      const card = document.createElement('a');
+      card.className = 'poetry-card';
+      card.href = '#video/' + v.id;
+      card.dataset.videoId = v.id;
+      card.style.opacity = '0';
+      card.style.transform = 'translateY(14px)';
+      card.style.transition = `opacity .55s ease ${i * 50}ms, transform .7s cubic-bezier(.16,1,.3,1) ${i * 50}ms, padding .5s cubic-bezier(.16,1,.3,1)`;
+
+      const num = document.createElement('span');
+      num.className = 'poetry-card-num';
+      num.textContent = pad2(i + 1);
+
+      const title = document.createElement('div');
+      title.className = 'poetry-card-title';
+      title.textContent = v.title;
+
+      const src = document.createElement('span');
+      src.className = 'poetry-card-source';
+      src.textContent = 'RUTUBE';
+
+      const arrow = document.createElement('span');
+      arrow.className = 'poetry-card-arrow';
+      arrow.textContent = '▶';
+
+      card.appendChild(num);
+      card.appendChild(title);
+      card.appendChild(src);
+      card.appendChild(arrow);
+      list.appendChild(card);
+
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          card.style.opacity = '1';
+          card.style.transform = 'translateY(0)';
+        });
+      });
+
+      card.addEventListener('click', e => {
+        if (window.location.hash === card.getAttribute('href')) {
+          e.preventDefault();
+          openPlayer(v.id);
+        }
+      });
+    });
+  }
+
+  function openPlayer(id) {
+    frame.src = 'https://rutube.ru/play/embed/' + id + '/';
+    modal.classList.add('show');
+    modal.setAttribute('aria-hidden', 'false');
+    document.body.style.overflow = 'hidden';
+  }
+  function closePlayer() {
+    modal.classList.remove('show');
+    modal.setAttribute('aria-hidden', 'true');
+    document.body.style.overflow = '';
+    // очищаем iframe после анимации, чтобы не играл в фоне
+    setTimeout(() => { frame.src = 'about:blank'; }, 400);
+  }
+  function closeAndClearHash() {
+    if (window.location.hash.startsWith('#video/')) {
+      history.pushState('', document.title, window.location.pathname + window.location.search);
+      closePlayer();
+    } else {
+      closePlayer();
+    }
+  }
+  function handleHash() {
+    const hash = window.location.hash;
+    if (hash.startsWith('#video/')) {
+      const id = hash.slice('#video/'.length);
+      if (id) openPlayer(id);
+    } else {
+      if (modal.classList.contains('show')) closePlayer();
+    }
+  }
+
+  close.addEventListener('click', e => { e.preventDefault(); closeAndClearHash(); });
+  modal.addEventListener('click', e => {
+    if (e.target === modal) closeAndClearHash();
+  });
+  document.addEventListener('keydown', e => {
+    if (modal.classList.contains('show') && e.key === 'Escape') closeAndClearHash();
+  });
+  window.addEventListener('hashchange', handleHash);
+
+  render();
+  handleHash();
 })();
 </script>
 <script>
@@ -2406,14 +3128,11 @@ render(); renderSecondHand(); setView('watch');
 
   if (!list || !readerModal) return;
 
-  /* ---------- кэш в памяти сессии ---------- */
   const indexCache    = { loaded: false, data: [] };
-  const articleCache  = new Map();   // slug -> md string
+  const articleCache  = new Map();
 
   let readingSlug     = null;
-  let openAnimationTimer = null;
 
-  /* ---------- утилита: тост ---------- */
   function toast(msg) {
     const c = document.getElementById('toastContainer');
     if (!c) return;
@@ -2424,7 +3143,6 @@ render(); renderSecondHand(); setView('watch');
     setTimeout(() => el.remove(), 2200);
   }
 
-  /* ---------- markdown ---------- */
   function esc(s) {
     return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
   }
@@ -2447,7 +3165,8 @@ render(); renderSecondHand(); setView('watch');
     let para = [];
     const flush = () => {
       if (!para.length) return;
-out.push('<p>' + para.map(inline).join(' ') + '</p>');      para = [];
+      out.push('<p>' + para.map(inline).join('<br>') + '</p>');
+      para = [];
     };
     let i = 0;
     while (i < lines.length) {
@@ -2499,13 +3218,31 @@ out.push('<p>' + para.map(inline).join(' ') + '</p>');      para = [];
     flush();
     return out.join('\n');
   }
+  function stripLeadingH1(md) {
+    return String(md || '').replace(/^\s*#\s+.*?(?:\r?\n|$)/, '');
+  }
 
-  /* ---------- загрузка с GitHub ---------- */
   async function loadIndex(force) {
     if (indexCache.loaded && !force) return indexCache.data;
     const res = await fetch(INDEX_URL, { cache: 'no-cache' });
     if (!res.ok) throw new Error('index.json: HTTP ' + res.status);
-    const data = await res.json();
+    const raw = await res.text();
+    let data;
+    try {
+      data = JSON.parse(raw);
+    } catch (e1) {
+      const cleaned = raw
+        .replace(/^\uFEFF/, '')
+        .replace(/\/\/[^\n]*/g, '')
+        .replace(/\/\*[\s\S]*?\*\//g, '')
+        .replace(/,\s*([\]}])/g, '$1');
+      try {
+        data = JSON.parse(cleaned);
+        console.warn('index.json: лишние запятые/комментарии — исправлено на лету.');
+      } catch (e2) {
+        throw new Error(e2.message);
+      }
+    }
     if (!Array.isArray(data)) throw new Error('index.json должен быть массивом');
     indexCache.data = data;
     indexCache.loaded = true;
@@ -2520,7 +3257,6 @@ out.push('<p>' + para.map(inline).join(' ') + '</p>');      para = [];
     return text;
   }
 
-  /* ---------- состояния ---------- */
   function renderLoading() {
     list.innerHTML = '<div class="parents-state">Загрузка…</div>';
   }
@@ -2535,7 +3271,6 @@ out.push('<p>' + para.map(inline).join(' ') + '</p>');      para = [];
     list.innerHTML = '<div class="parents-state">Пока нет статей<small>Создайте articles/index.json и добавьте первый материал</small></div>';
   }
 
-  /* ---------- список ---------- */
   function renderList(items) {
     list.innerHTML = '';
     if (!items.length) { renderEmpty(); return; }
@@ -2549,7 +3284,6 @@ out.push('<p>' + para.map(inline).join(' ') + '</p>');      para = [];
       card.className = 'parents-card';
       card.href = HASH_PREFIX + encodeURIComponent(slug);
       card.dataset.slug = slug;
-      // мягкая каскадная анимация появления
       card.style.opacity = '0';
       card.style.transform = 'translateY(14px)';
       card.style.transition = `opacity .55s ease ${idx * 55}ms, transform .7s cubic-bezier(.16,1,.3,1) ${idx * 55}ms, padding .5s cubic-bezier(.16,1,.3,1)`;
@@ -2566,7 +3300,6 @@ out.push('<p>' + para.map(inline).join(' ') + '</p>');      para = [];
       card.appendChild(a);
       list.appendChild(card);
 
-      // запускаем появление на следующем кадре
       requestAnimationFrame(() => {
         requestAnimationFrame(() => {
           card.style.opacity = '1';
@@ -2575,22 +3308,18 @@ out.push('<p>' + para.map(inline).join(' ') + '</p>');      para = [];
       });
 
       card.addEventListener('click', e => {
-        // если ссылка уже активна — просто открыть
         if (window.location.hash === card.getAttribute('href')) {
           e.preventDefault();
           openBySlug(slug);
         }
-        // иначе — стандартный переход по href, hashchange сам откроет
       });
     });
   }
 
-  /* ---------- читалка ---------- */
   async function openBySlug(slug) {
     if (!slug) return;
     if (readingSlug === slug && readerModal.classList.contains('show')) return;
 
-    // если что-то уже открыто — сначала закрыть без анимации
     if (readerModal.classList.contains('show')) {
       readerModal.classList.remove('show');
       readerModal.setAttribute('aria-hidden', 'true');
@@ -2601,7 +3330,6 @@ out.push('<p>' + para.map(inline).join(' ') + '</p>');      para = [];
       md = await loadArticle(slug);
     } catch (err) {
       toast('Статья не найдена');
-      // чистим hash
       if (window.location.hash.startsWith(HASH_PREFIX)) {
         history.replaceState('', document.title, window.location.pathname + window.location.search);
       }
@@ -2614,11 +3342,10 @@ out.push('<p>' + para.map(inline).join(' ') + '</p>');      para = [];
 
     readingSlug = slug;
     readerTitle.textContent = title;
-    readerContent.innerHTML = mdToHtml(md);
+    readerContent.innerHTML = mdToHtml(stripLeadingH1(md));
 
     document.body.style.overflow = 'hidden';
     readerModal.setAttribute('aria-hidden', 'false');
-    // гарантируем перерисовку перед показом
     void readerModal.offsetWidth;
     readerModal.classList.add('show');
   }
@@ -2633,7 +3360,6 @@ out.push('<p>' + para.map(inline).join(' ') + '</p>');      para = [];
 
   function closeArticle() {
     if (window.location.hash.startsWith(HASH_PREFIX)) {
-      // очищаем hash без перезагрузки
       history.pushState('', document.title, window.location.pathname + window.location.search);
       closeReader();
     } else {
@@ -2653,11 +3379,7 @@ out.push('<p>' + para.map(inline).join(' ') + '</p>');      para = [];
 
   window.addEventListener('hashchange', handleHash);
 
-  /* ---------- события закрытия ---------- */
-  readerClose.addEventListener('click', e => {
-    e.preventDefault();
-    closeArticle();
-  });
+  readerClose.addEventListener('click', e => { e.preventDefault(); closeArticle(); });
   readerModal.addEventListener('click', e => {
     if (e.target.classList.contains('parents-reader-surface')) closeArticle();
   });
@@ -2665,7 +3387,6 @@ out.push('<p>' + para.map(inline).join(' ') + '</p>');      para = [];
     if (readerModal.classList.contains('show') && e.key === 'Escape') closeArticle();
   });
 
-  /* ---------- старт ---------- */
   renderLoading();
   loadIndex()
     .then(items => renderList(items))
@@ -2673,10 +3394,7 @@ out.push('<p>' + para.map(inline).join(' ') + '</p>');      para = [];
       console.warn('Parents:', err);
       renderError(err.message || 'Ошибка загрузки');
     })
-    .finally(() => {
-      // если открыли сразу со ссылкой на статью — откроем её
-      handleHash();
-    });
+    .finally(() => { handleHash(); });
 })();
 </script>
 </body>
