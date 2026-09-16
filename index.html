@@ -971,13 +971,14 @@ body[data-skin="minimal"][data-mintone="dark"] .art-section::before{
   z-index:2;
 }
 
+/* -------- КАРТИНА: МАКСИМУМ ЭКРАНА -------- */
 .art-image-wrap{
   position:absolute;
   inset:0;
   display:flex;
   align-items:center;
   justify-content:center;
-  padding:clamp(72px,10vh,120px) clamp(28px,7vw,110px) clamp(110px,15vh,170px);
+  padding:clamp(58px,7vh,78px) clamp(66px,6.2vw,92px) clamp(78px,9.5vh,100px);
   will-change:opacity, transform, filter;
   transition:opacity .85s cubic-bezier(.16,1,.3,1),
              transform .85s cubic-bezier(.16,1,.3,1),
@@ -1123,6 +1124,88 @@ body[data-skin="minimal"] .art-exit:hover{
 }
 .art-exit:active{transform:scale(.94)}
 
+/* ============ СТРЕЛКИ НАВИГАЦИИ ПО КАРТИНАМ ============ */
+.art-nav{
+  position:absolute;
+  top:50%;
+  transform:translateY(-50%);
+  z-index:15;
+  width:clamp(48px,4.6vw,60px);
+  height:clamp(48px,4.6vw,60px);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:0 0 4px;
+  cursor:pointer;
+  font-family:var(--font-ui);
+  font-size:clamp(1.4rem,2.4vw,1.8rem);
+  font-weight:400;
+  line-height:1;
+  -webkit-tap-highlight-color:transparent;
+  user-select:none;
+  /* classic look */
+  background:var(--bg);
+  border:2px solid var(--fg);
+  color:var(--fg);
+  box-shadow:4px 4px 0 var(--accent);
+  opacity:0;
+  visibility:hidden;
+  transition:
+    opacity .5s ease .35s,
+    visibility 0s linear .35s,
+    transform .25s cubic-bezier(.16,1,.3,1),
+    background .2s ease,
+    color .2s ease,
+    border-color .2s ease,
+    box-shadow .2s ease;
+}
+.art-section.show .art-nav{
+  opacity:1;
+  visibility:visible;
+}
+.art-nav:hover{
+  background:var(--fg);
+  color:var(--bg);
+  transform:translateY(-50%) translate(-2px,-2px);
+  box-shadow:6px 6px 0 var(--accent);
+}
+.art-nav:active{
+  transform:translateY(-50%);
+  box-shadow:2px 2px 0 var(--accent);
+}
+.art-nav.prev{left:clamp(12px,1.8vw,24px)}
+.art-nav.next{right:clamp(12px,1.8vw,24px)}
+.art-nav[disabled]{pointer-events:none;}
+.art-section.show .art-nav[disabled]{
+  opacity:.15;
+  visibility:visible;
+}
+
+/* minimal */
+body[data-skin="minimal"] .art-nav{
+  width:clamp(44px,4.4vw,54px);
+  height:clamp(44px,4.4vw,54px);
+  border-radius:50%;
+  background:rgba(128,128,128,.06);
+  border:1px solid var(--rule-soft);
+  color:var(--fg-2);
+  font-size:clamp(1.2rem,2.1vw,1.55rem);
+  font-weight:300;
+  box-shadow:none;
+  backdrop-filter:blur(20px) saturate(140%);
+  -webkit-backdrop-filter:blur(20px) saturate(140%);
+}
+body[data-skin="minimal"] .art-nav:hover{
+  background:var(--fg);
+  color:var(--bg);
+  border-color:var(--fg);
+  transform:translateY(-50%) scale(1.08);
+  box-shadow:none;
+}
+body[data-skin="minimal"] .art-nav:active{
+  transform:translateY(-50%) scale(.94);
+}
+
 /* нижняя панель с переключателем */
 .art-bottom{
   position:absolute;
@@ -1235,10 +1318,11 @@ body[data-skin="minimal"] .art-order-btn:hover:not(.active){
   cursor:default;
 }
 
-/* мобильная адаптация */
+/* ============ ART MOBILE ============ */
 @media (max-width:640px){
+  /* Картина — почти во всю ширину: стрелки полупрозрачно наложены поверх */
   .art-image-wrap{
-    padding:64px 14px 118px;
+    padding:60px 8px 84px;
   }
   .art-info{
     font-size:.55rem;
@@ -1258,13 +1342,97 @@ body[data-skin="minimal"] .art-order-btn:hover:not(.active){
     height:42px;
     font-size:1.25rem;
   }
+  /* Стрелки — маленькие, стеклянные, поверх картины */
+  .art-nav,
+  body[data-skin="minimal"] .art-nav{
+    width:42px;
+    height:42px;
+    font-size:1.25rem;
+    border-radius:50%;
+    background:rgba(0,0,0,.42);
+    border:1px solid rgba(255,255,255,.28);
+    color:#fff;
+    box-shadow:none;
+    backdrop-filter:blur(14px) saturate(140%);
+    -webkit-backdrop-filter:blur(14px) saturate(140%);
+    padding:0 0 3px;
+  }
+  body:not([data-skin="minimal"]) .art-nav{
+    background:rgba(0,0,0,.5);
+    border-color:rgba(255,255,255,.3);
+  }
+  .art-nav:hover,
+  body[data-skin="minimal"] .art-nav:hover{
+    background:rgba(0,0,0,.65);
+    color:#fff;
+    border-color:rgba(255,255,255,.5);
+    transform:translateY(-50%);
+    box-shadow:none;
+  }
+  body[data-skin="minimal"] .art-nav:hover{
+    transform:translateY(-50%) scale(1.06);
+  }
+  .art-nav:active,
+  body[data-skin="minimal"] .art-nav:active{
+    transform:translateY(-50%) scale(.94);
+  }
+  .art-nav.prev{left:6px}
+  .art-nav.next{right:6px}
 }
 @media (max-width:420px){
+  .art-image-wrap{padding:58px 6px 82px;}
   .art-order-btn{
     padding:9px 12px;
     font-size:.55rem;
     letter-spacing:.12em;
   }
+  .art-nav,
+  body[data-skin="minimal"] .art-nav{
+    width:38px;
+    height:38px;
+    font-size:1.15rem;
+  }
+  .art-nav.prev{left:4px}
+  .art-nav.next{right:4px}
+}
+/* Мобильный ландшафт — вертикали мало, стрелки тоже overlay */
+@media (orientation: landscape) and (max-height: 560px){
+  .art-image-wrap{
+    padding:48px 8px 62px;
+  }
+  .art-top{padding:8px 12px;}
+  .art-bottom{padding:10px 16px;}
+  .art-info{font-size:.5rem;padding:5px 10px;letter-spacing:.16em;}
+  .art-exit{width:38px;height:38px;font-size:1.1rem;}
+  .art-order-btn{padding:7px 14px;font-size:.54rem;letter-spacing:.12em;}
+  .art-nav,
+  body[data-skin="minimal"] .art-nav{
+    width:38px;
+    height:38px;
+    font-size:1.1rem;
+    background:rgba(0,0,0,.45);
+    border:1px solid rgba(255,255,255,.28);
+    color:#fff;
+    box-shadow:none;
+    border-radius:50%;
+    backdrop-filter:blur(12px) saturate(140%);
+    -webkit-backdrop-filter:blur(12px) saturate(140%);
+  }
+  body:not([data-skin="minimal"]) .art-nav{
+    background:rgba(0,0,0,.5);
+  }
+  .art-nav:hover,
+  body[data-skin="minimal"] .art-nav:hover{
+    background:rgba(0,0,0,.68);
+    color:#fff;
+    border-color:rgba(255,255,255,.5);
+    transform:translateY(-50%);
+  }
+  body[data-skin="minimal"] .art-nav:hover{
+    transform:translateY(-50%) scale(1.06);
+  }
+  .art-nav.prev{left:4px}
+  .art-nav.next{right:4px}
 }
 
 /* ================================================================= */
@@ -2781,13 +2949,17 @@ body[data-skin="minimal"] .stamp-opt-swatch{border-radius:50%;border-width:1px}
     </article>
   </div>
 </div>
-  <div class="art-section" id="artCanvas" aria-hidden="true">
+
+<!-- ================= ART SECTION (ЖИВОПИСЬ) ================= -->
+<div class="art-section" id="artCanvas" aria-hidden="true">
   <div class="art-progress"><div class="art-progress-fill" id="artProgressFill"></div></div>
   <div class="art-scroll-catcher" id="artScrollCatcher"></div>
   <div class="art-top">
     <div class="art-info" id="artInfo">1 / 594</div>
     <button class="art-exit" id="artExit" type="button" aria-label="Выйти">×</button>
   </div>
+  <button class="art-nav prev" id="artPrev" type="button" aria-label="Предыдущая картина">‹</button>
+  <button class="art-nav next" id="artNext" type="button" aria-label="Следующая картина">›</button>
   <div class="art-bottom">
     <div class="art-controls" id="artControls">
       <button class="art-order-btn active" data-order="standard" type="button">Стандарт</button>
@@ -3733,6 +3905,8 @@ render(); renderSecondHand(); setView('watch');
   const exitBtn    = document.getElementById('artExit');
   const controls   = document.getElementById('artControls');
   const progress   = document.getElementById('artProgressFill');
+  const prevBtn    = document.getElementById('artPrev');
+  const nextBtn    = document.getElementById('artNext');
   if (!canvas || !catcher) return;
 
   let items = [];
@@ -3784,6 +3958,11 @@ render(); renderSecondHand(); setView('watch');
       imgCache.set(id, img);
     });
   }
+  function updateNav() {
+    if (!prevBtn || !nextBtn) return;
+    prevBtn.disabled = current <= 0;
+    nextBtn.disabled = current >= items.length - 1;
+  }
   function showImage(idx, direction) {
     if (idx < 0 || idx >= items.length) return;
     const id = items[idx];
@@ -3816,12 +3995,14 @@ render(); renderSecondHand(); setView('watch');
           if (direction === 'down')  oldWrap.classList.add('art-exit-up');
           if (direction === 'up')    oldWrap.classList.add('art-exit-down');
           if (!direction)            oldWrap.classList.add('art-exit-up');
-          setTimeout(() => { oldWrap.remove(); }, 900);        }
+          setTimeout(() => { oldWrap.remove(); }, 900);
+        }
       });
     });
     info.textContent = (idx + 1) + ' / ' + items.length;
     progress.style.width = ((idx + 1) / items.length * 100) + '%';
     preloadAround(idx);
+    updateNav();
   }
   function step(dir) {
     const next = current + dir;
@@ -3856,11 +4037,12 @@ render(); renderSecondHand(); setView('watch');
   window.artOpen  = openArt;
   window.artClose = closeArt;
 
+  // Выход из живописи — всегда в раздел "Учи слоги"
   exitBtn.addEventListener('click', e => {
     e.preventDefault();
     closeArt();
     document.querySelectorAll('.section-switch-btn').forEach(b => {
-      if (b.dataset.section === 'heroes') b.click();
+      if (b.dataset.section === 'syllables') b.click();
     });
   });
   controls.querySelectorAll('.art-order-btn').forEach(btn => {
@@ -3874,6 +4056,10 @@ render(); renderSecondHand(); setView('watch');
       showImage(0, null);
     });
   });
+
+  // Клики по стрелкам
+  if (prevBtn) prevBtn.addEventListener('click', e => { e.preventDefault(); step(-1); });
+  if (nextBtn) nextBtn.addEventListener('click', e => { e.preventDefault(); step(1); });
 
   function onWheel(e) {
     if (!canvas.classList.contains('show')) return;
@@ -3889,8 +4075,8 @@ render(); renderSecondHand(); setView('watch');
 
   document.addEventListener('keydown', e => {
     if (!canvas.classList.contains('show')) return;
-    if (e.key === 'ArrowDown' || e.key === 'PageDown') { e.preventDefault(); step(1); }
-    else if (e.key === 'ArrowUp' || e.key === 'PageUp') { e.preventDefault(); step(-1); }
+    if (e.key === 'ArrowDown' || e.key === 'PageDown' || e.key === 'ArrowRight') { e.preventDefault(); step(1); }
+    else if (e.key === 'ArrowUp' || e.key === 'PageUp' || e.key === 'ArrowLeft') { e.preventDefault(); step(-1); }
     else if (e.key === 'Escape') { e.preventDefault(); exitBtn.click(); }
   });
 
