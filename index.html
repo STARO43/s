@@ -1242,6 +1242,53 @@ body[data-skin="minimal"] .dictation-key:hover:not(:disabled){
     flex:0 0 auto;
   }
 
+  .dictation-answer-row{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:clamp(8px,2vw,16px);
+  width:100%;
+  position:relative;
+}
+.dictation-backspace,
+.dictation-backspace-spacer{
+  flex-shrink:0;
+  width:clamp(44px,7vw,56px);
+  height:clamp(44px,7vw,56px);
+}
+.dictation-backspace{
+  border-radius:50%;
+  border:3px solid var(--fg);
+  background:var(--bg);
+  color:var(--fg);
+  cursor:pointer;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:0;
+  transition:all .15s cubic-bezier(.4,0,.2,1);
+  box-shadow:4px 4px 0 var(--accent);
+  -webkit-tap-highlight-color:transparent;
+}
+.dictation-backspace svg{width:52%;height:52%;display:block}
+.dictation-backspace:hover{
+  background:var(--fg);color:var(--bg);
+  transform:translate(-2px,-2px);
+  box-shadow:6px 6px 0 var(--accent);
+}
+.dictation-backspace:active{transform:translate(0,0);box-shadow:2px 2px 0 var(--accent)}
+.dictation-backspace:disabled{opacity:.3;cursor:not-allowed;box-shadow:4px 4px 0 var(--accent)}
+
+body[data-skin="minimal"] .dictation-backspace{
+  border-width:1px;
+  border-color:var(--m-line-strong);
+  box-shadow:none;
+}
+body[data-skin="minimal"] .dictation-backspace:hover{
+  background:var(--bg-2);color:var(--fg);
+  transform:none;box-shadow:none;border-color:var(--fg);
+}
+
   /* Крестик — снизу слева, крупный и удобный для пальца */
   .dictation-exit{
     top:auto;
@@ -1324,6 +1371,12 @@ body[data-skin="minimal"] .dictation-key:hover:not(:disabled){
     font-size:.92rem;
     border-width:1.5px;
   }
+    .dictation-backspace,
+  .dictation-backspace-spacer{
+    width:38px;
+    height:38px;
+  }
+  .dictation-backspace{border-width:2px;box-shadow:3px 3px 0 var(--accent)}
   body[data-skin="minimal"] .dictation-key{
     border-radius:7px;
   }
@@ -1843,7 +1896,318 @@ body[data-skin="minimal"][data-mintone="dark"] .parents-reader-close:hover{
   .parents-reader-content{font-size:1.14rem;line-height:1.72}
   body:not([data-skin="minimal"]) .parents-reader-content > p:first-of-type::first-letter{font-size:3em}
 }
+/* ================================================================= */
+/* ==================== ART (ЖИВОПИСЬ) SECTION ==================== */
+/* ================================================================= */
+.art-section{
+  position:fixed;
+  inset:0;
+  top:0;
+  z-index:20;
+  background:var(--bg);
+  display:flex;
+  flex-direction:column;
+  overflow:hidden;
+  visibility:hidden;
+  opacity:0;
+  transition:opacity .45s cubic-bezier(.16,1,.3,1), visibility 0s linear .45s;
+}
+.art-section.show{
+  visibility:visible;
+  opacity:1;
+  transition:opacity .45s cubic-bezier(.16,1,.3,1), visibility 0s linear 0s;
+}
 
+/* холст — одна картина на экран */
+.art-canvas{
+  position:absolute;
+  inset:0;
+  background:var(--bg);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  overflow:hidden;
+}
+.art-image-wrap{
+  position:absolute;
+  inset:0;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:clamp(56px,7vh,88px) clamp(16px,4vw,56px);
+  will-change:opacity, transform;
+  transition:opacity .5s cubic-bezier(.16,1,.3,1), transform .55s cubic-bezier(.16,1,.3,1);
+}
+.art-image-wrap.art-exit-up{
+  opacity:0;
+  transform:translateY(-40px) scale(.96);
+  pointer-events:none;
+}
+.art-image-wrap.art-exit-down{
+  opacity:0;
+  transform:translateY(40px) scale(.96);
+  pointer-events:none;
+}
+.art-image-wrap.art-enter-from-down{
+  opacity:0;
+  transform:translateY(60px) scale(.97);
+  transition:none;
+}
+.art-image-wrap.art-enter-from-up{
+  opacity:0;
+  transform:translateY(-60px) scale(.97);
+  transition:none;
+}
+.art-image{
+  max-width:100%;
+  max-height:100%;
+  width:auto;
+  height:auto;
+  display:block;
+  object-fit:contain;
+  user-select:none;
+  -webkit-user-drag:none;
+  -webkit-tap-highlight-color:transparent;
+  box-shadow:0 30px 80px -30px rgba(0,0,0,.35);
+}
+body[data-skin="minimal"] .art-image{
+  box-shadow:0 40px 90px -40px rgba(0,0,0,.28);
+}
+body[data-skin="minimal"][data-mintone="dark"] .art-image{
+  box-shadow:0 40px 90px -40px rgba(0,0,0,.6);
+}
+
+/* верхняя панель — счётчик и подсказка */
+.art-info{
+  position:absolute;
+  top:clamp(14px,2.2vw,26px);
+  left:50%;
+  transform:translateX(-50%);
+  z-index:5;
+  font-family:var(--font-doc);
+  font-size:.62rem;
+  font-weight:600;
+  letter-spacing:.24em;
+  text-transform:uppercase;
+  color:var(--fg-3);
+  background:var(--bg);
+  padding:7px 16px;
+  border:1px solid var(--rule-soft);
+  user-select:none;
+  opacity:0;
+  transition:opacity .4s ease .2s;
+  pointer-events:none;
+}
+.art-section.show .art-info{opacity:1}
+body[data-skin="minimal"] .art-info{
+  background:var(--bg-2);
+  border:none;
+  border-radius:999px;
+  color:var(--fg-3);
+  padding:6px 16px;
+  font-weight:500;
+  letter-spacing:.22em;
+}
+
+/* кнопки порядка — снизу справа, прилипшие */
+.art-controls{
+  position:absolute;
+  bottom:clamp(14px,2.2vw,26px);
+  right:clamp(14px,2.2vw,26px);
+  z-index:6;
+  display:flex;
+  gap:8px;
+  opacity:0;
+  transition:opacity .4s ease .2s;
+}
+.art-section.show .art-controls{opacity:1}
+.art-order-btn{
+  background:var(--bg);
+  border:2px solid var(--fg);
+  color:var(--fg);
+  padding:10px 16px;
+  cursor:pointer;
+  font-family:var(--font-display);
+  font-weight:600;
+  font-size:.7rem;
+  letter-spacing:.14em;
+  text-transform:uppercase;
+  transition:all .12s linear;
+  -webkit-tap-highlight-color:transparent;
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
+  white-space:nowrap;
+}
+.art-order-btn:hover{background:var(--fg);color:var(--bg)}
+.art-order-btn.active{background:var(--accent);border-color:var(--accent);color:var(--accent-fg)}
+.art-order-btn.active:hover{background:var(--accent);color:var(--accent-fg)}
+body[data-skin="minimal"] .art-order-btn{
+  border:1px solid var(--m-line-strong);
+  background:var(--bg);
+  border-radius:999px;
+  font-family:var(--font-ui);
+  font-weight:500;
+  font-size:.62rem;
+  letter-spacing:.22em;
+  padding:9px 18px;
+}
+body[data-skin="minimal"] .art-order-btn:hover{
+  background:var(--bg-2);
+  color:var(--fg);
+  border-color:var(--fg);
+}
+body[data-skin="minimal"] .art-order-btn.active{
+  background:var(--accent);
+  border-color:var(--accent);
+  color:var(--accent-fg);
+}
+
+/* кнопка выхода — сверху справа */
+.art-exit{
+  position:absolute;
+  top:clamp(14px,2.2vw,26px);
+  right:clamp(14px,2.2vw,26px);
+  z-index:7;
+  width:clamp(44px,5vw,52px);
+  height:clamp(44px,5vw,52px);
+  border-radius:50%;
+  border:none;
+  background:var(--bg-2);
+  color:var(--fg);
+  font-family:var(--font-ui);
+  font-size:1.6rem;
+  font-weight:300;
+  line-height:1;
+  cursor:pointer;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:0 0 4px;
+  transition:all .18s ease;
+  -webkit-tap-highlight-color:transparent;
+  opacity:0;
+}
+.art-section.show .art-exit{opacity:1}
+.art-exit:hover{background:var(--fg);color:var(--bg);transform:scale(1.06)}
+body[data-skin="minimal"] .art-exit{
+  border:1px solid var(--m-line-strong);
+  background:var(--bg);
+  box-shadow:0 4px 16px rgba(0,0,0,.08);
+}
+body[data-skin="minimal"][data-mintone="dark"] .art-exit{
+  box-shadow:0 4px 16px rgba(0,0,0,.4);
+}
+body[data-skin="minimal"] .art-exit:hover{
+  background:var(--bg-2);
+  color:var(--fg);
+  transform:scale(1.06);
+}
+
+/* индикатор-полоска прогресса просмотра снизу */
+.art-progress{
+  position:absolute;
+  bottom:0;
+  left:0;
+  right:0;
+  height:2px;
+  background:transparent;
+  z-index:4;
+  pointer-events:none;
+}
+.art-progress-fill{
+  height:100%;
+  width:0%;
+  background:var(--accent);
+  transition:width .4s linear;
+}
+
+/* загрузка/пусто */
+.art-state{
+  position:absolute;
+  inset:0;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  text-align:center;
+  padding:40px 20px;
+  font-family:var(--font-doc);
+  font-size:.72rem;
+  font-weight:500;
+  letter-spacing:.28em;
+  text-transform:uppercase;
+  color:var(--fg-3);
+  line-height:1.9;
+}
+.art-state.is-error{color:var(--accent);letter-spacing:.16em}
+
+/* === Лента картин во весь экран === */
+/* Прокрутка: один скролл = следующая картина.
+   Реализуем через translateY самого арт-секшена,
+   чтобы не было видно «ленты». */
+
+/* скролл-контейнер — невидимый, только ловит события колеса */
+.art-scroll-catcher{
+  position:absolute;
+  inset:0;
+  z-index:1;
+  cursor:default;
+}
+
+/* минимал-скин для пустого/ошибочного состояния */
+body[data-skin="minimal"] .art-state{color:var(--fg-3)}
+
+/* мобильная адаптация */
+@media (max-width:640px){
+  .art-image-wrap{
+    padding:60px 10px 90px;
+  }
+  .art-info{
+    top:12px;
+    font-size:.52rem;
+    letter-spacing:.18em;
+    padding:6px 12px;
+  }
+  .art-controls{
+    bottom:14px;
+    right:14px;
+    left:14px;
+    gap:6px;
+    justify-content:flex-end;
+  }
+  .art-order-btn{
+    flex:1 1 auto;
+    justify-content:center;
+    padding:10px 10px;
+    font-size:.6rem;
+    letter-spacing:.1em;
+  }
+  body[data-skin="minimal"] .art-order-btn{
+    font-size:.56rem;
+    padding:9px 12px;
+    letter-spacing:.18em;
+  }
+  .art-exit{
+    top:12px;
+    right:12px;
+    width:42px;
+    height:42px;
+    font-size:1.3rem;
+  }
+}
+@media (max-width:420px){
+  .art-order-btn{
+    font-size:.55rem;
+    padding:9px 6px;
+    letter-spacing:.06em;
+  }
+  body[data-skin="minimal"] .art-order-btn{
+    font-size:.52rem;
+    padding:8px 10px;
+    letter-spacing:.14em;
+  }
+}
+  
 /* ================= MINIMAL SKIN ================= */
 body[data-skin="minimal"]{
   --m-bg:#fafaf9; --m-bg-2:#f2f2f0; --m-bg-3:#e9e9e6;
@@ -2071,6 +2435,7 @@ body[data-skin="minimal"] .stamp-opt-swatch{border-radius:50%;border-width:1px}
 <button class="section-switch-btn active" data-section="syllables">УЧИ СЛОГИ</button>
 <button class="section-switch-btn" data-section="clock">ЗНАЙ ВРЕМЯ</button>
 <button class="section-switch-btn" data-section="heroes">ЧТИ ВЕЛИКИХ</button>
+<button class="section-switch-btn" data-section="art">ЖИВОПИСЬ</button>
 <button class="section-switch-btn" data-section="cartoons">МУЛЬТЫ</button>
 <button class="section-switch-btn" data-section="parents">РОДИТЕЛЯМ</button>
 <button class="section-switch-btn" data-section="poetry">ПОЭЗИЯ</button>
@@ -2083,6 +2448,7 @@ body[data-skin="minimal"] .stamp-opt-swatch{border-radius:50%;border-width:1px}
 <div class="section-subtitle active" data-section="syllables">ЖМИ, СЛУШАЙ, ЗАПОМИНАЙ</div>
 <div class="section-subtitle" data-section="clock"><span class="digital-clock-inline" id="clockDigital24">03:00</span></div>
 <div class="section-subtitle" data-section="heroes">ВЕЛИКИЕ ЛИЧНОСТИ ОТЕЧЕСТВА</div>
+<div class="section-subtitle" data-section="art">КАРТИНЫ ХУДОЖНИКОВ</div>
 <div class="section-subtitle" data-section="cartoons">ХОРОШИЕ МУЛЬТФИЛЬМЫ</div>
 <div class="section-subtitle" data-section="parents">ПЕДАГОГИКА</div>
 <div class="section-subtitle" data-section="poetry">ДЛЯ ДУШИ</div>
@@ -2339,7 +2705,20 @@ body[data-skin="minimal"] .stamp-opt-swatch{border-radius:50%;border-width:1px}
 <section id="heroesSection" class="tab-section">
 <div class="heroes-timeline" id="heroesTimeline"></div>
 </section>
+<section id="artSection" class="tab-section">
+  <div class="art-section" id="artCanvas" aria-hidden="true">
+    <div class="art-scroll-catcher" id="artScrollCatcher"></div>
+    <div class="art-info" id="artInfo">1 / 594</div>
+    <button class="art-exit" id="artExit" type="button" aria-label="Выйти">×</button>
+    <div class="art-controls" id="artControls">
+      <button class="art-order-btn active" data-order="standard" type="button">Стандарт</button>
+      <button class="art-order-btn" data-order="random" type="button">Случайно</button>
+    </div>
+    <div class="art-progress"><div class="art-progress-fill" id="artProgressFill"></div></div>
+  </div>
+</section>
 
+  
 <section id="poetrySection" class="tab-section">
   <div class="media-wrapper">
     <div class="media-list" id="poetryList"></div>
@@ -2382,9 +2761,19 @@ body[data-skin="minimal"] .stamp-opt-swatch{border-radius:50%;border-width:1px}
           <path d="M19.07 4.93a10 10 0 0 1 0 14.14"/>
         </svg>
       </button>
-      <button class="dictation-next" id="dictationNextBtn" type="button" aria-label="Далее">→</button>
+            <button class="dictation-next" id="dictationNextBtn" type="button" aria-label="Далее">→</button>
     </div>
-    <div class="dictation-answer" id="dictationAnswer"></div>
+    <div class="dictation-answer-row">
+      <button class="dictation-backspace" id="dictationBackspace" type="button" aria-label="Удалить букву">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M21 4H8l-7 8 7 8h13a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2z"/>
+          <line x1="18" y1="9" x2="12" y2="15"/>
+          <line x1="12" y1="9" x2="18" y2="15"/>
+        </svg>
+      </button>
+      <div class="dictation-answer" id="dictationAnswer"></div>
+      <div class="dictation-backspace-spacer" aria-hidden="true"></div>
+    </div>
     <div class="dictation-layout-switch" id="dictationLayoutSwitch">
       <button type="button" data-layout="alpha" class="active">Алфавит</button>
       <button type="button" data-layout="qwerty">Клавиатура</button>
@@ -2472,8 +2861,7 @@ if (sectionCycleBtn) { sectionCycleBtn.addEventListener('click', () => { const i
 function loadLearnedSet() { try { return new Set(JSON.parse(localStorage.getItem('learned_syllables') || '[]')); } catch { return new Set(); } }
 function saveLearnedSet(s) { localStorage.setItem('learned_syllables', JSON.stringify(Array.from(s))); }
 let learnedSet = loadLearnedSet();
-function switchSection(s) { if (s === currentSection) return; currentSection = s; syllablesSection.classList.toggle('active', s === 'syllables'); clockSection.classList.toggle('active', s === 'clock'); heroesSection.classList.toggle('active', s === 'heroes'); if (poetrySection) poetrySection.classList.toggle('active', s === 'poetry'); if (cartoonsSection) cartoonsSection.classList.toggle('active', s === 'cartoons'); if (parentsSection) parentsSection.classList.toggle('active', s === 'parents'); sectionBtns.forEach(b => b.classList.toggle('active', b.dataset.section === s)); sectionSubtitleEls.forEach(e => e.classList.toggle('active', e.dataset.section === s)); updateCycleBtn(); if (s !== 'clock' && window.clockSpeakCancel) window.clockSpeakCancel(); if (s !== 'syllables') progressContainer.classList.remove('show'); }
-sectionBtns.forEach(b => b.addEventListener('click', () => switchSection(b.dataset.section)));
+function switchSection(s) { if (s === currentSection) return; currentSection = s; syllablesSection.classList.toggle('active', s === 'syllables'); clockSection.classList.toggle('active', s === 'clock'); heroesSection.classList.toggle('active', s === 'heroes'); if (poetrySection) poetrySection.classList.toggle('active', s === 'poetry'); if (cartoonsSection) cartoonsSection.classList.toggle('active', s === 'cartoons'); if (parentsSection) parentsSection.classList.toggle('active', s === 'parents'); sectionBtns.forEach(b => b.classList.toggle('active', b.dataset.section === s)); sectionSubtitleEls.forEach(e => e.classList.toggle('active', e.dataset.section === s)); updateCycleBtn(); if (s !== 'clock' && window.clockSpeakCancel) window.clockSpeakCancel(); if (s !== 'syllables') progressContainer.classList.remove('show'); if (s === 'art' && typeof window.artOpen === 'function') window.artOpen(); else if (typeof window.artClose === 'function') window.artClose(); }sectionBtns.forEach(b => b.addEventListener('click', () => switchSection(b.dataset.section)));
 window.addEventListener('scroll', () => scrollTopBtn.classList.toggle('visible', window.scrollY > 300));
 scrollTopBtn.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
 function refreshProgressData() { const t = syllables.length; const m = [...syllables].filter(s => learnedSet.has(s)).length; const p = t ? Math.round((m / t) * 100) : 0; progressLabel.textContent = `Отмечено: ${m} из ${t}`; progressFill.style.width = p + '%'; }
@@ -2564,6 +2952,7 @@ function showDictationTask() {
   dictationProgress.textContent = `Задание ${dictationIndex + 1} из ${dictationQuestions.length}`;
   dictationNextBtn.classList.remove('show');
   dictationSpeaker.style.display = 'flex';
+    if (dictationBackspace) dictationBackspace.disabled = true;
   renderDictationAnswer();
   setTimeout(() => playDictationAudio(), 250);
 }
@@ -2619,6 +3008,7 @@ function pressDictationKey(letter) {
   if (dictationInput.length >= dictationCurrent.length) return;
   dictationInput.push(letter);
   renderDictationAnswer();
+    if (dictationBackspace) dictationBackspace.disabled = !dictationInput.length;
   if (dictationInput.length === dictationCurrent.length) {
     setTimeout(checkDictationAnswer, 250);
   }
@@ -2645,6 +3035,7 @@ function checkDictationAnswer() {
   // Показываем кнопку «Далее», скрываем динамик
   dictationSpeaker.style.display = 'none';
   dictationNextBtn.classList.add('show');
+    if (dictationBackspace) dictationBackspace.disabled = true;
   dictationNextBtn.focus();
 }
 
@@ -2683,7 +3074,15 @@ function exitDictation() {
 if (dictationBtn) dictationBtn.addEventListener('click', startDictation);
 if (dictationExit) dictationExit.addEventListener('click', exitDictation);
 if (dictationSpeaker) dictationSpeaker.addEventListener('click', playDictationAudio);
-if (dictationNextBtn) dictationNextBtn.addEventListener('click', nextDictationTask);
+const dictationBackspace = document.getElementById('dictationBackspace');
+function pressBackspace() {
+  if (dictationLocked) return;
+  if (!dictationInput.length) return;
+  dictationInput.pop();
+  renderDictationAnswer();
+}
+if (dictationBackspace) dictationBackspace.addEventListener('click', pressBackspace);
+  if (dictationNextBtn) dictationNextBtn.addEventListener('click', nextDictationTask);
 if (dictationLayoutSwitch) {
   dictationLayoutSwitch.querySelectorAll('button').forEach(btn => {
     btn.addEventListener('click', () => {
@@ -3394,6 +3793,265 @@ render(); renderSecondHand(); setView('watch');
   renderMediaList(document.getElementById('poetryList'), poetryVideos, 'video');
   renderMediaList(document.getElementById('cartoonsList'), cartoonVideos, 'cartoon');
   handleHash();
+})();
+</script>
+  <script>
+/* ============================================================ */
+/* ============== ЖИВОПИСЬ — картины из art/ ================== */
+/* ============================================================ */
+(function () {
+  const INDEX_URL = 'art/index.json';
+  const IMG_DIR   = 'art/';
+  const WHEEL_THRESHOLD = 30;   // пиксельная дельта для срабатывания
+  const WHEEL_COOLDOWN  = 420;  // мс между переключениями
+
+  const canvas     = document.getElementById('artCanvas');
+  const catcher    = document.getElementById('artScrollCatcher');
+  const info       = document.getElementById('artInfo');
+  const exitBtn    = document.getElementById('artExit');
+  const controls   = document.getElementById('artControls');
+  const progress   = document.getElementById('artProgressFill');
+  if (!canvas || !catcher) return;
+
+  let items = [];          // список id (номеров)
+  let order = 'standard';  // 'standard' | 'random'
+  let current = 0;         // индекс в массиве
+  let currentImgEl = null;
+  let imgCache = new Map();
+  let lockScroll = false;
+  let lastWheelTime = 0;
+  let touchStartY = null;
+
+  /* --- загрузка индекса --- */
+  async function loadIndex() {
+    const res = await fetch(INDEX_URL, { cache: 'no-cache' });
+    if (!res.ok) throw new Error('art/index.json: HTTP ' + res.status);
+    const raw = await res.text();
+    let data;
+    try {
+      data = JSON.parse(raw);
+    } catch (e1) {
+      const cleaned = raw
+        .replace(/^\uFEFF/, '')
+        .replace(/\/\/[^\n]*/g, '')
+        .replace(/\/\*[\s\S]*?\*\//g, '')
+        .replace(/,\s*([\]}])/g, '$1');
+      data = JSON.parse(cleaned);
+    }
+    if (!Array.isArray(data)) throw new Error('art/index.json должен быть массивом');
+    // Нормализуем: только числа или имена без расширения
+    return data.map(x => String(x).replace(/\.(jpg|jpeg|png|webp)$/i, ''));
+  }
+
+  /* --- состояние --- */
+  function showState(text, isError) {
+    clearImage();
+    const div = document.createElement('div');
+    div.className = 'art-state' + (isError ? ' is-error' : '');
+    div.textContent = text;
+    canvas.appendChild(div);
+  }
+  function clearState() {
+    canvas.querySelectorAll('.art-state').forEach(el => el.remove());
+  }
+  function clearImage() {
+    if (currentImgEl) { currentImgEl.remove(); currentImgEl = null; }
+  }
+
+  /* --- построение порядка --- */
+  function buildOrder() {
+    if (order === 'standard') {
+      // в порядке возрастания номера
+      items.sort((a, b) => Number(a) - Number(b));
+    } else {
+      // случайный порядок
+      for (let i = items.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [items[i], items[j]] = [items[j], items[i]];
+      }
+    }
+  }
+
+  /* --- предзагрузка соседних картинок --- */
+  function preloadAround(idx) {
+    [idx + 1, idx - 1, idx + 2].forEach(i => {
+      if (i < 0 || i >= items.length) return;
+      const id = items[i];
+      if (imgCache.has(id)) return;
+      const img = new Image();
+      img.src = IMG_DIR + encodeURIComponent(id) + '.jpg';
+      imgCache.set(id, img);
+    });
+  }
+
+  /* --- показать картину с анимацией --- */
+  function showImage(idx, direction) {
+    if (idx < 0 || idx >= items.length) return;
+    const id = items[idx];
+    current = idx;
+
+    // готовим новую обёртку
+    const wrap = document.createElement('div');
+    wrap.className = 'art-image-wrap';
+
+    // направление входа
+    if (direction === 'down')  wrap.classList.add('art-enter-from-down');
+    if (direction === 'up')    wrap.classList.add('art-enter-from-up');
+
+    const img = document.createElement('img');
+    img.className = 'art-image';
+    img.alt = 'Картина ' + id;
+    img.draggable = false;
+    img.decoding = 'async';
+    img.src = IMG_DIR + encodeURIComponent(id) + '.jpg';
+    img.addEventListener('error', () => {
+      wrap.innerHTML = '';
+      const state = document.createElement('div');
+      state.className = 'art-state is-error';
+      state.textContent = 'Не удалось загрузить картину ' + id;
+      wrap.appendChild(state);
+    });
+    wrap.appendChild(img);
+    canvas.appendChild(wrap);
+
+    // смена: старую — в exit, новую — в show
+    const oldWrap = currentImgEl;
+    currentImgEl = wrap;
+
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        // новая появляется
+        wrap.classList.remove('art-enter-from-down', 'art-enter-from-up');
+        if (oldWrap) {
+          if (direction === 'down')  oldWrap.classList.add('art-exit-up');
+          if (direction === 'up')    oldWrap.classList.add('art-exit-down');
+          if (!direction)            oldWrap.classList.add('art-exit-up');
+          setTimeout(() => { oldWrap.remove(); }, 600);
+        }
+      });
+    });
+
+    // счётчик и прогресс
+    info.textContent = (idx + 1) + ' / ' + items.length;
+    progress.style.width = ((idx + 1) / items.length * 100) + '%';
+
+    preloadAround(idx);
+  }
+
+  /* --- переключение по направлению --- */
+  function step(dir) {
+    // dir = +1 — вперёд, -1 — назад
+    const next = current + dir;
+    if (next < 0 || next >= items.length) return;
+    showImage(next, dir > 0 ? 'down' : 'up');
+  }
+
+  /* --- открытие/закрытие режима --- */
+  function openArt() {
+    if (canvas.classList.contains('show')) return;
+    canvas.classList.add('show');
+    canvas.setAttribute('aria-hidden', 'false');
+    document.body.style.overflow = 'hidden';
+    if (!items.length) {
+      showState('Загрузка…');
+      loadIndex().then(list => {
+        items = list;
+        if (!items.length) { showState('Пока нет картин'); return; }
+        clearState();
+        buildOrder();
+        current = 0;
+        showImage(0, null);
+      }).catch(err => {
+        showState(err.message || 'Ошибка загрузки', true);
+      });
+    } else {
+      // уже загружено — обновим текущую
+      showImage(current, null);
+    }
+  }
+  function closeArt() {
+    if (!canvas.classList.contains('show')) return;
+    canvas.classList.remove('show');
+    canvas.setAttribute('aria-hidden', 'true');
+    document.body.style.overflow = '';
+  }
+
+  // Экспортируем наружу, чтобы switchSection мог вызвать
+  window.artOpen  = openArt;
+  window.artClose = closeArt;
+
+  /* --- события --- */
+  exitBtn.addEventListener('click', e => {
+    e.preventDefault();
+    closeArt();
+    // переключимся обратно на «Чти великих», чтобы не висел art
+    document.querySelectorAll('.section-switch-btn').forEach(b => {
+      if (b.dataset.section === 'heroes') b.click();
+    });
+  });
+
+  // порядок
+  controls.querySelectorAll('.art-order-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const newOrder = btn.dataset.order;
+      if (newOrder === order) return;
+      order = newOrder;
+      controls.querySelectorAll('.art-order-btn').forEach(b => b.classList.toggle('active', b === btn));
+      buildOrder();
+      current = 0;
+      showImage(0, null);
+    });
+  });
+
+  // колесо мыши — один скролл = одна картина
+  function onWheel(e) {
+    if (!canvas.classList.contains('show')) return;
+    e.preventDefault();
+    const now = Date.now();
+    if (now - lastWheelTime < WHEEL_COOLDOWN) return;
+    if (Math.abs(e.deltaY) < WHEEL_THRESHOLD) return;
+    lastWheelTime = now;
+    step(e.deltaY > 0 ? 1 : -1);
+  }
+  catcher.addEventListener('wheel', onWheel, { passive: false });
+  canvas.addEventListener('wheel', onWheel, { passive: false });
+
+  // стрелки вверх/вниз
+  document.addEventListener('keydown', e => {
+    if (!canvas.classList.contains('show')) return;
+    if (e.key === 'ArrowDown' || e.key === 'PageDown') { e.preventDefault(); step(1); }
+    else if (e.key === 'ArrowUp' || e.key === 'PageUp') { e.preventDefault(); step(-1); }
+    else if (e.key === 'Escape') { e.preventDefault(); exitBtn.click(); }
+  });
+
+  // тач-жест: свайп вверх/вниз = переключение
+  catcher.addEventListener('touchstart', e => {
+    if (!canvas.classList.contains('show')) return;
+    if (e.touches.length !== 1) return;
+    touchStartY = e.touches[0].clientY;
+  }, { passive: true });
+  catcher.addEventListener('touchend', e => {
+    if (!canvas.classList.contains('show')) return;
+    if (touchStartY === null) return;
+    const endY = (e.changedTouches && e.changedTouches[0]) ? e.changedTouches[0].clientY : null;
+    if (endY === null) { touchStartY = null; return; }
+    const dy = touchStartY - endY;
+    touchStartY = null;
+    const THRESH = 40;
+    if (dy > THRESH) step(1);
+    else if (dy < -THRESH) step(-1);
+  }, { passive: true });
+  catcher.addEventListener('touchmove', e => {
+    // блокируем нативный скролл под оверлеем
+    if (canvas.classList.contains('show')) {
+      if (e.cancelable) e.preventDefault();
+    }
+  }, { passive: false });
+
+  // подстраховка: если ушли из art — закрываем
+  window.addEventListener('hashchange', () => {
+    if (!window.location.hash.startsWith('#art')) closeArt();
+  });
 })();
 </script>
 <script>
