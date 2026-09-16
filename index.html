@@ -1209,12 +1209,12 @@ body[data-skin="minimal"] .art-nav:active{
 /* нижняя панель с переключателем */
 .art-bottom{
   position:absolute;
-  left:0; right:0; bottom:0;
+  left:auto; right:clamp(16px,2.2vw,26px); bottom:clamp(16px,2.2vw,26px);
   display:flex;
-  justify-content:center;
+  justify-content:flex-end;
   align-items:center;
-  padding:clamp(12px,1.6vw,18px) clamp(12px,2vw,20px);
-  z-index:10;
+  padding:0;
+  z-index:12;
   pointer-events:none;
   opacity:0;
   transform:translateY(8px);
@@ -2634,7 +2634,7 @@ body[data-skin="minimal"] .stamp-opt-swatch{border-radius:50%;border-width:1px}
 <div class="controls">
 <button id="normalBtn" class="active" data-tooltip="Все">▦</button>
 <button id="randomBtn" data-tooltip="Случайно">⇄</button>
-<button id="hideLearnedBtn" data-tooltip="Скрыть/показать">◐</button>
+<button id="hideLearnedBtn" data-tooltip="Скрыть/показать">👁</button>
 <button id="clearLearnedBtn" data-tooltip="Очистить">✕</button>
 <button id="examBtn" data-tooltip="Викторина">⚑</button>
 <button id="dictationBtn" data-tooltip="Диктант">✎</button>
