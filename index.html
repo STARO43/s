@@ -949,8 +949,17 @@ body[data-skin="minimal"] .media-card-arrow{
 .dictation-overlay::-webkit-scrollbar{display:none}
 .dictation-overlay.show{display:flex;animation:tabIn .25s var(--snap)}
 
+/* верхняя группа элементов (прогресс, динамик, ответ, переключатель) */
+.dictation-top{
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:clamp(14px,2.5vh,26px);
+  width:100%;
+}
+
 .dictation-exit{
-  position:absolute;
+  position:fixed;
   top:20px;left:20px;
   background:transparent;border:none;color:var(--fg);
   width:48px;height:48px;cursor:pointer;
@@ -959,6 +968,7 @@ body[data-skin="minimal"] .media-card-arrow{
   transition:transform .12s linear,color .12s linear;
   padding:0;line-height:1;border-radius:50%;
   -webkit-tap-highlight-color:transparent;
+  z-index:5;
 }
 .dictation-exit:hover{color:var(--accent);transform:scale(1.12)}
 
@@ -1220,14 +1230,203 @@ body[data-skin="minimal"] .dictation-key:hover:not(:disabled){
   transform:none;box-shadow:none;border-color:var(--fg);
 }
 
+/* ============== МОБИЛЬНАЯ ВЁРСТКА ДИКТАНТА ============== */
+@media (max-width: 640px) {
+  .dictation-overlay{
+    padding:12px 8px 82px;
+    gap:10px;
+    justify-content:flex-start;
+  }
+  .dictation-top{
+    gap:10px;
+    flex:0 0 auto;
+  }
+
+  /* Крестик — снизу слева, крупный и удобный для пальца */
+  .dictation-exit{
+    top:auto;
+    left:14px;
+    bottom:14px;
+    width:54px;
+    height:54px;
+    font-size:1.5rem;
+    background:var(--bg-2);
+    border:1.5px solid var(--fg);
+    border-radius:50%;
+    box-shadow:0 4px 14px rgba(0,0,0,.18);
+  }
+  body[data-skin="minimal"] .dictation-exit{
+    border:1px solid var(--m-line-strong);
+    background:var(--bg);
+    box-shadow:0 4px 14px rgba(0,0,0,.10);
+  }
+  .dictation-exit:hover{transform:scale(1.05)}
+
+  .dictation-progress{
+    font-size:.58rem;
+    letter-spacing:.2em;
+    margin-top:0;
+  }
+  .dictation-action-slot{
+    width:68px;
+    height:68px;
+  }
+  .dictation-speaker{
+    box-shadow:4px 4px 0 var(--accent);
+    border-width:2px;
+  }
+  .dictation-speaker:hover{
+    transform:none;
+    box-shadow:4px 4px 0 var(--accent);
+  }
+  .dictation-next{
+    font-size:1.7rem;
+    border-width:2px;
+  }
+  .dictation-answer{
+    min-height:52px;
+    gap:8px;
+    margin:0;
+  }
+  .dictation-letter{
+    width:42px;
+    height:42px;
+    font-size:1.5rem;
+    border-width:2px;
+  }
+  body[data-skin="minimal"] .dictation-letter{
+    border-radius:8px;
+  }
+  .dictation-layout-switch{
+    margin-bottom:0;
+  }
+  .dictation-layout-switch button{
+    padding:7px 12px;
+    font-size:.56rem;
+    letter-spacing:.14em;
+    border-width:1.5px;
+  }
+  .dictation-keyboard{
+    gap:4px;
+    padding:0;
+    width:100%;
+    max-width:none;
+  }
+  .dictation-keyboard.layout-alpha{
+    grid-template-columns:repeat(11,1fr);
+  }
+  .dictation-keyboard.layout-qwerty{
+    grid-template-columns:repeat(11,1fr);
+  }
+  .dictation-key{
+    aspect-ratio:unset;
+    height:36px;
+    font-size:.92rem;
+    border-width:1.5px;
+  }
+  body[data-skin="minimal"] .dictation-key{
+    border-radius:7px;
+  }
+}
+
+/* ============== ЛАНДШАФТ НА ТЕЛЕФОНЕ ============== */
+@media (orientation: landscape) and (max-height: 540px) {
+  .dictation-overlay{
+    padding:8px 12px;
+    gap:14px;
+    flex-direction:row;
+    align-items:center;
+    justify-content:center;
+    overflow:hidden;
+  }
+  .dictation-top{
+    flex:0 0 34%;
+    max-width:34%;
+    height:100%;
+    gap:6px;
+    justify-content:center;
+  }
+  .dictation-exit{
+    /* в ландшафте — в правом верхнем углу, там обычно нет чёлки */
+    top:8px;
+    right:8px;
+    left:auto;
+    bottom:auto;
+    width:40px;
+    height:40px;
+    font-size:1.2rem;
+    background:var(--bg-2);
+    border:1.5px solid var(--fg);
+    border-radius:50%;
+    box-shadow:0 3px 10px rgba(0,0,0,.15);
+  }
+  body[data-skin="minimal"] .dictation-exit{
+    border:1px solid var(--m-line-strong);
+    background:var(--bg);
+  }
+  .dictation-progress{
+    font-size:.52rem;
+    letter-spacing:.16em;
+    margin-top:0;
+  }
+  .dictation-action-slot{
+    width:52px;
+    height:52px;
+  }
+  .dictation-speaker{
+    box-shadow:3px 3px 0 var(--accent);
+    border-width:2px;
+  }
+  .dictation-speaker:hover{
+    transform:none;
+    box-shadow:3px 3px 0 var(--accent);
+  }
+  .dictation-answer{
+    min-height:40px;
+    gap:5px;
+    margin:0;
+    flex-wrap:nowrap;
+  }
+  .dictation-letter{
+    width:34px;
+    height:34px;
+    font-size:1.15rem;
+    border-width:2px;
+  }
+  body[data-skin="minimal"] .dictation-letter{
+    border-radius:7px;
+  }
+  .dictation-layout-switch button{
+    padding:5px 10px;
+    font-size:.52rem;
+    letter-spacing:.1em;
+    border-width:1.5px;
+  }
+  .dictation-keyboard{
+    flex:1;
+    max-width:none;
+    gap:3px;
+    padding:0;
+  }
+  .dictation-keyboard.layout-alpha{
+    grid-template-columns:repeat(11,1fr);
+  }
+  .dictation-keyboard.layout-qwerty{
+    grid-template-columns:repeat(11,1fr);
+  }
+  .dictation-key{
+    aspect-ratio:unset;
+    height:34px;
+    font-size:.85rem;
+    border-width:1.5px;
+  }
+  body[data-skin="minimal"] .dictation-key{
+    border-radius:7px;
+  }
+  .dictation-next{font-size:1.4rem;border-width:2px;}
+}
+
 @media (max-width:640px){
-  .dictation-overlay{padding:64px 12px 20px;gap:12px}
-  .dictation-exit{top:12px;left:12px;width:42px;height:42px;font-size:1.4rem}
-  .dictation-keyboard.layout-alpha{grid-template-columns:repeat(8,1fr);gap:4px}
-  .dictation-keyboard.layout-qwerty{grid-template-columns:repeat(9,1fr);gap:4px}
-  .dictation-key{font-size:.72rem;border-width:1.5px}
-  .dictation-letter{width:54px;height:54px;font-size:1.9rem;border-width:2px}
-  .dictation-speaker{box-shadow:4px 4px 0 var(--accent)}
   .media-wrapper{padding:24px 14px 80px}
   .media-card{gap:12px;padding:18px 4px}
   .media-card-source{display:none}
@@ -2173,21 +2372,23 @@ body[data-skin="minimal"] .stamp-opt-swatch{border-radius:50%;border-width:1px}
 <!-- ОВЕРЛЕЙ ДИКТАНТА -->
 <div class="dictation-overlay" id="dictationOverlay">
   <button class="dictation-exit" id="dictationExit" type="button" title="Выйти">✕</button>
-  <div class="dictation-progress" id="dictationProgress">Задание 1 из 10</div>
-  <div class="dictation-action-slot">
-    <button class="dictation-speaker" id="dictationSpeaker" type="button" aria-label="Прослушать слог">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-        <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" fill="currentColor" stroke="none"/>
-        <path d="M15.54 8.46a5 5 0 0 1 0 7.07"/>
-        <path d="M19.07 4.93a10 10 0 0 1 0 14.14"/>
-      </svg>
-    </button>
-    <button class="dictation-next" id="dictationNextBtn" type="button" aria-label="Далее">→</button>
-  </div>
-  <div class="dictation-answer" id="dictationAnswer"></div>
-  <div class="dictation-layout-switch" id="dictationLayoutSwitch">
-    <button type="button" data-layout="alpha" class="active">Алфавит</button>
-    <button type="button" data-layout="qwerty">Клавиатура</button>
+  <div class="dictation-top">
+    <div class="dictation-progress" id="dictationProgress">Задание 1 из 10</div>
+    <div class="dictation-action-slot">
+      <button class="dictation-speaker" id="dictationSpeaker" type="button" aria-label="Прослушать слог">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" fill="currentColor" stroke="none"/>
+          <path d="M15.54 8.46a5 5 0 0 1 0 7.07"/>
+          <path d="M19.07 4.93a10 10 0 0 1 0 14.14"/>
+        </svg>
+      </button>
+      <button class="dictation-next" id="dictationNextBtn" type="button" aria-label="Далее">→</button>
+    </div>
+    <div class="dictation-answer" id="dictationAnswer"></div>
+    <div class="dictation-layout-switch" id="dictationLayoutSwitch">
+      <button type="button" data-layout="alpha" class="active">Алфавит</button>
+      <button type="button" data-layout="qwerty">Клавиатура</button>
+    </div>
   </div>
   <div class="dictation-keyboard layout-alpha" id="dictationKeyboard"></div>
 </div>
@@ -2287,17 +2488,27 @@ function generateRandomItems() { const s = syllables.slice().sort(() => Math.ran
 hideLearnedBtn.addEventListener('click', () => { hideLearnedBtn.classList.toggle('active'); grid.classList.toggle('hide-learned', hideLearnedBtn.classList.contains('active')); });
 clearLearnedBtn.addEventListener('click', () => { learnedSet.clear(); saveLearnedSet(learnedSet); renderGrid(); flashProgress(); showToast('Очищено', 'success'); });
 examBtn.addEventListener('click', startExam);
+
+/* --- определение «сложного» слога/слова --- */
+function isHardSyllable(s) {
+  if (!s) return false;
+  const low = String(s).toLowerCase();
+  if (['веер','трос','перо','ушко','алла'].indexOf(low) !== -1) return true;
+  if (/[щЩэЭюЮ]/.test(s)) return true;
+  return false;
+}
+
 function startExam() { examOverlay.classList.add('show'); examNextBtn.classList.remove('show'); examRepeatBtn.style.display = 'flex'; examQuestions = getRandomExamQuestions(10); examIndex = 0; examScore = 0; showNextExamQuestion(); }
 function getRandomExamQuestions(c) { const s = syllables.slice().sort(() => Math.random() - 0.5); return s.slice(0, Math.min(c, s.length)); }
 function showNextExamQuestion() { if (examIndex >= examQuestions.length) { examOverlay.classList.remove('show'); if (examScore === 10) showCelebration(); else showToast(`Верно ${examScore} из 10`, 'info'); return; } const correct = examQuestions[examIndex]; currentExamCorrect = correct; examQuestion.textContent = `Вопрос ${examIndex + 1} из ${examQuestions.length}`; examResult.textContent = ''; examNextBtn.classList.remove('show'); examRepeatBtn.style.display = 'flex'; const variants = new Set([correct]); const fl = correct.charAt(0).toUpperCase(); const slp = syllables.filter(i => i !== correct && i.charAt(0).toUpperCase() === fl); const msl = Math.min(5, slp.length); const ss = slp.sort(() => Math.random() - 0.5).slice(0, msl); ss.forEach(i => variants.add(i)); const fp = syllables.filter(i => !variants.has(i)); while (variants.size < 6 && fp.length > 0) { const ri = fp[Math.floor(Math.random() * fp.length)]; variants.add(ri); fp.splice(fp.indexOf(ri), 1); } const va = [...variants].sort(() => Math.random() - 0.5); examOptions.innerHTML = ''; va.forEach(v => { const b = document.createElement('button'); b.className = 'exam-option'; b.textContent = v.toUpperCase(); b.addEventListener('click', () => handleExamAnswer(b, v, correct)); examOptions.appendChild(b); }); playAudio(correct); }
-function handleExamAnswer(btn, sel, correct) { const ao = examOptions.querySelectorAll('.exam-option'); ao.forEach(o => o.disabled = true); if (sel === correct) { btn.classList.add('correct'); examScore++; examResult.textContent = '✓'; } else { btn.classList.add('wrong'); ao.forEach(o => { if (o.textContent === correct.toUpperCase()) o.classList.add('correct'); }); examResult.textContent = '✕'; } examRepeatBtn.style.display = 'none'; examNextBtn.classList.add('show'); examNextBtn.focus(); }
+function handleExamAnswer(btn, sel, correct) { const ao = examOptions.querySelectorAll('.exam-option'); ao.forEach(o => o.disabled = true); if (sel === correct) { btn.classList.add('correct'); examScore++; examResult.textContent = '✓'; if (isHardSyllable(correct)) playAudio('Молодец'); } else { btn.classList.add('wrong'); ao.forEach(o => { if (o.textContent === correct.toUpperCase()) o.classList.add('correct'); }); examResult.textContent = '✕'; playAudio('Не-то'); } examRepeatBtn.style.display = 'none'; examNextBtn.classList.add('show'); examNextBtn.focus(); }
 examNextBtn.addEventListener('click', () => { examIndex++; showNextExamQuestion(); });
 examExitBtn.addEventListener('click', () => { examOverlay.classList.remove('show'); if (currentAudio) { currentAudio.pause(); currentAudio.src = ''; currentAudio = null; } examNextBtn.classList.remove('show'); examRepeatBtn.style.display = 'flex'; showToast('Прервано', 'info'); });
 examRepeatBtn.addEventListener('click', () => { if (currentExamCorrect) playAudio(currentExamCorrect); });
 const gifUrls = ['https://media.gifs.ru/2158157ec6a1788936055b9e9911600c84c63e85_300.webp', 'https://media.gifs.ru/2771cc0c57b56e4c6cfa23d2d9d3f4eb1aab5aaa_300.webp', 'https://media.gifs.ru/2d609cd63a3ae5874298b500f9ab4b5871aabd16_300.webp', 'https://media.gifs.ru/3f25bc7fbec4825f63f6e619e0bd3c8819d80aa9_300.webp', 'https://media.gifs.ru/cbaddb0c4d7bea31ff48e153877a7cec628dcd22_300.webp', 'https://media.gifs.ru/a8e88e80cbecdfc6f34d261a843c82f8f6c2e42b_300.webp', 'https://media.gifs.ru/2640e63683ecae76864a3b8cc40cfe569bb188de_300.webp', 'https://media.gifs.ru/dea46c4e68cbe967d1044828093869737c0697391d7011fc3094a163248f53ff_300.webp', 'https://media.gifs.ru/e6eeccd12fe0d671a5e0f134daafcd7068cef5cf3c99affb72ca341eb9f43157_300.webp', 'https://media.gifs.ru/45256be700bbfc9f441b0ea62ed7069989ac7cda44f5ecdf2399deaf60954a58_300.webp', 'https://media.gifs.ru/f3e3b39148c45df671a433372b8b3cf4bdc997fa799bf8406d281ef593e97b10_300.webp'];
 const dictationGifUrls = ['https://media.gifs.ru/61cd26c8786364a1e4a76fd009763b661f85ca8f3e096bb43b17302498ca5c7f_500.webp', 'https://media.gifs.ru/9e787df4bab0b00a5374cfdfc5a918951ea6cb523928646908d34bb0685b593b_500.webp', 'https://media.gifs.ru/5700e33f2af3231daf8f83e6dcf723473861b17237bb4a70d22466d2e1d8783f_500.webp', 'https://media.gifs.ru/e7282289c8762f0c1e043e8de4c956744cf4825e61d3271df1c056165a94087a_500.webp', 'https://media.gifs.ru/ad5217762cb356685f294b05f44f14e4ea31bde96b34ab5e676915ad26fccd11_500.webp', 'https://media.gifs.ru/4803a42b623dcf59c8fbc9163c868b59cbaf347b7509fa7986894ff076939531_500.webp', 'https://media.gifs.ru/6eec639e732ad955153d25eb4dbbf13309483001d72d19a96d31f5e15bcde81a_500.webp', 'https://media.gifs.ru/e7e70d34d6bdca01c2c9d659eee9cbfcf24a0e30_500.webp', 'https://media.gifs.ru/79d7264b9d3f26b8440a715b510ba3a47254973085259ad2ecdcf79f6ea73854_500.webp', 'https://media.gifs.ru/c77544fec3f04d9cc911ae531a20fdb7bcd6541e4c48fab9acb3ae70780b4466_500.webp', 'https://media.gifs.ru/c9bc464c72197a908f063db7a6e48152e57c229706387d2a62ae2e69d957ac3e_500.webp', 'https://media.gifs.ru/9f4fc9e6a4ffc774c7e94d5bdf92bfed770e614cb06e7cfd1f686092451590a2_500.webp'];
-function showCelebration() { celebrationGif.src = gifUrls[Math.floor(Math.random() * gifUrls.length)]; celebrationOverlay.classList.add('show'); }
-function showDictationCelebration() { celebrationGif.src = dictationGifUrls[Math.floor(Math.random() * dictationGifUrls.length)]; celebrationOverlay.classList.add('show'); }
+function showCelebration() { celebrationGif.src = gifUrls[Math.floor(Math.random() * gifUrls.length)]; celebrationOverlay.classList.add('show'); playAudio('Молодец'); }
+function showDictationCelebration() { celebrationGif.src = dictationGifUrls[Math.floor(Math.random() * dictationGifUrls.length)]; celebrationOverlay.classList.add('show'); playAudio('Молодец'); }
 celebrationClose.addEventListener('click', () => celebrationOverlay.classList.remove('show'));
 celebrationOverlay.addEventListener('click', e => { if (e.target === celebrationOverlay) celebrationOverlay.classList.remove('show'); });
 function showToast(m, t = 'info') { const toast = document.createElement('div'); toast.className = 'toast'; if (t === 'error') toast.classList.add('error'); if (t === 'success') toast.classList.add('success'); toast.textContent = m; toastContainer.appendChild(toast); setTimeout(() => toast.remove(), 2000); }
@@ -2326,7 +2537,8 @@ let dictationAudio = null;
 let dictationLayout = 'alpha';
 
 function getDictationQuestions(count) {
-  const pool = syllables.filter(s => /^[А-Яа-яЁё]{2,3}$/.test(s));
+  // Расширили пул до 2–4 букв, чтобы появлялись сложные слова (ВЕЕР, ТРОС и т. п.)
+  const pool = syllables.filter(s => /^[А-Яа-яЁё]{2,4}$/.test(s));
   const shuffled = pool.slice().sort(() => Math.random() - 0.5);
   return shuffled.slice(0, Math.min(count, shuffled.length));
 }
@@ -2422,10 +2634,13 @@ function checkDictationAnswer() {
   if (typed === correct) {
     dictationScore++;
     slots.forEach(slot => slot.classList.add('correct'));
+    // Сложный слог (4 буквы) — хвалим
+    if (dictationCurrent.length >= 4) playAudio('Молодец');
   } else {
     slots.forEach(slot => slot.classList.remove('filled'));
     slots.forEach(slot => slot.classList.add('wrong'));
     slots.forEach((slot, i) => { slot.textContent = correct[i] || ''; });
+    playAudio('Не-то');
   }
   // Показываем кнопку «Далее», скрываем динамик
   dictationSpeaker.style.display = 'none';
