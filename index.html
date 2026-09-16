@@ -2619,18 +2619,7 @@ body[data-skin="minimal"] .stamp-opt-swatch{border-radius:50%;border-width:1px}
 <div class="heroes-timeline" id="heroesTimeline"></div>
 </section>
 
-<section id="artSection" class="tab-section">
-  <div class="art-section" id="artCanvas" aria-hidden="true">
-    <div class="art-scroll-catcher" id="artScrollCatcher"></div>
-    <div class="art-info" id="artInfo">1 / 594</div>
-    <button class="art-exit" id="artExit" type="button" aria-label="Выйти">×</button>
-    <div class="art-controls" id="artControls">
-      <button class="art-order-btn active" data-order="standard" type="button">Стандарт</button>
-      <button class="art-order-btn" data-order="random" type="button">Случайно</button>
-    </div>
-    <div class="art-progress"><div class="art-progress-fill" id="artProgressFill"></div></div>
-  </div>
-</section>
+<section id="artSection" class="tab-section" style="display:none;"></section>
 
 <section id="poetrySection" class="tab-section">
   <div class="media-wrapper">
@@ -2701,6 +2690,16 @@ body[data-skin="minimal"] .stamp-opt-swatch{border-radius:50%;border-width:1px}
       <div class="parents-reader-content" id="parentsReaderContent"></div>
     </article>
   </div>
+</div>
+  <div class="art-section" id="artCanvas" aria-hidden="true">
+  <div class="art-scroll-catcher" id="artScrollCatcher"></div>
+  <div class="art-info" id="artInfo">1 / 594</div>
+  <button class="art-exit" id="artExit" type="button" aria-label="Выйти">×</button>
+  <div class="art-controls" id="artControls">
+    <button class="art-order-btn active" data-order="standard" type="button">Стандарт</button>
+    <button class="art-order-btn" data-order="random" type="button">Случайно</button>
+  </div>
+  <div class="art-progress"><div class="art-progress-fill" id="artProgressFill"></div></div>
 </div>
 
 <div class="progress-container" id="progressContainer">
