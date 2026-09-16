@@ -1854,7 +1854,7 @@ body[data-skin="minimal"] .stamp-opt-swatch{border-radius:50%;border-width:1px}
 <div class="header-masthead">
 <div class="masthead-cell masthead-left">
 <span>Стиль:</span>
-<button class="masthead-switch" id="skinSwitch" type="button" title="Стиль">минимализм</button>
+<button class="masthead-switch" id="skinSwitch" type="button" title="Визуаль">лёгкость</button>
 </div>
 <div class="masthead-cell masthead-center"><span class="masthead-sep"></span><span></span><span class="masthead-sep"></span></div>
 <div class="masthead-cell masthead-right">
@@ -2564,7 +2564,7 @@ window.addEventListener('scroll', () => { if (openMode) closeStamp(); }, { passi
 let sp = 'newsprint', si = 'kinovar'; try { sp = localStorage.getItem(STORAGE_PAPER) || 'newsprint'; si = localStorage.getItem(STORAGE_INK) || 'kinovar'; } catch (e) { } applyPaper(sp, true); applyInk(si, true);
 window.__syncSkinControls = function(){
   const ss = document.getElementById('skinSwitch');
-  if (ss) ss.textContent = (body.dataset.skin === 'minimal') ? 'минимализм' : 'газета';
+  if (ss) ss.textContent = (body.dataset.skin === 'minimal') ? 'лёгкий' : 'классический';
   if (!paperSwitch) return;
   paperSwitch.textContent = (body.dataset.skin === 'minimal') ? toneLabel() : findPaper(currentPaperKey).label;
   if (openMode) renderStampList(openMode);
@@ -3033,10 +3033,8 @@ render(); renderSecondHand(); setView('watch');
       const s = body.dataset.skin || 'minimal';
       if (s === 'minimal') {
         apply('classic', body.dataset.mintone || 'light');
-        toast('Газетный стиль');
       } else {
         apply('minimal', body.dataset.mintone || 'light');
-        toast('Минимализм');
       }
     });
   }
