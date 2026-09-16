@@ -3115,7 +3115,7 @@ function fetchBuffer(name) {
 function preloadAllClockAudio() {
   if (!audioCtx) return;
   for (let h = 1; h <= 12; h++) fetchBuffer(`h_${String(h).padStart(2, '0')}.mp3`);
-  for (let m = 0; m <= 59; m++) fetchBuffer(`m_${String(m).padStart(2, '0')}.mp3`);
+  for (let m = 1; m <= 59; m++) fetchBuffer(`m_${String(m).padStart(2, '0')}.mp3`);
   fetchBuffer('rovno.mp3');
 }
 function unlockAudioContext() {
