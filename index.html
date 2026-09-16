@@ -2962,8 +2962,8 @@ body[data-skin="minimal"] .stamp-opt-swatch{border-radius:50%;border-width:1px}
   <button class="art-nav next" id="artNext" type="button" aria-label="Следующая картина">›</button>
   <div class="art-bottom">
     <div class="art-controls" id="artControls">
-      <button class="art-order-btn active" data-order="standard" type="button">Стандарт</button>
-      <button class="art-order-btn" data-order="random" type="button">Случайно</button>
+      <button class="art-order-btn" data-order="standard" type="button">Стандарт</button>
+<button class="art-order-btn active" data-order="random" type="button">Случайно</button>
     </div>
   </div>
 </div>
@@ -3910,7 +3910,7 @@ render(); renderSecondHand(); setView('watch');
   if (!canvas || !catcher) return;
 
   let items = [];
-  let order = 'standard';
+let order = 'random';
   let current = 0;
   let currentImgEl = null;
   let imgCache = new Map();
