@@ -5,13 +5,13 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <!-- ===================== SEO ===================== -->
 <meta name="description" content="Громатиньо. Лучшее культурное место для вас и ваших детей.">
 <meta name="keywords" content="русский язык, слоги, история, поэзия, живопись, педагогика, обучение, культура, Россия, СССР">
 <meta name="author" content="Грамотиньо">
 <meta name="robots" content="index, follow">
-<meta name="theme-color" content="#e30613">
+<meta name="theme-color" content="#0d0d0e">
 
 <!-- ===================== Open Graph (соцсети) ===================== -->
 <meta property="og:type" content="website">
@@ -119,8 +119,7 @@ body[data-paper="carbon"][data-ink="berlin"] {
 --font-serif-body:    'Lora', 'PT Serif', Georgia, serif;
 --ease: cubic-bezier(0.16, 1, 0.3, 1);
 --snap: cubic-bezier(0.4, 0, 0.2, 1);
-/* высота нижнего бара на мобиле */
---mobilebar-h: 58px;
+--mobilebar-h: 56px;
 }
 html { -webkit-text-size-adjust: 100%; }
 body {
@@ -136,7 +135,6 @@ flex-direction: column;
 overscroll-behavior-x: none;
 transition: background-color 0.15s ease, color 0.15s ease;
 }
-/* Сетка фона — только на десктопе. На мобиле отключена ради fps. */
 body::before {
 content: '';
 position: fixed;
@@ -371,7 +369,7 @@ white-space: nowrap;
 .section-switch-btn.active { background: var(--fg); color: var(--bg); }
 .section-switch-btn:hover:not(.active) { background: var(--bg-2); }
 
-/* ===================== MOBILE NAV (снизу, как в приложениях) ===================== */
+/* ===================== MOBILE NAV (снизу, только иконки) ===================== */
 .mobile-nav { display: none; }
 
 .section-subtitles {
@@ -772,56 +770,6 @@ body[data-skin="minimal"] .controls-sep::before { height: 14px; }
 .progress-container { padding: 14px 18px 16px; }
 .masthead-stamp { left: 50% !important; right: auto !important; top: auto !important; bottom: 20px !important; transform: translateX(-50%) translateY(8px); box-shadow: 6px 6px 0 var(--accent); max-width: calc(100vw - 24px); }
 .masthead-stamp.show { transform: translateX(-50%) translateY(0); }
-
-/* ===================== НИЖНИЙ БАР ===================== */
-.mobile-nav {
-display: flex;
-position: fixed;
-left: 0; right: 0; bottom: 0;
-z-index: 1500;
-align-items: stretch;
-justify-content: space-around;
-gap: 0;
-background: var(--bg);
-border-top: 1px solid var(--rule-soft);
-padding-bottom: env(safe-area-inset-bottom, 0px);
-box-shadow: 0 -2px 10px rgba(0,0,0,.06);
-}
-body[data-skin="minimal"][data-mintone="dark"] .mobile-nav {
-background: var(--bg-2);
-border-top-color: var(--m-line);
-box-shadow: 0 -2px 10px rgba(0,0,0,.4);
-}
-.mobile-nav-item {
-flex: 1 1 0;
-display: flex;
-flex-direction: column;
-align-items: center;
-justify-content: center;
-gap: 3px;
-background: transparent;
-border: none;
-padding: 8px 2px 7px;
-min-height: 58px;
-color: var(--fg-2);
-font-family: var(--font-ui);
-font-weight: 500;
-font-size: 0.58rem;
-letter-spacing: 0.02em;
-line-height: 1;
-white-space: nowrap;
-cursor: pointer;
--webkit-tap-highlight-color: transparent;
-transition: color .15s ease;
-}
-.mobile-nav-item svg { width: 20px; height: 20px; display: block; }
-.mobile-nav-item:active { color: var(--fg); }
-.mobile-nav-item.active { color: var(--accent); }
-body[data-skin="minimal"][data-mintone="dark"] .mobile-nav-item { color: var(--fg-3); }
-body[data-skin="minimal"][data-mintone="dark"] .mobile-nav-item.active { color: var(--accent); }
-
-/* нижний отступ, чтобы контент не залезал под бар */
-body { padding-bottom: calc(var(--mobilebar-h) + env(safe-area-inset-bottom, 0px)); }
 }
 @media (max-width: 420px) {
 .frame-head-top { justify-content: center; gap: 6px; padding: 6px 8px; }
@@ -839,12 +787,8 @@ body[data-skin="minimal"] .controls button svg { width: 15px; height: 15px; }
 .hero-name { font-size: 0.92rem; }
 .hero-years { font-size: 0.58rem; }
 .clock-frame { width: min(480px, 96vw); }
-.mobile-nav-item { font-size: 0.54rem; min-height: 54px; }
-.mobile-nav-item svg { width: 18px; height: 18px; }
 }
 @media (max-width: 380px) {
-.mobile-nav-item { font-size: 0.5rem; min-height: 50px; }
-.mobile-nav-item svg { width: 17px; height: 17px; }
 }
 
 /* ================================================================= */
@@ -1421,6 +1365,11 @@ body[data-skin="minimal"] .art-order-btn:hover:not(.active){
   cursor:default;
 }
 
+/* ================================================================= */
+/* ============ MOBILE ART SCROLLER (scroll-snap carousel) ========= */
+/* ================================================================= */
+.art-scroller { display: none; }
+
 @media (max-width:640px){
   .art-image-wrap{
     padding:46px 4px 56px;
@@ -1476,91 +1425,76 @@ body[data-skin="minimal"] .art-order-btn:hover:not(.active){
     background: var(--bg-2);
     border: 1px solid var(--m-line);
   }
-  .art-nav,
-  body[data-skin="minimal"] .art-nav{
-    width:42px;
-    height:42px;
-    font-size:1.25rem;
-    border-radius:50%;
-    background:rgba(0,0,0,.6);
-    border:1px solid rgba(255,255,255,.32);
-    color:#fff;
-    box-shadow:none;
-    padding:0 0 3px;
+  /* на мобиле навигация стрелками не нужна — только свайп */
+  .art-nav { display: none !important; }
+  .art-scroll-catcher { display: none !important; }
+  .art-section::before { display: none !important; }
+  .art-image-wrap { display: none !important; }
+
+  /* Полноэкранный scroll-snap карусель */
+  .art-scroller {
+    display: flex;
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    overflow-x: auto;
+    overflow-y: hidden;
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+    z-index: 3;
+    overscroll-behavior-x: contain;
+    touch-action: pan-x;
   }
-  body:not([data-skin="minimal"]) .art-nav{
-    background:rgba(0,0,0,.62);
-    border-color:rgba(255,255,255,.34);
+  .art-scroller::-webkit-scrollbar { display: none; width: 0; height: 0; }
+
+  .art-slide {
+    flex: 0 0 100vw;
+    width: 100vw;
+    height: 100%;
+    scroll-snap-align: center;
+    scroll-snap-stop: always;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 50px 6px 62px;
+    box-sizing: border-box;
   }
-  .art-nav:hover,
-  body[data-skin="minimal"] .art-nav:hover{
-    background:rgba(0,0,0,.78);
-    color:#fff;
-    border-color:rgba(255,255,255,.55);
-    transform:translateY(-50%);
-    box-shadow:none;
+  .art-slide-img {
+    max-width: 100%;
+    max-height: 100%;
+    width: auto;
+    height: auto;
+    display: block;
+    object-fit: contain;
+    user-select: none;
+    -webkit-user-drag: none;
+    -webkit-tap-highlight-color: transparent;
+    background: #000;
   }
-  body[data-skin="minimal"] .art-nav:hover{
-    transform:translateY(-50%) scale(1.06);
+  .art-slide .art-state {
+    position: static;
+    inset: auto;
+    display: block;
+    padding: 40px 20px;
+    font-size: .62rem;
   }
-  .art-nav:active,
-  body[data-skin="minimal"] .art-nav:active{
-    transform:translateY(-50%) scale(.94);
-  }
-  .art-nav.prev{left:6px}
-  .art-nav.next{right:6px}
 }
 @media (max-width:420px){
-.art-image-wrap{padding:44px 4px 54px;}
   .art-order-btn{
     padding:9px 12px;
     font-size:.55rem;
     letter-spacing:.12em;
   }
-  .art-nav,
-  body[data-skin="minimal"] .art-nav{
-    width:38px;
-    height:38px;
-    font-size:1.15rem;
-  }
-  .art-nav.prev{left:4px}
-  .art-nav.next{right:4px}
 }
 @media (orientation: landscape) and (max-height: 560px){
-  .art-image-wrap{
-    padding:48px 8px 62px;
-  }
   .art-top{padding:8px 10px;}
   .art-bottom{padding:8px 12px;}
   .art-info{font-size:.5rem;padding:5px 10px;letter-spacing:.16em;}
   .art-exit{width:38px;height:38px;font-size:1.1rem;}
   .art-order-btn{padding:7px 14px;font-size:.54rem;letter-spacing:.12em;}
-  .art-nav,
-  body[data-skin="minimal"] .art-nav{
-    width:38px;
-    height:38px;
-    font-size:1.1rem;
-    background:rgba(0,0,0,.55);
-    border:1px solid rgba(255,255,255,.28);
-    color:#fff;
-    box-shadow:none;
-    border-radius:50%;
-  }
-  body:not([data-skin="minimal"]) .art-nav{
-    background:rgba(0,0,0,.6);
-  }
-  .art-nav:hover,
-  body[data-skin="minimal"] .art-nav:hover{
-    background:rgba(0,0,0,.72);
-    color:#fff;
-    border-color:rgba(255,255,255,.5);
-    transform:translateY(-50%);
-  }
-  body[data-skin="minimal"] .art-nav:hover{
-    transform:translateY(-50%) scale(1.06);
-  }
-  .art-nav.prev{left:4px}
-  .art-nav.next{right:4px}
 }
 
 /* ================================================================= */
@@ -2496,17 +2430,15 @@ body[data-skin="minimal"][data-mintone="dark"] .parents-reader-close:hover{
 @media (max-width:640px){
   .parents-wrapper{padding:24px 18px 90px}
 
-  /* Боковые поля увеличены — это тап-зона «тапнул сбоку — закрыл».
-     Кнопку × на мобиле скрываем: она мешала при скролле текста. */
   .parents-reader-surface{
     padding:14px 26px 60px;
   }
   .parents-reader-sheet{
     padding:44px 20px 32px;
     border-radius:16px;
-    will-change: transform, opacity;
+    will-change: auto;
     filter: none;
-    transition: transform .45s cubic-bezier(.16,1,.3,1), opacity .35s ease;
+    transition: transform .35s cubic-bezier(.16,1,.3,1), opacity .3s ease;
     box-shadow:
       0 22px 60px -20px rgba(0,0,0,.42),
       0 8px 22px -8px rgba(0,0,0,.22);
@@ -2522,7 +2454,7 @@ body[data-skin="minimal"][data-mintone="dark"] .parents-reader-close:hover{
   }
   .parents-reader-overlay.show .parents-reader-sheet{
     filter: none;
-    transition: transform .6s cubic-bezier(.16,1,.3,1), opacity .4s ease;
+    transition: transform .4s cubic-bezier(.16,1,.3,1), opacity .3s ease;
   }
 
   .parents-reader-close{
@@ -2764,103 +2696,174 @@ body[data-skin="minimal"] .stamp-opt.active{background:var(--bg-2);color:var(--a
 body[data-skin="minimal"] .stamp-opt-swatch{border-radius:50%;border-width:1px}
 
 /* ================================================================= */
-/* ============== MOBILE PERF + BOTTOM BAR ADJUSTMENTS ============= */
+/* ====== MOBILE PERF: без анимаций, без лишних теней ============== */
 /* ================================================================= */
 @media (max-width: 640px) {
-  /* 1. Отключаем тяжёлую фоновую сетку на мобиле — это главный
-        источник лагов при скролле на iPhone. */
+
+  /* -------- Убираем красный/цветной фон у системных элементов ---- */
+  html, body { background-color: var(--bg); }
+  * { -webkit-tap-highlight-color: transparent; }
+  ::selection { background: var(--bg-3); color: var(--fg); }
+
+  /* 1. Фоновая сетка — только на десктопе. */
   body::before { display: none; }
 
-  /* 2. Упрощаем тени и убираем лишние transition на больших слоях. */
-  .parents-reader-sheet,
+  /* 2. Никаких анимаций появления секций. */
+  .tab-section.active { animation: none !important; }
+  .hero-modal        { animation: none !important; }
+  .exam-overlay.show { animation: none !important; }
+  .dictation-overlay.show { animation: none !important; }
+  .celebration-overlay.show { animation: none !important; }
+  .toast { animation: none !important; opacity: 1; }
+
+  /* 3. Секции — contain для изоляции перерисовок. */
+  .tab-section { content-visibility: auto; contain-intrinsic-size: 900px; contain: layout style; }
+  .tab-section.active { content-visibility: visible; }
+
+  /* 4. Убираем тяжёлые тени на больших слоях. */
+  .clock-frame,
+  .hero-item,
+  .hero-modal-portrait,
   .media-player-stage,
-  .art-image {
-    box-shadow: 0 8px 24px rgba(0,0,0,.18);
+  .art-image,
+  .celebration-box,
+  .parents-reader-sheet {
+    box-shadow: none !important;
   }
   body[data-skin="minimal"][data-mintone="dark"] .parents-reader-sheet,
   body[data-skin="minimal"][data-mintone="dark"] .media-player-stage,
   body[data-skin="minimal"][data-mintone="dark"] .art-image {
-    box-shadow: 0 8px 24px rgba(0,0,0,.5);
+    box-shadow: none !important;
   }
-  .parents-reader-sheet { will-change: auto; }
-  .art-image-wrap  { will-change: auto; }
 
-  /* 3. content-visibility — браузер не рендерит невидимые табы. */
-  .tab-section { content-visibility: auto; contain-intrinsic-size: 800px; }
-  .tab-section.active { content-visibility: visible; }
+  /* 5. Упрощаем hover-эффекты с transform (они не нужны на тач-устройствах). */
+  .syllable-card,
+  .hero-item,
+  .media-card,
+  .parents-card,
+  .exam-option,
+  .controls button { transition: none !important; }
+  .syllable-card:not(.learned):hover,
+  .syllable-card.playing,
+  .hero-item:hover,
+  .exam-option:hover:not(:disabled) { transform: none !important; box-shadow: none !important; }
 
-  /* 4. Нижний бар: отступы под safe-area уже заданы, добавим
-        правильный отступ контенту, чтобы бар ничего не перекрывал. */
-  .grid-container      { padding-bottom: calc(90px + var(--mobilebar-h)); }
-  .media-wrapper       { padding-bottom: calc(90px + var(--mobilebar-h)); }
-  .parents-wrapper     { padding-bottom: calc(90px + var(--mobilebar-h)); }
-  .heroes-timeline     { padding-bottom: calc(90px + var(--mobilebar-h)); }
-  .clock-wrapper       { padding-bottom: calc(90px + var(--mobilebar-h)); }
-  .content-wrapper     { padding-bottom: 0; }
+  /* 6. Карточки слогов — простая подсветка вместо сложной анимации. */
+  .syllable-card:not(.learned):active { background: var(--bg-2); }
+  .syllable-card.playing { background: var(--accent); color: var(--accent-fg); }
 
-  /* 5. Прогресс-контейнер и кнопки «наверх» не залезают на бар. */
-  .progress-container  { bottom: calc(var(--mobilebar-h) + env(safe-area-inset-bottom, 0px)); }
-  .scroll-top-btn      { bottom: calc(16px + var(--mobilebar-h) + env(safe-area-inset-bottom, 0px)); }
-  .toast-container     { bottom: calc(16px + var(--mobilebar-h) + env(safe-area-inset-bottom, 0px)); }
+  /* 7. Hero modal: убираем тяжёлые фильтры и переходы. */
+  .hero-photo img { transition: none !important; }
+
+  /* 8. Нижние панели: достаточный отступ контенту. */
+  .grid-container   { padding-bottom: calc(80px + var(--mobilebar-h)); }
+  .media-wrapper    { padding-bottom: calc(80px + var(--mobilebar-h)); }
+  .parents-wrapper  { padding-bottom: calc(80px + var(--mobilebar-h)); }
+  .heroes-timeline  { padding-bottom: calc(80px + var(--mobilebar-h)); }
+  .clock-wrapper    { padding-bottom: calc(80px + var(--mobilebar-h)); }
+
+  .progress-container {
+    bottom: calc(var(--mobilebar-h) + env(safe-area-inset-bottom, 0px));
+    transition: transform .25s cubic-bezier(.16,1,.3,1) !important;
+  }
+  .scroll-top-btn {
+    bottom: calc(14px + var(--mobilebar-h) + env(safe-area-inset-bottom, 0px));
+  }
+  .toast-container {
+    bottom: calc(14px + var(--mobilebar-h) + env(safe-area-inset-bottom, 0px));
+  }
+
+  /* 9. media-player и parents-reader: быстрые переходы. */
+  .media-player-overlay,
+  .media-player-overlay.show,
+  .media-player-stage,
+  .media-player-overlay.show .media-player-stage,
+  .media-player-close,
+  .media-player-overlay.show .media-player-close,
+  .parents-reader-overlay,
+  .parents-reader-overlay.show,
+  .parents-reader-title,
+  .parents-reader-content,
+  .parents-reader-overlay.show .parents-reader-title,
+  .parents-reader-overlay.show .parents-reader-content {
+    transition-duration: .2s !important;
+    transition-timing-function: ease-out !important;
+  }
+  .media-player-stage { transform: none !important; opacity: 1 !important; }
+  .parents-reader-sheet { transform: none !important; opacity: 1 !important; filter: none !important; }
 }
 
 /* ================================================================= */
 /* ==================== MOBILE NAV (НИЖНИЙ БАР) ==================== */
 /* ================================================================= */
 @media (max-width: 640px) {
+  /* Бар со скроллом вбок, только иконки */
   .mobile-nav {
     display: flex;
     position: fixed;
     left: 0; right: 0; bottom: 0;
     z-index: 1500;
-    align-items: stretch;
-    justify-content: space-around;
-    gap: 0;
+    align-items: center;
+    gap: 4px;
     background: var(--bg);
     border-top: 1px solid var(--rule-soft);
-    padding-bottom: env(safe-area-inset-bottom, 0px);
-    box-shadow: 0 -2px 10px rgba(0,0,0,.06);
+    padding: 8px 8px calc(8px + env(safe-area-inset-bottom, 0px));
+    min-height: var(--mobilebar-h);
+    box-sizing: content-box;
+    overflow-x: auto;
+    overflow-y: hidden;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+    -webkit-overflow-scrolling: touch;
+    scroll-snap-type: x proximity;
+    scroll-padding-inline: 8px;
+    overscroll-behavior-x: contain;
   }
   body[data-skin="minimal"][data-mintone="dark"] .mobile-nav {
     background: var(--bg-2);
     border-top-color: var(--m-line);
-    box-shadow: 0 -2px 10px rgba(0,0,0,.4);
   }
+  .mobile-nav::-webkit-scrollbar { display: none; width: 0; height: 0; }
+
   .mobile-nav-item {
-    flex: 1 1 0;
+    flex: 0 0 auto;
     display: flex;
-    flex-direction: column;
     align-items: center;
     justify-content: center;
-    gap: 3px;
+    width: 48px;
+    height: 40px;
     background: transparent;
     border: none;
-    padding: 8px 2px 7px;
-    min-height: 58px;
+    border-radius: 10px;
     color: var(--fg-2);
-    font-family: var(--font-ui);
-    font-weight: 500;
-    font-size: 0.58rem;
-    letter-spacing: 0.02em;
-    line-height: 1;
-    white-space: nowrap;
     cursor: pointer;
+    scroll-snap-align: center;
     -webkit-tap-highlight-color: transparent;
-    transition: color .15s ease;
+    transition: color .12s ease, background-color .12s ease;
   }
-  .mobile-nav-item svg { width: 20px; height: 20px; display: block; }
-  .mobile-nav-item:active { color: var(--fg); }
-  .mobile-nav-item.active { color: var(--accent); }
   body[data-skin="minimal"][data-mintone="dark"] .mobile-nav-item { color: var(--fg-3); }
-  body[data-skin="minimal"][data-mintone="dark"] .mobile-nav-item.active { color: var(--accent); }
+
+  .mobile-nav-item svg { width: 22px; height: 22px; display: block; }
+
+  .mobile-nav-item:active { background: var(--bg-2); }
+  body[data-skin="minimal"][data-mintone="dark"] .mobile-nav-item:active { background: var(--bg-3); }
+
+  .mobile-nav-item.active {
+    color: var(--accent);
+    background: var(--bg-2);
+  }
+  body[data-skin="minimal"][data-mintone="dark"] .mobile-nav-item.active {
+    color: var(--accent);
+    background: var(--bg-3);
+  }
 }
 @media (max-width: 420px) {
-  .mobile-nav-item { font-size: 0.54rem; min-height: 54px; }
-  .mobile-nav-item svg { width: 18px; height: 18px; }
+  .mobile-nav-item { width: 44px; height: 38px; }
+  .mobile-nav-item svg { width: 20px; height: 20px; }
 }
 @media (max-width: 380px) {
-  .mobile-nav-item { font-size: 0.5rem; min-height: 50px; }
-  .mobile-nav-item svg { width: 17px; height: 17px; }
+  .mobile-nav-item { width: 42px; height: 36px; }
+  .mobile-nav-item svg { width: 19px; height: 19px; }
 }
 </style>
 </head>
@@ -3290,35 +3293,28 @@ body[data-skin="minimal"] .stamp-opt-swatch{border-radius:50%;border-width:1px}
 <footer class="footer"><p>Вайбкодинг. Пишите отзывы в тележку @vnvax</p></footer>
 <div class="toast-container" id="toastContainer"></div>
 
-<!-- ================= НИЖНИЙ МОБИЛЬНЫЙ БАР ================= -->
+<!-- ================= НИЖНИЙ МОБИЛЬНЫЙ БАР (только иконки, свайп вбок) ================= -->
 <nav class="mobile-nav" id="mobileNav" aria-label="Разделы">
-  <button class="mobile-nav-item active" data-section="syllables" type="button">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
-    Слоги
+  <button class="mobile-nav-item active" data-section="syllables" type="button" title="Слоги" aria-label="Слоги">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
   </button>
-  <button class="mobile-nav-item" data-section="clock" type="button">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
-    Время
+  <button class="mobile-nav-item" data-section="clock" type="button" title="Время" aria-label="Время">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
   </button>
-  <button class="mobile-nav-item" data-section="heroes" type="button">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l2.5 6.5H21l-5.2 4 1.9 6.5L12 16.4 6.3 20l1.9-6.5L3 9.5h6.5L12 3z"/></svg>
-    Великие
+  <button class="mobile-nav-item" data-section="heroes" type="button" title="Великие" aria-label="Великие">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l2.5 6.5H21l-5.2 4 1.9 6.5L12 16.4 6.3 20l1.9-6.5L3 9.5h6.5L12 3z"/></svg>
   </button>
-  <button class="mobile-nav-item" data-section="art" type="button">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="9" cy="10" r="2"/><path d="M21 16l-5-5-8 9"/></svg>
-    Живопись
+  <button class="mobile-nav-item" data-section="art" type="button" title="Живопись" aria-label="Живопись">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="9" cy="10" r="2"/><path d="M21 16l-5-5-8 9"/></svg>
   </button>
-  <button class="mobile-nav-item" data-section="cartoons" type="button">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M10 9l5 3-5 3V9z"/></svg>
-    Мульты
+  <button class="mobile-nav-item" data-section="cartoons" type="button" title="Мульты" aria-label="Мульты">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M10 9l5 3-5 3V9z"/></svg>
   </button>
-  <button class="mobile-nav-item" data-section="parents" type="button">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V5z"/><path d="M8 7h8M8 11h8M8 15h5"/></svg>
-    Родителям
+  <button class="mobile-nav-item" data-section="parents" type="button" title="Родителям" aria-label="Родителям">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V5z"/><path d="M8 7h8M8 11h8M8 15h5"/></svg>
   </button>
-  <button class="mobile-nav-item" data-section="poetry" type="button">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
-    Поэзия
+  <button class="mobile-nav-item" data-section="poetry" type="button" title="Поэзия" aria-label="Поэзия">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
   </button>
 </nav>
 
@@ -3359,14 +3355,19 @@ const parentsSection = document.getElementById('parentsSection');
 const heroesTimeline = document.getElementById('heroesTimeline');
 const mobileNav = document.getElementById('mobileNav');
 let currentMode = 'all'; let randomItems = []; let currentAudio = null; let examQuestions = []; let examIndex = 0; let examScore = 0; let currentExamCorrect = ''; let currentSection = 'syllables'; let progressTimer = null;
-const SECTION_ORDER = ['syllables', 'clock', 'heroes', 'art', 'poetry', 'cartoons', 'parents'];
 
 function updateMobileNav(centerActive) {
   if (!mobileNav) return;
+  let activeEl = null;
   mobileNav.querySelectorAll('.mobile-nav-item').forEach(item => {
     const isActive = item.dataset.section === currentSection;
     item.classList.toggle('active', isActive);
+    if (isActive) activeEl = item;
   });
+  if (activeEl && centerActive) {
+    try { activeEl.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' }); }
+    catch (e) { /* старые браузеры — просто без центрирования */ }
+  }
 }
 if (mobileNav) {
   mobileNav.querySelectorAll('.mobile-nav-item').forEach(item => {
@@ -3402,7 +3403,7 @@ window.addEventListener('scroll', () => scrollTopBtn.classList.toggle('visible',
 scrollTopBtn.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
 function refreshProgressData() { const t = syllables.length; const m = [...syllables].filter(s => learnedSet.has(s)).length; const p = t ? Math.round((m / t) * 100) : 0; progressLabel.textContent = `Отмечено: ${m} из ${t}`; progressFill.style.width = p + '%'; }
 function flashProgress() { refreshProgressData(); progressContainer.classList.add('show'); clearTimeout(progressTimer); progressTimer = setTimeout(() => progressContainer.classList.remove('show'), 2400); }
-function renderGrid() { grid.innerHTML = ''; const items = currentMode === 'random' ? randomItems : syllables; items.forEach(syllable => { const card = document.createElement('div'); card.className = 'syllable-card'; card.dataset.syllable = syllable; card.setAttribute('role', 'button'); card.setAttribute('tabindex', '0'); const ts = document.createElement('span'); ts.className = 'syllable-text'; ts.textContent = syllable; ts.style.pointerEvents = 'none'; card.appendChild(ts); const dot = document.createElement('div'); dot.className = 'learn-dot'; dot.title = 'Отметить'; dot.setAttribute('role', 'checkbox'); dot.setAttribute('aria-checked', learnedSet.has(syllable)); card.appendChild(dot); if (learnedSet.has(syllable)) card.classList.add('learned'); dot.addEventListener('click', e => { e.stopPropagation(); toggleLearned(syllable, card); }); card.addEventListener('click', () => handleSyllableClick(syllable, card)); card.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); handleSyllableClick(syllable, card); } }); grid.appendChild(card); }); refreshProgressData(); }
+function renderGrid() { grid.innerHTML = ''; const items = currentMode === 'random' ? randomItems : syllables; const frag = document.createDocumentFragment(); items.forEach(syllable => { const card = document.createElement('div'); card.className = 'syllable-card'; card.dataset.syllable = syllable; card.setAttribute('role', 'button'); card.setAttribute('tabindex', '0'); const ts = document.createElement('span'); ts.className = 'syllable-text'; ts.textContent = syllable; ts.style.pointerEvents = 'none'; card.appendChild(ts); const dot = document.createElement('div'); dot.className = 'learn-dot'; dot.title = 'Отметить'; dot.setAttribute('role', 'checkbox'); dot.setAttribute('aria-checked', learnedSet.has(syllable)); card.appendChild(dot); if (learnedSet.has(syllable)) card.classList.add('learned'); dot.addEventListener('click', e => { e.stopPropagation(); toggleLearned(syllable, card); }); card.addEventListener('click', () => handleSyllableClick(syllable, card)); card.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); handleSyllableClick(syllable, card); } }); frag.appendChild(card); }); grid.appendChild(frag); refreshProgressData(); }
 function toggleLearned(s, c) { if (learnedSet.has(s)) learnedSet.delete(s); else learnedSet.add(s); saveLearnedSet(learnedSet); c.classList.toggle('learned', learnedSet.has(s)); flashProgress(); }
 function playAudio(s, vol) { if (currentAudio) { currentAudio.pause(); currentAudio.src = ''; } const a = new Audio('audio/' + s + '.mp3'); a.volume = (typeof vol === 'number') ? vol : 1; currentAudio = a; a.addEventListener('ended', () => { currentAudio = null; }); a.play().catch(() => {}); }
 function handleSyllableClick(s, c) { c.classList.add('playing'); setTimeout(() => c.classList.remove('playing'), 500); playAudio(s); }
@@ -3508,14 +3509,16 @@ function renderDictationKeyboard() {
   dictationKeyboard.classList.add('layout-' + dictationLayout);
   dictationKeyboard.innerHTML = '';
   const layout = dictationLayout === 'alpha' ? ALPHA_LAYOUT : QWERTY_LAYOUT;
+  const frag = document.createDocumentFragment();
   layout.forEach(letter => {
     const key = document.createElement('button');
     key.type = 'button';
     key.className = 'dictation-key';
     key.textContent = letter;
     key.addEventListener('click', () => pressDictationKey(letter));
-    dictationKeyboard.appendChild(key);
+    frag.appendChild(key);
   });
+  dictationKeyboard.appendChild(frag);
 }
 function pressDictationKey(letter) {
   if (dictationLocked) return;
@@ -3606,9 +3609,9 @@ const TL_OTHERS = [{ year: 1825, name: 'Восстание<br>декабрист
 function plural(n, f) { const h = n % 100, t = n % 10; if (h >= 11 && h <= 19) return f[2]; if (t === 1) return f[0]; if (t >= 2 && t <= 4) return f[1]; return f[2]; }
 function buildTimelineHTML(b, d) { const bY = Math.max(b, TL_START), dY = Math.min(d, TL_END), l = tlPos(bY), w = tlPos(dY) - l; let h = '<div class="htl-panel"><div class="htl-head"><div class="htl-head-cell"><div class="htl-head-label">ХРОНОЛОГИЯ ИСТОРИИ</div></div><div class="htl-head-cell"></div></div><div class="htl-body"><div class="htl">'; for (let y = 1700; y <= 2000; y += 10) { if (y % 100 === 0 || y % 50 === 0) continue; h += `<div class="htl-dtick" style="left:${tlPos(y)}%"></div>`; } TL_HALVES.forEach(y => { h += `<div class="htl-htick" style="left:${tlPos(y)}%"></div>`; }); h += '<div class="htl-axis"></div>'; TL_CENTURIES.forEach(y => { h += `<div class="htl-ctick" style="left:${tlPos(y)}%"></div>`; }); h += `<div class="htl-life" style="left:${l}%;width:${w}%"></div>`; TL_WARS.forEach(e => { h += `<div class="htl-war" style="left:${tlPos(e.year)}%"><div class="htl-war-label"><div class="htl-war-year">${e.year}</div><div class="htl-war-name">${e.name}</div></div><div class="htl-war-tick"></div></div>`; }); TL_OTHERS.forEach(e => { h += `<div class="htl-other" style="left:${tlPos(e.year)}%"><div class="htl-other-tick"></div><div class="htl-other-label"><div class="htl-other-year">${e.year}</div><div class="htl-other-name">${e.name}</div></div></div>`; }); TL_CENTURIES.forEach(y => { h += `<div class="htl-cnum" style="left:${tlPos(y)}%">${y}</div>`; }); h += '</div></div></div>'; return h; }
 function encodePath(p) { return p.split('/').map(s => encodeURIComponent(s)).join('/'); }
-function renderHeroesTimeline() { if (!heroesTimeline) return; const centuries = [{ name: "XVIII век", filter: h => h.overrideCentury === 18 || (!h.overrideCentury && h.deathYear < 1801) }, { name: "XIX век", filter: h => h.overrideCentury === 19 || (!h.overrideCentury && h.deathYear >= 1801 && h.deathYear <= 1921) }, { name: "XX век", filter: h => h.overrideCentury === 20 || (!h.overrideCentury && h.deathYear > 1921) }]; let html = ''; centuries.forEach(c => { const heroes = heroesData.filter(c.filter).sort((a, b) => a.deathYear - b.deathYear); if (heroes.length === 0) return; html += `<div class="century-header"><span class="century-title">${c.name}</span></div><div class="heroes-grid">`; let ss = false; heroes.forEach(hero => { if (!ss && hero.name === "Ленин") { html += `</div><div class="soviet-band"><span>★</span> Советский период <span>★</span></div><div class="heroes-grid">`; ss = true; } const ip = encodePath('Great Rus/' + hero.images[0]); const age = hero.deathYear - hero.birthYear; const ij = JSON.stringify(hero.images.map(i => encodePath('Great Rus/' + i))); html += `<div class="hero-item" data-name="${hero.name}" data-birth="${hero.birthYear}" data-death="${hero.deathYear}" data-audio="${encodePath('Great Rus/' + hero.audio)}" data-images='${ij}'><div class="hero-photo"><img src="${ip}" alt="${hero.name}" loading="lazy"></div><div class="hero-info"><div class="hero-name">${hero.name}</div><div class="hero-years">${hero.birthYear}—${hero.deathYear} <span class="hero-age">${age}</span></div></div></div>`; }); html += `</div>`; }); heroesTimeline.innerHTML = html; heroesTimeline.querySelectorAll('.hero-item').forEach(item => { item.addEventListener('click', function () { openHeroModal(this.dataset.name, JSON.parse(this.dataset.images), this.dataset.audio, parseInt(this.dataset.birth, 10), parseInt(this.dataset.death, 10)); }); }); }
+function renderHeroesTimeline() { if (!heroesTimeline) return; const centuries = [{ name: "XVIII век", filter: h => h.overrideCentury === 18 || (!h.overrideCentury && h.deathYear < 1801) }, { name: "XIX век", filter: h => h.overrideCentury === 19 || (!h.overrideCentury && h.deathYear >= 1801 && h.deathYear <= 1921) }, { name: "XX век", filter: h => h.overrideCentury === 20 || (!h.overrideCentury && h.deathYear > 1921) }]; let html = ''; centuries.forEach(c => { const heroes = heroesData.filter(c.filter).sort((a, b) => a.deathYear - b.deathYear); if (heroes.length === 0) return; html += `<div class="century-header"><span class="century-title">${c.name}</span></div><div class="heroes-grid">`; let ss = false; heroes.forEach(hero => { if (!ss && hero.name === "Ленин") { html += `</div><div class="soviet-band"><span>★</span> Советский период <span>★</span></div><div class="heroes-grid">`; ss = true; } const ip = encodePath('Great Rus/' + hero.images[0]); const age = hero.deathYear - hero.birthYear; const ij = JSON.stringify(hero.images.map(i => encodePath('Great Rus/' + i))); html += `<div class="hero-item" data-name="${hero.name}" data-birth="${hero.birthYear}" data-death="${hero.deathYear}" data-audio="${encodePath('Great Rus/' + hero.audio)}" data-images='${ij}'><div class="hero-photo"><img src="${ip}" alt="${hero.name}" loading="lazy" decoding="async"></div><div class="hero-info"><div class="hero-name">${hero.name}</div><div class="hero-years">${hero.birthYear}—${hero.deathYear} <span class="hero-age">${age}</span></div></div></div>`; }); html += `</div>`; }); heroesTimeline.innerHTML = html; heroesTimeline.querySelectorAll('.hero-item').forEach(item => { item.addEventListener('click', function () { openHeroModal(this.dataset.name, JSON.parse(this.dataset.images), this.dataset.audio, parseInt(this.dataset.birth, 10), parseInt(this.dataset.death, 10)); }); }); }
 let heroModal = null, heroAudio = new Audio(), currentImageIndex = 0, currentImages = [];
-function openHeroModal(name, images, audioSrc, birthYear, deathYear) { if (heroModal) heroModal.remove(); currentImages = images; currentImageIndex = 0; const nH = images.length > 1 ? `<button class="hero-nav prev" type="button" aria-label="Предыдущий">‹</button><button class="hero-nav next" type="button" aria-label="Следующий">›</button>` : ''; const ini = name.split(/\s+/).map(w => w.charAt(0)).join('').slice(0, 2).toUpperCase(); heroModal = document.createElement('div'); heroModal.className = 'hero-modal'; heroModal.innerHTML = `<button class="hero-modal-repeat" type="button" aria-label="Повторить звук">♪</button><button class="hero-modal-close" type="button" aria-label="Закрыть">×</button><div class="hero-modal-portrait-wrap">${nH}<img class="hero-modal-portrait" src="${images[0]}" alt="${name}"></div><div class="hero-modal-info"><h3>${name}</h3><div class="hero-modal-years">${birthYear} — ${deathYear}</div></div><div class="hero-modal-timeline">${buildTimelineHTML(birthYear, deathYear)}</div>`; const imgEl = heroModal.querySelector('.hero-modal-portrait'); imgEl.addEventListener('error', () => { const p = document.createElement('div'); p.className = 'hero-portrait-placeholder'; p.textContent = ini; imgEl.replaceWith(p); }); document.body.appendChild(heroModal); playHeroAudio(audioSrc); heroModal.querySelector('.hero-modal-close').addEventListener('click', () => { heroModal.remove(); heroAudio.pause(); heroAudio.currentTime = 0; }); heroModal.querySelector('.hero-modal-repeat').addEventListener('click', () => playHeroAudio(audioSrc)); const pB = heroModal.querySelector('.hero-nav.prev'), nB = heroModal.querySelector('.hero-nav.next'); if (pB) pB.addEventListener('click', () => { currentImageIndex = (currentImageIndex - 1 + currentImages.length) % currentImages.length; const im = heroModal.querySelector('.hero-modal-portrait'); if (im) im.src = currentImages[currentImageIndex]; }); if (nB) nB.addEventListener('click', () => { currentImageIndex = (currentImageIndex + 1) % currentImages.length; const im = heroModal.querySelector('.hero-modal-portrait'); if (im) im.src = currentImages[currentImageIndex]; }); }
+function openHeroModal(name, images, audioSrc, birthYear, deathYear) { if (heroModal) heroModal.remove(); currentImages = images; currentImageIndex = 0; const nH = images.length > 1 ? `<button class="hero-nav prev" type="button" aria-label="Предыдущий">‹</button><button class="hero-nav next" type="button" aria-label="Следующий">›</button>` : ''; const ini = name.split(/\s+/).map(w => w.charAt(0)).join('').slice(0, 2).toUpperCase(); heroModal = document.createElement('div'); heroModal.className = 'hero-modal'; heroModal.innerHTML = `<button class="hero-modal-repeat" type="button" aria-label="Повторить звук">♪</button><button class="hero-modal-close" type="button" aria-label="Закрыть">×</button><div class="hero-modal-portrait-wrap">${nH}<img class="hero-modal-portrait" src="${images[0]}" alt="${name}" decoding="async"></div><div class="hero-modal-info"><h3>${name}</h3><div class="hero-modal-years">${birthYear} — ${deathYear}</div></div><div class="hero-modal-timeline">${buildTimelineHTML(birthYear, deathYear)}</div>`; const imgEl = heroModal.querySelector('.hero-modal-portrait'); imgEl.addEventListener('error', () => { const p = document.createElement('div'); p.className = 'hero-portrait-placeholder'; p.textContent = ini; imgEl.replaceWith(p); }); document.body.appendChild(heroModal); playHeroAudio(audioSrc); heroModal.querySelector('.hero-modal-close').addEventListener('click', () => { heroModal.remove(); heroAudio.pause(); heroAudio.currentTime = 0; }); heroModal.querySelector('.hero-modal-repeat').addEventListener('click', () => playHeroAudio(audioSrc)); const pB = heroModal.querySelector('.hero-nav.prev'), nB = heroModal.querySelector('.hero-nav.next'); if (pB) pB.addEventListener('click', () => { currentImageIndex = (currentImageIndex - 1 + currentImages.length) % currentImages.length; const im = heroModal.querySelector('.hero-modal-portrait'); if (im) im.src = currentImages[currentImageIndex]; }); if (nB) nB.addEventListener('click', () => { currentImageIndex = (currentImageIndex + 1) % currentImages.length; const im = heroModal.querySelector('.hero-modal-portrait'); if (im) im.src = currentImages[currentImageIndex]; }); }
 function playHeroAudio(s) { heroAudio.src = s; heroAudio.play().catch(e => console.log('Ошибка воспроизведения', e)); }
 renderHeroesTimeline(); renderGrid(); updateMobileNav(false);
 })();
@@ -4166,14 +4169,12 @@ render(); renderSecondHand(); setView('watch');
   function renderMediaList(listEl, items, hashPrefix) {
     if (!listEl) return;
     listEl.innerHTML = '';
+    const frag = document.createDocumentFragment();
     items.forEach((v, i) => {
       const card = document.createElement('a');
       card.className = 'media-card';
       card.href = '#' + hashPrefix + '/' + v.id;
       card.dataset.videoId = v.id;
-      card.style.opacity = '0';
-      card.style.transform = 'translateY(14px)';
-      card.style.transition = `opacity .55s ease ${i * 50}ms, transform .7s cubic-bezier(.16,1,.3,1) ${i * 50}ms, padding .5s cubic-bezier(.16,1,.3,1)`;
       const num = document.createElement('span');
       num.className = 'media-card-num';
       num.textContent = pad2(i + 1);
@@ -4190,14 +4191,9 @@ render(); renderSecondHand(); setView('watch');
       card.appendChild(title);
       card.appendChild(src);
       card.appendChild(arrow);
-      listEl.appendChild(card);
-      requestAnimationFrame(() => {
-        requestAnimationFrame(() => {
-          card.style.opacity = '1';
-          card.style.transform = 'translateY(0)';
-        });
-      });
+      frag.appendChild(card);
     });
+    listEl.appendChild(frag);
   }
   const modal  = document.getElementById('mediaPlayerModal');
   const frame  = document.getElementById('mediaPlayerFrame');
@@ -4259,12 +4255,14 @@ render(); renderSecondHand(); setView('watch');
 <script>
 /* ============================================================ */
 /* ============== ЖИВОПИСЬ — картины из art/ ================== */
+/*   Мобильная версия — scroll-snap карусель (нативный скролл) */
 /* ============================================================ */
 (function () {
   const INDEX_URL = 'art/index.json';
   const IMG_DIR   = 'art/';
   const WHEEL_THRESHOLD = 30;
   const WHEEL_COOLDOWN  = 420;
+  const MOBILE_MQ = window.matchMedia('(max-width: 640px)');
 
   const canvas     = document.getElementById('artCanvas');
   const catcher    = document.getElementById('artScrollCatcher');
@@ -4277,12 +4275,14 @@ render(); renderSecondHand(); setView('watch');
   if (!canvas || !catcher) return;
 
   let items = [];
-let order = 'random';
+  let order = 'random';
   let current = 0;
   let currentImgEl = null;
   let imgCache = new Map();
   let lastWheelTime = 0;
   let touchStartY = null;
+  let scroller = null;      /* мобильная карусель */
+  let scrollTicking = false;
 
   async function loadIndex() {
     const res = await fetch(INDEX_URL, { cache: 'no-cache' });
@@ -4299,6 +4299,7 @@ let order = 'random';
   }
   function showState(text, isError) {
     clearImage();
+    clearScroller();
     const div = document.createElement('div');
     div.className = 'art-state' + (isError ? ' is-error' : '');
     div.textContent = text;
@@ -4306,6 +4307,8 @@ let order = 'random';
   }
   function clearState() { canvas.querySelectorAll('.art-state').forEach(el => el.remove()); }
   function clearImage() { if (currentImgEl) { currentImgEl.remove(); currentImgEl = null; } }
+  function clearScroller() { if (scroller) { scroller.remove(); scroller = null; } }
+
   function buildOrder() {
     if (order === 'standard') items.sort((a, b) => Number(a) - Number(b));
     else {
@@ -4330,6 +4333,13 @@ let order = 'random';
     prevBtn.disabled = current <= 0;
     nextBtn.disabled = current >= items.length - 1;
   }
+  function updateProgressAndInfo() {
+    info.textContent = (current + 1) + ' / ' + items.length;
+    progress.style.width = ((current + 1) / items.length * 100) + '%';
+    updateNav();
+  }
+
+  /* ============ ДЕСКТОП (как было) ============ */
   function showImage(idx, direction) {
     if (idx < 0 || idx >= items.length) return;
     const id = items[idx];
@@ -4366,16 +4376,82 @@ let order = 'random';
         }
       });
     });
-    info.textContent = (idx + 1) + ' / ' + items.length;
-    progress.style.width = ((idx + 1) / items.length * 100) + '%';
+    updateProgressAndInfo();
     preloadAround(idx);
-    updateNav();
   }
-  function step(dir) {
+
+  /* ============ МОБИЛЬНАЯ КАРУСЕЛЬ ============ */
+  function buildMobileCarousel() {
+    clearState();
+    clearImage();
+    clearScroller();
+    scroller = document.createElement('div');
+    scroller.className = 'art-scroller';
+    const frag = document.createDocumentFragment();
+    items.forEach((id, idx) => {
+      const slide = document.createElement('div');
+      slide.className = 'art-slide';
+      slide.dataset.index = idx;
+      const img = document.createElement('img');
+      img.className = 'art-slide-img';
+      img.alt = 'Картина ' + id;
+      img.draggable = false;
+      img.decoding = 'async';
+      img.loading = (idx <= 2) ? 'eager' : 'lazy';
+      img.src = IMG_DIR + encodeURIComponent(id) + '.jpg';
+      img.addEventListener('error', () => {
+        slide.innerHTML = '';
+        const state = document.createElement('div');
+        state.className = 'art-state is-error';
+        state.textContent = 'Не удалось загрузить';
+        slide.appendChild(state);
+      }, { once: true });
+      slide.appendChild(img);
+      frag.appendChild(slide);
+    });
+    scroller.appendChild(frag);
+    canvas.appendChild(scroller);
+
+    scroller.addEventListener('scroll', () => {
+      if (scrollTicking) return;
+      scrollTicking = true;
+      requestAnimationFrame(() => {
+        scrollTicking = false;
+        if (!scroller) return;
+        const w = scroller.clientWidth || 1;
+        const idx = Math.round(scroller.scrollLeft / w);
+        if (idx !== current && idx >= 0 && idx < items.length) {
+          current = idx;
+          updateProgressAndInfo();
+        }
+      });
+    }, { passive: true });
+
+    /* Ставим на текущую позицию без анимации. */
+    requestAnimationFrame(() => {
+      if (!scroller) return;
+      scroller.scrollLeft = current * scroller.clientWidth;
+      updateProgressAndInfo();
+    });
+  }
+
+  function mobileStep(dir) {
+    if (!scroller) return;
     const next = current + dir;
     if (next < 0 || next >= items.length) return;
-    showImage(next, dir > 0 ? 'down' : 'up');
+    scroller.scrollTo({ left: next * scroller.clientWidth, behavior: 'smooth' });
   }
+
+  /* ============ Общая логика ============ */
+  function step(dir) {
+    if (MOBILE_MQ.matches) mobileStep(dir);
+    else {
+      const next = current + dir;
+      if (next < 0 || next >= items.length) return;
+      showImage(next, dir > 0 ? 'down' : 'up');
+    }
+  }
+
   function openArt() {
     if (canvas.classList.contains('show')) return;
     canvas.classList.add('show');
@@ -4389,10 +4465,19 @@ let order = 'random';
         clearState();
         buildOrder();
         current = 0;
-        showImage(0, null);
+        if (MOBILE_MQ.matches) buildMobileCarousel();
+        else showImage(0, null);
       }).catch(err => showState(err.message || 'Ошибка загрузки', true));
     } else {
-      showImage(current, null);
+      if (MOBILE_MQ.matches) {
+        if (!scroller) buildMobileCarousel();
+        else {
+          scroller.scrollLeft = current * scroller.clientWidth;
+          updateProgressAndInfo();
+        }
+      } else {
+        showImage(current, null);
+      }
     }
   }
   function closeArt() {
@@ -4414,6 +4499,7 @@ let order = 'random';
       if (b.dataset.section === 'syllables') b.click();
     });
   });
+
   controls.querySelectorAll('.art-order-btn').forEach(btn => {
     btn.addEventListener('click', () => {
       const newOrder = btn.dataset.order;
@@ -4422,14 +4508,20 @@ let order = 'random';
       controls.querySelectorAll('.art-order-btn').forEach(b => b.classList.toggle('active', b === btn));
       buildOrder();
       current = 0;
-      showImage(0, null);
+      if (MOBILE_MQ.matches) {
+        buildMobileCarousel();
+      } else {
+        showImage(0, null);
+      }
     });
   });
 
   if (prevBtn) prevBtn.addEventListener('click', e => { e.preventDefault(); step(-1); });
   if (nextBtn) nextBtn.addEventListener('click', e => { e.preventDefault(); step(1); });
 
+  /* --- десктопные жесты/колесо --- */
   function onWheel(e) {
+    if (MOBILE_MQ.matches) return;
     if (!canvas.classList.contains('show')) return;
     e.preventDefault();
     const now = Date.now();
@@ -4449,11 +4541,13 @@ let order = 'random';
   });
 
   catcher.addEventListener('touchstart', e => {
+    if (MOBILE_MQ.matches) return;
     if (!canvas.classList.contains('show')) return;
     if (e.touches.length !== 1) return;
     touchStartY = e.touches[0].clientY;
   }, { passive: true });
   catcher.addEventListener('touchend', e => {
+    if (MOBILE_MQ.matches) return;
     if (!canvas.classList.contains('show')) return;
     if (touchStartY === null) return;
     const endY = (e.changedTouches && e.changedTouches[0]) ? e.changedTouches[0].clientY : null;
@@ -4465,10 +4559,18 @@ let order = 'random';
     else if (dy < -THRESH) step(-1);
   }, { passive: true });
   catcher.addEventListener('touchmove', e => {
+    if (MOBILE_MQ.matches) return;
     if (canvas.classList.contains('show')) {
       if (e.cancelable) e.preventDefault();
     }
   }, { passive: false });
+
+  /* Реакция на смену размера экрана */
+  MOBILE_MQ.addEventListener('change', () => {
+    if (!canvas.classList.contains('show')) return;
+    if (MOBILE_MQ.matches) buildMobileCarousel();
+    else showImage(current, null);
+  });
 
   window.addEventListener('hashchange', () => {
     if (!window.location.hash.startsWith('#art')) closeArt();
@@ -4477,7 +4579,7 @@ let order = 'random';
 </script>
 <script>
 /* ============================================================ */
-/* ============== РОДИТЕЛЯМ — статьи с GitHub ================= */
+/* ============== РОДИТЕЛЯМ — статьи ========================= */
 /* ============================================================ */
 (function () {
   const INDEX_URL      = 'articles/index.json';
@@ -4608,7 +4710,8 @@ let order = 'random';
   function renderList(items) {
     list.innerHTML = '';
     if (!items.length) { renderEmpty(); return; }
-    items.forEach((item, idx) => {
+    const frag = document.createDocumentFragment();
+    items.forEach((item) => {
       const slug  = String(item.slug || '').trim();
       const title = String(item.title || slug || 'Без названия');
       if (!slug) return;
@@ -4616,9 +4719,6 @@ let order = 'random';
       card.className = 'parents-card';
       card.href = HASH_PREFIX + encodeURIComponent(slug);
       card.dataset.slug = slug;
-      card.style.opacity = '0';
-      card.style.transform = 'translateY(14px)';
-      card.style.transition = `opacity .55s ease ${idx * 55}ms, transform .7s cubic-bezier(.16,1,.3,1) ${idx * 55}ms, padding .5s cubic-bezier(.16,1,.3,1)`;
       const t = document.createElement('div');
       t.className = 'parents-card-title';
       t.textContent = title;
@@ -4627,17 +4727,12 @@ let order = 'random';
       a.textContent = '→';
       card.appendChild(t);
       card.appendChild(a);
-      list.appendChild(card);
-      requestAnimationFrame(() => {
-        requestAnimationFrame(() => {
-          card.style.opacity = '1';
-          card.style.transform = 'translateY(0)';
-        });
-      });
+      frag.appendChild(card);
       card.addEventListener('click', e => {
         if (window.location.hash === card.getAttribute('href')) { e.preventDefault(); openBySlug(slug); }
       });
     });
+    list.appendChild(frag);
   }
   async function openBySlug(slug) {
     if (!slug) return;
@@ -4665,6 +4760,9 @@ let order = 'random';
     readerModal.setAttribute('aria-hidden', 'false');
     void readerModal.offsetWidth;
     readerModal.classList.add('show');
+    /* Сброс скролла в начало */
+    const surf = readerModal.querySelector('.parents-reader-surface');
+    if (surf) surf.scrollTop = 0;
   }
   function closeReader() {
     if (!readerModal.classList.contains('show')) return;
@@ -4690,8 +4788,6 @@ let order = 'random';
   }
   window.addEventListener('hashchange', handleHash);
   if (readerClose) readerClose.addEventListener('click', e => { e.preventDefault(); closeArticle(); });
-  /* Клик по «пустому» месту сбоку/снизу/сверху листа — закрывает статью.
-     Сам лист — потомок .parents-reader-surface, поэтому клики по нему сюда не попадают. */
   readerModal.addEventListener('click', e => {
     if (e.target.classList.contains('parents-reader-surface')) closeArticle();
   });
