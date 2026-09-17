@@ -368,10 +368,7 @@ white-space: nowrap;
 .section-switch-btn:last-child { border-right: none; }
 .section-switch-btn.active { background: var(--fg); color: var(--bg); }
 .section-switch-btn:hover:not(.active) { background: var(--bg-2); }
-
-/* ===================== MOBILE NAV (снизу, только иконки) ===================== */
 .mobile-nav { display: none; }
-
 .section-subtitles {
 display: flex;
 margin: 0;
@@ -788,12 +785,9 @@ body[data-skin="minimal"] .controls button svg { width: 15px; height: 15px; }
 .hero-years { font-size: 0.58rem; }
 .clock-frame { width: min(480px, 96vw); }
 }
-@media (max-width: 380px) {
-}
+@media (max-width: 380px) {}
 
-/* ================================================================= */
-/* ==================== MEDIA SECTIONS (POETRY + CARTOONS) ========= */
-/* ================================================================= */
+/* ============ MEDIA SECTIONS (POETRY + CARTOONS) ========= */
 .media-wrapper{
   max-width:960px;
   margin:0 auto;
@@ -915,9 +909,7 @@ body[data-skin="minimal"] .media-card-arrow{
   font-weight:300;
 }
 
-/* ================================================================= */
-/* ==================== MEDIA PLAYER MODAL ========================= */
-/* ================================================================= */
+/* ============ MEDIA PLAYER MODAL ========= */
 .media-player-overlay{
   position:fixed;
   inset:0;
@@ -994,9 +986,7 @@ body[data-skin="minimal"] .media-card-arrow{
 .media-player-close:hover{background:rgba(255,255,255,.28)}
 .media-player-close:active{transform:scale(.94) rotate(0)}
 
-/* ================================================================= */
-/* ==================== ART (ЖИВОПИСЬ) SECTION ===================== */
-/* ================================================================= */
+/* ============ ART (ЖИВОПИСЬ) ========= */
 .art-section{
   position:fixed;
   inset:0;
@@ -1364,10 +1354,6 @@ body[data-skin="minimal"] .art-order-btn:hover:not(.active){
   z-index:1;
   cursor:default;
 }
-
-/* ================================================================= */
-/* ============ MOBILE ART SCROLLER (scroll-snap carousel) ========= */
-/* ================================================================= */
 .art-scroller { display: none; }
 
 @media (max-width:640px){
@@ -1414,24 +1400,12 @@ body[data-skin="minimal"] .art-order-btn:hover:not(.active){
     font-size:.58rem;
     letter-spacing:.16em;
   }
-  .art-exit{
-    width:36px;
-    height:36px;
-    font-size:1.1rem;
-    background: var(--bg);
-    border: 1px solid var(--rule-soft);
-  }
-  body[data-skin="minimal"] .art-exit {
-    background: var(--bg-2);
-    border: 1px solid var(--m-line);
-  }
-  /* на мобиле навигация стрелками не нужна — только свайп */
+  .art-exit{ display: none !important; }
   .art-nav { display: none !important; }
   .art-scroll-catcher { display: none !important; }
   .art-section::before { display: none !important; }
   .art-image-wrap { display: none !important; }
 
-  /* Полноэкранный scroll-snap карусель */
   .art-scroller {
     display: flex;
     position: absolute;
@@ -1440,13 +1414,14 @@ body[data-skin="minimal"] .art-order-btn:hover:not(.active){
     height: 100%;
     overflow-x: auto;
     overflow-y: hidden;
-    scroll-snap-type: x mandatory;
+    scroll-snap-type: x proximity;
     -webkit-overflow-scrolling: touch;
     scrollbar-width: none;
     -ms-overflow-style: none;
     z-index: 3;
     overscroll-behavior-x: contain;
     touch-action: pan-x;
+    contain: layout paint style;
   }
   .art-scroller::-webkit-scrollbar { display: none; width: 0; height: 0; }
 
@@ -1461,6 +1436,9 @@ body[data-skin="minimal"] .art-order-btn:hover:not(.active){
     justify-content: center;
     padding: 50px 6px 62px;
     box-sizing: border-box;
+    contain: layout paint style;
+    content-visibility: auto;
+    contain-intrinsic-size: 100vw 100vh;
   }
   .art-slide-img {
     max-width: 100%;
@@ -1473,6 +1451,7 @@ body[data-skin="minimal"] .art-order-btn:hover:not(.active){
     -webkit-user-drag: none;
     -webkit-tap-highlight-color: transparent;
     background: #000;
+    contain: content;
   }
   .art-slide .art-state {
     position: static;
@@ -1493,13 +1472,10 @@ body[data-skin="minimal"] .art-order-btn:hover:not(.active){
   .art-top{padding:8px 10px;}
   .art-bottom{padding:8px 12px;}
   .art-info{font-size:.5rem;padding:5px 10px;letter-spacing:.16em;}
-  .art-exit{width:38px;height:38px;font-size:1.1rem;}
   .art-order-btn{padding:7px 14px;font-size:.54rem;letter-spacing:.12em;}
 }
 
-/* ================================================================= */
-/* ==================== DICTATION OVERLAY ========================== */
-/* ================================================================= */
+/* ============ DICTATION OVERLAY ========= */
 .dictation-overlay{
   position:fixed;
   inset:0;
@@ -2043,9 +2019,7 @@ body[data-skin="minimal"] .dictation-key:hover:not(:disabled){
   .media-player-close{top:12px;right:12px;width:42px;height:42px;font-size:1.4rem}
 }
 
-/* ================================================================= */
-/* ==================== PARENTS SECTION ============================ */
-/* ================================================================= */
+/* ============ PARENTS SECTION ========= */
 .parents-wrapper{
   max-width:780px;
   margin:0 auto;
@@ -2426,13 +2400,9 @@ body[data-skin="minimal"][data-mintone="dark"] .parents-reader-close:hover{
   background:#fff;color:#000;
 }
 
-/* ===================== PARENTS READER — MOBILE ===================== */
 @media (max-width:640px){
   .parents-wrapper{padding:24px 18px 90px}
-
-  .parents-reader-surface{
-    padding:14px 26px 60px;
-  }
+  .parents-reader-surface{ padding:14px 26px 60px; }
   .parents-reader-sheet{
     padding:44px 20px 32px;
     border-radius:16px;
@@ -2456,20 +2426,14 @@ body[data-skin="minimal"][data-mintone="dark"] .parents-reader-close:hover{
     filter: none;
     transition: transform .4s cubic-bezier(.16,1,.3,1), opacity .3s ease;
   }
-
-  .parents-reader-close{
-    display: none !important;
-  }
-
+  .parents-reader-close{ display: none !important; }
   .parents-reader-title{
     font-size:1.35rem;
     line-height:1.2;
     margin-bottom:.55em;
     padding-bottom:.4em;
   }
-  body[data-skin="minimal"] .parents-reader-title{
-    font-size:1.3rem;
-  }
+  body[data-skin="minimal"] .parents-reader-title{ font-size:1.3rem; }
   .parents-reader-content{
     font-size:1rem;
     line-height:1.65;
@@ -2695,20 +2659,13 @@ body[data-skin="minimal"] .stamp-opt:hover{background:var(--bg-2);border-color:t
 body[data-skin="minimal"] .stamp-opt.active{background:var(--bg-2);color:var(--accent);border-color:transparent}
 body[data-skin="minimal"] .stamp-opt-swatch{border-radius:50%;border-width:1px}
 
-/* ================================================================= */
-/* ====== MOBILE PERF: без анимаций, без лишних теней ============== */
-/* ================================================================= */
+/* ============ MOBILE PERF ============ */
 @media (max-width: 640px) {
-
-  /* -------- Убираем красный/цветной фон у системных элементов ---- */
   html, body { background-color: var(--bg); }
   * { -webkit-tap-highlight-color: transparent; }
   ::selection { background: var(--bg-3); color: var(--fg); }
-
-  /* 1. Фоновая сетка — только на десктопе. */
   body::before { display: none; }
 
-  /* 2. Никаких анимаций появления секций. */
   .tab-section.active { animation: none !important; }
   .hero-modal        { animation: none !important; }
   .exam-overlay.show { animation: none !important; }
@@ -2716,11 +2673,9 @@ body[data-skin="minimal"] .stamp-opt-swatch{border-radius:50%;border-width:1px}
   .celebration-overlay.show { animation: none !important; }
   .toast { animation: none !important; opacity: 1; }
 
-  /* 3. Секции — contain для изоляции перерисовок. */
   .tab-section { content-visibility: auto; contain-intrinsic-size: 900px; contain: layout style; }
   .tab-section.active { content-visibility: visible; }
 
-  /* 4. Убираем тяжёлые тени на больших слоях. */
   .clock-frame,
   .hero-item,
   .hero-modal-portrait,
@@ -2736,7 +2691,6 @@ body[data-skin="minimal"] .stamp-opt-swatch{border-radius:50%;border-width:1px}
     box-shadow: none !important;
   }
 
-  /* 5. Упрощаем hover-эффекты с transform (они не нужны на тач-устройствах). */
   .syllable-card,
   .hero-item,
   .media-card,
@@ -2748,14 +2702,11 @@ body[data-skin="minimal"] .stamp-opt-swatch{border-radius:50%;border-width:1px}
   .hero-item:hover,
   .exam-option:hover:not(:disabled) { transform: none !important; box-shadow: none !important; }
 
-  /* 6. Карточки слогов — простая подсветка вместо сложной анимации. */
   .syllable-card:not(.learned):active { background: var(--bg-2); }
   .syllable-card.playing { background: var(--accent); color: var(--accent-fg); }
 
-  /* 7. Hero modal: убираем тяжёлые фильтры и переходы. */
   .hero-photo img { transition: none !important; }
 
-  /* 8. Нижние панели: достаточный отступ контенту. */
   .grid-container   { padding-bottom: calc(80px + var(--mobilebar-h)); }
   .media-wrapper    { padding-bottom: calc(80px + var(--mobilebar-h)); }
   .parents-wrapper  { padding-bottom: calc(80px + var(--mobilebar-h)); }
@@ -2773,7 +2724,6 @@ body[data-skin="minimal"] .stamp-opt-swatch{border-radius:50%;border-width:1px}
     bottom: calc(14px + var(--mobilebar-h) + env(safe-area-inset-bottom, 0px));
   }
 
-  /* 9. media-player и parents-reader: быстрые переходы. */
   .media-player-overlay,
   .media-player-overlay.show,
   .media-player-stage,
@@ -2793,11 +2743,8 @@ body[data-skin="minimal"] .stamp-opt-swatch{border-radius:50%;border-width:1px}
   .parents-reader-sheet { transform: none !important; opacity: 1 !important; filter: none !important; }
 }
 
-/* ================================================================= */
-/* ==================== MOBILE NAV (НИЖНИЙ БАР) ==================== */
-/* ================================================================= */
+/* ============ MOBILE NAV ============ */
 @media (max-width: 640px) {
-  /* Бар со скроллом вбок, только иконки */
   .mobile-nav {
     display: flex;
     position: fixed;
@@ -3250,13 +3197,11 @@ body[data-skin="minimal"] .stamp-opt-swatch{border-radius:50%;border-width:1px}
   </div>
 </div>
 
-<!-- ================= ART SECTION (ЖИВОПИСЬ) ================= -->
 <div class="art-section" id="artCanvas" aria-hidden="true">
   <div class="art-progress"><div class="art-progress-fill" id="artProgressFill"></div></div>
   <div class="art-scroll-catcher" id="artScrollCatcher"></div>
   <div class="art-top">
     <div class="art-info" id="artInfo">1 / 594</div>
-    <button class="art-exit" id="artExit" type="button" aria-label="Выйти">×</button>
   </div>
   <button class="art-nav prev" id="artPrev" type="button" aria-label="Предыдущая картина">‹</button>
   <button class="art-nav next" id="artNext" type="button" aria-label="Следующая картина">›</button>
@@ -3293,7 +3238,6 @@ body[data-skin="minimal"] .stamp-opt-swatch{border-radius:50%;border-width:1px}
 <footer class="footer"><p>Вайбкодинг. Пишите отзывы в тележку @vnvax</p></footer>
 <div class="toast-container" id="toastContainer"></div>
 
-<!-- ================= НИЖНИЙ МОБИЛЬНЫЙ БАР (только иконки, свайп вбок) ================= -->
 <nav class="mobile-nav" id="mobileNav" aria-label="Разделы">
   <button class="mobile-nav-item active" data-section="syllables" type="button" title="Слоги" aria-label="Слоги">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
@@ -3366,7 +3310,7 @@ function updateMobileNav(centerActive) {
   });
   if (activeEl && centerActive) {
     try { activeEl.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' }); }
-    catch (e) { /* старые браузеры — просто без центрирования */ }
+    catch (e) {}
   }
 }
 if (mobileNav) {
@@ -3396,6 +3340,7 @@ function switchSection(s) {
   if (s !== 'syllables') progressContainer.classList.remove('show');
   if (s === 'art' && typeof window.artOpen === 'function') window.artOpen();
   else if (typeof window.artClose === 'function') window.artClose();
+  /* НЕ трогаем location.hash — иначе Safari показывает адресную строку */
   window.scrollTo({ top: 0, behavior: 'auto' });
 }
 sectionBtns.forEach(b => b.addEventListener('click', () => switchSection(b.dataset.section)));
@@ -4255,7 +4200,8 @@ render(); renderSecondHand(); setView('watch');
 <script>
 /* ============================================================ */
 /* ============== ЖИВОПИСЬ — картины из art/ ================== */
-/*   Мобильная версия — scroll-snap карусель (нативный скролл) */
+/*  Мобильная версия: scroll-snap карусель + свайп вверх/вниз  */
+/*  Десктоп: как было (плавная смена кадров)                    */
 /* ============================================================ */
 (function () {
   const INDEX_URL = 'art/index.json';
@@ -4281,8 +4227,11 @@ render(); renderSecondHand(); setView('watch');
   let imgCache = new Map();
   let lastWheelTime = 0;
   let touchStartY = null;
-  let scroller = null;      /* мобильная карусель */
+  let scroller = null;
   let scrollTicking = false;
+  /* вертикальный свайп для закрытия */
+  let closeSwipe = null;  /* {startX, startY, axis, active} */
+  let closing = false;
 
   async function loadIndex() {
     const res = await fetch(INDEX_URL, { cache: 'no-cache' });
@@ -4339,7 +4288,7 @@ render(); renderSecondHand(); setView('watch');
     updateNav();
   }
 
-  /* ============ ДЕСКТОП (как было) ============ */
+  /* ---------- ДЕСКТОП ---------- */
   function showImage(idx, direction) {
     if (idx < 0 || idx >= items.length) return;
     const id = items[idx];
@@ -4380,24 +4329,29 @@ render(); renderSecondHand(); setView('watch');
     preloadAround(idx);
   }
 
-  /* ============ МОБИЛЬНАЯ КАРУСЕЛЬ ============ */
+  /* ---------- МОБИЛЬНАЯ КАРУСЕЛЬ ---------- */
   function buildMobileCarousel() {
     clearState();
     clearImage();
     clearScroller();
     scroller = document.createElement('div');
     scroller.className = 'art-scroller';
+
     const frag = document.createDocumentFragment();
+    /* для быстрых краёв подгружаем первые/последние сразу */
+    const EAGER = 3;
     items.forEach((id, idx) => {
       const slide = document.createElement('div');
       slide.className = 'art-slide';
       slide.dataset.index = idx;
+
       const img = document.createElement('img');
       img.className = 'art-slide-img';
       img.alt = 'Картина ' + id;
       img.draggable = false;
       img.decoding = 'async';
-      img.loading = (idx <= 2) ? 'eager' : 'lazy';
+      /* content-visibility авто уже есть в CSS, но ещё и lazy */
+      img.loading = (idx < EAGER) ? 'eager' : 'lazy';
       img.src = IMG_DIR + encodeURIComponent(id) + '.jpg';
       img.addEventListener('error', () => {
         slide.innerHTML = '';
@@ -4427,12 +4381,67 @@ render(); renderSecondHand(); setView('watch');
       });
     }, { passive: true });
 
-    /* Ставим на текущую позицию без анимации. */
     requestAnimationFrame(() => {
       if (!scroller) return;
       scroller.scrollLeft = current * scroller.clientWidth;
       updateProgressAndInfo();
     });
+
+    /* --- вертикальный свайп для закрытия: только на мобиле --- */
+    closeSwipe = { startX: 0, startY: 0, lastX: 0, lastY: 0, axis: null, active: false, t0: 0 };
+    scroller.addEventListener('touchstart', e => {
+      if (closing) return;
+      if (e.touches.length !== 1) return;
+      const t = e.touches[0];
+      closeSwipe.startX = t.clientX;
+      closeSwipe.startY = t.clientY;
+      closeSwipe.lastX = t.clientX;
+      closeSwipe.lastY = t.clientY;
+      closeSwipe.axis = null;
+      closeSwipe.active = true;
+      closeSwipe.t0 = Date.now();
+    }, { passive: true });
+    scroller.addEventListener('touchmove', e => {
+      if (!closeSwipe.active || closing) return;
+      if (e.touches.length !== 1) { closeSwipe.active = false; return; }
+      const t = e.touches[0];
+      closeSwipe.lastX = t.clientX;
+      closeSwipe.lastY = t.clientY;
+      if (!closeSwipe.axis) {
+        const dx = Math.abs(closeSwipe.lastX - closeSwipe.startX);
+        const dy = Math.abs(closeSwipe.lastY - closeSwipe.startY);
+        if (dx < 6 && dy < 6) return;
+        /* если движение больше по вертикали — это «закрыть»,
+           если по горизонтали — листать карусель (не мешаем) */
+        closeSwipe.axis = dy > dx ? 'v' : 'h';
+        if (closeSwipe.axis === 'v') {
+          /* пока не мешаем браузеру: он уже получил touchmove.
+             На iOS/Android с touch-action: pan-x горизонтальные жесты
+             идут в скролл карусели; вертикальные мы перехватываем
+             через preventDefault ниже, чтобы прокрутка документа не шла. */
+        }
+      }
+      if (closeSwipe.axis === 'v') {
+        if (e.cancelable) e.preventDefault();
+      }
+    }, { passive: false });
+    const finishSwipe = (e) => {
+      if (!closeSwipe.active) return;
+      closeSwipe.active = false;
+      if (closing) return;
+      if (closeSwipe.axis !== 'v') return;
+      const dy = closeSwipe.lastY - closeSwipe.startY;
+      const dt = Date.now() - closeSwipe.t0;
+      const absdy = Math.abs(dy);
+      /* сработает при «быстром» флике (>=30px за <300мс) или при длинном (>=80px) */
+      const fast = dt < 300 && absdy >= 30;
+      const long = absdy >= 80;
+      if (fast || long) {
+        closeArt();
+      }
+    };
+    scroller.addEventListener('touchend', finishSwipe, { passive: true });
+    scroller.addEventListener('touchcancel', () => { closeSwipe.active = false; }, { passive: true });
   }
 
   function mobileStep(dir) {
@@ -4442,7 +4451,6 @@ render(); renderSecondHand(); setView('watch');
     scroller.scrollTo({ left: next * scroller.clientWidth, behavior: 'smooth' });
   }
 
-  /* ============ Общая логика ============ */
   function step(dir) {
     if (MOBILE_MQ.matches) mobileStep(dir);
     else {
@@ -4482,20 +4490,29 @@ render(); renderSecondHand(); setView('watch');
   }
   function closeArt() {
     if (!canvas.classList.contains('show')) return;
+    closing = true;
     canvas.classList.remove('show');
     canvas.setAttribute('aria-hidden', 'true');
     document.body.style.overflow = '';
+    /* если мы внутри мобильного раздела — вернёмся на «Слоги» */
+    if (MOBILE_MQ.matches) {
+      const mobileBtn = document.querySelector('.mobile-nav-item[data-section="syllables"]');
+      if (mobileBtn) mobileBtn.click();
+    }
+    setTimeout(() => { closing = false; }, 300);
   }
   window.artOpen  = openArt;
   window.artClose = closeArt;
 
-  exitBtn.addEventListener('click', e => {
+  /* кнопки ‹/› (только десктоп) */
+  if (prevBtn) prevBtn.addEventListener('click', e => { e.preventDefault(); step(-1); });
+  if (nextBtn) nextBtn.addEventListener('click', e => { e.preventDefault(); step(1); });
+
+  /* крестик (десктоп) */
+  if (exitBtn) exitBtn.addEventListener('click', e => {
     e.preventDefault();
     closeArt();
     document.querySelectorAll('.section-switch-btn').forEach(b => {
-      if (b.dataset.section === 'syllables') b.click();
-    });
-    document.querySelectorAll('.mobile-nav-item').forEach(b => {
       if (b.dataset.section === 'syllables') b.click();
     });
   });
@@ -4508,16 +4525,10 @@ render(); renderSecondHand(); setView('watch');
       controls.querySelectorAll('.art-order-btn').forEach(b => b.classList.toggle('active', b === btn));
       buildOrder();
       current = 0;
-      if (MOBILE_MQ.matches) {
-        buildMobileCarousel();
-      } else {
-        showImage(0, null);
-      }
+      if (MOBILE_MQ.matches) buildMobileCarousel();
+      else showImage(0, null);
     });
   });
-
-  if (prevBtn) prevBtn.addEventListener('click', e => { e.preventDefault(); step(-1); });
-  if (nextBtn) nextBtn.addEventListener('click', e => { e.preventDefault(); step(1); });
 
   /* --- десктопные жесты/колесо --- */
   function onWheel(e) {
@@ -4535,9 +4546,10 @@ render(); renderSecondHand(); setView('watch');
 
   document.addEventListener('keydown', e => {
     if (!canvas.classList.contains('show')) return;
+    if (MOBILE_MQ.matches && e.key === 'Escape') { e.preventDefault(); closeArt(); return; }
     if (e.key === 'ArrowDown' || e.key === 'PageDown' || e.key === 'ArrowRight') { e.preventDefault(); step(1); }
     else if (e.key === 'ArrowUp' || e.key === 'PageUp' || e.key === 'ArrowLeft') { e.preventDefault(); step(-1); }
-    else if (e.key === 'Escape') { e.preventDefault(); exitBtn.click(); }
+    else if (e.key === 'Escape') { e.preventDefault(); closeArt(); }
   });
 
   catcher.addEventListener('touchstart', e => {
@@ -4565,7 +4577,6 @@ render(); renderSecondHand(); setView('watch');
     }
   }, { passive: false });
 
-  /* Реакция на смену размера экрана */
   MOBILE_MQ.addEventListener('change', () => {
     if (!canvas.classList.contains('show')) return;
     if (MOBILE_MQ.matches) buildMobileCarousel();
@@ -4760,7 +4771,6 @@ render(); renderSecondHand(); setView('watch');
     readerModal.setAttribute('aria-hidden', 'false');
     void readerModal.offsetWidth;
     readerModal.classList.add('show');
-    /* Сброс скролла в начало */
     const surf = readerModal.querySelector('.parents-reader-surface');
     if (surf) surf.scrollTop = 0;
   }
