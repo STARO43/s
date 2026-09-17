@@ -769,102 +769,81 @@ body[data-skin="minimal"] .controls-sep::before { height: 14px; }
 .masthead-stamp { left: 50% !important; right: auto !important; top: auto !important; bottom: 20px !important; transform: translateX(-50%) translateY(8px); box-shadow: 6px 6px 0 var(--accent); max-width: calc(100vw - 24px); }
 .masthead-stamp.show { transform: translateX(-50%) translateY(0); }
 
-/* ===================== MOBILE NAV (styles) ===================== */
+/* ===================== MOBILE NAV (NEW) ===================== */
 .mobile-nav {
   display: flex;
-  align-items: stretch;
-  gap: 4px;
+  align-items: center;
+  gap: 6px;
   margin: 0 -14px;
   padding: 10px 14px;
   background: var(--bg);
   border-top: 3px solid var(--fg);
-  border-bottom: 3px solid var(--fg);
-  overflow: hidden;
+  border-bottom: 1px solid var(--rule-soft);
+  overflow-x: auto;
+  overflow-y: hidden;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  -webkit-overflow-scrolling: touch;
+  scroll-padding-inline: 14px;
+  overscroll-behavior-x: contain;
 }
+.mobile-nav::-webkit-scrollbar { display: none; width: 0; height: 0; }
+
 .mobile-nav-item {
-  flex: 0 0 32px;
-  min-width: 0;
-  height: 38px;
-  padding: 0;
-  background: var(--bg);
-  border: 2px solid var(--fg);
+  flex: 0 0 auto;
+  padding: 9px 14px;
+  background: transparent;
+  border: 1.5px solid var(--fg);
+  border-radius: 999px;
   color: var(--fg);
-  font-family: var(--font-display);
-  font-weight: 700;
-  font-size: 1rem;
+  font-family: var(--font-ui);
+  font-weight: 500;
+  font-size: 0.72rem;
   line-height: 1;
-  letter-spacing: 0;
-  text-transform: uppercase;
+  letter-spacing: 0.01em;
+  white-space: nowrap;
   cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: background 0.12s linear, color 0.12s linear, border-color 0.12s linear;
   -webkit-tap-highlight-color: transparent;
+  transition: background-color .16s ease, color .16s ease, border-color .16s ease;
 }
 .mobile-nav-item:active {
-  background: var(--accent);
-  color: var(--accent-fg);
-  border-color: var(--accent);
+  background: var(--bg-2);
 }
-.mobile-nav-item .mobile-nav-letter { display: block; }
-.mobile-nav-item .mobile-nav-label { display: none; }
 .mobile-nav-item.active {
-  flex: 1 1 auto;
-  min-width: 70px;
-  padding: 0 10px;
   background: var(--fg);
   color: var(--bg);
   border-color: var(--fg);
 }
-.mobile-nav-item.active .mobile-nav-letter { display: none; }
-.mobile-nav-item.active .mobile-nav-label {
-  display: block;
-  font-family: var(--font-display);
-  font-weight: 600;
-  font-size: 0.68rem;
-  letter-spacing: 0.16em;
-  line-height: 1;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  text-transform: uppercase;
+.mobile-nav-item.active:active {
+  background: var(--fg);
 }
+
 body[data-skin="minimal"] .mobile-nav {
   border-top: 1px solid var(--m-line);
   border-bottom: 1px solid var(--m-line);
-  gap: 5px;
   padding: 12px 14px;
+  gap: 6px;
 }
 body[data-skin="minimal"] .mobile-nav-item {
-  flex: 0 0 34px;
-  height: 34px;
   border: 1px solid var(--m-line-strong);
-  border-radius: 8px;
-  background: transparent;
-  color: var(--fg-2);
-  font-family: var(--font-ui);
+  color: var(--fg-3);
   font-weight: 400;
-  font-size: 0.85rem;
-  letter-spacing: 0;
+  font-size: 0.72rem;
+  padding: 9px 14px;
 }
 body[data-skin="minimal"] .mobile-nav-item:active {
   background: var(--bg-2);
-  border-color: var(--fg);
   color: var(--fg);
+  border-color: var(--fg);
 }
 body[data-skin="minimal"] .mobile-nav-item.active {
   background: var(--accent);
-  border-color: var(--accent);
   color: var(--accent-fg);
-  padding: 0 12px;
+  border-color: var(--accent);
 }
-body[data-skin="minimal"] .mobile-nav-item.active .mobile-nav-label {
-  font-family: var(--font-ui);
-  font-weight: 400;
-  font-size: 0.68rem;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
+body[data-skin="minimal"] .mobile-nav-item.active:active {
+  background: var(--accent);
+  border-color: var(--accent);
 }
 }
 @media (max-width: 420px) {
@@ -883,17 +862,14 @@ body[data-skin="minimal"] .controls button svg { width: 15px; height: 15px; }
 .hero-name { font-size: 0.92rem; }
 .hero-years { font-size: 0.58rem; }
 .clock-frame { width: min(480px, 96vw); }
-.mobile-nav { gap: 3px; padding: 8px 12px; margin: 0 -12px; }
-.mobile-nav-item { flex: 0 0 28px; height: 34px; font-size: 0.9rem; }
-body[data-skin="minimal"] .mobile-nav-item { flex: 0 0 30px; height: 30px; font-size: 0.78rem; }
+.mobile-nav { gap: 5px; padding: 10px 12px; margin: 0 -12px; scroll-padding-inline: 12px; }
+.mobile-nav-item { padding: 8px 12px; font-size: 0.68rem; }
+body[data-skin="minimal"] .mobile-nav-item { padding: 8px 12px; font-size: 0.68rem; }
 }
 @media (max-width: 380px) {
-.mobile-nav { gap: 3px; padding: 8px 12px; margin: 0 -12px; }
-.mobile-nav-item { flex: 0 0 26px; height: 32px; font-size: 0.85rem; }
-.mobile-nav-item.active { padding: 0 8px; }
-.mobile-nav-item.active .mobile-nav-label { font-size: 0.62rem; letter-spacing: 0.12em; }
-body[data-skin="minimal"] .mobile-nav-item { flex: 0 0 28px; height: 28px; font-size: 0.72rem; }
-body[data-skin="minimal"] .mobile-nav-item.active .mobile-nav-label { font-size: 0.6rem; letter-spacing: 0.1em; }
+.mobile-nav { gap: 5px; padding: 9px 12px; margin: 0 -12px; scroll-padding-inline: 12px; }
+.mobile-nav-item { padding: 8px 11px; font-size: 0.66rem; }
+body[data-skin="minimal"] .mobile-nav-item { padding: 8px 11px; font-size: 0.66rem; }
 }
 
 /* ================================================================= */
@@ -2541,43 +2517,43 @@ body[data-skin="minimal"][data-mintone="dark"] .parents-reader-close:hover{
   background:#fff;color:#000;
 }
 
-/* ===================== PARENTS READER — MOBILE FIX ===================== */
+/* ===================== PARENTS READER — MOBILE ===================== */
 @media (max-width:640px){
   .parents-wrapper{padding:24px 18px 90px}
-  .parents-reader-surface{padding:14px 10px 60px}
+
+  /* Боковые поля увеличены — это тап-зона «тапнул сбоку — закрыл».
+     Кнопку × на мобиле скрываем: она мешала при скролле текста. */
+  .parents-reader-surface{
+    padding:14px 26px 60px;
+  }
   .parents-reader-sheet{
-    padding:52px 20px 32px;
+    padding:44px 20px 32px;
     border-radius:16px;
     will-change: transform, opacity;
     filter: none;
     transition: transform .45s cubic-bezier(.16,1,.3,1), opacity .35s ease;
+    box-shadow:
+      0 22px 60px -20px rgba(0,0,0,.42),
+      0 8px 22px -8px rgba(0,0,0,.22);
+  }
+  body[data-skin="minimal"][data-mintone="dark"] .parents-reader-sheet{
+    box-shadow:
+      0 22px 60px -20px rgba(0,0,0,.7),
+      0 8px 22px -8px rgba(0,0,0,.4);
+  }
+  body:not([data-skin="minimal"]) .parents-reader-sheet{
+    border-radius:0;
+    padding:44px 20px 32px;
   }
   .parents-reader-overlay.show .parents-reader-sheet{
     filter: none;
     transition: transform .6s cubic-bezier(.16,1,.3,1), opacity .4s ease;
   }
-  body:not([data-skin="minimal"]) .parents-reader-sheet{
-    border-radius:0;
-    padding:52px 20px 32px;
-  }
+
   .parents-reader-close{
-    top:10px;
-    right:10px;
-    width:36px;
-    height:36px;
-    font-size:1.1rem;
-    padding:0 0 3px;
+    display: none !important;
   }
-  body[data-skin="minimal"] .parents-reader-close{
-    background:#101010;
-    color:#ffffff;
-    box-shadow:none;
-  }
-  body[data-skin="minimal"][data-mintone="dark"] .parents-reader-close{
-    background:#ededeb;
-    color:#0d0d0e;
-    box-shadow:none;
-  }
+
   .parents-reader-title{
     font-size:1.35rem;
     line-height:1.2;
@@ -2850,34 +2826,13 @@ body[data-skin="minimal"] .stamp-opt-swatch{border-radius:50%;border-width:1px}
 <button class="section-switch-btn" data-section="poetry">ПОЭЗИЯ</button>
 </div>
 <nav class="mobile-nav" id="mobileNav" aria-label="Разделы">
-<button class="mobile-nav-item active" data-section="syllables" type="button" aria-label="Учи слоги">
-<span class="mobile-nav-letter">С</span>
-<span class="mobile-nav-label">Учи слоги</span>
-</button>
-<button class="mobile-nav-item" data-section="clock" type="button" aria-label="Знай время">
-<span class="mobile-nav-letter">Ч</span>
-<span class="mobile-nav-label">Знай время</span>
-</button>
-<button class="mobile-nav-item" data-section="heroes" type="button" aria-label="Чти великих">
-<span class="mobile-nav-letter">Л</span>
-<span class="mobile-nav-label">Чти великих</span>
-</button>
-<button class="mobile-nav-item" data-section="art" type="button" aria-label="Живопись">
-<span class="mobile-nav-letter">Ж</span>
-<span class="mobile-nav-label">Живопись</span>
-</button>
-<button class="mobile-nav-item" data-section="cartoons" type="button" aria-label="Мульты">
-<span class="mobile-nav-letter">М</span>
-<span class="mobile-nav-label">Мульты</span>
-</button>
-<button class="mobile-nav-item" data-section="parents" type="button" aria-label="Родителям">
-<span class="mobile-nav-letter">Р</span>
-<span class="mobile-nav-label">Родителям</span>
-</button>
-<button class="mobile-nav-item" data-section="poetry" type="button" aria-label="Поэзия">
-<span class="mobile-nav-letter">П</span>
-<span class="mobile-nav-label">Поэзия</span>
-</button>
+<button class="mobile-nav-item active" data-section="syllables" type="button">Слоги</button>
+<button class="mobile-nav-item" data-section="clock" type="button">Время</button>
+<button class="mobile-nav-item" data-section="heroes" type="button">Великие</button>
+<button class="mobile-nav-item" data-section="art" type="button">Живопись</button>
+<button class="mobile-nav-item" data-section="cartoons" type="button">Мульты</button>
+<button class="mobile-nav-item" data-section="parents" type="button">Родителям</button>
+<button class="mobile-nav-item" data-section="poetry" type="button">Поэзия</button>
 </nav>
 <div class="section-subtitles">
 <div class="section-subtitle active" data-section="syllables">ЖМИ, СЛУШАЙ, ЗАПОМИНАЙ</div>
@@ -3218,7 +3173,6 @@ body[data-skin="minimal"] .stamp-opt-swatch{border-radius:50%;border-width:1px}
 </div>
 
 <div class="parents-reader-overlay" id="parentsReaderModal" aria-hidden="true">
-  <button class="parents-reader-close" id="parentsReaderClose" type="button" aria-label="Закрыть">×</button>
   <div class="parents-reader-surface">
     <article class="parents-reader-sheet">
       <h1 class="parents-reader-title" id="parentsReaderTitle"></h1>
@@ -3309,10 +3263,18 @@ let currentMode = 'all'; let randomItems = []; let currentAudio = null; let exam
 const SECTION_ORDER = ['syllables', 'clock', 'heroes', 'art', 'poetry', 'cartoons', 'parents'];
 const SECTION_LABELS = { syllables: 'Учи слоги', clock: 'Знай время', heroes: 'Чти великих', art: 'Живопись', poetry: 'Поэзия', cartoons: 'Мульты', parents: 'Родителям' };
 
-function updateMobileNav() {
+function updateMobileNav(centerActive) {
   if (!mobileNav) return;
   mobileNav.querySelectorAll('.mobile-nav-item').forEach(item => {
-    item.classList.toggle('active', item.dataset.section === currentSection);
+    const isActive = item.dataset.section === currentSection;
+    item.classList.toggle('active', isActive);
+    if (isActive && centerActive) {
+      try {
+        item.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+      } catch (e) {
+        /* очень старые браузеры — просто без центрирования */
+      }
+    }
   });
 }
 if (mobileNav) {
@@ -3335,7 +3297,7 @@ function switchSection(s) {
   if (parentsSection) parentsSection.classList.toggle('active', s === 'parents');
   sectionBtns.forEach(b => b.classList.toggle('active', b.dataset.section === s));
   sectionSubtitleEls.forEach(e => e.classList.toggle('active', e.dataset.section === s));
-  updateMobileNav();
+  updateMobileNav(true);
   if (s !== 'clock' && window.clockSpeakCancel) window.clockSpeakCancel();
   if (s === 'clock' && typeof window.clockTickStart === 'function') window.clockTickStart();
   else if (typeof window.clockTickStop === 'function') window.clockTickStop();
@@ -3556,7 +3518,7 @@ function renderHeroesTimeline() { if (!heroesTimeline) return; const centuries =
 let heroModal = null, heroAudio = new Audio(), currentImageIndex = 0, currentImages = [];
 function openHeroModal(name, images, audioSrc, birthYear, deathYear) { if (heroModal) heroModal.remove(); currentImages = images; currentImageIndex = 0; const nH = images.length > 1 ? `<button class="hero-nav prev" type="button" aria-label="Предыдущий">‹</button><button class="hero-nav next" type="button" aria-label="Следующий">›</button>` : ''; const ini = name.split(/\s+/).map(w => w.charAt(0)).join('').slice(0, 2).toUpperCase(); heroModal = document.createElement('div'); heroModal.className = 'hero-modal'; heroModal.innerHTML = `<button class="hero-modal-repeat" type="button" aria-label="Повторить звук">♪</button><button class="hero-modal-close" type="button" aria-label="Закрыть">×</button><div class="hero-modal-portrait-wrap">${nH}<img class="hero-modal-portrait" src="${images[0]}" alt="${name}"></div><div class="hero-modal-info"><h3>${name}</h3><div class="hero-modal-years">${birthYear} — ${deathYear}</div></div><div class="hero-modal-timeline">${buildTimelineHTML(birthYear, deathYear)}</div>`; const imgEl = heroModal.querySelector('.hero-modal-portrait'); imgEl.addEventListener('error', () => { const p = document.createElement('div'); p.className = 'hero-portrait-placeholder'; p.textContent = ini; imgEl.replaceWith(p); }); document.body.appendChild(heroModal); playHeroAudio(audioSrc); heroModal.querySelector('.hero-modal-close').addEventListener('click', () => { heroModal.remove(); heroAudio.pause(); heroAudio.currentTime = 0; }); heroModal.querySelector('.hero-modal-repeat').addEventListener('click', () => playHeroAudio(audioSrc)); const pB = heroModal.querySelector('.hero-nav.prev'), nB = heroModal.querySelector('.hero-nav.next'); if (pB) pB.addEventListener('click', () => { currentImageIndex = (currentImageIndex - 1 + currentImages.length) % currentImages.length; const im = heroModal.querySelector('.hero-modal-portrait'); if (im) im.src = currentImages[currentImageIndex]; }); if (nB) nB.addEventListener('click', () => { currentImageIndex = (currentImageIndex + 1) % currentImages.length; const im = heroModal.querySelector('.hero-modal-portrait'); if (im) im.src = currentImages[currentImageIndex]; }); }
 function playHeroAudio(s) { heroAudio.src = s; heroAudio.play().catch(e => console.log('Ошибка воспроизведения', e)); }
-renderHeroesTimeline(); renderGrid(); updateMobileNav();
+renderHeroesTimeline(); renderGrid(); updateMobileNav(false);
 })();
 (function () {
 const STORAGE_PAPER = 'gramotino_paper', STORAGE_INK = 'gramotino_ink';
@@ -4632,7 +4594,9 @@ let order = 'random';
     }
   }
   window.addEventListener('hashchange', handleHash);
-  readerClose.addEventListener('click', e => { e.preventDefault(); closeArticle(); });
+  if (readerClose) readerClose.addEventListener('click', e => { e.preventDefault(); closeArticle(); });
+  /* Клик по «пустому» месту сбоку/снизу/сверху листа — закрывает статью.
+     Сам лист — потомок .parents-reader-surface, поэтому клики по нему сюда не попадают. */
   readerModal.addEventListener('click', e => {
     if (e.target.classList.contains('parents-reader-surface')) closeArticle();
   });
