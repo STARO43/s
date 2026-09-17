@@ -36,8 +36,7 @@
 <link rel="dns-prefetch" href="https://rutube.ru">
 <link rel="preconnect" href="https://s.rutube.ru">
 <link rel="dns-prefetch" href="https://s.rutube.ru">
-<!-- Шрифты обрезаны до реально используемых весов -->
-<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500;600;700&family=Inter:wght@300;400;500&family=Playfair+Display:wght@600;700&family=Lora:wght@400;500;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=IBM+Plex+Mono:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Inter:wght@200;300;400;500;600;700&family=PT+Serif:ital,wght@0,400;0,700;1,400;1,700&family=Lora:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,400&display=swap" rel="stylesheet">
 <title>Грамотиньо</title>
 <style>
 * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -114,18 +113,15 @@ body[data-paper="carbon"][data-ink="berlin"] {
 --font-display: 'Oswald', 'Arial Narrow', sans-serif;
 --font-doc:     'IBM Plex Mono', 'Courier New', monospace;
 --font-ui:      'Inter', system-ui, sans-serif;
---font-serif:   'Lora', Georgia, 'Times New Roman', serif;
---font-serif-display: 'Playfair Display', 'Lora', Georgia, serif;
---font-serif-body:    'Lora', Georgia, serif;
+--font-serif:   'PT Serif', Georgia, 'Times New Roman', serif;
+--font-serif-display: 'Playfair Display', 'PT Serif', Georgia, serif;
+--font-serif-body:    'Lora', 'PT Serif', Georgia, serif;
 --ease: cubic-bezier(0.16, 1, 0.3, 1);
 --snap: cubic-bezier(0.4, 0, 0.2, 1);
 }
 html { -webkit-text-size-adjust: 100%; }
-
-/* ===== body: фон-сетка теперь статичная (без position: fixed) =====
-   Это ключевая правка для iPhone — WebKit больше не перерисовывает
-   fixed-слой с repeating-градиентом на каждом кадре скролла. */
 body {
+background: var(--bg);
 color: var(--fg);
 font-family: var(--font-ui);
 font-size: 16px;
@@ -135,20 +131,31 @@ line-height: 1.4;
 display: flex;
 flex-direction: column;
 overscroll-behavior-x: none;
-background-color: var(--bg);
-background-image:
-  linear-gradient(var(--rule-soft) 1px, transparent 1px),
-  linear-gradient(90deg, var(--rule-soft) 1px, transparent 1px);
-background-size: 40px 40px;
-background-position: -1px -1px;
 transition: background-color 0.15s ease, color 0.15s ease;
 }
+body::before {
+content: '';
+position: fixed;
+inset: 0;
+background-image:
+linear-gradient(var(--rule-soft) 1px, transparent 1px),
+linear-gradient(90deg, var(--rule-soft) 1px, transparent 1px);
+background-size: 40px 40px;
+background-position: -1px -1px;
+pointer-events: none;
+z-index: 0;
+opacity: 0.35;
+transform: translateZ(0);
+contain: paint;
+}
+body > * { position: relative; z-index: 1; }
 .header-masthead {
 display: flex;
 align-items: center;
 justify-content: space-between;
 gap: 14px;
 padding: 10px 0;
+border-top: none;
 border-bottom: 3px solid var(--fg);
 font-family: var(--font-doc);
 font-size: 0.6rem;
@@ -310,6 +317,7 @@ display: flex;
 align-items: center;
 justify-content: center;
 padding: 14px 20px;
+border-top: none;
 border-bottom: 3px solid var(--fg);
 font-family: var(--font-doc);
 font-size: 0.72rem;
@@ -683,7 +691,7 @@ opacity: 0.3;
 .frame-head-bot > .frame-head-tag:last-child { flex: 0 0 auto; }
 .frame-head-title { padding: 11px 14px; text-align: center; font-family: var(--font-display); font-weight: 600; font-size: clamp(0.72rem, 2.5vw, 1.05rem); letter-spacing: 0.1em; text-transform: uppercase; line-height: 1.15; white-space: nowrap; overflow: hidden; color: var(--fg); text-overflow: ellipsis; }
 .clock-stack { width: 100%; margin: 0 auto; position: relative; z-index: 1; }
-.clock-view { width: 100%; aspect-ratio: 440 / 520; position: relative; cursor: pointer; touch-action: pan-y; user-select: none; -webkit-user-select: none; -webkit-tap-highlight-color: transparent; -webkit-touch-callout: none; -webkit-user-drag: none; }
+.clock-view { width: 100%; aspect-ratio: 440 / 520; position: relative; cursor: pointer; touch-action: pan-y; user-select: none; -webkit-user-select: none; -webkit-tap-highlight-color: transparent; -webkit-touch-callout: none; -webkit-user-drag: none; transform: translateZ(0); }
 .clock-view.view-watch { cursor: grab; }
 .clock-view.view-watch.dragging { cursor: grabbing; }
 .clock-view.view-scheme { cursor: pointer; }
@@ -701,10 +709,6 @@ body.is-ios #watchSvgIOS { display: block; }
 
 @media (max-width: 1024px) { .syllable-grid { grid-template-columns: repeat(3, 1fr); } }
 @media (max-width: 640px) {
-/* На мобиле сетка фона с более крупной ячейкой + мягче контраст — дешевле для GPU */
-body {
-  background-size: 40px 40px;
-}
 .header { padding: 12px 14px 0; }
 .header-masthead { padding: 8px 0; font-size: 0.55rem; letter-spacing: 0.12em; gap: 4px 10px; flex-wrap: wrap; justify-content: center; margin-bottom: 2px; }
 .masthead-cell.masthead-left, .masthead-cell.masthead-right { flex: 0 1 auto; justify-content: center; }
@@ -741,9 +745,6 @@ body[data-skin="minimal"] .controls-sep::before { height: 14px; }
 .century-header:not(:first-child) { margin-top: 40px; }
 .heroes-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(148px, 1fr)); gap: 12px; margin-bottom: 18px; overflow: visible; padding: 0; }
 .hero-item { flex: none; scroll-snap-align: none; }
-/* На мобиле убираем grayscale-фильтр — тяжёлый для GPU на iOS */
-.hero-photo img { filter: none; transition: none; }
-.hero-item:hover .hero-photo img { filter: none; }
 .hero-info { padding: 10px 10px 12px; }
 .hero-name { font-size: 1rem; }
 .hero-years { font-size: 0.62rem; }
@@ -761,7 +762,6 @@ body[data-skin="minimal"] .controls-sep::before { height: 14px; }
 .hero-modal-timeline { display: none; }
 .clock-wrapper { padding: 26px 0 70px; }
 .clock-frame { padding: 12px; box-shadow: 7px 7px 0 var(--accent); }
-.clock-frame::before { opacity: 0.2; background-size: 10px 10px; }
 .frame-head { margin-bottom: 14px; }
 .frame-head-title { padding: 9px 10px; font-size: clamp(0.6rem, 2.9vw, 0.82rem); letter-spacing: 0.06em; }
 .frame-head-top, .frame-head-bot { font-size: 0.5rem; padding: 5px 8px; letter-spacing: 0.1em; }
@@ -769,7 +769,7 @@ body[data-skin="minimal"] .controls-sep::before { height: 14px; }
 .masthead-stamp { left: 50% !important; right: auto !important; top: auto !important; bottom: 20px !important; transform: translateX(-50%) translateY(8px); box-shadow: 6px 6px 0 var(--accent); max-width: calc(100vw - 24px); }
 .masthead-stamp.show { transform: translateX(-50%) translateY(0); }
 
-/* ===================== MOBILE NAV ===================== */
+/* ===================== MOBILE NAV (NEW) ===================== */
 .mobile-nav {
   display: flex;
   align-items: center;
@@ -1096,7 +1096,6 @@ body[data-skin="minimal"] .media-card-arrow{
   transition:opacity .55s cubic-bezier(.16,1,.3,1), visibility 0s linear 0s;
 }
 
-/* Радиальный градиент-виньетка: только на десктопе (на мобиле отключён) */
 .art-section::before{
   content:'';
   position:absolute;
@@ -1107,9 +1106,6 @@ body[data-skin="minimal"] .media-card-arrow{
 }
 body[data-skin="minimal"][data-mintone="dark"] .art-section::before{
   background:radial-gradient(ellipse 80% 70% at center, transparent 30%, rgba(0,0,0,.35) 100%);
-}
-@media (max-width:768px){
-  .art-section::before{display:none;}
 }
 
 .art-canvas{
@@ -1129,30 +1125,33 @@ body[data-skin="minimal"][data-mintone="dark"] .art-section::before{
   align-items:center;
   justify-content:center;
   padding:clamp(44px,4.8vh,54px) clamp(58px,5vw,78px) clamp(48px,5.4vh,58px);
-  /* Убрали filter из will-change/transition — только opacity + transform.
-     Это сильно уменьшает репенд на iPhone во время смены картины. */
-  will-change: opacity, transform;
-  transition:opacity .6s cubic-bezier(.16,1,.3,1),
-             transform .6s cubic-bezier(.16,1,.3,1);
+  will-change:opacity, transform, filter;
+  transition:opacity .85s cubic-bezier(.16,1,.3,1),
+             transform .85s cubic-bezier(.16,1,.3,1),
+             filter .85s cubic-bezier(.16,1,.3,1);
 }
 .art-image-wrap.art-exit-up{
   opacity:0;
   transform:translateY(-36px) scale(.965);
+  filter:blur(6px);
   pointer-events:none;
 }
 .art-image-wrap.art-exit-down{
   opacity:0;
   transform:translateY(36px) scale(.965);
+  filter:blur(6px);
   pointer-events:none;
 }
 .art-image-wrap.art-enter-from-down{
   opacity:0;
   transform:translateY(46px) scale(.965);
+  filter:blur(6px);
   transition:none;
 }
 .art-image-wrap.art-enter-from-up{
   opacity:0;
   transform:translateY(-46px) scale(.965);
+  filter:blur(6px);
   transition:none;
 }
 
@@ -1167,11 +1166,25 @@ body[data-skin="minimal"][data-mintone="dark"] .art-section::before{
   -webkit-user-drag:none;
   -webkit-tap-highlight-color:transparent;
   border-radius:2px;
-  /* Одна тень вместо четырёх — быстрее растрирование */
-  box-shadow:0 20px 50px -14px rgba(0,0,0,.35);
+  box-shadow:
+    0 1px 2px rgba(0,0,0,.04),
+    0 6px 16px rgba(0,0,0,.06),
+    0 20px 48px -10px rgba(0,0,0,.14),
+    0 60px 120px -30px rgba(0,0,0,.22);
+}
+body[data-skin="minimal"] .art-image{
+  box-shadow:
+    0 1px 2px rgba(0,0,0,.04),
+    0 6px 20px rgba(0,0,0,.06),
+    0 24px 56px -12px rgba(0,0,0,.14),
+    0 70px 140px -40px rgba(0,0,0,.22);
 }
 body[data-skin="minimal"][data-mintone="dark"] .art-image{
-  box-shadow:0 20px 50px -14px rgba(0,0,0,.7);
+  box-shadow:
+    0 1px 2px rgba(0,0,0,.4),
+    0 8px 24px rgba(0,0,0,.5),
+    0 30px 70px -14px rgba(0,0,0,.6),
+    0 80px 160px -50px rgba(0,0,0,.85);
 }
 
 .art-top{
@@ -1436,11 +1449,21 @@ body[data-skin="minimal"] .art-order-btn:hover:not(.active){
 @media (max-width:640px){
   .art-image-wrap{
     padding:46px 4px 56px;
+    will-change: transform;
+  }
+  .art-image-wrap.art-exit-up,
+  .art-image-wrap.art-exit-down,
+  .art-image-wrap.art-enter-from-down,
+  .art-image-wrap.art-enter-from-up {
+    filter: none;
   }
   .art-image,
   body[data-skin="minimal"] .art-image,
   body[data-skin="minimal"][data-mintone="dark"] .art-image {
-    box-shadow: 0 10px 30px rgba(0,0,0,.28);
+    box-shadow: 0 8px 24px rgba(0,0,0,.20);
+  }
+  body[data-skin="minimal"][data-mintone="dark"] .art-image {
+    box-shadow: 0 8px 24px rgba(0,0,0,.55);
   }
   .art-info{
     font-size:.5rem;
@@ -2253,10 +2276,12 @@ body[data-skin="minimal"] .parents-card-arrow{font-size:.85rem;font-weight:300}
   padding:clamp(36px,6vw,80px) clamp(24px,6.5vw,80px) clamp(44px,7vw,88px);
   transform:translateY(60px) scale(.96);
   opacity:0;
+  filter:blur(3px);
   transition:
     transform .55s cubic-bezier(.4,0,.2,1),
-    opacity .4s ease;
-  will-change:transform, opacity;
+    opacity .4s ease,
+    filter .4s ease;
+  will-change:transform, opacity, filter;
   box-shadow:
     0 1px 0 rgba(255,255,255,.55) inset,
     0 44px 100px -32px rgba(0,0,0,.42),
@@ -2265,9 +2290,11 @@ body[data-skin="minimal"] .parents-card-arrow{font-size:.85rem;font-weight:300}
 .parents-reader-overlay.show .parents-reader-sheet{
   transform:translateY(0) scale(1);
   opacity:1;
+  filter:blur(0);
   transition:
     transform .85s cubic-bezier(.16,1,.3,1),
-    opacity .6s cubic-bezier(.16,1,.3,1);
+    opacity .6s cubic-bezier(.16,1,.3,1),
+    filter .6s cubic-bezier(.16,1,.3,1);
 }
 .parents-reader-close{
   position:fixed;
@@ -2503,6 +2530,7 @@ body[data-skin="minimal"][data-mintone="dark"] .parents-reader-close:hover{
     padding:44px 20px 32px;
     border-radius:16px;
     will-change: transform, opacity;
+    filter: none;
     transition: transform .45s cubic-bezier(.16,1,.3,1), opacity .35s ease;
     box-shadow:
       0 22px 60px -20px rgba(0,0,0,.42),
@@ -2518,6 +2546,7 @@ body[data-skin="minimal"][data-mintone="dark"] .parents-reader-close:hover{
     padding:44px 20px 32px;
   }
   .parents-reader-overlay.show .parents-reader-sheet{
+    filter: none;
     transition: transform .6s cubic-bezier(.16,1,.3,1), opacity .4s ease;
   }
 
@@ -2578,7 +2607,6 @@ body[data-skin="minimal"]{
   --bg:var(--m-bg); --bg-2:var(--m-bg-2); --bg-3:var(--m-bg-3);
   --fg:var(--m-fg); --fg-2:var(--m-fg-2); --fg-3:var(--m-fg-3);
   --rule-soft:transparent; --accent-fg:#ffffff;
-  background-image: none; /* у минимализма нет сетки фона */
 }
 body[data-skin="minimal"][data-mintone="dark"]{
   --m-bg:#0d0d0e; --m-bg-2:#151517; --m-bg-3:#1e1e21;
@@ -2602,6 +2630,7 @@ body[data-skin="minimal"][data-mintone="dark"][data-ink="sepia"]       {--accent
 body[data-skin="minimal"][data-mintone="dark"][data-ink="emerald"]     {--accent:#45c96a}
 body[data-skin="minimal"][data-mintone="dark"][data-ink="purpur"]      {--accent:#c977ff}
 body[data-skin="minimal"][data-mintone="dark"][data-ink="cadmium"]     {--accent:#ff9147}
+body[data-skin="minimal"]::before{display:none}
 body[data-skin="minimal"] .header{padding:20px 22px 0}
 body[data-skin="minimal"] .header-masthead{
   border-bottom:1px solid var(--m-line); padding:14px 0; margin-bottom:0;
@@ -2615,7 +2644,7 @@ body[data-skin="minimal"] .header-kicker{
   font-size:.6rem; font-weight:500; letter-spacing:.42em; color:var(--fg-3);
 }
 body[data-skin="minimal"] .header h1{
-  font-family:var(--font-ui); font-weight:300;
+  font-family:var(--font-ui); font-weight:200;
   font-size:clamp(1.9rem,10.5vw,5.4rem); line-height:1; letter-spacing:.06em;
     text-transform:uppercase; margin:22px 0 40px;
 }
@@ -2706,10 +2735,6 @@ body[data-skin="minimal"] .hero-item:hover{transform:none;box-shadow:none}
 body[data-skin="minimal"] .hero-photo{border-bottom:none;border-radius:8px;background:var(--bg-2)}
 body[data-skin="minimal"] .hero-photo img{filter:grayscale(1) contrast(1.05)}
 body[data-skin="minimal"] .hero-item:hover .hero-photo img{filter:grayscale(0) contrast(1.05)}
-@media (max-width:640px){
-  body[data-skin="minimal"] .hero-photo img,
-  body[data-skin="minimal"] .hero-item:hover .hero-photo img{filter:none;}
-}
 body[data-skin="minimal"] .hero-info{padding:12px 2px 0;gap:4px}
 body[data-skin="minimal"] .hero-name{font-family:var(--font-ui);font-weight:500;font-size:.86rem;letter-spacing:.01em;text-transform:none;line-height:1.25}
 body[data-skin="minimal"] .hero-years{font-size:.66rem;font-weight:400;color:var(--fg-3);letter-spacing:.04em}
@@ -2725,7 +2750,7 @@ body[data-skin="minimal"] .hero-modal-repeat{color:var(--fg-2)}
 body[data-skin="minimal"] .hero-modal-close:hover,
 body[data-skin="minimal"] .hero-modal-repeat:hover{color:var(--accent)}
 body[data-skin="minimal"] .hero-modal-portrait{border-radius:10px}
-body[data-skin="minimal"] .hero-portrait-placeholder{background:var(--bg-2);border-radius:10px;color:var(--fg-3);font-weight:300}
+body[data-skin="minimal"] .hero-portrait-placeholder{background:var(--bg-2);border-radius:10px;color:var(--fg-3);font-weight:200}
 body[data-skin="minimal"] .hero-modal-info h3{font-family:var(--font-ui);font-weight:300;font-size:clamp(1.5rem,4.6vw,2.4rem);letter-spacing:.02em;text-transform:none}
 body[data-skin="minimal"] .hero-modal-years{font-weight:400;font-size:.78rem;letter-spacing:.24em;color:var(--accent);margin-top:10px}
 body[data-skin="minimal"] .hero-nav{border:1px solid var(--m-line-strong);border-radius:50%;background:var(--bg);color:var(--fg-2)}
@@ -3240,21 +3265,17 @@ const SECTION_LABELS = { syllables: 'Учи слоги', clock: 'Знай вре
 
 function updateMobileNav(centerActive) {
   if (!mobileNav) return;
-  let activeEl = null;
   mobileNav.querySelectorAll('.mobile-nav-item').forEach(item => {
     const isActive = item.dataset.section === currentSection;
     item.classList.toggle('active', isActive);
-    if (isActive) activeEl = item;
+    if (isActive && centerActive) {
+      try {
+        item.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+      } catch (e) {
+        /* очень старые браузеры — просто без центрирования */
+      }
+    }
   });
-  if (activeEl && centerActive) {
-    // Быстрое центрирование через scrollLeft без jank, который даёт scrollIntoView на iOS
-    const navRect = mobileNav.getBoundingClientRect();
-    const itemRect = activeEl.getBoundingClientRect();
-    const target = mobileNav.scrollLeft
-      + (itemRect.left + itemRect.width / 2)
-      - (navRect.left + navRect.width / 2);
-    mobileNav.scrollTo({ left: target, behavior: 'smooth' });
-  }
 }
 if (mobileNav) {
   mobileNav.querySelectorAll('.mobile-nav-item').forEach(item => {
@@ -3285,7 +3306,7 @@ function switchSection(s) {
   else if (typeof window.artClose === 'function') window.artClose();
 }
 sectionBtns.forEach(b => b.addEventListener('click', () => switchSection(b.dataset.section)));
-window.addEventListener('scroll', () => scrollTopBtn.classList.toggle('visible', window.scrollY > 300), { passive: true });
+window.addEventListener('scroll', () => scrollTopBtn.classList.toggle('visible', window.scrollY > 300));
 scrollTopBtn.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
 function refreshProgressData() { const t = syllables.length; const m = [...syllables].filter(s => learnedSet.has(s)).length; const p = t ? Math.round((m / t) * 100) : 0; progressLabel.textContent = `Отмечено: ${m} из ${t}`; progressFill.style.width = p + '%'; }
 function flashProgress() { refreshProgressData(); progressContainer.classList.add('show'); clearTimeout(progressTimer); progressTimer = setTimeout(() => progressContainer.classList.remove('show'), 2400); }
@@ -4374,6 +4395,7 @@ let order = 'random';
   const readerModal   = $('parentsReaderModal');
   const readerTitle   = $('parentsReaderTitle');
   const readerContent = $('parentsReaderContent');
+  const readerClose   = $('parentsReaderClose');
 
   if (!list || !readerModal) return;
 
@@ -4572,6 +4594,7 @@ let order = 'random';
     }
   }
   window.addEventListener('hashchange', handleHash);
+  if (readerClose) readerClose.addEventListener('click', e => { e.preventDefault(); closeArticle(); });
   /* Клик по «пустому» месту сбоку/снизу/сверху листа — закрывает статью.
      Сам лист — потомок .parents-reader-surface, поэтому клики по нему сюда не попадают. */
   readerModal.addEventListener('click', e => {
