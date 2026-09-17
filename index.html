@@ -174,7 +174,13 @@ white-space: nowrap;
 overflow: hidden;
 text-overflow: ellipsis;
 max-width: 100%;
+display: inline-flex;
+align-items: baseline;
+gap: 5px;
 }
+.masthead-switch-label { white-space: nowrap; }
+.masthead-switch-sep { white-space: nowrap; opacity: 0.7; }
+.masthead-switch-value { white-space: nowrap; }
 .masthead-switch::after {
 content: '';
 position: absolute;
@@ -354,8 +360,17 @@ transition: background 0.1s linear;
 align-items: center;
 justify-content: center;
 gap: 10px;
+-webkit-tap-highlight-color: transparent;
 }
-.section-cycle-btn .section-cycle-arrow { font-family: var(--font-ui); font-size: 1.05rem; opacity: 0.75; }
+.section-cycle-btn .section-cycle-icon {
+width: 18px;
+height: 18px;
+flex-shrink: 0;
+transition: transform 0.35s var(--ease);
+}
+.section-cycle-btn.open .section-cycle-icon {
+transform: rotate(180deg);
+}
 .section-cycle-btn:active { background: var(--accent); }
 .section-subtitles {
 display: flex;
@@ -426,7 +441,7 @@ pointer-events: none;
 .progress-label { font-family: var(--font-doc); font-size: 0.7rem; font-weight: 600; letter-spacing: 0.16em; text-transform: uppercase; margin-bottom: 12px; }
 .progress-bar { width: 100%; height: 8px; background: rgba(128,128,128,0.25); overflow: hidden; }
 .progress-fill { height: 100%; background: var(--accent); width: 0%; transition: width 0.4s linear; }
-.controls { display: flex; justify-content: center; gap: 0; padding: 32px 20px 26px; flex-wrap: wrap; }
+.controls { display: flex; justify-content: center; gap: 0; padding: 32px 20px 26px; flex-wrap: wrap; align-items: center; }
 .controls button {
 background: var(--bg);
 border: 2px solid var(--fg);
@@ -443,6 +458,8 @@ justify-content: center;
 transition: all 0.1s linear;
 position: relative;
 margin-left: -2px;
+padding: 0;
+-webkit-tap-highlight-color: transparent;
 }
 .controls button:first-child { margin-left: 0; }
 .controls button:hover { background: var(--fg); color: var(--bg); z-index: 3; }
@@ -470,6 +487,50 @@ transition: opacity 0.12s linear, transform 0.12s linear, visibility 0.12s;
 z-index: 10;
 }
 .controls button:hover::after { opacity: 1; visibility: visible; transform: translateX(-50%) translateY(0); }
+.controls button svg {
+width: 22px;
+height: 22px;
+display: block;
+pointer-events: none;
+fill: none;
+stroke: currentColor;
+stroke-width: 1.9;
+stroke-linecap: square;
+stroke-linejoin: miter;
+}
+body[data-skin="minimal"] .controls button svg {
+width: 19px;
+height: 19px;
+stroke-width: 1.3;
+stroke-linecap: round;
+stroke-linejoin: round;
+}
+.controls-sep {
+flex-shrink: 0;
+width: 22px;
+height: 58px;
+position: relative;
+}
+.controls-sep::before {
+content: '';
+position: absolute;
+left: 50%;
+top: 50%;
+transform: translate(-50%, -50%);
+width: 2px;
+height: 26px;
+background: var(--fg);
+opacity: 0.22;
+}
+body[data-skin="minimal"] .controls-sep {
+width: 28px;
+}
+body[data-skin="minimal"] .controls-sep::before {
+width: 1px;
+height: 18px;
+background: var(--m-line-strong);
+opacity: 1;
+}
 .grid-container { max-width: 960px; margin: 0 auto; padding: 0 20px 100px; width: 100%; }
 .syllable-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0; border-top: 2px solid var(--fg); border-left: 2px solid var(--fg); }
 .syllable-grid.hide-learned .syllable-card.learned { display: none; }
@@ -651,15 +712,17 @@ body.is-ios #watchSvgIOS { display: block; }
 @media (max-width: 1024px) { .syllable-grid { grid-template-columns: repeat(3, 1fr); } }
 @media (max-width: 640px) {
 .header { padding: 12px 14px 0; }
-.header-masthead { padding: 8px 0; font-size: 0.3rem; letter-spacing: 0.12em; gap: 4px 10px; flex-wrap: wrap; justify-content: center; margin-bottom: 2px; }
+.header-masthead { padding: 8px 0; font-size: 0.55rem; letter-spacing: 0.12em; gap: 4px 10px; flex-wrap: wrap; justify-content: center; margin-bottom: 2px; }
 .masthead-cell.masthead-left, .masthead-cell.masthead-right { flex: 0 1 auto; justify-content: center; }
 .masthead-cell.masthead-center { display: none; }
 .masthead-sep.optional { display: none; }
+.masthead-switch-sep,
+.masthead-switch-value { display: none; }
 .header-kicker { margin-bottom: 14px; font-size: 0.52rem; letter-spacing: 0.14em; padding: 10px 12px; line-height: 1.3; border-top: 1px solid var(--fg); }
 .header h1 { font-size: 17.5vw; line-height: 0.85; letter-spacing: -0.04em; white-space: nowrap; word-break: keep-all; overflow-wrap: normal; margin: 10px 0 16px; max-width: 100%; }
 .section-switch { display: none; }
 .section-cycle-btn { display: flex; width: 100%; margin: 0; font-size: 0.8rem; letter-spacing: 0.14em; padding: 16px 14px; }
-.section-cycle-btn .section-cycle-arrow { font-size: 0.95rem; }
+.section-cycle-btn .section-cycle-icon { width: 16px; height: 16px; }
 .section-subtitles { margin: 0 -14px; min-height: 40px; }
 .section-subtitle { display: none; padding: 10px 10px; font-size: 0.56rem; letter-spacing: 0.1em; min-height: 2.8em; text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; line-height: 1.2; flex: 1 1 100%; }
 .section-subtitle.active { display: flex; opacity: 1; visibility: visible; }
@@ -671,7 +734,13 @@ body.is-ios #watchSvgIOS { display: block; }
 .learn-dot { width: 12px; height: 12px; top: 6px; right: 6px; border-width: 1.6px; }
 .controls { padding: 16px 14px 12px; gap: 4px; }
 .controls button { width: 42px; height: 42px; font-size: 1.05rem; border-width: 1.5px; }
+.controls button svg { width: 19px; height: 19px; }
+body[data-skin="minimal"] .controls button svg { width: 17px; height: 17px; }
 .controls button::after { display: none; }
+.controls-sep { width: 14px; height: 42px; }
+.controls-sep::before { width: 2px; height: 20px; }
+body[data-skin="minimal"] .controls-sep { width: 18px; }
+body[data-skin="minimal"] .controls-sep::before { height: 14px; }
 .exam-exit-btn { top: auto; bottom: 20px; left: 20px; width: 42px; height: 42px; font-size: 1rem; }
 .exam-options { grid-template-columns: repeat(2, 1fr); gap: 8px; }
 .exam-option { padding: 18px 8px; font-size: 1.1rem; }
@@ -710,14 +779,250 @@ body.is-ios #watchSvgIOS { display: block; }
 .frame-head-top > .frame-head-tag:first-child, .frame-head-top > .frame-head-tag:last-child { display: none; }
 .header h1 { font-size: 17vw; letter-spacing: -0.05em; margin: 8px 0 14px; }
 .header-kicker { font-size: 0.48rem; letter-spacing: 0.12em; }
-.header-masthead { font-size: 0.46rem; letter-spacing: 0.1em; }
+.header-masthead { font-size: 0.5rem; letter-spacing: 0.1em; }
 .section-cycle-btn { font-size: 0.75rem; padding: 15px 12px; }
 .controls button { width: 38px; height: 38px; font-size: 0.95rem; }
+.controls button svg { width: 17px; height: 17px; }
+body[data-skin="minimal"] .controls button svg { width: 15px; height: 15px; }
+.controls-sep { width: 12px; height: 38px; }
 .section-subtitle { font-size: 0.52rem; letter-spacing: 0.06em; }
 .heroes-grid { grid-template-columns: repeat(auto-fill, minmax(132px, 1fr)); gap: 10px; }
 .hero-name { font-size: 0.92rem; }
 .hero-years { font-size: 0.58rem; }
 .clock-frame { width: min(480px, 96vw); }
+}
+
+/* ================================================================= */
+/* ============== MOBILE BOTTOM SHEET =============================== */
+/* ================================================================= */
+.mobile-sheet-backdrop,
+.mobile-sheet { display: none; }
+
+@media (max-width: 640px) {
+.mobile-sheet-backdrop {
+  display: block;
+  position: fixed;
+  inset: 0;
+  z-index: 6400;
+  background: rgba(0, 0, 0, 0.42);
+  -webkit-backdrop-filter: blur(0px) saturate(100%);
+  backdrop-filter: blur(0px) saturate(100%);
+  opacity: 0;
+  visibility: hidden;
+  transition:
+    opacity 0.45s cubic-bezier(0.16, 1, 0.3, 1),
+    backdrop-filter 0.55s cubic-bezier(0.16, 1, 0.3, 1),
+    -webkit-backdrop-filter 0.55s cubic-bezier(0.16, 1, 0.3, 1),
+    visibility 0s linear 0.45s;
+}
+.mobile-sheet-backdrop.show {
+  opacity: 1;
+  visibility: visible;
+  -webkit-backdrop-filter: blur(16px) saturate(120%);
+  backdrop-filter: blur(16px) saturate(120%);
+  transition:
+    opacity 0.45s cubic-bezier(0.16, 1, 0.3, 1),
+    backdrop-filter 0.55s cubic-bezier(0.16, 1, 0.3, 1),
+    -webkit-backdrop-filter 0.55s cubic-bezier(0.16, 1, 0.3, 1),
+    visibility 0s linear 0s;
+}
+
+.mobile-sheet {
+  display: block;
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 6500;
+  background: var(--bg);
+  color: var(--fg);
+  padding: 10px 20px calc(20px + env(safe-area-inset-bottom, 0px));
+  transform: translateY(110%);
+  transition: transform 0.55s cubic-bezier(0.16, 1, 0.3, 1);
+  max-height: 92vh;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+  will-change: transform;
+}
+.mobile-sheet.show { transform: translateY(0); }
+
+body:not([data-skin="minimal"]) .mobile-sheet {
+  border-top: 3px solid var(--fg);
+  box-shadow: 0 -6px 0 var(--accent);
+  border-radius: 0;
+}
+
+body[data-skin="minimal"] .mobile-sheet {
+  border-radius: 26px 26px 0 0;
+  border-top: 1px solid var(--m-line);
+  box-shadow: 0 -24px 60px -20px rgba(0,0,0,0.22);
+  padding-top: 12px;
+}
+body[data-skin="minimal"][data-mintone="dark"] .mobile-sheet {
+  box-shadow: 0 -24px 60px -20px rgba(0,0,0,0.6);
+}
+
+.mobile-sheet-handle {
+  width: 60px;
+  height: 3px;
+  background: var(--fg);
+  opacity: 0.35;
+  border-radius: 0;
+  margin: 4px auto 18px;
+  flex-shrink: 0;
+}
+body[data-skin="minimal"] .mobile-sheet-handle {
+  width: 38px;
+  height: 4px;
+  border-radius: 999px;
+  background: var(--fg-3);
+  opacity: 0.5;
+  margin: 6px auto 22px;
+}
+
+.mobile-sheet-nav {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+.mobile-sheet-item {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 17px 4px;
+  background: transparent;
+  border: none;
+  color: var(--fg);
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 1.05rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  cursor: pointer;
+  text-align: left;
+  width: 100%;
+  border-bottom: 1px solid var(--rule-soft);
+  transition: color 0.12s linear, padding-left 0.35s var(--ease);
+  -webkit-tap-highlight-color: transparent;
+}
+.mobile-sheet-item:last-of-type { border-bottom: none; }
+.mobile-sheet-item:active { padding-left: 10px; }
+.mobile-sheet-item.active { color: var(--accent); }
+
+body[data-skin="minimal"] .mobile-sheet-item {
+  font-family: var(--font-ui);
+  font-weight: 300;
+  font-size: 1.1rem;
+  letter-spacing: -0.005em;
+  text-transform: none;
+  padding: 19px 4px;
+  border-bottom: 1px solid var(--m-line);
+}
+
+.mobile-sheet-icon {
+  width: 22px;
+  height: 22px;
+  flex-shrink: 0;
+  color: var(--fg-3);
+  stroke-width: 1.8;
+  stroke-linecap: square;
+  stroke-linejoin: miter;
+  transition: color 0.15s linear;
+}
+body[data-skin="minimal"] .mobile-sheet-icon {
+  width: 20px;
+  height: 20px;
+  stroke-width: 1.3;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.mobile-sheet-item.active .mobile-sheet-icon { color: var(--accent); }
+
+.mobile-sheet-label {
+  flex: 1;
+  min-width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.mobile-sheet-check {
+  flex-shrink: 0;
+  font-family: var(--font-doc);
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--accent);
+  opacity: 0;
+  transform: translateX(-4px);
+  transition: opacity 0.2s ease, transform 0.3s var(--snap);
+}
+body[data-skin="minimal"] .mobile-sheet-check {
+  font-family: var(--font-ui);
+  font-weight: 400;
+  font-size: 0.85rem;
+}
+.mobile-sheet-item.active .mobile-sheet-check {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+.mobile-sheet-share {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  width: 100%;
+  margin-top: 22px;
+  padding: 15px 20px;
+  background: var(--bg);
+  border: 2px solid var(--fg);
+  color: var(--fg);
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 0.8rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all 0.12s linear;
+  -webkit-tap-highlight-color: transparent;
+}
+.mobile-sheet-share svg {
+  width: 16px;
+  height: 16px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: square;
+  stroke-linejoin: miter;
+}
+.mobile-sheet-share:active {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--accent-fg);
+}
+body[data-skin="minimal"] .mobile-sheet-share {
+  background: transparent;
+  border: 1px solid var(--m-line-strong);
+  border-radius: 999px;
+  font-family: var(--font-ui);
+  font-weight: 400;
+  font-size: 0.72rem;
+  letter-spacing: 0.2em;
+  padding: 14px 20px;
+}
+body[data-skin="minimal"] .mobile-sheet-share svg {
+  width: 15px;
+  height: 15px;
+  stroke-width: 1.4;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+body[data-skin="minimal"] .mobile-sheet-share:active {
+  background: var(--bg-2);
+  border-color: var(--accent);
+  color: var(--accent);
+}
 }
 
 /* ================================================================= */
@@ -948,7 +1253,6 @@ body[data-skin="minimal"] .media-card-arrow{
   transition:opacity .55s cubic-bezier(.16,1,.3,1), visibility 0s linear 0s;
 }
 
-/* мягкое затемнение по краям */
 .art-section::before{
   content:'';
   position:absolute;
@@ -971,7 +1275,6 @@ body[data-skin="minimal"][data-mintone="dark"] .art-section::before{
   z-index:2;
 }
 
-/* -------- КАРТИНА: МАКСИМУМ ЭКРАНА -------- */
 .art-image-wrap{
   position:absolute;
   inset:0;
@@ -1009,7 +1312,6 @@ body[data-skin="minimal"][data-mintone="dark"] .art-section::before{
   transition:none;
 }
 
-/* сама картина — как в паспарту, с многослойной тенью */
 .art-image{
   max-width:100%;
   max-height:100%;
@@ -1042,7 +1344,6 @@ body[data-skin="minimal"][data-mintone="dark"] .art-image{
     0 80px 160px -50px rgba(0,0,0,.85);
 }
 
-/* верхняя панель */
 .art-top{
   position:absolute;
   top:0; left:0; right:0;
@@ -1081,7 +1382,6 @@ body[data-skin="minimal"] .art-info{
 }
 .art-section.show .art-info{opacity:1;transform:translateY(0);}
 
-/* круглая кнопка выхода */
 .art-exit{
   flex-shrink:0;
   width:clamp(36px,3.6vw,42px);
@@ -1124,7 +1424,6 @@ body[data-skin="minimal"] .art-exit:hover{
 }
 .art-exit:active{transform:scale(.94)}
 
-/* ============ СТРЕЛКИ НАВИГАЦИИ ПО КАРТИНАМ ============ */
 .art-nav{
   position:absolute;
   top:50%;
@@ -1143,7 +1442,6 @@ body[data-skin="minimal"] .art-exit:hover{
   line-height:1;
   -webkit-tap-highlight-color:transparent;
   user-select:none;
-  /* classic look */
   background:var(--bg);
   border:2px solid var(--fg);
   color:var(--fg);
@@ -1181,7 +1479,6 @@ body[data-skin="minimal"] .art-exit:hover{
   visibility:visible;
 }
 
-/* minimal */
 body[data-skin="minimal"] .art-nav{
   width:clamp(44px,4.4vw,54px);
   height:clamp(44px,4.4vw,54px);
@@ -1206,7 +1503,6 @@ body[data-skin="minimal"] .art-nav:active{
   transform:translateY(-50%) scale(.94);
 }
 
-/* нижняя панель с переключателем */
 .art-bottom{
   position:absolute;
   left:auto; right:clamp(16px,2.2vw,26px); bottom:clamp(16px,2.2vw,26px);
@@ -1273,7 +1569,6 @@ body[data-skin="minimal"] .art-order-btn:hover:not(.active){
   color:var(--fg);
 }
 
-/* тонкая линия прогресса сверху */
 .art-progress{
   position:absolute;
   top:0; left:0; right:0;
@@ -1291,7 +1586,6 @@ body[data-skin="minimal"] .art-order-btn:hover:not(.active){
   opacity:.55;
 }
 
-/* состояния */
 .art-state{
   position:absolute;
   inset:0;
@@ -1310,7 +1604,6 @@ body[data-skin="minimal"] .art-order-btn:hover:not(.active){
 }
 .art-state.is-error{color:var(--accent);letter-spacing:.16em;}
 
-/* невидимый ловец скролла — под всем содержимым */
 .art-scroll-catcher{
   position:absolute;
   inset:0;
@@ -1318,9 +1611,7 @@ body[data-skin="minimal"] .art-order-btn:hover:not(.active){
   cursor:default;
 }
 
-/* ============ ART MOBILE ============ */
 @media (max-width:640px){
-  /* Картина — почти во всю ширину: стрелки полупрозрачно наложены поверх */
   .art-image-wrap{
     padding:46px 4px 56px;
   }
@@ -1342,7 +1633,6 @@ body[data-skin="minimal"] .art-order-btn:hover:not(.active){
     height:36px;
     font-size:1.1rem;
   }
-  /* Стрелки — маленькие, стеклянные, поверх картины */
   .art-nav,
   body[data-skin="minimal"] .art-nav{
     width:42px;
@@ -1395,7 +1685,6 @@ body[data-skin="minimal"] .art-order-btn:hover:not(.active){
   .art-nav.prev{left:4px}
   .art-nav.next{right:4px}
 }
-/* Мобильный ландшафт — вертикали мало, стрелки тоже overlay */
 @media (orientation: landscape) and (max-height: 560px){
   .art-image-wrap{
     padding:48px 8px 62px;
@@ -2587,17 +2876,19 @@ body[data-skin="minimal"] .stamp-opt-swatch{border-radius:50%;border-width:1px}
 <header class="header">
 <div class="header-masthead">
 <div class="masthead-cell masthead-left">
-<span>Стиль:</span>
-<button class="masthead-switch" id="skinSwitch" type="button" title="Визуаль">лёгкость</button>
+<button class="masthead-switch" id="skinSwitch" type="button" title="Стиль">
+<span class="masthead-switch-label">Стиль</span><span class="masthead-switch-sep">:</span><span class="masthead-switch-value">лёгкость</span>
+</button>
 </div>
 <div class="masthead-cell masthead-center"><span class="masthead-sep"></span><span></span><span class="masthead-sep"></span></div>
 <div class="masthead-cell masthead-right">
-<span class="masthead-sep optional">|</span>
-<span>Бумага:</span>
-<button class="masthead-switch" id="paperSwitch" type="button" title="Бумага">газетная</button>
+<button class="masthead-switch" id="paperSwitch" type="button" title="Бумага">
+<span class="masthead-switch-label">Бумага</span><span class="masthead-switch-sep">:</span><span class="masthead-switch-value">газетная</span>
+</button>
 <span class="masthead-sep">·</span>
-<span>Краска:</span>
-<button class="masthead-switch" id="inkSwitch" type="button" title="Краска">киноварь</button>
+<button class="masthead-switch" id="inkSwitch" type="button" title="Краска">
+<span class="masthead-switch-label">Краска</span><span class="masthead-switch-sep">:</span><span class="masthead-switch-value">киноварь</span>
+</button>
 </div>
 </div>
 <div class="header-kicker">УЧИТЬСЯ, УЧИТЬСЯ И ЕЩЁ РАЗ УЧИТЬСЯ</div>
@@ -2611,9 +2902,9 @@ body[data-skin="minimal"] .stamp-opt-swatch{border-radius:50%;border-width:1px}
 <button class="section-switch-btn" data-section="parents">РОДИТЕЛЯМ</button>
 <button class="section-switch-btn" data-section="poetry">ПОЭЗИЯ</button>
 </div>
-<button class="section-cycle-btn" id="sectionCycleBtn" type="button">
+<button class="section-cycle-btn" id="sectionCycleBtn" type="button" aria-haspopup="dialog">
 <span class="section-cycle-label">УЧИ СЛОГИ</span>
-<span class="section-cycle-arrow">➛</span>
+<svg class="section-cycle-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 15 12 9 18 15"/></svg>
 </button>
 <div class="section-subtitles">
 <div class="section-subtitle active" data-section="syllables">ЖМИ, СЛУШАЙ, ЗАПОМИНАЙ</div>
@@ -2632,12 +2923,25 @@ body[data-skin="minimal"] .stamp-opt-swatch{border-radius:50%;border-width:1px}
 <div class="content-wrapper">
 <section id="syllablesSection" class="tab-section active">
 <div class="controls">
-<button id="normalBtn" class="active" data-tooltip="Все">▦</button>
-<button id="randomBtn" data-tooltip="Случайно">⇄</button>
-<button id="hideLearnedBtn" data-tooltip="Скрыть/показать">👁</button>
-<button id="clearLearnedBtn" data-tooltip="Очистить">✕</button>
-<button id="examBtn" data-tooltip="Викторина">⚑</button>
-<button id="dictationBtn" data-tooltip="Диктант">✎</button>
+<button id="normalBtn" class="active" data-tooltip="Все" aria-label="Все">
+<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="3.5" width="7" height="7"/><rect x="13.5" y="3.5" width="7" height="7"/><rect x="3.5" y="13.5" width="7" height="7"/><rect x="13.5" y="13.5" width="7" height="7"/></svg>
+</button>
+<button id="randomBtn" data-tooltip="Случайно" aria-label="Случайно">
+<svg viewBox="0 0 24 24" aria-hidden="true"><polyline points="16 3 21 3 21 8"/><line x1="4" y1="20" x2="21" y2="3"/><polyline points="21 16 21 21 16 21"/><line x1="15" y1="15" x2="21" y2="21"/><line x1="4" y1="4" x2="9" y2="9"/></svg>
+</button>
+<button id="hideLearnedBtn" data-tooltip="Скрыть/показать" aria-label="Скрыть/показать">
+<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+</button>
+<button id="clearLearnedBtn" data-tooltip="Очистить" aria-label="Очистить">
+<svg viewBox="0 0 24 24" aria-hidden="true"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+</button>
+<span class="controls-sep" aria-hidden="true"></span>
+<button id="examBtn" data-tooltip="Викторина" aria-label="Викторина">
+<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 22V3"/><path d="M5 4h12l-2 4 2 4H5"/></svg>
+</button>
+<button id="dictationBtn" data-tooltip="Диктант" aria-label="Диктант">
+<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5z"/></svg>
+</button>
 </div>
 <div class="grid-container"><div class="syllable-grid" id="syllableGrid"></div></div>
 </section>
@@ -2968,6 +3272,53 @@ body[data-skin="minimal"] .stamp-opt-swatch{border-radius:50%;border-width:1px}
   </div>
 </div>
 
+<!-- ================= MOBILE BOTTOM SHEET ================= -->
+<div class="mobile-sheet-backdrop" id="mobileSheetBackdrop" aria-hidden="true"></div>
+<div class="mobile-sheet" id="mobileSheet" role="dialog" aria-modal="true" aria-label="Разделы" aria-hidden="true">
+  <div class="mobile-sheet-handle" aria-hidden="true"></div>
+  <nav class="mobile-sheet-nav" id="mobileSheetNav">
+    <button class="mobile-sheet-item active" data-section="syllables" type="button">
+      <svg class="mobile-sheet-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+      <span class="mobile-sheet-label">Учи слоги</span>
+      <span class="mobile-sheet-check" aria-hidden="true">✓</span>
+    </button>
+    <button class="mobile-sheet-item" data-section="clock" type="button">
+      <svg class="mobile-sheet-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true"><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15 14"/></svg>
+      <span class="mobile-sheet-label">Знай время</span>
+      <span class="mobile-sheet-check" aria-hidden="true">✓</span>
+    </button>
+    <button class="mobile-sheet-item" data-section="heroes" type="button">
+      <svg class="mobile-sheet-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true"><polygon points="12 2 15 9 22 9.5 17 14.5 18.5 22 12 18 5.5 22 7 14.5 2 9.5 9 9"/></svg>
+      <span class="mobile-sheet-label">Чти великих</span>
+      <span class="mobile-sheet-check" aria-hidden="true">✓</span>
+    </button>
+    <button class="mobile-sheet-item" data-section="art" type="button">
+      <svg class="mobile-sheet-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="1"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+      <span class="mobile-sheet-label">Живопись</span>
+      <span class="mobile-sheet-check" aria-hidden="true">✓</span>
+    </button>
+    <button class="mobile-sheet-item" data-section="cartoons" type="button">
+      <svg class="mobile-sheet-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polygon points="10 8 16 12 10 16" fill="currentColor" stroke="none"/></svg>
+      <span class="mobile-sheet-label">Мульты</span>
+      <span class="mobile-sheet-check" aria-hidden="true">✓</span>
+    </button>
+    <button class="mobile-sheet-item" data-section="parents" type="button">
+      <svg class="mobile-sheet-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21v-1a6 6 0 0 1 6-6h4a6 6 0 0 1 6 6v1"/></svg>
+      <span class="mobile-sheet-label">Родителям</span>
+      <span class="mobile-sheet-check" aria-hidden="true">✓</span>
+    </button>
+    <button class="mobile-sheet-item" data-section="poetry" type="button">
+      <svg class="mobile-sheet-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true"><path d="M20.24 12.24a6 6 0 0 0-8.49-8.49L5 10.5V19h8.5z"/><line x1="16" y1="8" x2="2" y2="22"/><line x1="17.5" y1="15" x2="9" y2="15"/></svg>
+      <span class="mobile-sheet-label">Поэзия</span>
+      <span class="mobile-sheet-check" aria-hidden="true">✓</span>
+    </button>
+  </nav>
+  <button class="mobile-sheet-share" id="mobileSheetShare" type="button">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg>
+    <span>Поделиться сайтом</span>
+  </button>
+</div>
+
 <div class="progress-container" id="progressContainer">
 <div class="progress-label" id="progressLabel">Отмечено: 0 из 0</div>
 <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
@@ -3032,11 +3383,71 @@ let currentMode = 'all'; let randomItems = []; let currentAudio = null; let exam
 const SECTION_ORDER = ['syllables', 'clock', 'heroes', 'art', 'poetry', 'cartoons', 'parents'];
 const SECTION_LABELS = { syllables: 'Учи слоги', clock: 'Знай время', heroes: 'Чти великих', art: 'Живопись', poetry: 'Поэзия', cartoons: 'Мульты', parents: 'Родителям' };
 function updateCycleBtn() { if (!sectionCycleBtn) return; const l = sectionCycleBtn.querySelector('.section-cycle-label'); if (l) l.textContent = SECTION_LABELS[currentSection]; }
-if (sectionCycleBtn) { sectionCycleBtn.addEventListener('click', () => { const i = SECTION_ORDER.indexOf(currentSection); switchSection(SECTION_ORDER[(i + 1) % SECTION_ORDER.length]); }); }
+function updateMobileSheetActive() {
+  document.querySelectorAll('.mobile-sheet-item').forEach(item => {
+    item.classList.toggle('active', item.dataset.section === currentSection);
+  });
+}
+/* ====================== MOBILE BOTTOM SHEET ====================== */
+const mobileSheet = document.getElementById('mobileSheet');
+const mobileSheetBackdrop = document.getElementById('mobileSheetBackdrop');
+const mobileSheetShare = document.getElementById('mobileSheetShare');
+function openMobileSheet() {
+  if (!mobileSheet) return;
+  updateMobileSheetActive();
+  if (sectionCycleBtn) sectionCycleBtn.classList.add('open');
+  mobileSheetBackdrop.classList.add('show');
+  mobileSheet.setAttribute('aria-hidden', 'false');
+  requestAnimationFrame(() => mobileSheet.classList.add('show'));
+  document.body.style.overflow = 'hidden';
+}
+function closeMobileSheet() {
+  if (!mobileSheet) return;
+  if (sectionCycleBtn) sectionCycleBtn.classList.remove('open');
+  mobileSheet.classList.remove('show');
+  mobileSheet.setAttribute('aria-hidden', 'true');
+  mobileSheetBackdrop.classList.remove('show');
+  document.body.style.overflow = '';
+}
+if (mobileSheetBackdrop) mobileSheetBackdrop.addEventListener('click', closeMobileSheet);
+if (mobileSheet) {
+  mobileSheet.querySelectorAll('.mobile-sheet-item').forEach(item => {
+    item.addEventListener('click', () => {
+      const s = item.dataset.section;
+      closeMobileSheet();
+      setTimeout(() => switchSection(s), 60);
+    });
+  });
+}
+if (mobileSheetShare) {
+  mobileSheetShare.addEventListener('click', async () => {
+    const url = window.location.origin + window.location.pathname;
+    const shareData = { title: 'Грамотиньо', text: 'Учимся читать играя — Грамотиньо', url };
+    if (navigator.share) {
+      try { await navigator.share(shareData); } catch (e) {}
+    } else if (navigator.clipboard) {
+      try {
+        await navigator.clipboard.writeText(url);
+        closeMobileSheet();
+        showToast('Ссылка скопирована', 'success');
+      } catch (e) {
+        showToast('Не удалось скопировать', 'error');
+      }
+    } else {
+      closeMobileSheet();
+      showToast('Ссылка: ' + url, 'info');
+    }
+  });
+}
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape' && mobileSheet && mobileSheet.classList.contains('show')) closeMobileSheet();
+});
+/* ==================== /MOBILE BOTTOM SHEET ====================== */
+if (sectionCycleBtn) { sectionCycleBtn.addEventListener('click', () => { openMobileSheet(); }); }
 function loadLearnedSet() { try { return new Set(JSON.parse(localStorage.getItem('learned_syllables') || '[]')); } catch { return new Set(); } }
 function saveLearnedSet(s) { localStorage.setItem('learned_syllables', JSON.stringify(Array.from(s))); }
 let learnedSet = loadLearnedSet();
-function switchSection(s) { if (s === currentSection) return; currentSection = s; syllablesSection.classList.toggle('active', s === 'syllables'); clockSection.classList.toggle('active', s === 'clock'); heroesSection.classList.toggle('active', s === 'heroes'); if (poetrySection) poetrySection.classList.toggle('active', s === 'poetry'); if (cartoonsSection) cartoonsSection.classList.toggle('active', s === 'cartoons'); if (parentsSection) parentsSection.classList.toggle('active', s === 'parents'); sectionBtns.forEach(b => b.classList.toggle('active', b.dataset.section === s)); sectionSubtitleEls.forEach(e => e.classList.toggle('active', e.dataset.section === s)); updateCycleBtn(); if (s !== 'clock' && window.clockSpeakCancel) window.clockSpeakCancel(); if (s !== 'syllables') progressContainer.classList.remove('show'); if (s === 'art' && typeof window.artOpen === 'function') window.artOpen(); else if (typeof window.artClose === 'function') window.artClose(); }
+function switchSection(s) { if (s === currentSection) return; currentSection = s; syllablesSection.classList.toggle('active', s === 'syllables'); clockSection.classList.toggle('active', s === 'clock'); heroesSection.classList.toggle('active', s === 'heroes'); if (poetrySection) poetrySection.classList.toggle('active', s === 'poetry'); if (cartoonsSection) cartoonsSection.classList.toggle('active', s === 'cartoons'); if (parentsSection) parentsSection.classList.toggle('active', s === 'parents'); sectionBtns.forEach(b => b.classList.toggle('active', b.dataset.section === s)); sectionSubtitleEls.forEach(e => e.classList.toggle('active', e.dataset.section === s)); updateCycleBtn(); updateMobileSheetActive(); if (s !== 'clock' && window.clockSpeakCancel) window.clockSpeakCancel(); if (s !== 'syllables') progressContainer.classList.remove('show'); if (s === 'art' && typeof window.artOpen === 'function') window.artOpen(); else if (typeof window.artClose === 'function') window.artClose(); }
 sectionBtns.forEach(b => b.addEventListener('click', () => switchSection(b.dataset.section)));
 window.addEventListener('scroll', () => scrollTopBtn.classList.toggle('visible', window.scrollY > 300));
 scrollTopBtn.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
@@ -3250,7 +3661,7 @@ function renderHeroesTimeline() { if (!heroesTimeline) return; const centuries =
 let heroModal = null, heroAudio = new Audio(), currentImageIndex = 0, currentImages = [];
 function openHeroModal(name, images, audioSrc, birthYear, deathYear) { if (heroModal) heroModal.remove(); currentImages = images; currentImageIndex = 0; const nH = images.length > 1 ? `<button class="hero-nav prev" type="button" aria-label="Предыдущий">‹</button><button class="hero-nav next" type="button" aria-label="Следующий">›</button>` : ''; const ini = name.split(/\s+/).map(w => w.charAt(0)).join('').slice(0, 2).toUpperCase(); heroModal = document.createElement('div'); heroModal.className = 'hero-modal'; heroModal.innerHTML = `<button class="hero-modal-repeat" type="button" aria-label="Повторить звук">♪</button><button class="hero-modal-close" type="button" aria-label="Закрыть">×</button><div class="hero-modal-portrait-wrap">${nH}<img class="hero-modal-portrait" src="${images[0]}" alt="${name}"></div><div class="hero-modal-info"><h3>${name}</h3><div class="hero-modal-years">${birthYear} — ${deathYear}</div></div><div class="hero-modal-timeline">${buildTimelineHTML(birthYear, deathYear)}</div>`; const imgEl = heroModal.querySelector('.hero-modal-portrait'); imgEl.addEventListener('error', () => { const p = document.createElement('div'); p.className = 'hero-portrait-placeholder'; p.textContent = ini; imgEl.replaceWith(p); }); document.body.appendChild(heroModal); playHeroAudio(audioSrc); heroModal.querySelector('.hero-modal-close').addEventListener('click', () => { heroModal.remove(); heroAudio.pause(); heroAudio.currentTime = 0; }); heroModal.querySelector('.hero-modal-repeat').addEventListener('click', () => playHeroAudio(audioSrc)); const pB = heroModal.querySelector('.hero-nav.prev'), nB = heroModal.querySelector('.hero-nav.next'); if (pB) pB.addEventListener('click', () => { currentImageIndex = (currentImageIndex - 1 + currentImages.length) % currentImages.length; const im = heroModal.querySelector('.hero-modal-portrait'); if (im) im.src = currentImages[currentImageIndex]; }); if (nB) nB.addEventListener('click', () => { currentImageIndex = (currentImageIndex + 1) % currentImages.length; const im = heroModal.querySelector('.hero-modal-portrait'); if (im) im.src = currentImages[currentImageIndex]; }); }
 function playHeroAudio(s) { heroAudio.src = s; heroAudio.play().catch(e => console.log('Ошибка воспроизведения', e)); }
-renderHeroesTimeline(); renderGrid(); updateCycleBtn();
+renderHeroesTimeline(); renderGrid(); updateCycleBtn(); updateMobileSheetActive();
 })();
 (function () {
 const STORAGE_PAPER = 'gramotino_paper', STORAGE_INK = 'gramotino_ink';
@@ -3261,8 +3672,14 @@ let currentPaperKey = 'newsprint', currentInkKey = 'kinovar', openMode = null;
 function pad2(n) { return String(n).padStart(2, '0'); }
 function findPaper(k) { return PAPERS.find(p => p.key === k) || PAPERS[0]; }
 function findInk(k) { return INKS.find(i => i.key === k) || INKS[0]; }
-function applyPaper(k, silent) { if (!PAPERS.some(p => p.key === k)) k = 'newsprint'; currentPaperKey = k; body.dataset.paper = k; try { localStorage.setItem(STORAGE_PAPER, k); } catch (e) { } if (paperSwitch) paperSwitch.textContent = findPaper(k).label; if (!silent && openMode === 'paper') renderStampList('paper'); }
-function applyInk(k, silent) { if (!INKS.some(i => i.key === k)) k = 'kinovar'; currentInkKey = k; body.dataset.ink = k; try { localStorage.setItem(STORAGE_INK, k); } catch (e) { } if (inkSwitch) inkSwitch.textContent = findInk(k).label; if (!silent && openMode === 'ink') renderStampList('ink'); }
+function setSwitchValue(btn, value) {
+  if (!btn) return;
+  const val = btn.querySelector('.masthead-switch-value');
+  if (val) val.textContent = value;
+  else btn.textContent = value;
+}
+function applyPaper(k, silent) { if (!PAPERS.some(p => p.key === k)) k = 'newsprint'; currentPaperKey = k; body.dataset.paper = k; try { localStorage.setItem(STORAGE_PAPER, k); } catch (e) { } if (paperSwitch) setSwitchValue(paperSwitch, findPaper(k).label); if (!silent && openMode === 'paper') renderStampList('paper'); }
+function applyInk(k, silent) { if (!INKS.some(i => i.key === k)) k = 'kinovar'; currentInkKey = k; body.dataset.ink = k; try { localStorage.setItem(STORAGE_INK, k); } catch (e) { } if (inkSwitch) setSwitchValue(inkSwitch, findInk(k).label); if (!silent && openMode === 'ink') renderStampList('ink'); }
 function cyclePaper() { const i = PAPERS.findIndex(p => p.key === currentPaperKey); applyPaper(PAPERS[(i + 1) % PAPERS.length].key); }
 function cycleInk() { const i = INKS.findIndex(p => p.key === currentInkKey); applyInk(INKS[(i + 1) % INKS.length].key); }
 function toneLabel(){ return body.dataset.mintone === 'dark' ? 'тёмная' : 'светлая'; }
@@ -3285,7 +3702,7 @@ function renderToneList() {
     btn.addEventListener('click', () => {
       body.dataset.mintone = item.key;
       try { localStorage.setItem('gramotino_mintone', item.key); } catch(e){}
-      if (paperSwitch) paperSwitch.textContent = toneLabel();
+      if (paperSwitch) setSwitchValue(paperSwitch, toneLabel());
       renderStampList('paper');
     });
     stampList.appendChild(btn);
@@ -3300,7 +3717,7 @@ paperSwitch.addEventListener('click', () => {
     const t = body.dataset.mintone === 'dark' ? 'light' : 'dark';
     body.dataset.mintone = t;
     try { localStorage.setItem('gramotino_mintone', t); } catch(e){}
-    paperSwitch.textContent = toneLabel();
+    setSwitchValue(paperSwitch, toneLabel());
     return;
   }
   cyclePaper();
@@ -3317,9 +3734,9 @@ window.addEventListener('scroll', () => { if (openMode) closeStamp(); }, { passi
 let sp = 'newsprint', si = 'kinovar'; try { sp = localStorage.getItem(STORAGE_PAPER) || 'newsprint'; si = localStorage.getItem(STORAGE_INK) || 'kinovar'; } catch (e) { } applyPaper(sp, true); applyInk(si, true);
 window.__syncSkinControls = function(){
   const ss = document.getElementById('skinSwitch');
-  if (ss) ss.textContent = (body.dataset.skin === 'minimal') ? 'лёгкий' : 'классический';
+  if (ss) setSwitchValue(ss, (body.dataset.skin === 'minimal') ? 'лёгкость' : 'классика');
   if (!paperSwitch) return;
-  paperSwitch.textContent = (body.dataset.skin === 'minimal') ? toneLabel() : findPaper(currentPaperKey).label;
+  setSwitchValue(paperSwitch, (body.dataset.skin === 'minimal') ? toneLabel() : findPaper(currentPaperKey).label);
   if (openMode) renderStampList(openMode);
 };
 window.__syncSkinControls();
@@ -3737,15 +4154,6 @@ render(); renderSecondHand(); setView('watch');
   const body = document.body;
   const h1 = document.querySelector('.header h1');
   if (!h1) return;
-  function toast(msg) {
-    const c = document.getElementById('toastContainer');
-    if (!c) return;
-    const el = document.createElement('div');
-    el.className = 'toast';
-    el.textContent = msg;
-    c.appendChild(el);
-    setTimeout(() => el.remove(), 2600);
-  }
   function apply(skin, tone) {
     body.dataset.skin = skin;
     body.dataset.mintone = tone;
@@ -4037,7 +4445,6 @@ let order = 'random';
   window.artOpen  = openArt;
   window.artClose = closeArt;
 
-  // Выход из живописи — всегда в раздел "Учи слоги"
   exitBtn.addEventListener('click', e => {
     e.preventDefault();
     closeArt();
@@ -4057,7 +4464,6 @@ let order = 'random';
     });
   });
 
-  // Клики по стрелкам
   if (prevBtn) prevBtn.addEventListener('click', e => { e.preventDefault(); step(-1); });
   if (nextBtn) nextBtn.addEventListener('click', e => { e.preventDefault(); step(1); });
 
