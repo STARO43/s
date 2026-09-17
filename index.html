@@ -2777,392 +2777,9 @@ body[data-skin="minimal"] .stamp-opt-swatch{border-radius:50%;border-width:1px}
   .mobile-nav-item { width: 42px; height: 36px; }
   .mobile-nav-item svg { width: 19px; height: 19px; }
 }
-
-/* ============================================================ */
-/* ==================== ГЛАВНАЯ СТРАНИЦА ====================== */
-/* ============================================================ */
-
-body.home-active .header h1,
-body.home-active .header-kicker { display: none; }
-body.home-active .header-masthead { border-bottom: none; padding-bottom: 6px; }
-body.home-active .section-switch { border-top: none; }
-body.home-active .section-subtitles { border-bottom: none; }
-
-body[data-skin="minimal"] .header h1 { margin: 22px 0 40px; }
-body[data-skin="minimal"].home-active .header-masthead { border-bottom: none; }
-body[data-skin="minimal"].home-active .section-switch { border-top: none; }
-body[data-skin="minimal"].home-active .section-subtitles { border-bottom: none; }
-
-/* ---------- Hero ---------- */
-.home-section { padding: 0; }
-
-.home-hero {
-  position: relative;
-  min-height: 78vh;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  padding: 60px 20px 100px;
-  overflow: hidden;
-  text-align: center;
-  isolation: isolate;
-}
-
-.home-stars {
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  z-index: 0;
-}
-
-.home-star {
-  position: absolute;
-  display: block;
-  transform-origin: 50% 50%;
-  filter:
-    drop-shadow(0 0 22px rgba(227, 6, 19, 0.55))
-    drop-shadow(0 0 6px rgba(230, 180, 74, 0.35));
-  animation: homeStarSpin 44s linear infinite;
-  will-change: transform;
-}
-.home-star polygon { transform-origin: 50% 50%; }
-
-.home-star-1 { width: clamp(90px, 12vw, 165px); top: 6%; right: 5%;  animation-duration: 52s; animation-delay: 0s; }
-.home-star-2 { width: clamp(70px, 9vw, 130px);  bottom: 12%; left: 4%; animation-duration: 60s; animation-delay: -15s; animation-direction: reverse; }
-.home-star-3 { width: clamp(50px, 6vw, 95px);   top: 22%; left: 7%;  animation-duration: 40s; animation-delay: -22s; opacity: 0.9; }
-.home-star-4 { width: clamp(44px, 5.5vw, 82px); bottom: 18%; right: 9%; animation-duration: 47s; animation-delay: -8s; opacity: 0.85; }
-.home-star-5 { width: clamp(36px, 4.4vw, 66px); top: 46%; right: 22%; animation-duration: 36s; animation-delay: -18s; opacity: 0.7; animation-direction: reverse; }
-.home-star-6 { width: clamp(30px, 3.6vw, 52px); top: 58%; left: 20%;  animation-duration: 30s; animation-delay: -11s; opacity: 0.6; }
-
-@keyframes homeStarSpin {
-  from { transform: rotate(0deg); }
-  to   { transform: rotate(360deg); }
-}
-
-.home-hero-content {
-  position: relative;
-  z-index: 1;
-  max-width: 1000px;
-  width: 100%;
-}
-
-.home-kicker {
-  font-family: var(--font-doc);
-  font-size: 0.58rem;
-  font-weight: 600;
-  letter-spacing: 0.42em;
-  text-transform: uppercase;
-  color: var(--fg-3);
-  margin: 0 0 30px;
-  animation: homeFadeIn 1.2s var(--ease) both;
-}
-
-.home-title {
-  font-family: var(--font-display);
-  font-weight: 700;
-  font-size: clamp(3.4rem, 15.5vw, 12.5rem);
-  line-height: 0.86;
-  letter-spacing: -0.02em;
-  text-transform: uppercase;
-  color: var(--fg);
-  margin: 0;
-  animation: homeFadeIn 1s var(--ease) 0.1s both;
-  text-shadow: 0 0 60px rgba(227, 6, 19, 0.18);
-}
-.home-title::after { content: '.'; color: var(--accent); }
-
-.home-divider {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 18px;
-  margin: 34px auto 24px;
-  max-width: 460px;
-  animation: homeFadeIn 1s var(--ease) 0.25s both;
-}
-.home-divider::before,
-.home-divider::after {
-  content: '';
-  flex: 1;
-  height: 1px;
-  background: var(--rule-soft);
-}
-body[data-skin="minimal"] .home-divider::before,
-body[data-skin="minimal"] .home-divider::after { background: var(--m-line-strong); }
-.home-divider-star {
-  display: inline-block;
-  color: var(--accent);
-  font-size: 0.9rem;
-  line-height: 1;
-  animation: homeDividerSpin 14s linear infinite;
-}
-@keyframes homeDividerSpin {
-  from { transform: rotate(0deg); }
-  to   { transform: rotate(360deg); }
-}
-
-.home-tagline {
-  font-family: var(--font-serif-display);
-  font-weight: 500;
-  font-style: italic;
-  font-size: clamp(1.05rem, 2.1vw, 1.6rem);
-  line-height: 1.5;
-  letter-spacing: -0.004em;
-  color: var(--fg-2);
-  margin: 0 auto;
-  max-width: 34ch;
-  animation: homeFadeIn 1s var(--ease) 0.4s both;
-}
-
-@keyframes homeFadeIn {
-  from { opacity: 0; transform: translateY(14px); }
-  to   { opacity: 1; transform: translateY(0); }
-}
-
-.home-scroll-hint {
-  position: absolute;
-  bottom: 28px;
-  left: 50%;
-  transform: translateX(-50%);
-  font-family: var(--font-doc);
-  font-size: 0.6rem;
-  font-weight: 600;
-  letter-spacing: 0.3em;
-  text-transform: uppercase;
-  color: var(--fg-3);
-  z-index: 1;
-  animation: homeHintPulse 2.6s ease-in-out infinite;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 6px;
-}
-.home-scroll-hint::after {
-  content: '';
-  width: 1px; height: 22px;
-  background: currentColor;
-  opacity: 0.6;
-}
-@keyframes homeHintPulse {
-  0%, 100% { opacity: 0.35; transform: translate(-50%, 0); }
-  50%      { opacity: 1;    transform: translate(-50%, 6px); }
-}
-
-/* ---------- Две аудитории ---------- */
-.home-audiences {
-  max-width: 960px;
-  margin: 0 auto;
-  padding: 24px 20px 110px;
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: clamp(28px, 4vw, 72px);
-  position: relative;
-}
-.home-audiences::before {
-  content: '';
-  position: absolute;
-  top: 40px;
-  bottom: 110px;
-  left: 50%;
-  width: 1px;
-  background: var(--rule-soft);
-  transform: translateX(-0.5px);
-}
-body[data-skin="minimal"] .home-audiences::before { background: var(--m-line); }
-
-.home-audience { min-width: 0; }
-
-.home-audience-head {
-  display: flex;
-  align-items: baseline;
-  gap: 14px;
-  padding-bottom: 20px;
-  margin-bottom: 20px;
-  border-bottom: 2px solid var(--fg);
-}
-body[data-skin="minimal"] .home-audience-head { border-bottom: 1px solid var(--m-line-strong); }
-
-.home-audience-num {
-  font-family: var(--font-doc);
-  font-size: 0.62rem;
-  font-weight: 700;
-  letter-spacing: 0.22em;
-  color: var(--accent);
-  flex-shrink: 0;
-}
-
-.home-audience-title {
-  font-family: var(--font-display);
-  font-size: clamp(1.4rem, 3vw, 2.1rem);
-  font-weight: 600;
-  letter-spacing: 0.02em;
-  text-transform: uppercase;
-  color: var(--fg);
-  line-height: 1;
-  flex: 1;
-}
-body[data-skin="minimal"] .home-audience-title {
-  font-family: var(--font-ui);
-  font-weight: 300;
-  letter-spacing: 0.04em;
-  text-transform: none;
-}
-.home-audience-title::after { content: '.'; color: var(--accent); }
-
-.home-audience-count {
-  font-family: var(--font-doc);
-  font-size: 0.55rem;
-  font-weight: 600;
-  letter-spacing: 0.24em;
-  text-transform: uppercase;
-  color: var(--fg-3);
-  white-space: nowrap;
-  flex-shrink: 0;
-}
-
-.home-audience-lead {
-  font-family: var(--font-serif-body);
-  font-style: italic;
-  font-size: 0.98rem;
-  line-height: 1.55;
-  color: var(--fg-2);
-  margin-bottom: 18px;
-  letter-spacing: 0.002em;
-}
-
-.home-audience-list {
-  display: flex;
-  flex-direction: column;
-}
-
-.home-entry {
-  display: grid;
-  grid-template-columns: 30px 1fr auto;
-  align-items: baseline;
-  gap: 14px;
-  padding: 20px 0;
-  border-bottom: 1px solid var(--rule-soft);
-  text-decoration: none;
-  color: inherit;
-  cursor: pointer;
-  transition: padding .4s var(--ease);
-  -webkit-tap-highlight-color: transparent;
-}
-body[data-skin="minimal"] .home-entry { border-bottom-color: var(--m-line); }
-.home-audience-list .home-entry:last-child { border-bottom: none; }
-
-.home-entry-num {
-  font-family: var(--font-doc);
-  font-size: 0.6rem;
-  font-weight: 600;
-  letter-spacing: 0.16em;
-  color: var(--fg-3);
-  transition: color .3s ease;
-  padding-top: 2px;
-}
-
-.home-entry-body { min-width: 0; }
-
-.home-entry-title {
-  font-family: var(--font-display);
-  font-size: clamp(1rem, 1.7vw, 1.25rem);
-  font-weight: 600;
-  letter-spacing: 0.02em;
-  text-transform: uppercase;
-  color: var(--fg);
-  line-height: 1.15;
-  transition: color .3s ease;
-}
-body[data-skin="minimal"] .home-entry-title {
-  font-family: var(--font-ui);
-  font-weight: 400;
-  letter-spacing: 0.004em;
-  text-transform: none;
-}
-
-.home-entry-sub {
-  font-family: var(--font-ui);
-  font-size: 0.74rem;
-  font-weight: 300;
-  color: var(--fg-3);
-  margin-top: 5px;
-  line-height: 1.45;
-  letter-spacing: 0.005em;
-}
-
-.home-entry-arrow {
-  font-family: var(--font-ui);
-  font-size: 0.9rem;
-  color: var(--fg-3);
-  opacity: 0;
-  transform: translateX(-6px);
-  transition:
-    opacity .3s var(--ease),
-    transform .3s var(--ease),
-    color .3s ease;
-  padding-top: 2px;
-}
-
-.home-entry:hover { padding-left: 8px; }
-.home-entry:hover .home-entry-title { color: var(--accent); }
-.home-entry:hover .home-entry-num   { color: var(--accent); }
-.home-entry:hover .home-entry-arrow {
-  opacity: 1;
-  transform: translateX(0);
-  color: var(--accent);
-}
-
-/* ---------- Адаптив ---------- */
-@media (max-width: 760px) {
-  .home-hero {
-    min-height: 68vh;
-    padding: 40px 16px 80px;
-  }
-  .home-kicker {
-    font-size: 0.5rem;
-    letter-spacing: 0.3em;
-    margin-bottom: 20px;
-  }
-  .home-title { font-size: clamp(2.8rem, 22vw, 7rem); }
-  .home-tagline { font-size: 0.95rem; max-width: 26ch; }
-  .home-divider { margin: 22px auto 16px; max-width: 280px; gap: 12px; }
-
-  .home-star-1 { width: 64px; top: 5%; right: 3%; }
-  .home-star-2 { width: 56px; bottom: 8%; left: 3%; }
-  .home-star-3 { width: 40px; top: 15%; left: 5%; }
-  .home-star-4 { width: 36px; bottom: 13%; right: 5%; }
-  .home-star-5 { display: none; }
-  .home-star-6 { display: none; }
-
-  .home-audiences {
-    grid-template-columns: 1fr;
-    gap: 0;
-    padding: 8px 14px 90px;
-  }
-  .home-audiences::before { display: none; }
-  .home-audience {
-    padding: 30px 0;
-    border-bottom: 1px solid var(--rule-soft);
-  }
-  body[data-skin="minimal"] .home-audience { border-bottom-color: var(--m-line); }
-  .home-audience:last-child { border-bottom: none; padding-bottom: 20px; }
-  .home-audience-count { display: none; }
-  .home-audience-lead { font-size: 0.9rem; margin-bottom: 14px; }
-  .home-entry {
-    padding: 16px 0;
-    grid-template-columns: 24px 1fr auto;
-    gap: 10px;
-  }
-  .home-entry-sub { font-size: 0.68rem; }
-}
-
-@media (max-width: 420px) {
-  .home-audience-head { padding-bottom: 16px; margin-bottom: 16px; gap: 10px; }
-}
 </style>
 </head>
-<body data-paper="newsprint" data-ink="kinovar" data-skin="minimal" data-mintone="dark" class="home-active">
+<body data-paper="newsprint" data-ink="kinovar" data-skin="minimal" data-mintone="dark">
 <script>
 (function(){try{
   document.body.dataset.skin    = localStorage.getItem('gramotino_skin')    || 'minimal';
@@ -3190,8 +2807,7 @@ body[data-skin="minimal"] .home-entry-title {
 <div class="header-kicker">УЧИТЬСЯ, УЧИТЬСЯ И ЕЩЁ РАЗ УЧИТЬСЯ</div>
 <h1>Грамотиньо</h1>
 <div class="section-switch">
-<button class="section-switch-btn active" data-section="home">ГЛАВНАЯ</button>
-<button class="section-switch-btn" data-section="syllables">УЧИ СЛОГИ</button>
+<button class="section-switch-btn active" data-section="syllables">УЧИ СЛОГИ</button>
 <button class="section-switch-btn" data-section="clock">ЗНАЙ ВРЕМЯ</button>
 <button class="section-switch-btn" data-section="heroes">ЧТИ ВЕЛИКИХ</button>
 <button class="section-switch-btn" data-section="art">ЖИВОПИСЬ</button>
@@ -3200,8 +2816,7 @@ body[data-skin="minimal"] .home-entry-title {
 <button class="section-switch-btn" data-section="poetry">ПОЭЗИЯ</button>
 </div>
 <div class="section-subtitles">
-<div class="section-subtitle active" data-section="home">КУЛЬТУРА · ЯЗЫК · ИСТОРИЯ · НАУКА · ТЕХНИКА · ПЕДАГОГИКА</div>
-<div class="section-subtitle" data-section="syllables">ЖМИ, СЛУШАЙ, ЗАПОМИНАЙ</div>
+<div class="section-subtitle active" data-section="syllables">ЖМИ, СЛУШАЙ, ЗАПОМИНАЙ</div>
 <div class="section-subtitle" data-section="clock"><span class="digital-clock-inline" id="clockDigital24">03:00</span></div>
 <div class="section-subtitle" data-section="heroes">ВЕЛИКИЕ ЛИЧНОСТИ ОТЕЧЕСТВА</div>
 <div class="section-subtitle" data-section="art">КАРТИНЫ РУССКИХ ХУДОЖНИКОВ</div>
@@ -3215,147 +2830,7 @@ body[data-skin="minimal"] .home-entry-title {
 <div class="stamp-list" id="stampList"></div>
 </div>
 <div class="content-wrapper">
-
-<!-- ============ ГЛАВНАЯ ============ -->
-<section id="homeSection" class="tab-section home-section active">
-  <div class="home-hero">
-    <div class="home-stars" aria-hidden="true">
-      <svg class="home-star home-star-1" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
-        <polygon points="50,8 62,38 92,38 68,60 78,90 50,74 22,90 32,60 8,38 38,38"
-                 fill="#c11d1d" stroke="#e0b84a" stroke-width="1.4" stroke-linejoin="miter"/>
-        <polygon points="50,8 62,38 92,38 68,60 78,90 50,74 22,90 32,60 8,38 38,38"
-                 fill="none" stroke="rgba(255,255,255,0.45)" stroke-width="0.5"
-                 transform="translate(0,-0.8)"/>
-      </svg>
-      <svg class="home-star home-star-2" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
-        <polygon points="50,8 62,38 92,38 68,60 78,90 50,74 22,90 32,60 8,38 38,38"
-                 fill="#c11d1d" stroke="#e0b84a" stroke-width="1.4" stroke-linejoin="miter"/>
-        <polygon points="50,8 62,38 92,38 68,60 78,90 50,74 22,90 32,60 8,38 38,38"
-                 fill="none" stroke="rgba(255,255,255,0.45)" stroke-width="0.5"
-                 transform="translate(0,-0.8)"/>
-      </svg>
-      <svg class="home-star home-star-3" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
-        <polygon points="50,8 62,38 92,38 68,60 78,90 50,74 22,90 32,60 8,38 38,38"
-                 fill="#c11d1d" stroke="#e0b84a" stroke-width="1.4" stroke-linejoin="miter"/>
-        <polygon points="50,8 62,38 92,38 68,60 78,90 50,74 22,90 32,60 8,38 38,38"
-                 fill="none" stroke="rgba(255,255,255,0.45)" stroke-width="0.5"
-                 transform="translate(0,-0.8)"/>
-      </svg>
-      <svg class="home-star home-star-4" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
-        <polygon points="50,8 62,38 92,38 68,60 78,90 50,74 22,90 32,60 8,38 38,38"
-                 fill="#c11d1d" stroke="#e0b84a" stroke-width="1.4" stroke-linejoin="miter"/>
-        <polygon points="50,8 62,38 92,38 68,60 78,90 50,74 22,90 32,60 8,38 38,38"
-                 fill="none" stroke="rgba(255,255,255,0.45)" stroke-width="0.5"
-                 transform="translate(0,-0.8)"/>
-      </svg>
-      <svg class="home-star home-star-5" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
-        <polygon points="50,8 62,38 92,38 68,60 78,90 50,74 22,90 32,60 8,38 38,38"
-                 fill="#c11d1d" stroke="#e0b84a" stroke-width="1.4" stroke-linejoin="miter"/>
-        <polygon points="50,8 62,38 92,38 68,60 78,90 50,74 22,90 32,60 8,38 38,38"
-                 fill="none" stroke="rgba(255,255,255,0.45)" stroke-width="0.5"
-                 transform="translate(0,-0.8)"/>
-      </svg>
-      <svg class="home-star home-star-6" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
-        <polygon points="50,8 62,38 92,38 68,60 78,90 50,74 22,90 32,60 8,38 38,38"
-                 fill="#c11d1d" stroke="#e0b84a" stroke-width="1.4" stroke-linejoin="miter"/>
-        <polygon points="50,8 62,38 92,38 68,60 78,90 50,74 22,90 32,60 8,38 38,38"
-                 fill="none" stroke="rgba(255,255,255,0.45)" stroke-width="0.5"
-                 transform="translate(0,-0.8)"/>
-      </svg>
-    </div>
-    <div class="home-hero-content">
-      <div class="home-kicker">Портал для детей и родителей</div>
-      <h2 class="home-title">Грамотиньо</h2>
-      <div class="home-divider" aria-hidden="true">
-        <span class="home-divider-star">★</span>
-      </div>
-      <p class="home-tagline">Культура. Язык. История. Наука. Техника. Педагогика.</p>
-    </div>
-    <div class="home-scroll-hint" aria-hidden="true">Вниз</div>
-  </div>
-
-  <div class="home-audiences">
-    <div class="home-audience">
-      <div class="home-audience-head">
-        <span class="home-audience-num">01</span>
-        <h3 class="home-audience-title">Детям</h3>
-        <span class="home-audience-count">3 раздела</span>
-      </div>
-      <p class="home-audience-lead">Всё, что можно потрогать, послушать и запомнить. Каждый слог — с озвучкой, каждое слово — с картинкой.</p>
-      <div class="home-audience-list">
-        <a class="home-entry" data-section="syllables" href="#syllables">
-          <span class="home-entry-num">01</span>
-          <div class="home-entry-body">
-            <div class="home-entry-title">Учи слоги</div>
-            <div class="home-entry-sub">Слоги и короткие слова — жми, слушай, запоминай. Викторина и диктант внутри.</div>
-          </div>
-          <span class="home-entry-arrow">→</span>
-        </a>
-        <a class="home-entry" data-section="clock" href="#clock">
-          <span class="home-entry-num">02</span>
-          <div class="home-entry-body">
-            <div class="home-entry-title">Знай время</div>
-            <div class="home-entry-sub">Часы со стрелками, схема минут, озвучка каждого часа.</div>
-          </div>
-          <span class="home-entry-arrow">→</span>
-        </a>
-        <a class="home-entry" data-section="cartoons" href="#cartoons">
-          <span class="home-entry-num">03</span>
-          <div class="home-entry-body">
-            <div class="home-entry-title">Мультфильмы</div>
-            <div class="home-entry-sub">Полёт на Луну, Сармико, Каштанка, Кем быть?</div>
-          </div>
-          <span class="home-entry-arrow">→</span>
-        </a>
-      </div>
-    </div>
-
-    <div class="home-audience">
-      <div class="home-audience-head">
-        <span class="home-audience-num">02</span>
-        <h3 class="home-audience-title">Старшим</h3>
-        <span class="home-audience-count">4 раздела</span>
-      </div>
-      <p class="home-audience-lead">Разделы, к которым возвращаются не за ответом, а за настроением. Живопись, поэзия, история — и статьи для тех, кто рядом с ребёнком.</p>
-      <div class="home-audience-list">
-        <a class="home-entry" data-section="heroes" href="#heroes">
-          <span class="home-entry-num">01</span>
-          <div class="home-entry-body">
-            <div class="home-entry-title">Чти великих</div>
-            <div class="home-entry-sub">49 имён от Ломоносова до Гагарина, хронология 1650–2010, портреты и голоса.</div>
-          </div>
-          <span class="home-entry-arrow">→</span>
-        </a>
-        <a class="home-entry" data-section="art" href="#art">
-          <span class="home-entry-num">02</span>
-          <div class="home-entry-body">
-            <div class="home-entry-title">Живопись</div>
-            <div class="home-entry-sub">Картины русских художников — случайный порядок или хронология.</div>
-          </div>
-          <span class="home-entry-arrow">→</span>
-        </a>
-        <a class="home-entry" data-section="poetry" href="#poetry">
-          <span class="home-entry-num">03</span>
-          <div class="home-entry-body">
-            <div class="home-entry-title">Поэзия</div>
-            <div class="home-entry-sub">Есенин, Симонов, Пушкин, Лермонтов — читают наши современники.</div>
-          </div>
-          <span class="home-entry-arrow">→</span>
-        </a>
-        <a class="home-entry" data-section="parents" href="#parents">
-          <span class="home-entry-num">04</span>
-          <div class="home-entry-body">
-            <div class="home-entry-title">Педагогика</div>
-            <div class="home-entry-sub">Статьи, эссе и материалы — читальня для родителей.</div>
-          </div>
-          <span class="home-entry-arrow">→</span>
-        </a>
-      </div>
-    </div>
-  </div>
-</section>
-
-<section id="syllablesSection" class="tab-section">
+<section id="syllablesSection" class="tab-section active">
 <div class="controls">
 <button id="normalBtn" class="active" data-tooltip="Все" aria-label="Все">
 <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="3.5" width="7" height="7"/><rect x="13.5" y="3.5" width="7" height="7"/><rect x="3.5" y="13.5" width="7" height="7"/><rect x="13.5" y="13.5" width="7" height="7"/></svg>
@@ -3729,10 +3204,7 @@ body[data-skin="minimal"] .home-entry-title {
 <div class="toast-container" id="toastContainer"></div>
 
 <nav class="mobile-nav" id="mobileNav" aria-label="Разделы">
-  <button class="mobile-nav-item active" data-section="home" type="button" title="Главная" aria-label="Главная">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><polygon points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26"/></svg>
-  </button>
-  <button class="mobile-nav-item" data-section="syllables" type="button" title="Слоги" aria-label="Слоги">
+  <button class="mobile-nav-item active" data-section="syllables" type="button" title="Слоги" aria-label="Слоги">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
   </button>
   <button class="mobile-nav-item" data-section="clock" type="button" title="Время" aria-label="Время">
@@ -3783,7 +3255,6 @@ const celebrationGif = document.getElementById('celebrationGif');
 const celebrationClose = document.getElementById('celebrationClose');
 const sectionBtns = document.querySelectorAll('.section-switch-btn');
 const sectionSubtitleEls = document.querySelectorAll('.section-subtitle');
-const homeSection = document.getElementById('homeSection');
 const syllablesSection = document.getElementById('syllablesSection');
 const clockSection = document.getElementById('clockSection');
 const heroesSection = document.getElementById('heroesSection');
@@ -3792,7 +3263,7 @@ const cartoonsSection = document.getElementById('cartoonsSection');
 const parentsSection = document.getElementById('parentsSection');
 const heroesTimeline = document.getElementById('heroesTimeline');
 const mobileNav = document.getElementById('mobileNav');
-let currentMode = 'all'; let randomItems = []; let currentAudio = null; let examQuestions = []; let examIndex = 0; let examScore = 0; let currentExamCorrect = ''; let currentSection = 'home'; let progressTimer = null;
+let currentMode = 'all'; let randomItems = []; let currentAudio = null; let examQuestions = []; let examIndex = 0; let examScore = 0; let currentExamCorrect = ''; let currentSection = 'syllables'; let progressTimer = null;
 
 function updateMobileNav(centerActive) {
   if (!mobileNav) return;
@@ -3819,14 +3290,12 @@ let learnedSet = loadLearnedSet();
 function switchSection(s) {
   if (s === currentSection) return;
   currentSection = s;
-  if (homeSection) homeSection.classList.toggle('active', s === 'home');
   syllablesSection.classList.toggle('active', s === 'syllables');
   clockSection.classList.toggle('active', s === 'clock');
   heroesSection.classList.toggle('active', s === 'heroes');
   if (poetrySection) poetrySection.classList.toggle('active', s === 'poetry');
   if (cartoonsSection) cartoonsSection.classList.toggle('active', s === 'cartoons');
   if (parentsSection) parentsSection.classList.toggle('active', s === 'parents');
-  document.body.classList.toggle('home-active', s === 'home');
   sectionBtns.forEach(b => b.classList.toggle('active', b.dataset.section === s));
   sectionSubtitleEls.forEach(e => e.classList.toggle('active', e.dataset.section === s));
   updateMobileNav(true);
@@ -3841,13 +3310,6 @@ function switchSection(s) {
   document.body.scrollTop = 0;
 }
 sectionBtns.forEach(b => b.addEventListener('click', () => switchSection(b.dataset.section)));
-document.querySelectorAll('.home-entry').forEach(el => {
-  el.addEventListener('click', e => {
-    e.preventDefault();
-    const s = el.dataset.section;
-    if (s) switchSection(s);
-  });
-});
 window.addEventListener('scroll', () => scrollTopBtn.classList.toggle('visible', window.scrollY > 300), { passive: true });
 scrollTopBtn.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
 function refreshProgressData() { const t = syllables.length; const m = [...syllables].filter(s => learnedSet.has(s)).length; const p = t ? Math.round((m / t) * 100) : 0; progressLabel.textContent = `Отмечено: ${m} из ${t}`; progressFill.style.width = p + '%'; }
