@@ -1132,46 +1132,6 @@ body[data-skin="minimal"] .art-info{
 }
 .art-section.show .art-info{opacity:1;transform:translateY(0);}
 
-.art-exit{
-  flex-shrink:0;
-  width:clamp(36px,3.6vw,42px);
-  height:clamp(36px,3.6vw,42px);
-  border-radius:50%;
-  border:1px solid var(--rule-soft);
-  background:rgba(128,128,128,.06);
-  color:var(--fg-2);
-  font-family:var(--font-ui);
-  font-size:1.15rem;
-  font-weight:300;
-  line-height:1;
-  cursor:pointer;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  padding:0 0 4px;
-  transition:all .25s cubic-bezier(.16,1,.3,1);
-  -webkit-tap-highlight-color:transparent;
-  opacity:0;
-  transform:scale(.85);
-}
-body[data-skin="minimal"] .art-exit{
-  background:var(--bg-2);
-  border:1px solid var(--m-line);
-}
-.art-section.show .art-exit{opacity:1;transform:scale(1);transition-delay:.2s;}
-.art-exit:hover{
-  background:var(--fg);
-  color:var(--bg);
-  border-color:var(--fg);
-  transform:scale(1.08);
-}
-body[data-skin="minimal"] .art-exit:hover{
-  background:var(--fg);
-  color:var(--bg);
-  border-color:var(--fg);
-}
-.art-exit:active{transform:scale(.94)}
-
 .art-nav{
   position:absolute;
   top:50%;
@@ -1348,6 +1308,8 @@ body[data-skin="minimal"] .art-order-btn:hover:not(.active){
 }
 .art-state.is-error{color:var(--accent);letter-spacing:.16em;}
 
+/* Ловим клик по пустому месту вокруг картинки (десктоп).
+   На тач-мобиле/планшете наоборот нужен для скролла и свайпа. */
 .art-scroll-catcher{
   position:absolute;
   inset:0;
@@ -1356,7 +1318,7 @@ body[data-skin="minimal"] .art-order-btn:hover:not(.active){
 }
 .art-scroller { display: none; }
 
-/* === MOBILE / TABLET (pointer:coarse) ART CAROUSEL === */
+/* === Мобильный/тач-режим (узкие экраны и pointer:coarse) === */
 @media (max-width:640px), (pointer:coarse) {
   .art-image-wrap{
     padding:46px 4px 56px;
@@ -1401,7 +1363,6 @@ body[data-skin="minimal"] .art-order-btn:hover:not(.active){
     font-size:.58rem;
     letter-spacing:.16em;
   }
-  .art-exit{ display: none !important; }
   .art-nav { display: none !important; }
   .art-scroll-catcher { display: none !important; }
   .art-section::before { display: none !important; }
@@ -1415,8 +1376,8 @@ body[data-skin="minimal"] .art-order-btn:hover:not(.active){
     height: 100%;
     overflow-x: auto;
     overflow-y: hidden;
-    /* mandatory + scroll-snap-stop: always → всегда доводит до целого слайда */
-    scroll-snap-type: x mandatory;
+    /* Без scroll-snap — плавную доводку делает JS */
+    scroll-snap-type: none;
     scroll-behavior: auto;
     -webkit-overflow-scrolling: touch;
     scrollbar-width: none;
@@ -1432,8 +1393,8 @@ body[data-skin="minimal"] .art-order-btn:hover:not(.active){
     flex: 0 0 100%;
     width: 100%;
     height: 100%;
-    scroll-snap-align: start;
-    scroll-snap-stop: always;
+    scroll-snap-align: none;
+    scroll-snap-stop: normal;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -3344,7 +3305,6 @@ function switchSection(s) {
   if (s !== 'syllables') progressContainer.classList.remove('show');
   if (s === 'art' && typeof window.artOpen === 'function') window.artOpen();
   else if (typeof window.artClose === 'function') window.artClose();
-  /* Скролл через прямое присваивание — не триггерит адресную строку iOS */
   const de = document.documentElement;
   de.scrollTop = 0;
   document.body.scrollTop = 0;
@@ -4206,9 +4166,10 @@ render(); renderSecondHand(); setView('watch');
 <script>
 /* ============================================================ */
 /* ============== ЖИВОПИСЬ — картины из art/ ================== */
-/*   Мобиле + тач-планшеты: горизонтальный scroll-snap +       */
-/*   вертикальный свайп вверх/вниз для закрытия.                */
-/*   Десктоп — плавная смена кадров (как было).                 */
+/*   Десктоп: стрелки/колесо/клавиши, клик по пустому месту —   */
+/*            выход (как в «Родителям»).                        */
+/*   Тач (моб./планшет): свайп вбок = листание, свайп вверх/    */
+/*            вниз = закрыть. Плавная доводка через rAF.        */
 /* ============================================================ */
 (function () {
   const INDEX_URL = 'art/index.json';
@@ -4216,7 +4177,6 @@ render(); renderSecondHand(); setView('watch');
   const WHEEL_THRESHOLD = 30;
   const WHEEL_COOLDOWN  = 420;
 
-  /* touchMode: на узких экранах или при pointer:coarse (iPad, iPhone и др.) */
   const MQ_NARROW = window.matchMedia('(max-width: 640px)');
   const MQ_COARSE = window.matchMedia('(pointer: coarse)');
   function isTouchMode() { return MQ_NARROW.matches || MQ_COARSE.matches; }
@@ -4224,7 +4184,6 @@ render(); renderSecondHand(); setView('watch');
   const canvas     = document.getElementById('artCanvas');
   const catcher    = document.getElementById('artScrollCatcher');
   const info       = document.getElementById('artInfo');
-  const exitBtn    = document.getElementById('artExit');
   const controls   = document.getElementById('artControls');
   const progress   = document.getElementById('artProgressFill');
   const prevBtn    = document.getElementById('artPrev');
@@ -4242,6 +4201,24 @@ render(); renderSecondHand(); setView('watch');
   let scrollTicking = false;
   let swipeState = null; /* {startX,startY,lastX,lastY,axis,t0,active} */
   let closing = false;
+  let smoothRafId = null;
+
+  /* плавная прокрутка скролл-контейнера на rAF с ease-out cubic */
+  function smoothScrollTo(el, target, duration) {
+    if (smoothRafId) cancelAnimationFrame(smoothRafId);
+    const start = el.scrollLeft;
+    const delta = target - start;
+    if (Math.abs(delta) < 1) { el.scrollLeft = target; smoothRafId = null; return; }
+    const t0 = performance.now();
+    const easeOut = t => 1 - Math.pow(1 - t, 3);
+    const tick = now => {
+      const t = Math.min(1, (now - t0) / duration);
+      el.scrollLeft = start + delta * easeOut(t);
+      if (t < 1) smoothRafId = requestAnimationFrame(tick);
+      else smoothRafId = null;
+    };
+    smoothRafId = requestAnimationFrame(tick);
+  }
 
   async function loadIndex() {
     const res = await fetch(INDEX_URL, { cache: 'no-cache' });
@@ -4266,7 +4243,10 @@ render(); renderSecondHand(); setView('watch');
   }
   function clearState() { canvas.querySelectorAll('.art-state').forEach(el => el.remove()); }
   function clearImage() { if (currentImgEl) { currentImgEl.remove(); currentImgEl = null; } }
-  function clearScroller() { if (scroller) { scroller.remove(); scroller = null; } }
+  function clearScroller() {
+    if (smoothRafId) { cancelAnimationFrame(smoothRafId); smoothRafId = null; }
+    if (scroller) { scroller.remove(); scroller = null; }
+  }
 
   function buildOrder() {
     if (order === 'standard') items.sort((a, b) => Number(a) - Number(b));
@@ -4339,7 +4319,7 @@ render(); renderSecondHand(); setView('watch');
     preloadAround(idx);
   }
 
-  /* ---------------- МОБИЛЬНАЯ / ПЛАНШЕТНАЯ КАРУСЕЛЬ ---------------- */
+  /* ---------------- ТАЧ-КАРУСЕЛЬ ---------------- */
   function buildTouchCarousel() {
     clearState();
     clearImage();
@@ -4359,7 +4339,6 @@ render(); renderSecondHand(); setView('watch');
       img.alt = 'Картина ' + id;
       img.draggable = false;
       img.decoding = 'async';
-      /* первые и последние — сразу, остальные lazy, чтобы не рендерить 594 картинки */
       img.loading = (idx < EAGER_FIRST || idx >= N - EAGER_LAST) ? 'eager' : 'lazy';
       img.src = IMG_DIR + encodeURIComponent(id) + '.jpg';
       img.addEventListener('error', () => {
@@ -4381,6 +4360,8 @@ render(); renderSecondHand(); setView('watch');
       requestAnimationFrame(() => {
         scrollTicking = false;
         if (!scroller) return;
+        /* пока идёт наша плавная доводка — не сбиваем current раньше времени */
+        if (smoothRafId) return;
         const w = scroller.clientWidth || 1;
         const idx = Math.round(scroller.scrollLeft / w);
         if (idx !== current && idx >= 0 && idx < items.length) {
@@ -4390,7 +4371,7 @@ render(); renderSecondHand(); setView('watch');
       });
     }, { passive: true });
 
-    /* --- touch-жесты: горизонталь = листание (нативно), вертикаль = закрыть --- */
+    /* Touch: горизонталь = листание, вертикаль = закрыть */
     swipeState = { startX: 0, startY: 0, lastX: 0, lastY: 0, axis: null, active: false, t0: 0 };
     scroller.addEventListener('touchstart', e => {
       if (closing) return;
@@ -4418,7 +4399,7 @@ render(); renderSecondHand(); setView('watch');
         swipeState.axis = dy > dx ? 'v' : 'h';
       }
       if (swipeState.axis === 'v') {
-        /* вертикальный жест = закрыть. Отменяем горизонтальный snap на время. */
+        /* вертикаль = закрыть, отменяем горизонтальный скролл */
         if (e.cancelable) e.preventDefault();
       }
     }, { passive: false });
@@ -4427,6 +4408,10 @@ render(); renderSecondHand(); setView('watch');
       if (!swipeState.active) return;
       swipeState.active = false;
       if (closing) return;
+
+      const w = scroller.clientWidth || 1;
+
+      /* ---- вертикаль: закрыть ---- */
       if (swipeState.axis === 'v') {
         const dy = swipeState.lastY - swipeState.startY;
         const dt = Date.now() - swipeState.t0;
@@ -4436,34 +4421,27 @@ render(); renderSecondHand(); setView('watch');
         if (fast || long) closeArt();
         return;
       }
-      /* Горизонтальный жест завершён.
-         На случай, если iOS не долетел до snap-точки: доводим скролл
-         до ближайшего слайда принудительно. */
+
+      /* ---- горизонталь: плавно доехать до нужного слайда ---- */
       if (swipeState.axis === 'h') {
         const dx = swipeState.lastX - swipeState.startX;
         const dt = Date.now() - swipeState.t0;
         const absdx = Math.abs(dx);
-        const fast = dt < 250 && absdx >= 25;
-        const long = absdx >= 60;
-        if (fast || long) {
-          const dir = dx < 0 ? 1 : -1;
-          const next = Math.max(0, Math.min(items.length - 1, current + dir));
-          const w = scroller.clientWidth || 1;
-          if (next !== current) {
-            scroller.scrollTo({ left: next * w, behavior: 'smooth' });
-          } else {
-            scroller.scrollTo({ left: current * w, behavior: 'smooth' });
-          }
+        const v = absdx / Math.max(1, dt); /* px/ms */
+
+        let target = current;
+        /* быстрый флик или большой сдвиг → перелистываем на 1 */
+        if ((v > 0.4 && absdx > 12) || absdx > w * 0.22) {
+          target = current + (dx < 0 ? 1 : -1);
         } else {
-          /* маленький сдвиг — вернёмся к текущему слайду, без полукартинок */
-          const w = scroller.clientWidth || 1;
-          const snapIdx = Math.round(scroller.scrollLeft / w);
-          if (snapIdx !== current) {
-            current = Math.max(0, Math.min(items.length - 1, snapIdx));
-            updateProgressAndInfo();
-          }
-          scroller.scrollTo({ left: current * w, behavior: 'smooth' });
+          /* маленький сдвиг — вернуться на текущий */
+          target = current;
         }
+        target = Math.max(0, Math.min(items.length - 1, target));
+
+        smoothScrollTo(scroller, target * w, 320);
+        current = target;
+        updateProgressAndInfo();
       }
     };
     scroller.addEventListener('touchend', finish, { passive: true });
@@ -4481,7 +4459,7 @@ render(); renderSecondHand(); setView('watch');
       if (!scroller) return;
       const next = Math.max(0, Math.min(items.length - 1, current + dir));
       if (next === current) return;
-      scroller.scrollTo({ left: next * scroller.clientWidth, behavior: 'smooth' });
+      smoothScrollTo(scroller, next * scroller.clientWidth, 320);
       current = next;
       updateProgressAndInfo();
     } else {
@@ -4525,9 +4503,8 @@ render(); renderSecondHand(); setView('watch');
     canvas.classList.remove('show');
     canvas.setAttribute('aria-hidden', 'true');
     document.body.style.overflow = '';
-    /* вернёмся на «Слоги» через нижний бар, если он есть */
     const mobileBtn = document.querySelector('.mobile-nav-item[data-section="syllables"]');
-    if (mobileBtn) mobileBtn.click();
+    if (mobileBtn && MQ_NARROW.matches) mobileBtn.click();
     else {
       document.querySelectorAll('.section-switch-btn').forEach(b => {
         if (b.dataset.section === 'syllables') b.click();
@@ -4540,7 +4517,6 @@ render(); renderSecondHand(); setView('watch');
 
   if (prevBtn) prevBtn.addEventListener('click', e => { e.preventDefault(); step(-1); });
   if (nextBtn) nextBtn.addEventListener('click', e => { e.preventDefault(); step(1); });
-  if (exitBtn) exitBtn.addEventListener('click', e => { e.preventDefault(); closeArt(); });
 
   controls.querySelectorAll('.art-order-btn').forEach(btn => {
     btn.addEventListener('click', () => {
@@ -4555,7 +4531,7 @@ render(); renderSecondHand(); setView('watch');
     });
   });
 
-  /* --- десктопные жесты/колесо --- */
+  /* --- десктоп: колесо --- */
   function onWheel(e) {
     if (isTouchMode()) return;
     if (!canvas.classList.contains('show')) return;
@@ -4569,6 +4545,7 @@ render(); renderSecondHand(); setView('watch');
   catcher.addEventListener('wheel', onWheel, { passive: false });
   canvas.addEventListener('wheel', onWheel, { passive: false });
 
+  /* --- десктоп: клавиатура --- */
   document.addEventListener('keydown', e => {
     if (!canvas.classList.contains('show')) return;
     if (e.key === 'ArrowDown' || e.key === 'PageDown' || e.key === 'ArrowRight') { e.preventDefault(); step(1); }
@@ -4576,6 +4553,21 @@ render(); renderSecondHand(); setView('watch');
     else if (e.key === 'Escape') { e.preventDefault(); closeArt(); }
   });
 
+  /* --- ДЕСКТОП: КЛИК ПО ПУСТОМУ МЕСТУ = ЗАКРЫТЬ (как в Родителям) --- */
+  function onCatchClick(e) {
+    if (isTouchMode()) return;
+    if (!canvas.classList.contains('show')) return;
+    /* клик по картинке, стрелкам, панелям — не закрываем */
+    if (e.target.closest('.art-image')) return;
+    if (e.target.closest('.art-nav')) return;
+    if (e.target.closest('.art-controls')) return;
+    if (e.target.closest('.art-info')) return;
+    closeArt();
+  }
+  catcher.addEventListener('click', onCatchClick);
+  canvas.addEventListener('click', onCatchClick);
+
+  /* --- десктопные тач-жесты (на всякий случай) --- */
   catcher.addEventListener('touchstart', e => {
     if (isTouchMode()) return;
     if (!canvas.classList.contains('show')) return;
