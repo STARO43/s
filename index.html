@@ -1356,7 +1356,8 @@ body[data-skin="minimal"] .art-order-btn:hover:not(.active){
 }
 .art-scroller { display: none; }
 
-@media (max-width:640px){
+/* === MOBILE / TABLET (pointer:coarse) ART CAROUSEL === */
+@media (max-width:640px), (pointer:coarse) {
   .art-image-wrap{
     padding:46px 4px 56px;
     will-change: transform;
@@ -1414,7 +1415,9 @@ body[data-skin="minimal"] .art-order-btn:hover:not(.active){
     height: 100%;
     overflow-x: auto;
     overflow-y: hidden;
-    scroll-snap-type: x proximity;
+    /* mandatory + scroll-snap-stop: always → всегда доводит до целого слайда */
+    scroll-snap-type: x mandatory;
+    scroll-behavior: auto;
     -webkit-overflow-scrolling: touch;
     scrollbar-width: none;
     -ms-overflow-style: none;
@@ -1426,10 +1429,10 @@ body[data-skin="minimal"] .art-order-btn:hover:not(.active){
   .art-scroller::-webkit-scrollbar { display: none; width: 0; height: 0; }
 
   .art-slide {
-    flex: 0 0 100vw;
-    width: 100vw;
+    flex: 0 0 100%;
+    width: 100%;
     height: 100%;
-    scroll-snap-align: center;
+    scroll-snap-align: start;
     scroll-snap-stop: always;
     display: flex;
     align-items: center;
@@ -2786,6 +2789,7 @@ body[data-skin="minimal"] .stamp-opt-swatch{border-radius:50%;border-width:1px}
     cursor: pointer;
     scroll-snap-align: center;
     -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
     transition: color .12s ease, background-color .12s ease;
   }
   body[data-skin="minimal"][data-mintone="dark"] .mobile-nav-item { color: var(--fg-3); }
@@ -3309,7 +3313,7 @@ function updateMobileNav(centerActive) {
     if (isActive) activeEl = item;
   });
   if (activeEl && centerActive) {
-    try { activeEl.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' }); }
+    try { activeEl.scrollIntoView({ behavior: 'auto', inline: 'center', block: 'nearest' }); }
     catch (e) {}
   }
 }
@@ -3340,8 +3344,10 @@ function switchSection(s) {
   if (s !== 'syllables') progressContainer.classList.remove('show');
   if (s === 'art' && typeof window.artOpen === 'function') window.artOpen();
   else if (typeof window.artClose === 'function') window.artClose();
-  /* НЕ трогаем location.hash — иначе Safari показывает адресную строку */
-  window.scrollTo({ top: 0, behavior: 'auto' });
+  /* Скролл через прямое присваивание — не триггерит адресную строку iOS */
+  const de = document.documentElement;
+  de.scrollTop = 0;
+  document.body.scrollTop = 0;
 }
 sectionBtns.forEach(b => b.addEventListener('click', () => switchSection(b.dataset.section)));
 window.addEventListener('scroll', () => scrollTopBtn.classList.toggle('visible', window.scrollY > 300), { passive: true });
@@ -4200,15 +4206,20 @@ render(); renderSecondHand(); setView('watch');
 <script>
 /* ============================================================ */
 /* ============== ЖИВОПИСЬ — картины из art/ ================== */
-/*  Мобильная версия: scroll-snap карусель + свайп вверх/вниз  */
-/*  Десктоп: как было (плавная смена кадров)                    */
+/*   Мобиле + тач-планшеты: горизонтальный scroll-snap +       */
+/*   вертикальный свайп вверх/вниз для закрытия.                */
+/*   Десктоп — плавная смена кадров (как было).                 */
 /* ============================================================ */
 (function () {
   const INDEX_URL = 'art/index.json';
   const IMG_DIR   = 'art/';
   const WHEEL_THRESHOLD = 30;
   const WHEEL_COOLDOWN  = 420;
-  const MOBILE_MQ = window.matchMedia('(max-width: 640px)');
+
+  /* touchMode: на узких экранах или при pointer:coarse (iPad, iPhone и др.) */
+  const MQ_NARROW = window.matchMedia('(max-width: 640px)');
+  const MQ_COARSE = window.matchMedia('(pointer: coarse)');
+  function isTouchMode() { return MQ_NARROW.matches || MQ_COARSE.matches; }
 
   const canvas     = document.getElementById('artCanvas');
   const catcher    = document.getElementById('artScrollCatcher');
@@ -4229,8 +4240,7 @@ render(); renderSecondHand(); setView('watch');
   let touchStartY = null;
   let scroller = null;
   let scrollTicking = false;
-  /* вертикальный свайп для закрытия */
-  let closeSwipe = null;  /* {startX, startY, axis, active} */
+  let swipeState = null; /* {startX,startY,lastX,lastY,axis,t0,active} */
   let closing = false;
 
   async function loadIndex() {
@@ -4288,7 +4298,7 @@ render(); renderSecondHand(); setView('watch');
     updateNav();
   }
 
-  /* ---------- ДЕСКТОП ---------- */
+  /* ---------------- ДЕСКТОП ---------------- */
   function showImage(idx, direction) {
     if (idx < 0 || idx >= items.length) return;
     const id = items[idx];
@@ -4329,8 +4339,8 @@ render(); renderSecondHand(); setView('watch');
     preloadAround(idx);
   }
 
-  /* ---------- МОБИЛЬНАЯ КАРУСЕЛЬ ---------- */
-  function buildMobileCarousel() {
+  /* ---------------- МОБИЛЬНАЯ / ПЛАНШЕТНАЯ КАРУСЕЛЬ ---------------- */
+  function buildTouchCarousel() {
     clearState();
     clearImage();
     clearScroller();
@@ -4338,8 +4348,7 @@ render(); renderSecondHand(); setView('watch');
     scroller.className = 'art-scroller';
 
     const frag = document.createDocumentFragment();
-    /* для быстрых краёв подгружаем первые/последние сразу */
-    const EAGER = 3;
+    const EAGER_FIRST = 3, EAGER_LAST = 3, N = items.length;
     items.forEach((id, idx) => {
       const slide = document.createElement('div');
       slide.className = 'art-slide';
@@ -4350,8 +4359,8 @@ render(); renderSecondHand(); setView('watch');
       img.alt = 'Картина ' + id;
       img.draggable = false;
       img.decoding = 'async';
-      /* content-visibility авто уже есть в CSS, но ещё и lazy */
-      img.loading = (idx < EAGER) ? 'eager' : 'lazy';
+      /* первые и последние — сразу, остальные lazy, чтобы не рендерить 594 картинки */
+      img.loading = (idx < EAGER_FIRST || idx >= N - EAGER_LAST) ? 'eager' : 'lazy';
       img.src = IMG_DIR + encodeURIComponent(id) + '.jpg';
       img.addEventListener('error', () => {
         slide.innerHTML = '';
@@ -4381,79 +4390,101 @@ render(); renderSecondHand(); setView('watch');
       });
     }, { passive: true });
 
+    /* --- touch-жесты: горизонталь = листание (нативно), вертикаль = закрыть --- */
+    swipeState = { startX: 0, startY: 0, lastX: 0, lastY: 0, axis: null, active: false, t0: 0 };
+    scroller.addEventListener('touchstart', e => {
+      if (closing) return;
+      if (e.touches.length !== 1) return;
+      const t = e.touches[0];
+      swipeState.startX = t.clientX;
+      swipeState.startY = t.clientY;
+      swipeState.lastX  = t.clientX;
+      swipeState.lastY  = t.clientY;
+      swipeState.axis = null;
+      swipeState.active = true;
+      swipeState.t0 = Date.now();
+    }, { passive: true });
+
+    scroller.addEventListener('touchmove', e => {
+      if (!swipeState.active || closing) return;
+      if (e.touches.length !== 1) { swipeState.active = false; return; }
+      const t = e.touches[0];
+      swipeState.lastX = t.clientX;
+      swipeState.lastY = t.clientY;
+      if (!swipeState.axis) {
+        const dx = Math.abs(swipeState.lastX - swipeState.startX);
+        const dy = Math.abs(swipeState.lastY - swipeState.startY);
+        if (dx < 6 && dy < 6) return;
+        swipeState.axis = dy > dx ? 'v' : 'h';
+      }
+      if (swipeState.axis === 'v') {
+        /* вертикальный жест = закрыть. Отменяем горизонтальный snap на время. */
+        if (e.cancelable) e.preventDefault();
+      }
+    }, { passive: false });
+
+    const finish = () => {
+      if (!swipeState.active) return;
+      swipeState.active = false;
+      if (closing) return;
+      if (swipeState.axis === 'v') {
+        const dy = swipeState.lastY - swipeState.startY;
+        const dt = Date.now() - swipeState.t0;
+        const absdy = Math.abs(dy);
+        const fast = dt < 300 && absdy >= 30;
+        const long = absdy >= 80;
+        if (fast || long) closeArt();
+        return;
+      }
+      /* Горизонтальный жест завершён.
+         На случай, если iOS не долетел до snap-точки: доводим скролл
+         до ближайшего слайда принудительно. */
+      if (swipeState.axis === 'h') {
+        const dx = swipeState.lastX - swipeState.startX;
+        const dt = Date.now() - swipeState.t0;
+        const absdx = Math.abs(dx);
+        const fast = dt < 250 && absdx >= 25;
+        const long = absdx >= 60;
+        if (fast || long) {
+          const dir = dx < 0 ? 1 : -1;
+          const next = Math.max(0, Math.min(items.length - 1, current + dir));
+          const w = scroller.clientWidth || 1;
+          if (next !== current) {
+            scroller.scrollTo({ left: next * w, behavior: 'auto' });
+          } else {
+            scroller.scrollTo({ left: current * w, behavior: 'auto' });
+          }
+        } else {
+          /* маленький сдвиг — вернёмся к текущему слайду, без полукартинок */
+          const w = scroller.clientWidth || 1;
+          const snapIdx = Math.round(scroller.scrollLeft / w);
+          if (snapIdx !== current) {
+            current = Math.max(0, Math.min(items.length - 1, snapIdx));
+            updateProgressAndInfo();
+          }
+          scroller.scrollTo({ left: current * w, behavior: 'auto' });
+        }
+      }
+    };
+    scroller.addEventListener('touchend', finish, { passive: true });
+    scroller.addEventListener('touchcancel', () => { swipeState.active = false; }, { passive: true });
+
     requestAnimationFrame(() => {
       if (!scroller) return;
       scroller.scrollLeft = current * scroller.clientWidth;
       updateProgressAndInfo();
     });
-
-    /* --- вертикальный свайп для закрытия: только на мобиле --- */
-    closeSwipe = { startX: 0, startY: 0, lastX: 0, lastY: 0, axis: null, active: false, t0: 0 };
-    scroller.addEventListener('touchstart', e => {
-      if (closing) return;
-      if (e.touches.length !== 1) return;
-      const t = e.touches[0];
-      closeSwipe.startX = t.clientX;
-      closeSwipe.startY = t.clientY;
-      closeSwipe.lastX = t.clientX;
-      closeSwipe.lastY = t.clientY;
-      closeSwipe.axis = null;
-      closeSwipe.active = true;
-      closeSwipe.t0 = Date.now();
-    }, { passive: true });
-    scroller.addEventListener('touchmove', e => {
-      if (!closeSwipe.active || closing) return;
-      if (e.touches.length !== 1) { closeSwipe.active = false; return; }
-      const t = e.touches[0];
-      closeSwipe.lastX = t.clientX;
-      closeSwipe.lastY = t.clientY;
-      if (!closeSwipe.axis) {
-        const dx = Math.abs(closeSwipe.lastX - closeSwipe.startX);
-        const dy = Math.abs(closeSwipe.lastY - closeSwipe.startY);
-        if (dx < 6 && dy < 6) return;
-        /* если движение больше по вертикали — это «закрыть»,
-           если по горизонтали — листать карусель (не мешаем) */
-        closeSwipe.axis = dy > dx ? 'v' : 'h';
-        if (closeSwipe.axis === 'v') {
-          /* пока не мешаем браузеру: он уже получил touchmove.
-             На iOS/Android с touch-action: pan-x горизонтальные жесты
-             идут в скролл карусели; вертикальные мы перехватываем
-             через preventDefault ниже, чтобы прокрутка документа не шла. */
-        }
-      }
-      if (closeSwipe.axis === 'v') {
-        if (e.cancelable) e.preventDefault();
-      }
-    }, { passive: false });
-    const finishSwipe = (e) => {
-      if (!closeSwipe.active) return;
-      closeSwipe.active = false;
-      if (closing) return;
-      if (closeSwipe.axis !== 'v') return;
-      const dy = closeSwipe.lastY - closeSwipe.startY;
-      const dt = Date.now() - closeSwipe.t0;
-      const absdy = Math.abs(dy);
-      /* сработает при «быстром» флике (>=30px за <300мс) или при длинном (>=80px) */
-      const fast = dt < 300 && absdy >= 30;
-      const long = absdy >= 80;
-      if (fast || long) {
-        closeArt();
-      }
-    };
-    scroller.addEventListener('touchend', finishSwipe, { passive: true });
-    scroller.addEventListener('touchcancel', () => { closeSwipe.active = false; }, { passive: true });
-  }
-
-  function mobileStep(dir) {
-    if (!scroller) return;
-    const next = current + dir;
-    if (next < 0 || next >= items.length) return;
-    scroller.scrollTo({ left: next * scroller.clientWidth, behavior: 'smooth' });
   }
 
   function step(dir) {
-    if (MOBILE_MQ.matches) mobileStep(dir);
-    else {
+    if (isTouchMode()) {
+      if (!scroller) return;
+      const next = Math.max(0, Math.min(items.length - 1, current + dir));
+      if (next === current) return;
+      scroller.scrollTo({ left: next * scroller.clientWidth, behavior: 'auto' });
+      current = next;
+      updateProgressAndInfo();
+    } else {
       const next = current + dir;
       if (next < 0 || next >= items.length) return;
       showImage(next, dir > 0 ? 'down' : 'up');
@@ -4473,12 +4504,12 @@ render(); renderSecondHand(); setView('watch');
         clearState();
         buildOrder();
         current = 0;
-        if (MOBILE_MQ.matches) buildMobileCarousel();
+        if (isTouchMode()) buildTouchCarousel();
         else showImage(0, null);
       }).catch(err => showState(err.message || 'Ошибка загрузки', true));
     } else {
-      if (MOBILE_MQ.matches) {
-        if (!scroller) buildMobileCarousel();
+      if (isTouchMode()) {
+        if (!scroller) buildTouchCarousel();
         else {
           scroller.scrollLeft = current * scroller.clientWidth;
           updateProgressAndInfo();
@@ -4494,28 +4525,22 @@ render(); renderSecondHand(); setView('watch');
     canvas.classList.remove('show');
     canvas.setAttribute('aria-hidden', 'true');
     document.body.style.overflow = '';
-    /* если мы внутри мобильного раздела — вернёмся на «Слоги» */
-    if (MOBILE_MQ.matches) {
-      const mobileBtn = document.querySelector('.mobile-nav-item[data-section="syllables"]');
-      if (mobileBtn) mobileBtn.click();
+    /* вернёмся на «Слоги» через нижний бар, если он есть */
+    const mobileBtn = document.querySelector('.mobile-nav-item[data-section="syllables"]');
+    if (mobileBtn) mobileBtn.click();
+    else {
+      document.querySelectorAll('.section-switch-btn').forEach(b => {
+        if (b.dataset.section === 'syllables') b.click();
+      });
     }
     setTimeout(() => { closing = false; }, 300);
   }
   window.artOpen  = openArt;
   window.artClose = closeArt;
 
-  /* кнопки ‹/› (только десктоп) */
   if (prevBtn) prevBtn.addEventListener('click', e => { e.preventDefault(); step(-1); });
   if (nextBtn) nextBtn.addEventListener('click', e => { e.preventDefault(); step(1); });
-
-  /* крестик (десктоп) */
-  if (exitBtn) exitBtn.addEventListener('click', e => {
-    e.preventDefault();
-    closeArt();
-    document.querySelectorAll('.section-switch-btn').forEach(b => {
-      if (b.dataset.section === 'syllables') b.click();
-    });
-  });
+  if (exitBtn) exitBtn.addEventListener('click', e => { e.preventDefault(); closeArt(); });
 
   controls.querySelectorAll('.art-order-btn').forEach(btn => {
     btn.addEventListener('click', () => {
@@ -4525,14 +4550,14 @@ render(); renderSecondHand(); setView('watch');
       controls.querySelectorAll('.art-order-btn').forEach(b => b.classList.toggle('active', b === btn));
       buildOrder();
       current = 0;
-      if (MOBILE_MQ.matches) buildMobileCarousel();
+      if (isTouchMode()) buildTouchCarousel();
       else showImage(0, null);
     });
   });
 
   /* --- десктопные жесты/колесо --- */
   function onWheel(e) {
-    if (MOBILE_MQ.matches) return;
+    if (isTouchMode()) return;
     if (!canvas.classList.contains('show')) return;
     e.preventDefault();
     const now = Date.now();
@@ -4546,20 +4571,19 @@ render(); renderSecondHand(); setView('watch');
 
   document.addEventListener('keydown', e => {
     if (!canvas.classList.contains('show')) return;
-    if (MOBILE_MQ.matches && e.key === 'Escape') { e.preventDefault(); closeArt(); return; }
     if (e.key === 'ArrowDown' || e.key === 'PageDown' || e.key === 'ArrowRight') { e.preventDefault(); step(1); }
     else if (e.key === 'ArrowUp' || e.key === 'PageUp' || e.key === 'ArrowLeft') { e.preventDefault(); step(-1); }
     else if (e.key === 'Escape') { e.preventDefault(); closeArt(); }
   });
 
   catcher.addEventListener('touchstart', e => {
-    if (MOBILE_MQ.matches) return;
+    if (isTouchMode()) return;
     if (!canvas.classList.contains('show')) return;
     if (e.touches.length !== 1) return;
     touchStartY = e.touches[0].clientY;
   }, { passive: true });
   catcher.addEventListener('touchend', e => {
-    if (MOBILE_MQ.matches) return;
+    if (isTouchMode()) return;
     if (!canvas.classList.contains('show')) return;
     if (touchStartY === null) return;
     const endY = (e.changedTouches && e.changedTouches[0]) ? e.changedTouches[0].clientY : null;
@@ -4571,17 +4595,19 @@ render(); renderSecondHand(); setView('watch');
     else if (dy < -THRESH) step(-1);
   }, { passive: true });
   catcher.addEventListener('touchmove', e => {
-    if (MOBILE_MQ.matches) return;
+    if (isTouchMode()) return;
     if (canvas.classList.contains('show')) {
       if (e.cancelable) e.preventDefault();
     }
   }, { passive: false });
 
-  MOBILE_MQ.addEventListener('change', () => {
+  const onMQChange = () => {
     if (!canvas.classList.contains('show')) return;
-    if (MOBILE_MQ.matches) buildMobileCarousel();
+    if (isTouchMode()) buildTouchCarousel();
     else showImage(current, null);
-  });
+  };
+  if (MQ_NARROW.addEventListener) MQ_NARROW.addEventListener('change', onMQChange);
+  if (MQ_COARSE.addEventListener) MQ_COARSE.addEventListener('change', onMQChange);
 
   window.addEventListener('hashchange', () => {
     if (!window.location.hash.startsWith('#art')) closeArt();
