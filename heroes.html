@@ -9,466 +9,14 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Space+Mono:ital,wght@0,400;0,700;1,400&family=PT+Mono&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+<link rel="stylesheet" href="shared.css">
 <title>Грамотиньо. Великие</title>
 <style>
-:root {
-    --bg: #F4F1EA;
-    --text: #0A0A0A;
-    --red: #D90429;
-    --font-display: 'Oswald', sans-serif;
-    --font-mono: 'Space Mono', monospace;
-}
-
-* { margin: 0; padding: 0; box-sizing: border-box; }
-html { scroll-behavior: smooth; }
-
-body {
-    background-color: var(--bg);
-    color: var(--text);
-    font-family: var(--font-mono);
-    overflow-x: hidden;
-    line-height: 1.5;
-    min-height: 100vh;
-    position: relative;
-    -webkit-font-smoothing: antialiased;
-    -webkit-tap-highlight-color: transparent;
-}
-
-body {
-    background-image:
-        radial-gradient(ellipse 90% 70% at 12% 4%, rgba(255, 253, 246, 0.95), transparent 62%),
-        radial-gradient(ellipse 80% 60% at 88% 96%, rgba(214, 202, 180, 0.55), transparent 66%),
-        radial-gradient(ellipse 60% 50% at 50% 50%, rgba(248, 244, 235, 0.55), transparent 80%);
-    background-attachment: fixed;
-    background-repeat: no-repeat;
-}
-body::before {
-    content: '';
-    position: fixed;
-    inset: 0;
-    z-index: 1;
-    pointer-events: none;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='280' height='280'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
-    background-size: 280px 280px;
-    opacity: 0.14;
-    mix-blend-mode: multiply;
-}
-body.menu-open::before { display: none; }
-
 /* ============================================================
-   МОБИЛЬНЫЕ: облегчённый фон и лёгкие анимации
+   УНИКАЛЬНЫЕ СТИЛИ СТРАНИЦЫ «ВЕЛИКИЕ»
    ============================================================ */
-@media (max-width: 768px) {
-    body {
-        background-image: none;
-        background-attachment: scroll;
-    }
-    body::before,
-    body::after { display: none; }
 
-    /* Оставляем анимированными только: шторки (старт), бургер-кружок, меню, лёгкий fade у контента */
-    *,
-    *::before,
-    *::after {
-        transition: none !important;
-    }
-    .shutter {
-        transition: transform 0.8s cubic-bezier(0.85, 0, 0.15, 1) !important;
-    }
-    .burger-btn,
-    .burger-btn .ring,
-    .burger-btn .ring::before,
-    .burger-btn .burger-icon,
-    .burger-btn .burger-icon span {
-        transition: all 0.4s ease !important;
-    }
-    .burger-btn .ring {
-        transition: border-color 0.4s ease, transform 0.7s cubic-bezier(0.34, 1.56, 0.64, 1) !important;
-    }
-    .burger-btn .ring::before {
-        transition: top 0.5s ease, transform 0.5s ease !important;
-    }
-    .burger-btn .burger-icon {
-        transition: transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) !important;
-    }
-    .burger-btn .burger-icon span {
-        transition: all 0.45s cubic-bezier(0.34, 1.56, 0.64, 1) !important;
-    }
-    .burger-menu {
-        transition: opacity 0.2s ease !important;
-    }
-    .burger-link {
-        transition: color 0.15s ease, opacity 0.18s ease !important;
-        transform: none !important;
-    }
-    .burger-menu.open .burger-link {
-        transition: color 0.15s ease, opacity 0.18s ease !important;
-        transform: none !important;
-        opacity: 1;
-    }
-    .burger-menu.open .burger-menu-col-left .burger-link:nth-child(n),
-    .burger-menu.open .burger-menu-col-right .burger-link:nth-child(n) {
-        transition-delay: 0s !important;
-    }
-    .burger-link:hover,
-    .burger-menu-col-left .burger-link:hover,
-    .burger-menu-col-right .burger-link:hover { transform: none !important; }
-
-    /* Карточки героев на мобиле: без transform, только лёгкий fade при появлении */
-    .hero-item {
-        transition: none !important;
-        opacity: 0;
-    }
-    .hero-item.is-visible {
-        opacity: 1;
-        transition: opacity 0.35s ease !important;
-    }
-    .hero-item:hover { transform: none !important; box-shadow: none !important; }
-    .hero-photo img { transition: none !important; }
-
-    .century-header,
-    .century-header::before,
-    .century-header::after,
-    .soviet-band,
-    .soviet-band::before,
-    .soviet-band::after {
-        opacity: 0;
-    }
-    .century-header.is-visible,
-    .soviet-band.is-visible {
-        opacity: 1;
-        transition: opacity 0.4s ease !important;
-    }
-
-    .page-logo .l1,
-    .page-logo .l2 { opacity: 0; }
-    .page-logo.is-visible .l1,
-    .page-logo.is-visible .l2 {
-        opacity: 1;
-        transition: opacity 0.5s ease !important;
-    }
-
-    .hero-modal,
-    .hero-modal-portrait,
-    .hero-nav,
-    .hero-modal-close,
-    .hero-modal-repeat { transition: none !important; }
-    .hero-nav:hover { background: var(--bg) !important; color: var(--text) !important; }
-    .hero-modal-close:hover,
-    .hero-modal-repeat:hover { color: var(--text) !important; transform: none !important; }
-}
-
-/* LOADER */
-.loader-overlay {
-    position: fixed;
-    inset: 0;
-    z-index: 9999;
-    display: flex;
-    flex-direction: column;
-    pointer-events: none;
-}
-.shutter {
-    flex: 1;
-    background: var(--text);
-    transform-origin: center;
-    will-change: transform;
-}
-.shutter-top { transform-origin: top; }
-.shutter-bot { transform-origin: bottom; }
-
-/* HEADER */
-.page-header {
-    position: relative;
-    z-index: 10;
-    max-width: 1300px;
-    margin: 0 auto;
-    padding: 3.4rem 5vw 0;
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-    gap: 2rem;
-}
-.page-logo {
-    font-family: var(--font-display);
-    font-weight: 700;
-    line-height: 0.92;
-    letter-spacing: -0.04em;
-    text-transform: uppercase;
-}
-.page-logo .l1 {
-    display: block;
-    font-size: clamp(2.4rem, 7.5vw, 6.4rem);
-    color: var(--red);
-}
-.page-logo .l2 {
-    display: block;
-    font-size: clamp(1.5rem, 5vw, 4.2rem);
-    color: var(--text);
-    margin-top: 0.05em;
-}
-@media (max-width: 640px) {
-    .page-header { padding: 2rem 5vw 0; }
-}
-
-/* BURGER */
-.burger-btn {
-    position: fixed;
-    top: 22px;
-    right: 22px;
-    width: 62px;
-    height: 62px;
-    z-index: 500;
-    background: transparent;
-    border: none;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    -webkit-tap-highlight-color: transparent;
-    opacity: 0;
-    padding: 0;
-}
-.burger-btn .ring {
-    position: absolute;
-    inset: 6px;
-    border: 1px solid rgba(10, 10, 10, 0.28);
-    border-radius: 50%;
-    transition: border-color 0.4s ease, transform 0.7s cubic-bezier(0.34, 1.56, 0.64, 1);
-    pointer-events: none;
-}
-.burger-btn .ring::before {
-    content: '';
-    position: absolute;
-    top: -1px;
-    left: 50%;
-    width: 6px;
-    height: 6px;
-    background: var(--red);
-    border-radius: 50%;
-    transform: translateX(-50%);
-    transition: top 0.5s ease, transform 0.5s ease;
-}
-.burger-btn:not(.open):hover .ring { border-color: var(--red); transform: rotate(180deg); }
-.burger-icon {
-    position: relative;
-    width: 26px;
-    height: 26px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
-}
-.burger-btn:not(.open):hover .burger-icon { transform: rotate(90deg); }
-.burger-icon span {
-    position: absolute;
-    width: 9px;
-    height: 9px;
-    background: var(--text);
-    border-radius: 1px;
-    transition: all 0.45s cubic-bezier(0.34, 1.56, 0.64, 1);
-}
-.burger-icon span:nth-child(1) { top: 0; left: 0; transform-origin: top left; }
-.burger-icon span:nth-child(2) { top: 0; right: 0; transform-origin: top right; background: var(--red); }
-.burger-icon span:nth-child(3) { bottom: 0; left: 0; transform-origin: bottom left; }
-.burger-icon span:nth-child(4) { bottom: 0; right: 0; transform-origin: bottom right; background: var(--red); }
-.burger-btn:not(.open):hover .burger-icon span:nth-child(1) { transform: translate(-3px, -3px) scale(1.08); }
-.burger-btn:not(.open):hover .burger-icon span:nth-child(2) { transform: translate(3px, -3px) scale(1.08); }
-.burger-btn:not(.open):hover .burger-icon span:nth-child(3) { transform: translate(-3px, 3px) scale(1.08); }
-.burger-btn:not(.open):hover .burger-icon span:nth-child(4) { transform: translate(3px, 3px) scale(1.08); }
-.burger-btn.open .burger-icon { transform: rotate(0deg); }
-.burger-btn.open .ring { border-color: var(--red); transform: rotate(405deg); }
-.burger-btn.open .ring::before { top: calc(100% - 5px); transform: translateX(-50%) scale(1.4); }
-.burger-btn.open .burger-icon span:nth-child(1) { transform: translate(8.5px, 8.5px) rotate(45deg); width: 26px; height: 2.5px; }
-.burger-btn.open .burger-icon span:nth-child(2) { transform: translate(-8.5px, 8.5px) rotate(-45deg); width: 26px; height: 2.5px; opacity: 0; }
-.burger-btn.open .burger-icon span:nth-child(3) { transform: translate(8.5px, -8.5px) rotate(-45deg); width: 26px; height: 2.5px; opacity: 0; }
-.burger-btn.open .burger-icon span:nth-child(4) { transform: translate(-8.5px, -8.5px) rotate(45deg); width: 26px; height: 2.5px; }
-.burger-btn.open:hover .ring { transform: rotate(585deg); }
-.burger-btn.open:hover .burger-icon { transform: rotate(0deg) scale(1.12); }
-
-@media (max-width: 768px) {
-    .burger-btn { top: 14px; right: 14px; width: 54px; height: 54px; }
-    .burger-btn .ring { inset: 5px; }
-    .burger-icon { width: 22px; height: 22px; }
-    .burger-icon span { width: 8px; height: 8px; }
-    .burger-btn.open .burger-icon span:nth-child(1),
-    .burger-btn.open .burger-icon span:nth-child(4) { width: 22px; }
-    .burger-btn.open .burger-icon span:nth-child(1) { transform: translate(7px, 7px) rotate(45deg); }
-    .burger-btn.open .burger-icon span:nth-child(4) { transform: translate(-7px, -7px) rotate(45deg); }
-}
-
-/* МЕНЮ */
-.burger-menu {
-    position: fixed;
-    inset: 0;
-    z-index: 400;
-    background: var(--bg);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 4vw 5vw;
-    opacity: 0;
-    pointer-events: none;
-    transition: opacity 0.22s ease;
-    overflow-y: auto;
-    overflow-x: hidden;
-    contain: layout paint;
-}
-.burger-menu.open { opacity: 1; pointer-events: auto; }
-
-.burger-menu-inner {
-    position: relative;
-    z-index: 1;
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: clamp(24px, 4vw, 64px);
-    width: 100%;
-    max-width: 1400px;
-    padding: 2rem 0;
-}
-.burger-menu-col {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 0.1em;
-    min-width: 0;
-}
-.burger-menu-col-left  { justify-self: start; }
-.burger-menu-col-right { justify-self: end; align-items: flex-end; text-align: right; }
-
-.burger-link {
-    font-family: var(--font-display);
-    font-size: clamp(1.8rem, 3.6vw, 3.8rem);
-    font-weight: 700;
-    line-height: 1.05;
-    letter-spacing: -0.03em;
-    text-transform: uppercase;
-    color: var(--text);
-    text-decoration: none;
-    position: relative;
-    display: inline-block;
-    transform: translate3d(0, 22px, 0);
-    opacity: 0;
-    backface-visibility: hidden;
-    -webkit-backface-visibility: hidden;
-    word-break: break-word;
-    max-width: 100%;
-    transition:
-        color 0.2s ease,
-        transform 0.22s ease,
-        opacity 0.18s ease;
-}
-.burger-menu.open .burger-link {
-    transform: translate3d(0, 0, 0);
-    opacity: 1;
-    transition:
-        color 0.25s ease,
-        transform 0.5s cubic-bezier(0.16, 1, 0.3, 1),
-        opacity 0.4s ease;
-}
-.burger-menu.open .burger-menu-col-left .burger-link:nth-child(1) { transition-delay: 0.06s; }
-.burger-menu.open .burger-menu-col-left .burger-link:nth-child(2) { transition-delay: 0.11s; }
-.burger-menu.open .burger-menu-col-left .burger-link:nth-child(3) { transition-delay: 0.16s; }
-.burger-menu.open .burger-menu-col-left .burger-link:nth-child(4) { transition-delay: 0.21s; }
-.burger-menu.open .burger-menu-col-left .burger-link:nth-child(5) { transition-delay: 0.26s; }
-.burger-menu.open .burger-menu-col-right .burger-link:nth-child(1) { transition-delay: 0.14s; }
-.burger-menu.open .burger-menu-col-right .burger-link:nth-child(2) { transition-delay: 0.19s; }
-.burger-menu.open .burger-menu-col-right .burger-link:nth-child(3) { transition-delay: 0.24s; }
-
-.burger-link:hover { color: var(--red); }
-.burger-menu-col-left  .burger-link:hover { transform: translateX(14px); }
-.burger-menu-col-right .burger-link:hover { transform: translateX(-14px); }
-.burger-link.active {
-    color: var(--red);
-    font-style: italic;
-    letter-spacing: -0.02em;
-}
-.burger-menu-col-left  .burger-link.active::before {
-    content: '→';
-    position: absolute;
-    left: -0.9em;
-    top: 50%;
-    transform: translateY(-50%);
-    font-size: 0.55em;
-    opacity: 0.9;
-    font-style: normal;
-}
-.burger-menu-col-right .burger-link.active::after {
-    content: '←';
-    position: absolute;
-    right: -0.9em;
-    top: 50%;
-    transform: translateY(-50%);
-    font-size: 0.55em;
-    opacity: 0.9;
-    font-style: normal;
-}
-.burger-menu-foot {
-    position: absolute;
-    bottom: 3.5vh;
-    left: 50%;
-    transform: translateX(-50%);
-    font-family: var(--font-mono);
-    font-size: 0.65rem;
-    font-weight: 700;
-    letter-spacing: 0.24em;
-    text-transform: uppercase;
-    color: rgba(10, 10, 10, 0.35);
-    white-space: nowrap;
-    text-align: center;
-    z-index: 1;
-}
-@media (max-width: 900px) {
-    .burger-menu-inner { gap: clamp(20px, 3vw, 40px); }
-    .burger-link { font-size: clamp(1.6rem, 4.4vw, 2.8rem); }
-}
-@media (max-width: 640px) {
-    .burger-menu {
-        padding: 5rem 6vw 3rem;
-        align-items: flex-start;
-        transition: opacity 0.18s ease;
-    }
-    .burger-menu-inner {
-        grid-template-columns: 1fr;
-        gap: 0.4em;
-        padding: 0;
-        justify-items: start;
-    }
-    .burger-menu-col-left,
-    .burger-menu-col-right {
-        justify-self: start;
-        align-items: flex-start;
-        text-align: left;
-        width: 100%;
-    }
-    .burger-menu-col-right {
-        margin-top: 0.5em;
-        padding-top: 0.5em;
-        border-top: 1px solid rgba(10, 10, 10, 0.15);
-        width: 100%;
-    }
-    .burger-link {
-        font-size: clamp(1.7rem, 7.4vw, 2.6rem);
-        line-height: 1.12;
-    }
-    .burger-menu-foot {
-        bottom: 1.4rem;
-        font-size: 0.55rem;
-        letter-spacing: 0.16em;
-        left: 6vw;
-        right: 6vw;
-        transform: none;
-        text-align: left;
-        white-space: normal;
-    }
-}
-@media (max-width: 420px) {
-    .burger-link { font-size: clamp(1.5rem, 7vw, 2.1rem); }
-    .burger-menu-inner { gap: 0.35em; }
-}
-
-/* ============================================================
-   ТАЙМЛАЙН ВЕЛИКИХ — обновлённый дизайн
-   ============================================================ */
+/* ---------- ТАЙМЛАЙН ВЕЛИКИХ ---------- */
 .heroes-timeline {
     position: relative;
     z-index: 10;
@@ -477,7 +25,7 @@ body.menu-open::before { display: none; }
     padding: 3rem 5vw 6rem;
 }
 
-/* ЗАГОЛОВОК ВЕКА — новая версия: линия сверху, крупный заголовок, счётчик справа */
+/* Заголовок века: линия сверху, крупный заголовок */
 .century-header {
     position: relative;
     display: flex;
@@ -512,7 +60,7 @@ body.menu-open::before { display: none; }
     line-height: 1;
 }
 
-/* СОВЕТСКАЯ ПОЛОСА — тонкая, с точками */
+/* Советская полоса — тонкая, с точками-звёздами */
 .soviet-band {
     position: relative;
     display: flex;
@@ -540,7 +88,7 @@ body.menu-open::before { display: none; }
     opacity: 0.8;
 }
 
-/* СЕТКА */
+/* ---------- СЕТКА КАРТОЧЕК ---------- */
 .heroes-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
@@ -548,7 +96,7 @@ body.menu-open::before { display: none; }
     margin-bottom: 26px;
 }
 
-/* КАРТОЧКА ГЕРОЯ — новая версия: тонкая рамка, линии-акценты, спокойные тени */
+/* ---------- КАРТОЧКА ГЕРОЯ ---------- */
 .hero-item {
     position: relative;
     display: flex;
@@ -565,7 +113,6 @@ body.menu-open::before { display: none; }
     -webkit-tap-highlight-color: transparent;
     isolation: isolate;
 }
-/* Красная линия сверху, растёт при наведении */
 .hero-item::before {
     content: '';
     position: absolute;
@@ -588,7 +135,6 @@ body.menu-open::before { display: none; }
     width: 100%;
 }
 
-/* ФОТО */
 .hero-photo {
     position: relative;
     aspect-ratio: 1 / 1;
@@ -608,7 +154,6 @@ body.menu-open::before { display: none; }
     transform: scale(1.03);
 }
 
-/* ИНФО */
 .hero-info {
     position: relative;
     padding: 16px 16px 18px;
@@ -653,7 +198,7 @@ body.menu-open::before { display: none; }
     font-weight: 400;
 }
 
-/* Мобильная адаптация карточек */
+/* ---------- МОБИЛЬНАЯ АДАПТАЦИЯ ---------- */
 @media (max-width: 640px) {
     .heroes-timeline { padding: 2rem 4vw 5rem; }
     .heroes-grid {
@@ -683,9 +228,23 @@ body.menu-open::before { display: none; }
         margin: 16px 0 22px;
         gap: 12px;
     }
+
+    /* лёгкий fade карточек на мобиле */
+    .hero-item { opacity: 0; }
+    .hero-item.is-visible {
+        opacity: 1;
+        transition: opacity 0.35s ease !important;
+    }
+    .century-header,
+    .soviet-band { opacity: 0; }
+    .century-header.is-visible,
+    .soviet-band.is-visible {
+        opacity: 1;
+        transition: opacity 0.4s ease !important;
+    }
 }
 
-/* МОДАЛЬНОЕ ОКНО (без изменений) */
+/* ---------- МОДАЛЬНОЕ ОКНО ГЕРОЯ ---------- */
 .hero-modal {
     position: fixed;
     inset: 0;
@@ -825,6 +384,7 @@ body.menu-open::before { display: none; }
     user-select: none;
 }
 
+/* ---------- ТАЙМЛАЙН ВНУТРИ МОДАЛКИ ---------- */
 .hero-modal-timeline {
     flex-shrink: 0;
     width: 100%;
@@ -1094,43 +654,14 @@ body.menu-open::before { display: none; }
     </div>
 </header>
 
-<section class="heroes-timeline" id="heroesTimeline"></section>
+<section class="heroes-timeline" id="heroesTimeline" data-page-content></section>
 
 <script>
 /* ============================================================
-   БУРГЕР
+   УНИКАЛЬНЫЙ СКРИПТ СТРАНИЦЫ «ВЕЛИКИЕ»
    ============================================================ */
-(function () {
-    const burgerBtn  = document.getElementById('burgerBtn');
-    const burgerMenu = document.getElementById('burgerMenu');
-    if (!burgerBtn || !burgerMenu) return;
 
-    function openMenu() {
-        burgerMenu.classList.add('open');
-        burgerBtn.classList.add('open');
-        document.body.style.overflow = 'hidden';
-        document.body.classList.add('menu-open');
-    }
-    function closeMenu() {
-        burgerMenu.classList.remove('open');
-        burgerBtn.classList.remove('open');
-        document.body.style.overflow = '';
-        document.body.classList.remove('menu-open');
-    }
-
-    burgerBtn.addEventListener('click', () => {
-        if (burgerMenu.classList.contains('open')) closeMenu();
-        else openMenu();
-    });
-
-    document.querySelectorAll('.burger-link').forEach(link => {
-        link.addEventListener('click', () => closeMenu());
-    });
-})();
-
-/* ============================================================
-   ДАННЫЕ ВЕЛИКИХ
-   ============================================================ */
+/* ---------- ДАННЫЕ ВЕЛИКИХ ---------- */
 const heroesData = [
     { name: "Александров",       birthYear: 1905, deathYear: 1994, images: ["Александров.jpg"],       audio: "Александров.mp3" },
     { name: "Белинский",         birthYear: 1811, deathYear: 1848, images: ["Белинский.jpg"],         audio: "Белинский.mp3" },
@@ -1230,9 +761,7 @@ function encodePath(p) {
     return p.split('/').map(s => encodeURIComponent(s)).join('/');
 }
 
-/* ============================================================
-   РЕНДЕР ТАЙМЛАЙНА
-   ============================================================ */
+/* ---------- РЕНДЕР ТАЙМЛАЙНА ---------- */
 function renderHeroesTimeline() {
     const timeline = document.getElementById('heroesTimeline');
     if (!timeline) return;
@@ -1249,7 +778,8 @@ function renderHeroesTimeline() {
         const heroes = heroesData.filter(c.filter).sort((a, b) => a.deathYear - b.deathYear);
         if (heroes.length === 0) return;
 
-html += `<div class="century-header"><span class="century-title">${c.name}</span></div><div class="heroes-grid">`;        let sovietBandInserted = false;
+        html += `<div class="century-header"><span class="century-title">${c.name}</span></div><div class="heroes-grid">`;
+        let sovietBandInserted = false;
 
         heroes.forEach(hero => {
             if (!sovietBandInserted && hero.name === "Ленин") {
@@ -1287,11 +817,17 @@ html += `<div class="century-header"><span class="century-title">${c.name}</span
             );
         });
     });
+
+    /* Мобильный лёгкий fade появления карточек */
+    if (window.matchMedia('(max-width: 640px)').matches) {
+        const fadeEls = timeline.querySelectorAll('.century-header, .soviet-band, .hero-item');
+        fadeEls.forEach((el, i) => {
+            setTimeout(() => el.classList.add('is-visible'), i * 10);
+        });
+    }
 }
 
-/* ============================================================
-   МОДАЛЬНОЕ ОКНО
-   ============================================================ */
+/* ---------- МОДАЛЬНОЕ ОКНО ---------- */
 let heroModal = null;
 let heroAudio = new Audio();
 let currentImageIndex = 0;
@@ -1371,74 +907,13 @@ function playHeroAudio(src) {
     heroAudio.play().catch(e => console.log('Ошибка воспроизведения', e));
 }
 
-/* ============================================================
-   СТАРТ + АНИМАЦИЯ ПОЯВЛЕНИЯ
-   ============================================================ */
+/* ---------- СТАРТ ---------- */
 document.addEventListener('DOMContentLoaded', () => {
     renderHeroesTimeline();
-
-    const isMobile = window.matchMedia('(max-width: 768px)').matches;
-    const tl = gsap.timeline({ defaults: { ease: 'power4.out' } });
-
-    /* Шторки — всегда */
-    tl.to('.shutter', {
-        duration: 0.8,
-        scaleY: 0,
-        stagger: { amount: 0.3, from: 'center' },
-        ease: 'expo.inOut'
-    });
-
-    if (!isMobile) {
-        /* Десктоп — полная анимация появления */
-        tl.fromTo('.page-logo .l1',
-                { opacity: 0, y: 30, skewX: -6 },
-                { opacity: 1, y: 0, skewX: 0, duration: 0.9, ease: 'power3.out' },
-                '-=0.5')
-            .fromTo('.page-logo .l2',
-                { opacity: 0, y: 24 },
-                { opacity: 1, y: 0, duration: 0.85, ease: 'power3.out' },
-                '-=0.65')
-            .fromTo('.burger-btn',
-                { opacity: 0, scale: 0.6, rotate: -90 },
-                { opacity: 1, scale: 1, rotate: 0, duration: 0.65, ease: 'back.out(1.8)' },
-                '-=0.55')
-            .fromTo('.century-header',
-                { opacity: 0, y: 24 },
-                { opacity: 1, y: 0, duration: 0.7, stagger: 0.08, ease: 'power3.out' },
-                '-=0.5')
-            .fromTo('.hero-item',
-                { opacity: 0, y: 30, scale: 0.94 },
-                { opacity: 1, y: 0, scale: 1, duration: 0.5, stagger: 0.02, ease: 'back.out(1.5)' },
-                '-=0.4');
-    } else {
-        /* Мобила — только лёгкий fade (opacity) */
-        tl.set('.burger-btn', { opacity: 1 });
-
-        /* Плавный fade-in логотипа */
-        tl.set('#pageLogo', { opacity: 0 }, '+=0.05')
-          .to('#pageLogo', { opacity: 1, duration: 0.5, ease: 'power2.out' })
-          .add(() => {
-              /* Плавное появление карточек и заголовков через лёгкий fade (opacity) */
-              const fadeEls = document.querySelectorAll('.century-header, .soviet-band, .hero-item');
-              fadeEls.forEach((el, i) => {
-                  el.style.transition = 'opacity 0.35s ease';
-                  el.style.opacity = '0';
-                  setTimeout(() => {
-                      el.style.opacity = '1';
-                  }, i * 12);
-              });
-          }, '-=0.3');
-    }
-
-    tl.to('#loader', {
-        opacity: 0,
-        duration: 0.3,
-        onComplete: () => {
-            const loader = document.getElementById('loader');
-            if (loader) loader.style.display = 'none';
-        }
-    }, '-=0.2');
+    /* Стартовая анимация появления страницы уже запускается из shared.js */
 });
 </script>
+
+<script src="shared.js" defer></script>
 </body>
 </html>
