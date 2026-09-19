@@ -1,6 +1,3 @@
-Вот исправленный код. Я переписал логику отрисовки циферблата «Победа» (теперь там настоящая «железная дорога»), вернул стандартный курсор, починил звук при перетаскивании и разделил анимации меню: на компьютере они красивые и плавные, а на телефоне — максимально простые (только прозрачность), чтобы не тормозило.
-
-```html
 <!DOCTYPE html>
 <html lang="ru">
 <head>
@@ -10,7 +7,7 @@
 <meta name="theme-color" content="#F4F1EA">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Space+Mono:ital,wght@0,400;0,700;1,400&family=PT+Mono&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Space+Mono:ital,wght@0,400;0,700;1,400&family=PT+Mono&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
 <title>Грамотиньо. Время</title>
 <style>
@@ -20,7 +17,6 @@
     --red: #D90429;
     --font-display: 'Oswald', sans-serif;
     --font-mono: 'Space Mono', monospace;
-    --font-serif: 'Playfair Display', serif; /* Для цифр Победы */
 
     --evm-bg:      #0B0F0B;
     --evm-text:    #C7E0C7;
@@ -191,7 +187,7 @@ body::before {
     max-width: 620px;
     aspect-ratio: 440 / 520;
     position: relative;
-    cursor: default; /* Стандартный курсор по запросу */
+    cursor: pointer;
     user-select: none;
     -webkit-user-select: none;
     -webkit-tap-highlight-color: transparent;
@@ -233,7 +229,17 @@ body::before {
 }
 .watch-container.hidden { display: none; }
 
-/* Label removed as per request */
+.clock-style-label {
+    font-family: var(--font-mono);
+    font-size: 0.58rem;
+    font-weight: 700;
+    letter-spacing: 0.24em;
+    text-transform: uppercase;
+    color: rgba(10, 10, 10, 0.45);
+    text-align: center;
+    pointer-events: none;
+    margin-top: 1rem;
+}
 
 @media (max-width: 1024px) {
     .page-header {
@@ -335,7 +341,7 @@ body::before {
 }
 
 /* ============================================================
-   БУРГЕР-МЕНЮ — ОПТИМИЗИРОВАННО ДЛЯ МОБИЛЬНЫХ
+   БУРГЕР-МЕНЮ — ДВЕ КОЛОНКИ
    ============================================================ */
 .burger-menu {
     position: fixed;
@@ -348,6 +354,7 @@ body::before {
     padding: 6rem 5vw 5rem;
     opacity: 0;
     pointer-events: none;
+    transition: opacity 0.4s ease;
     overflow-y: auto;
     overflow-x: hidden;
     -webkit-overflow-scrolling: touch;
@@ -403,59 +410,34 @@ body::before {
     text-transform: uppercase;
     color: var(--text);
     text-decoration: none;
+    transition: color 0.25s ease, transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
     position: relative;
     display: inline-block;
+    transform: translateY(30px);
+    opacity: 0;
     word-break: break-word;
     max-width: 100%;
 }
-
-/* АНИМАЦИИ ДЛЯ ДЕСКТОПА (ОСТАЛИСЬ КАК БЫЛИ) */
-@media (min-width: 641px) {
-    .burger-link {
-        opacity: 0;
-        transition: color 0.25s ease, transform 0.55s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.45s ease;
-        transform: translateY(30px);
-    }
-    .burger-menu.open .burger-link {
-        transform: translateY(0);
-        opacity: 1;
-    }
-    .burger-menu.open .burger-menu-col-left .burger-link:nth-child(1) { transition-delay: 0.10s; }
-    .burger-menu.open .burger-menu-col-left .burger-link:nth-child(2) { transition-delay: 0.16s; }
-    .burger-menu.open .burger-menu-col-left .burger-link:nth-child(3) { transition-delay: 0.22s; }
-    .burger-menu.open .burger-menu-col-left .burger-link:nth-child(4) { transition-delay: 0.28s; }
-    .burger-menu.open .burger-menu-col-left .burger-link:nth-child(5) { transition-delay: 0.34s; }
-    .burger-menu.open .burger-menu-col-right .burger-link:nth-child(1) { transition-delay: 0.22s; }
-    .burger-menu.open .burger-menu-col-right .burger-link:nth-child(2) { transition-delay: 0.28s; }
-    .burger-menu.open .burger-menu-col-right .burger-link:nth-child(3) { transition-delay: 0.34s; }
-    
-    .burger-menu-col-left  .burger-link:hover { transform: translateX(14px); }
-    .burger-menu-col-right .burger-link:hover { transform: translateX(-14px); }
+.burger-menu.open .burger-link {
+    transform: translateY(0);
+    opacity: 1;
+    transition:
+        color 0.25s ease,
+        transform 0.55s cubic-bezier(0.16, 1, 0.3, 1),
+        opacity 0.45s ease;
 }
-
-/* АНИМАЦИИ ДЛЯ МОБИЛЬНЫХ (ТОЛЬКО OPACITY, БЕЗ ТЯЖЕЛЫХ TRANSFORM) */
-@media (max-width: 640px) {
-    .burger-link {
-        opacity: 0;
-        transition: opacity 0.3s ease, color 0.25s ease;
-    }
-    .burger-menu.open .burger-link {
-        opacity: 1;
-    }
-    .burger-menu.open .burger-menu-col-left .burger-link:nth-child(1) { transition-delay: 0.05s; }
-    .burger-menu.open .burger-menu-col-left .burger-link:nth-child(2) { transition-delay: 0.10s; }
-    .burger-menu.open .burger-menu-col-left .burger-link:nth-child(3) { transition-delay: 0.15s; }
-    .burger-menu.open .burger-menu-col-left .burger-link:nth-child(4) { transition-delay: 0.20s; }
-    .burger-menu.open .burger-menu-col-left .burger-link:nth-child(5) { transition-delay: 0.25s; }
-    .burger-menu.open .burger-menu-col-right .burger-link:nth-child(1) { transition-delay: 0.15s; }
-    .burger-menu.open .burger-menu-col-right .burger-link:nth-child(2) { transition-delay: 0.20s; }
-    .burger-menu.open .burger-menu-col-right .burger-link:nth-child(3) { transition-delay: 0.25s; }
-    
-    .burger-menu-col-left  .burger-link:hover,
-    .burger-menu-col-right .burger-link:hover { transform: none; }
-}
+.burger-menu.open .burger-menu-col-left .burger-link:nth-child(1) { transition-delay: 0.10s; }
+.burger-menu.open .burger-menu-col-left .burger-link:nth-child(2) { transition-delay: 0.16s; }
+.burger-menu.open .burger-menu-col-left .burger-link:nth-child(3) { transition-delay: 0.22s; }
+.burger-menu.open .burger-menu-col-left .burger-link:nth-child(4) { transition-delay: 0.28s; }
+.burger-menu.open .burger-menu-col-left .burger-link:nth-child(5) { transition-delay: 0.34s; }
+.burger-menu.open .burger-menu-col-right .burger-link:nth-child(1) { transition-delay: 0.22s; }
+.burger-menu.open .burger-menu-col-right .burger-link:nth-child(2) { transition-delay: 0.28s; }
+.burger-menu.open .burger-menu-col-right .burger-link:nth-child(3) { transition-delay: 0.34s; }
 
 .burger-link:hover { color: var(--red); }
+.burger-menu-col-left  .burger-link:hover { transform: translateX(14px); }
+.burger-menu-col-right .burger-link:hover { transform: translateX(-14px); }
 
 .burger-link.active {
     color: var(--red);
@@ -523,7 +505,8 @@ body::before {
         width: 100%;
     }
     .burger-link { font-size: clamp(2rem, 9vw, 3.4rem); line-height: 1.05; }
-    
+    .burger-menu-col-left  .burger-link:hover,
+    .burger-menu-col-right .burger-link:hover { transform: translateX(10px); }
     .burger-menu-col-right .burger-link.active::after {
         content: '→';
         right: auto;
@@ -983,12 +966,12 @@ body::before {
                         <g id="clkM-numbersGroup"></g>
                         <line id="clkM-hourHand"   x1="200" y1="288" x2="200" y2="194" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
                         <line id="clkM-minuteHand" x1="200" y1="296" x2="200" y2="158" stroke="currentColor" stroke-width="1.1" stroke-linecap="round"/>
-                        <line id="clkM-secondHand" x1="200" y1="260" x2="200" y2="134" stroke="currentColor" stroke-width="0.6" opacity="0.7" stroke-linecap="round"/>
+                        <line id="clkM-secondHand" x1="200" y1="290" x2="200" y2="134" stroke="currentColor" stroke-width="0.6" opacity="0.7" stroke-linecap="round"/>
                         <circle cx="200" cy="260" r="4.5" fill="none" stroke="currentColor" stroke-width="1"/>
                         <circle cx="200" cy="260" r="1.6" fill="currentColor"/>
                     </svg>
 
-                    <!-- ====== ПОБЕДА СВЕТЛЫЕ ====== -->
+                    <!-- ====== ПОБЕДА СВЕТЛЫЕ (реалистичная, старая советская) ====== -->
                     <svg id="watchSvgLight" class="watch-svg" viewBox="-20 0 440 520" xmlns="http://www.w3.org/2000/svg" style="display:none;">
                         <defs>
                             <radialGradient id="clkL-caseGrad" cx="0.35" cy="0.28" r="0.9">
@@ -1029,6 +1012,7 @@ body::before {
                             </linearGradient>
                         </defs>
 
+                        <!-- ремешок сверху -->
                         <g>
                             <path d="M 138 -10 L 262 -10 L 272 105 L 128 105 Z" fill="url(#clkL-strapGrad)"/>
                             <path d="M 138 -10 L 148 -10 L 138 105 L 128 105 Z" fill="rgba(0,0,0,0.35)"/>
@@ -1037,6 +1021,7 @@ body::before {
                             <line x1="155" y1="-8" x2="146" y2="103" stroke="#c9a070" stroke-width="0.8" stroke-dasharray="3,4" opacity="0.55"/>
                             <line x1="245" y1="-8" x2="254" y2="103" stroke="#c9a070" stroke-width="0.8" stroke-dasharray="3,4" opacity="0.55"/>
                         </g>
+                        <!-- ремешок снизу -->
                         <g>
                             <path d="M 128 415 L 272 415 L 262 530 L 138 530 Z" fill="url(#clkL-strapGrad)"/>
                             <path d="M 128 415 L 138 415 L 148 530 L 138 530 Z" fill="rgba(0,0,0,0.35)"/>
@@ -1045,9 +1030,11 @@ body::before {
                             <line x1="146" y1="417" x2="155" y2="528" stroke="#c9a070" stroke-width="0.8" stroke-dasharray="3,4" opacity="0.55"/>
                             <line x1="254" y1="417" x2="245" y2="528" stroke="#c9a070" stroke-width="0.8" stroke-dasharray="3,4" opacity="0.55"/>
                         </g>
+                        <!-- ушки корпуса -->
                         <rect x="122" y="76" width="156" height="38" rx="13" fill="url(#clkL-caseGrad)"/>
                         <rect x="122" y="406" width="156" height="38" rx="13" fill="url(#clkL-caseGrad)"/>
 
+                        <!-- заводная головка -->
                         <g>
                             <rect x="366" y="253" width="6" height="14" fill="url(#clkL-crownStem)" stroke="#505050" stroke-width="0.4"/>
                             <rect x="372" y="248" width="22" height="24" rx="3" fill="url(#clkL-crownGrad)" stroke="#404040" stroke-width="0.7"/>
@@ -1061,6 +1048,7 @@ body::before {
                             <rect x="373" y="249" width="20" height="3" rx="1" fill="#ffffff" opacity="0.55"/>
                         </g>
 
+                        <!-- корпус (многослойный) -->
                         <circle cx="200" cy="260" r="170" fill="url(#clkL-caseGrad)"/>
                         <circle cx="200" cy="260" r="170" fill="url(#clkL-caseShine)"/>
                         <circle cx="200" cy="260" r="159" fill="none" stroke="#2a2a2a" stroke-width="1.2" opacity="0.85"/>
@@ -1073,21 +1061,25 @@ body::before {
                         <circle cx="200" cy="260" r="147" fill="url(#clkL-dialGrad)"/>
                         <circle cx="200" cy="260" r="147" fill="url(#clkL-dialVignette)"/>
 
+                        <!-- метки и цифры -->
                         <g id="clkL-ticksGroup"></g>
                         <g id="clkL-numbersGroup"></g>
 
+                        <!-- надписи как у настоящей Победы -->
                         <text x="200" y="212" text-anchor="middle" font-family="Georgia, 'Times New Roman', serif" font-size="13" font-weight="700" letter-spacing="3" fill="#1a1a1a">ПОБЕДА</text>
                         <text x="200" y="316" text-anchor="middle" font-family="Georgia, 'Times New Roman', serif" font-size="7" font-weight="700" letter-spacing="3.4" fill="#3a3a3a">СДЕЛАНО В СССР</text>
 
+                        <!-- стекло -->
                         <circle cx="200" cy="260" r="147" fill="url(#clkL-crystalGrad)" pointer-events="none"/>
 
+                        <!-- центральная гайка и стрелки -->
                         <circle cx="200" cy="260" r="7" fill="url(#clkL-caseGrad)"/>
                         <g id="clkL-hands">
                             <g id="clkL-hourHand">
                                 <path d="M 200 158 L 207 222 L 205 252 L 200 268 L 195 252 L 193 222 Z" fill="url(#clkL-handGrad)"/>
                             </g>
                             <g id="clkL-minuteHand">
-                                <path d="M 200 128 L 205 200 L 204 252 L 200 270 L 196 252 L 195 200 Z" fill="url(#clkL-handGrad)"/>
+                                <path d="M 200 108 L 205 200 L 204 252 L 200 270 L 196 252 L 195 200 Z" fill="url(#clkL-handGrad)"/>
                             </g>
                         </g>
                         <circle cx="200" cy="260" r="5.5" fill="url(#clkL-bezelGrad)"/>
@@ -1158,6 +1150,7 @@ body::before {
 
             </div>
         </div>
+        <div class="clock-style-label" id="styleLabel">минималистичные</div>
     </div>
 </header>
 
@@ -1178,6 +1171,9 @@ body::before {
 </div>
 
 <script>
+/* ============================================================
+   УТИЛИТЫ
+   ============================================================ */
 const sleep = (ms) => new Promise(r => setTimeout(r, ms));
 
 const evmOverlay = document.getElementById('evmOverlay');
@@ -1245,12 +1241,18 @@ const ASCII_ART = [
     '█     █   █ █   █ █   █  ███    █   █   █ █   █ ████   ███ '
 ];
 
+/* ============================================================
+   БУРГЕР
+   ============================================================ */
 burgerBtn.addEventListener('click', () => {
     const isOpen = burgerMenu.classList.toggle('open');
     burgerBtn.classList.toggle('open', isOpen);
     document.body.style.overflow = isOpen ? 'hidden' : '';
 });
 
+/* ============================================================
+   ТЕРМИНАЛ
+   ============================================================ */
 termWord.addEventListener('click', () => {
     if (terminalOpened) return;
     terminalOpened = true;
@@ -1266,6 +1268,9 @@ function closeTerminal() {
     terminalOpened = false;
 }
 
+/* ============================================================
+   STARFIELD
+   ============================================================ */
 function startStarfield() {
     if (starfieldActive) return;
     starfieldActive = true;
@@ -1317,6 +1322,9 @@ function stopStarfield() {
     if (starfieldRaf) { cancelAnimationFrame(starfieldRaf); starfieldRaf = null; }
 }
 
+/* ============================================================
+   СЦЕНАРИЙ ТЕРМИНАЛА
+   ============================================================ */
 async function startTerminal() {
     if (terminalStarted) return;
     terminalStarted = true;
@@ -1509,6 +1517,9 @@ document.addEventListener('keydown', (e) => {
     if (e.key === 'Escape' && terminalOpened) closeTerminal();
 });
 
+/* ============================================================
+   СТАРТОВАЯ АНИМАЦИЯ
+   ============================================================ */
 document.addEventListener('DOMContentLoaded', () => {
     const tl = gsap.timeline({ defaults: { ease: 'power4.out' } });
     tl.to('.shutter', {
@@ -1547,15 +1558,20 @@ document.addEventListener('DOMContentLoaded', () => {
         });
 });
 
+/* ============================================================
+   ЧАСЫ — ПОЛНАЯ ЛОГИКА
+   ============================================================ */
 (function () {
     const clockView    = document.getElementById('clockView');
     const watchView    = document.getElementById('watchView');
     const schemeView   = document.getElementById('schemeView');
     const minuteScheme = document.getElementById('minuteScheme');
     const clockSwitch  = document.getElementById('clockSwitch');
+    const styleLabel   = document.getElementById('styleLabel');
     const clockDigitalEl = document.getElementById('clockDigital');
     if (!clockView || !watchView) return;
 
+    /* --- iOS detection --- */
     const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) ||
                   (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
 
@@ -1573,6 +1589,11 @@ document.addEventListener('DOMContentLoaded', () => {
         'victory-dark':  document.getElementById('watchSvgDark')
     };
     const PREFIXES = { 'minimal': 'clkM', 'victory-light': 'clkL', 'victory-dark': 'clkDk' };
+    const STYLE_LABELS = {
+        'minimal': 'минималистичные',
+        'victory-light': 'победа · светлые',
+        'victory-dark': 'победа · тёмные'
+    };
     const STYLE_ORDER = ['minimal', 'victory-light', 'victory-dark'];
 
     let currentStyle = 'minimal';
@@ -1581,6 +1602,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let currentView = 'watch';
     let lastDragTime = 0;
 
+    /* --- Аудио Web Audio API --- */
     const AC_CTOR = window.AudioContext || window.webkitAudioContext;
     const audioCtx = AC_CTOR ? new AC_CTOR() : null;
     const audioBuffers = new Map();
@@ -1655,6 +1677,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    /* --- Построение циферблатов --- */
     const builtDials = new Set();
 
     function buildDial(prefix) {
@@ -1701,50 +1724,20 @@ document.addEventListener('DOMContentLoaded', () => {
                 numbers.appendChild(t);
             }
         } else {
-            // ЖЕЛЕЗНАЯ ДОРОГА ДЛЯ ПОБЕДЫ
             for (let i = 0; i < 60; i++) {
                 const a = (i * 6 - 90) * Math.PI / 180;
                 const big = i % 5 === 0;
-                
-                if (big) {
-                     // Большие метки одинарные толстые
-                    const r1 = 131, r2 = 142;
-                    const l = document.createElementNS(NS, 'line');
-                    l.setAttribute('x1', (CX + r1 * Math.cos(a)).toFixed(2));
-                    l.setAttribute('y1', (CY + r1 * Math.sin(a)).toFixed(2));
-                    l.setAttribute('x2', (CX + r2 * Math.cos(a)).toFixed(2));
-                    l.setAttribute('y2', (CY + r2 * Math.sin(a)).toFixed(2));
-                    l.setAttribute('stroke', tickColor);
-                    l.setAttribute('stroke-width', '1.6');
-                    l.setAttribute('stroke-linecap', 'round');
-                    ticks.appendChild(l);
-                } else {
-                    // Маленькие метки двойные (железная дорога)
-                    const offset = 0.8; 
-                    const r1 = 133, r2 = 138;
-                    
-                    const a1 = ((i * 6 - 90) - offset) * Math.PI / 180;
-                    const l1 = document.createElementNS(NS, 'line');
-                    l1.setAttribute('x1', (CX + r1 * Math.cos(a1)).toFixed(2));
-                    l1.setAttribute('y1', (CY + r1 * Math.sin(a1)).toFixed(2));
-                    l1.setAttribute('x2', (CX + r2 * Math.cos(a1)).toFixed(2));
-                    l1.setAttribute('y2', (CY + r2 * Math.sin(a1)).toFixed(2));
-                    l1.setAttribute('stroke', tickColor);
-                    l1.setAttribute('stroke-width', '0.5');
-                    l1.setAttribute('stroke-linecap', 'round');
-                    ticks.appendChild(l1);
-
-                    const a2 = ((i * 6 - 90) + offset) * Math.PI / 180;
-                    const l2 = document.createElementNS(NS, 'line');
-                    l2.setAttribute('x1', (CX + r1 * Math.cos(a2)).toFixed(2));
-                    l2.setAttribute('y1', (CY + r1 * Math.sin(a2)).toFixed(2));
-                    l2.setAttribute('x2', (CX + r2 * Math.cos(a2)).toFixed(2));
-                    l2.setAttribute('y2', (CY + r2 * Math.sin(a2)).toFixed(2));
-                    l2.setAttribute('stroke', tickColor);
-                    l2.setAttribute('stroke-width', '0.5');
-                    l2.setAttribute('stroke-linecap', 'round');
-                    ticks.appendChild(l2);
-                }
+                const r1 = big ? 131 : 133, r2 = big ? 142 : 138;
+                const l = document.createElementNS(NS, 'line');
+                l.setAttribute('x1', (CX + r1 * Math.cos(a)).toFixed(2));
+                l.setAttribute('y1', (CY + r1 * Math.sin(a)).toFixed(2));
+                l.setAttribute('x2', (CX + r2 * Math.cos(a)).toFixed(2));
+                l.setAttribute('y2', (CY + r2 * Math.sin(a)).toFixed(2));
+                l.setAttribute('stroke', tickColor);
+                l.setAttribute('stroke-width', big ? '1.6' : '0.55');
+                if (isDark) l.setAttribute('opacity', big ? '1' : '0.55');
+                l.setAttribute('stroke-linecap', 'round');
+                ticks.appendChild(l);
             }
             for (let i = 1; i <= 12; i++) {
                 const a = (i * 30 - 90) * Math.PI / 180;
@@ -1806,6 +1799,8 @@ document.addEventListener('DOMContentLoaded', () => {
         buildDial(prefix);
         if (style === 'victory-dark') buildSubDial();
 
+        if (styleLabel) styleLabel.textContent = STYLE_LABELS[style];
+
         render();
         preloadOnDemand();
     }
@@ -1824,13 +1819,6 @@ document.addEventListener('DOMContentLoaded', () => {
         if (dm) dm.textContent = mm;
 
         if (currentStyle === 'victory-dark') renderSecondHand();
-        else if (currentStyle === 'minimal') renderMinimalSecondHand();
-    }
-
-    function renderMinimalSecondHand() {
-        if (currentStyle !== 'minimal' || !activeSecondHand) return;
-        const deg = seconds * 6;
-        activeSecondHand.setAttribute('transform', `rotate(${deg} 200 260)`);
     }
 
     function renderSecondHand() {
@@ -1845,6 +1833,7 @@ document.addEventListener('DOMContentLoaded', () => {
         activeSecondHand.setAttribute('y2', y2.toFixed(2));
     }
 
+    /* --- Тик времени --- */
     let isVisible = true;
     document.addEventListener('visibilitychange', () => { isVisible = !document.hidden; });
 
@@ -1857,7 +1846,6 @@ document.addEventListener('DOMContentLoaded', () => {
             render();
         }
         if (currentStyle === 'victory-dark') renderSecondHand();
-        else if (currentStyle === 'minimal') renderMinimalSecondHand();
     }, 1000);
 
     function applyTotal() {
@@ -1868,6 +1856,7 @@ document.addEventListener('DOMContentLoaded', () => {
         hour = h === 0 ? 12 : h;
     }
 
+    /* --- Переключение view: часы / схема --- */
     function setView(view) {
         currentView = view;
         if (view === 'watch') {
@@ -1884,6 +1873,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     function toggleView() { setView(currentView === 'watch' ? 'scheme' : 'watch'); }
 
+    /* --- Геометрия --- */
     function getPoint(e) {
         if (e.touches && e.touches.length > 0) return { x: e.touches[0].clientX, y: e.touches[0].clientY };
         if (e.changedTouches && e.changedTouches.length > 0) return { x: e.changedTouches[0].clientX, y: e.changedTouches[0].clientY };
@@ -1906,6 +1896,7 @@ document.addEventListener('DOMContentLoaded', () => {
         return Math.hypot(p.x - cx, p.y - cy) <= GRAB_RADIUS * scale;
     }
 
+    /* --- Жесты --- */
     let gesture = null;
     function startGesture(point, source) {
         if (gesture) return;
@@ -1960,7 +1951,6 @@ document.addEventListener('DOMContentLoaded', () => {
         if (wasDrag) {
             clockView.classList.remove('dragging');
             lastDragTime = Date.now();
-            // ВОЗВРАЩЕН ЗВУК ПРИ ПЕРЕТАСКИВАНИИ
             if (!isIOS) speakTime();
         } else if (!wasScroll && !wasOther && point && duration >= TAP_MIN_DURATION && duration < TAP_MAX_DURATION) {
             const ddx = Math.abs(point.x - gesture.startX);
@@ -1990,10 +1980,14 @@ document.addEventListener('DOMContentLoaded', () => {
     window.addEventListener('mousemove', e => { if (!gesture || gesture.source !== 'mouse') return; moveGesture(e, getPoint(e)); });
     window.addEventListener('mouseup', e => { if (!gesture || gesture.source !== 'mouse') return; endGesture(getPoint(e)); });
 
+    /* Клик по циферблату — озвучка (кроме iOS, где просто сработает как тап для драга) */
     clockView.addEventListener('click', e => {
         if (Date.now() - lastDragTime < 300) return;
+        unlockAudioContext();
+        if (!isIOS) speakTime();
     });
 
+    /* --- КЛИК ПО ЦИФРОВОМУ ВРЕМЕНИ = ОЗВУЧКА --- */
     if (clockDigitalEl) {
         clockDigitalEl.addEventListener('click', e => {
             e.stopPropagation();
@@ -2002,6 +1996,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    /* --- Кнопка-переключатель стиля --- */
     let clickTimer = null, clickCount = 0;
     function playSpin() {
         clockSwitch.classList.remove('spin');
@@ -2026,6 +2021,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
+    /* --- Схема минут --- */
     (function buildScheme() {
         if (!minuteScheme) return;
         const S = 100;
@@ -2046,12 +2042,20 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     })();
 
+    /* --- Инициализация --- */
     applyStyle('minimal');
     setView('watch');
 
-    // АВТО-ОЗВУЧКА УДАЛЕНА
+    /* Автоматическое воспроизведение на десктопе через 1.5 секунды после старта */
+    if (!isIOS && audioCtx) {
+        setTimeout(() => {
+            try {
+                unlockAudioContext();
+                if (audioCtx.state === 'running') speakTime();
+            } catch (e) {}
+        }, 1500);
+    }
 })();
 </script>
 </body>
 </html>
-```
