@@ -67,6 +67,23 @@ body::before {
     }
 }
 
+/* КУРСОР ВСЕГДА СТАНДАРТНЫЙ */
+a, button, input, textarea, select, [role="button"],
+.burger-btn, .burger-link, .term-list-item, .terminal-word,
+.clock-view, .clock-switch, .clock-digital {
+    cursor: default;
+}
+
+/* Блокировка прокрутки при открытом меню (важно для Яндекс.Браузера) */
+html.menu-open,
+html.menu-open body {
+    overflow: hidden !important;
+    height: 100% !important;
+    width: 100% !important;
+    overscroll-behavior: none;
+    touch-action: none;
+}
+
 /* LOADER */
 .loader-overlay {
     position: fixed;
@@ -119,7 +136,6 @@ body::before {
 }
 
 .page-logo .l1.terminal-word {
-    cursor: default;
     user-select: none;
     -webkit-tap-highlight-color: transparent;
     position: relative;
@@ -157,7 +173,6 @@ body::before {
     font-variant-numeric: tabular-nums;
     user-select: none;
     line-height: 1;
-    cursor: pointer;
 }
 .clock-digital .clock-digital-sep {
     color: var(--red);
@@ -187,16 +202,12 @@ body::before {
     max-width: 620px;
     aspect-ratio: 440 / 520;
     position: relative;
-    cursor: pointer;
     user-select: none;
     -webkit-user-select: none;
     -webkit-tap-highlight-color: transparent;
     touch-action: pan-y;
     transform: translateZ(0);
 }
-.clock-view.view-watch { cursor: grab; }
-.clock-view.view-watch.dragging { cursor: grabbing; }
-.clock-view.view-scheme { cursor: pointer; }
 
 .watch-container {
     position: absolute;
@@ -259,7 +270,6 @@ body::before {
     z-index: 500;
     background: transparent;
     border: none;
-    cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -328,12 +338,16 @@ body::before {
     .burger-icon span { width: 8px; height: 8px; }
 }
 
-/* ============================================================
-   БУРГЕР-МЕНЮ — ДВЕ КОЛОНКИ
-   ============================================================ */
+/* БУРГЕР-МЕНЮ — ДВЕ КОЛОНКИ (фикс для Яндекс.Браузера) */
 .burger-menu {
     position: fixed;
-    inset: 0;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100vh;
+    height: 100dvh;
+    min-height: 100vh;
+    min-height: 100dvh;
     z-index: 400;
     background: var(--bg);
     display: flex;
@@ -516,10 +530,7 @@ body::before {
     .burger-menu-inner { gap: 0.35em; }
 }
 
-/* ============================================================
-   МОБИЛЬНАЯ УПРОЩЁННАЯ АНИМАЦИЯ МЕНЮ
-   (только для мобильных — убираем тяжёлые эффекты)
-   ============================================================ */
+/* УПРОЩЁННАЯ АНИМАЦИЯ МЕНЮ ДЛЯ МОБИЛЬНЫХ */
 @media (max-width: 768px) {
     .burger-menu::before { display: none; }
     .burger-link {
@@ -541,9 +552,7 @@ body::before {
     }
 }
 
-/* ============================================================
-   ТЕРМИНАЛ
-   ============================================================ */
+/* ТЕРМИНАЛ */
 .evm-overlay {
     position: fixed;
     inset: 0;
@@ -729,7 +738,6 @@ body::before {
     font-family: inherit;
     font-size: inherit;
     text-transform: uppercase;
-    cursor: pointer;
     transition: color 0.15s;
     border: none;
     background: transparent;
@@ -795,7 +803,6 @@ body::before {
     z-index: 499;
     background: transparent;
     border: none;
-    cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -1061,7 +1068,7 @@ body::before {
                             <rect x="373" y="249" width="20" height="3" rx="1" fill="#ffffff" opacity="0.55"/>
                         </g>
 
-                        <!-- корпус (многослойный) -->
+                        <!-- корпус -->
                         <circle cx="200" cy="260" r="170" fill="url(#clkL-caseGrad)"/>
                         <circle cx="200" cy="260" r="170" fill="url(#clkL-caseShine)"/>
                         <circle cx="200" cy="260" r="159" fill="none" stroke="#2a2a2a" stroke-width="1.2" opacity="0.85"/>
@@ -1097,7 +1104,7 @@ body::before {
                         <!-- стекло -->
                         <circle cx="200" cy="260" r="147" fill="url(#clkL-crystalGrad)" pointer-events="none"/>
 
-                        <!-- центральная гайка и стрелки -->
+                        <!-- стрелки -->
                         <g id="clkL-hands">
                             <g id="clkL-hourHand">
                                 <path d="M 200 170 L 205 230 L 204 256 L 200 272 L 196 256 L 195 230 Z" fill="url(#clkL-handGrad)"/>
@@ -1291,18 +1298,23 @@ const ASCII_ART = [
     '█     █   █ █   █ █   █  ███    █   █   █ █   █ ████   ███ '
 ];
 
-/* ============================================================
-   БУРГЕР
-   ============================================================ */
+/* БУРГЕР (с фиксом для Яндекс.Браузера) */
 burgerBtn.addEventListener('click', () => {
     const isOpen = burgerMenu.classList.toggle('open');
     burgerBtn.classList.toggle('open', isOpen);
-    document.body.style.overflow = isOpen ? 'hidden' : '';
+
+    if (isOpen) {
+        document.documentElement.classList.add('menu-open');
+        document.body.style.overflow = 'hidden';
+        document.documentElement.style.overflow = 'hidden';
+    } else {
+        document.documentElement.classList.remove('menu-open');
+        document.body.style.overflow = '';
+        document.documentElement.style.overflow = '';
+    }
 });
 
-/* ============================================================
-   ТЕРМИНАЛ
-   ============================================================ */
+/* ТЕРМИНАЛ */
 termWord.addEventListener('click', () => {
     if (terminalOpened) return;
     terminalOpened = true;
@@ -1318,9 +1330,7 @@ function closeTerminal() {
     terminalOpened = false;
 }
 
-/* ============================================================
-   STARFIELD
-   ============================================================ */
+/* STARFIELD */
 function startStarfield() {
     if (starfieldActive) return;
     starfieldActive = true;
@@ -1372,9 +1382,7 @@ function stopStarfield() {
     if (starfieldRaf) { cancelAnimationFrame(starfieldRaf); starfieldRaf = null; }
 }
 
-/* ============================================================
-   СЦЕНАРИЙ ТЕРМИНАЛА
-   ============================================================ */
+/* СЦЕНАРИЙ ТЕРМИНАЛА */
 async function startTerminal() {
     if (terminalStarted) return;
     terminalStarted = true;
@@ -1567,9 +1575,7 @@ document.addEventListener('keydown', (e) => {
     if (e.key === 'Escape' && terminalOpened) closeTerminal();
 });
 
-/* ============================================================
-   СТАРТОВАЯ АНИМАЦИЯ
-   ============================================================ */
+/* СТАРТОВАЯ АНИМАЦИЯ (не тронута) */
 document.addEventListener('DOMContentLoaded', () => {
     const tl = gsap.timeline({ defaults: { ease: 'power4.out' } });
     tl.to('.shutter', {
@@ -1650,7 +1656,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let currentView = 'watch';
     let lastDragTime = 0;
 
-    /* --- Аудио --- */
+    /* Аудио */
     const AC_CTOR = window.AudioContext || window.webkitAudioContext;
     const audioCtx = AC_CTOR ? new AC_CTOR() : null;
     const audioBuffers = new Map();
@@ -1725,7 +1731,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    /* --- Построение циферблатов --- */
+    /* Построение циферблатов */
     const builtDials = new Set();
 
     function buildDial(prefix) {
@@ -1741,7 +1747,6 @@ document.addEventListener('DOMContentLoaded', () => {
         const tickColor = isDark ? '#a8d878' : '#1a1a1a';
 
         if (isMin) {
-            /* Минимализм: 60 меток снаружи, арабские цифры */
             for (let i = 0; i < 60; i++) {
                 const a = (i * 6 - 90) * Math.PI / 180;
                 const big = i % 5 === 0;
@@ -1773,7 +1778,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 numbers.appendChild(t);
             }
         } else {
-            /* Победа (светлая/тёмная): железнодорожная шкала внутри, римские цифры снаружи */
             const rIn = 92, rOut = 100;
             for (let i = 0; i < 60; i++) {
                 const a = (i * 6 - 90) * Math.PI / 180;
@@ -1790,7 +1794,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 ticks.appendChild(l);
             }
             for (let i = 1; i <= 12; i++) {
-                if (i === 6) continue; /* VI пропускаем — там субциферблат */
+                if (i === 6) continue;
                 const a = (i * 30 - 90) * Math.PI / 180;
                 const t = document.createElementNS(NS, 'text');
                 t.setAttribute('x', (CX + 125 * Math.cos(a)).toFixed(2));
@@ -1881,9 +1885,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function renderSecondHand() {
         if (!activeSecondHand) return;
+        if (currentStyle === 'minimal') {
+            const deg = seconds * 6;
+            activeSecondHand.setAttribute('transform', `rotate(${deg} ${CX} ${CY})`);
+            return;
+        }
         let scx, scy, srad;
-        if (currentStyle === 'victory-dark') { scx = 200; scy = 355; srad = 32; }
-        else if (currentStyle === 'victory-light') { scx = 200; scy = 352; srad = 26; }
+        if (currentStyle === 'victory-dark')      { scx = 200; scy = 355; srad = 32; }
+        else if (currentStyle === 'victory-light'){ scx = 200; scy = 352; srad = 26; }
         else return;
         const deg = seconds * 6;
         const rad = (deg - 90) * Math.PI / 180;
@@ -1895,7 +1904,7 @@ document.addEventListener('DOMContentLoaded', () => {
         activeSecondHand.setAttribute('y2', y2.toFixed(2));
     }
 
-    /* --- Тик времени --- */
+    /* Тик времени */
     let isVisible = true;
     document.addEventListener('visibilitychange', () => { isVisible = !document.hidden; });
 
@@ -1919,7 +1928,7 @@ document.addEventListener('DOMContentLoaded', () => {
         hour = h === 0 ? 12 : h;
     }
 
-    /* --- Переключение view --- */
+    /* Переключение view */
     function setView(view) {
         currentView = view;
         if (view === 'watch') {
@@ -1936,7 +1945,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     function toggleView() { setView(currentView === 'watch' ? 'scheme' : 'watch'); }
 
-    /* --- Геометрия --- */
+    /* Геометрия */
     function getPoint(e) {
         if (e.touches && e.touches.length > 0) return { x: e.touches[0].clientX, y: e.touches[0].clientY };
         if (e.changedTouches && e.changedTouches.length > 0) return { x: e.changedTouches[0].clientX, y: e.changedTouches[0].clientY };
@@ -1959,7 +1968,7 @@ document.addEventListener('DOMContentLoaded', () => {
         return Math.hypot(p.x - cx, p.y - cy) <= GRAB_RADIUS * scale;
     }
 
-    /* --- Жесты --- */
+    /* Жесты */
     let gesture = null;
     function startGesture(point, source) {
         if (gesture) return;
@@ -2057,7 +2066,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    /* --- Переключатель стиля --- */
+    /* Переключатель стиля */
     let clickTimer = null, clickCount = 0;
     function playSpin() {
         clockSwitch.classList.remove('spin');
@@ -2082,7 +2091,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    /* --- Схема минут --- */
+    /* Схема минут */
     (function buildScheme() {
         if (!minuteScheme) return;
         const S = 100;
@@ -2103,18 +2112,11 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     })();
 
-    /* --- Инициализация --- */
+    /* Инициализация */
     applyStyle('minimal');
     setView('watch');
 
-    if (!isIOS && audioCtx) {
-        setTimeout(() => {
-            try {
-                unlockAudioContext();
-                if (audioCtx.state === 'running') speakTime();
-            } catch (e) {}
-        }, 1500);
-    }
+    /* БЕЗ авто-проигрывания времени при загрузке */
 })();
 </script>
 </body>
