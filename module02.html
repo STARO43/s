@@ -338,7 +338,7 @@ html.menu-open body {
     .burger-icon span { width: 8px; height: 8px; }
 }
 
-/* БУРГЕР-МЕНЮ — ДВЕ КОЛОНКИ (фикс для Яндекс.Браузера) */
+/* БУРГЕР-МЕНЮ — чисто белый фон, ссылки внизу скролла */
 .burger-menu {
     position: fixed;
     top: 0;
@@ -349,11 +349,12 @@ html.menu-open body {
     min-height: 100vh;
     min-height: 100dvh;
     z-index: 400;
-    background: var(--bg);
+    background: #FFFFFF;
     display: flex;
-    align-items: flex-start;
-    justify-content: center;
-    padding: 6rem 5vw 5rem;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-end;
+    padding: 6rem 5vw 2.5rem;
     opacity: 0;
     pointer-events: none;
     transition: opacity 0.4s ease;
@@ -371,16 +372,8 @@ html.menu-open body {
 }
 .burger-menu.open { opacity: 1; pointer-events: auto; }
 
-.burger-menu::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    pointer-events: none;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='360' height='360'%3E%3Cfilter id='n2'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.78' numOctaves='5' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n2)'/%3E%3C/svg%3E");
-    background-size: 360px 360px;
-    opacity: 0.18;
-    mix-blend-mode: multiply;
-}
+/* Фон-текстура полностью убран */
+.burger-menu::before { content: none; }
 
 .burger-menu-inner {
     position: relative;
@@ -390,7 +383,8 @@ html.menu-open body {
     width: 100%;
     max-width: 1400px;
     padding: 0;
-    margin: auto 0;
+    margin: 0;
+    margin-top: auto;
 }
 
 .burger-menu-col {
@@ -468,10 +462,11 @@ html.menu-open body {
 }
 
 .burger-menu-foot {
-    position: absolute;
-    bottom: 3.5vh;
-    left: 50%;
-    transform: translateX(-50%);
+    position: relative;
+    margin-top: 1.5rem;
+    left: auto;
+    bottom: auto;
+    transform: none;
     font-family: var(--font-mono);
     font-size: 0.65rem;
     font-weight: 700;
@@ -486,7 +481,7 @@ html.menu-open body {
     .burger-link { font-size: clamp(1.8rem, 5.2vw, 3.4rem); }
 }
 @media (max-width: 640px) {
-    .burger-menu { padding: 5.5rem 5vw 4rem; align-items: flex-start; }
+    .burger-menu { padding: 5.5rem 5vw 2.5rem; align-items: stretch; justify-content: flex-end; }
     .burger-menu-inner {
         grid-template-columns: 1fr;
         gap: 0.4em;
@@ -516,13 +511,12 @@ html.menu-open body {
     }
     .burger-menu-col-right .burger-link.active::before { content: none; }
     .burger-menu-foot {
-        bottom: 1.4rem;
-        font-size: 0.55rem;
-        letter-spacing: 0.16em;
-        left: 5vw; right: 5vw;
+        position: relative;
+        bottom: auto; left: auto; right: auto;
         transform: none;
         text-align: left;
         white-space: normal;
+        margin-top: 1.2rem;
     }
 }
 @media (max-width: 420px) {
@@ -532,7 +526,6 @@ html.menu-open body {
 
 /* УПРОЩЁННАЯ АНИМАЦИЯ МЕНЮ ДЛЯ МОБИЛЬНЫХ */
 @media (max-width: 768px) {
-    .burger-menu::before { display: none; }
     .burger-link {
         transform: translateY(8px);
         transition: color 0.18s ease, transform 0.22s ease, opacity 0.22s ease;
@@ -995,66 +988,108 @@ html.menu-open body {
                     <svg id="watchSvgLight" class="watch-svg" viewBox="-20 0 440 520" xmlns="http://www.w3.org/2000/svg" style="display:none;">
                         <defs>
                             <radialGradient id="clkL-caseGrad" cx="0.35" cy="0.28" r="0.9">
-                                <stop offset="0" stop-color="#f8f8f8"/><stop offset="0.18" stop-color="#dcdcdc"/><stop offset="0.45" stop-color="#a8a8a8"/><stop offset="0.72" stop-color="#787878"/><stop offset="0.92" stop-color="#585858"/><stop offset="1" stop-color="#3a3a3a"/>
+                                <stop offset="0" stop-color="#f2f2f2"/>
+                                <stop offset="0.25" stop-color="#d6d6d6"/>
+                                <stop offset="0.55" stop-color="#a8a8a8"/>
+                                <stop offset="0.8" stop-color="#7d7d7d"/>
+                                <stop offset="1" stop-color="#4a4a4a"/>
                             </radialGradient>
                             <linearGradient id="clkL-caseShine" x1="0.15" y1="0" x2="0.85" y2="1">
-                                <stop offset="0" stop-color="#ffffff" stop-opacity="0.55"/><stop offset="0.25" stop-color="#ffffff" stop-opacity="0.12"/><stop offset="0.5" stop-color="#ffffff" stop-opacity="0"/><stop offset="0.78" stop-color="#000000" stop-opacity="0.08"/><stop offset="1" stop-color="#000000" stop-opacity="0.35"/>
+                                <stop offset="0" stop-color="#ffffff" stop-opacity="0.65"/>
+                                <stop offset="0.3" stop-color="#ffffff" stop-opacity="0.1"/>
+                                <stop offset="0.6" stop-color="#ffffff" stop-opacity="0"/>
+                                <stop offset="1" stop-color="#000000" stop-opacity="0.35"/>
                             </linearGradient>
                             <linearGradient id="clkL-bezelGrad" x1="0" y1="0" x2="0.25" y2="1">
-                                <stop offset="0" stop-color="#ffffff"/><stop offset="0.1" stop-color="#ececec"/><stop offset="0.25" stop-color="#b8b8b8"/><stop offset="0.4" stop-color="#e4e4e4"/><stop offset="0.55" stop-color="#909090"/><stop offset="0.75" stop-color="#c8c8c8"/><stop offset="0.9" stop-color="#666666"/><stop offset="1" stop-color="#464646"/>
+                                <stop offset="0" stop-color="#ffffff"/>
+                                <stop offset="0.12" stop-color="#ececec"/>
+                                <stop offset="0.35" stop-color="#b6b6b6"/>
+                                <stop offset="0.55" stop-color="#e0e0e0"/>
+                                <stop offset="0.75" stop-color="#8e8e8e"/>
+                                <stop offset="0.92" stop-color="#c0c0c0"/>
+                                <stop offset="1" stop-color="#5c5c5c"/>
                             </linearGradient>
-                            <linearGradient id="clkL-bezelHighlight" x1="0.2" y1="0" x2="0.8" y2="1">
-                                <stop offset="0" stop-color="#ffffff" stop-opacity="0.7"/><stop offset="0.3" stop-color="#ffffff" stop-opacity="0"/><stop offset="0.7" stop-color="#ffffff" stop-opacity="0"/><stop offset="1" stop-color="#ffffff" stop-opacity="0.3"/>
-                            </linearGradient>
-                            <radialGradient id="clkL-dialGrad" cx="0.45" cy="0.38" r="0.78">
-                                <stop offset="0" stop-color="#fefcf3"/><stop offset="0.5" stop-color="#f7f0dc"/><stop offset="1" stop-color="#e6d8b5"/>
+
+                            <radialGradient id="clkL-dialGrad" cx="0.48" cy="0.42" r="0.8">
+                                <stop offset="0" stop-color="#f7efd8"/>
+                                <stop offset="0.55" stop-color="#eee1be"/>
+                                <stop offset="1" stop-color="#d8c79a"/>
                             </radialGradient>
                             <radialGradient id="clkL-dialVignette" cx="0.5" cy="0.5" r="0.5">
-                                <stop offset="0.62" stop-color="#000000" stop-opacity="0"/><stop offset="0.9" stop-color="#000000" stop-opacity="0.08"/><stop offset="1" stop-color="#000000" stop-opacity="0.24"/>
+                                <stop offset="0.7" stop-color="#000000" stop-opacity="0"/>
+                                <stop offset="0.92" stop-color="#000000" stop-opacity="0.08"/>
+                                <stop offset="1" stop-color="#000000" stop-opacity="0.22"/>
                             </radialGradient>
+
                             <linearGradient id="clkL-crystalGrad" x1="0" y1="0" x2="0.6" y2="0.6">
-                                <stop offset="0" stop-color="#ffffff" stop-opacity="0.45"/><stop offset="0.2" stop-color="#ffffff" stop-opacity="0"/><stop offset="0.5" stop-color="#ffffff" stop-opacity="0"/><stop offset="0.85" stop-color="#ffffff" stop-opacity="0"/><stop offset="1" stop-color="#ffffff" stop-opacity="0.18"/>
+                                <stop offset="0" stop-color="#ffffff" stop-opacity="0.4"/>
+                                <stop offset="0.25" stop-color="#ffffff" stop-opacity="0"/>
+                                <stop offset="0.85" stop-color="#ffffff" stop-opacity="0"/>
+                                <stop offset="1" stop-color="#ffffff" stop-opacity="0.15"/>
                             </linearGradient>
-                            <linearGradient id="clkL-handGrad" x1="0" y1="0" x2="1" y2="0">
-                                <stop offset="0" stop-color="#2a2a2a"/><stop offset="0.5" stop-color="#0a0a0a"/><stop offset="1" stop-color="#2a2a2a"/>
+
+                            <linearGradient id="clkL-handGrad" x1="0" y1="0" x2="0" y2="1">
+                                <stop offset="0" stop-color="#2b2b2b"/>
+                                <stop offset="0.5" stop-color="#0b0b0b"/>
+                                <stop offset="1" stop-color="#2b2b2b"/>
                             </linearGradient>
+
                             <linearGradient id="clkL-strapGrad" x1="0" y1="0" x2="1" y2="0">
-                                <stop offset="0" stop-color="#3a1e0c"/><stop offset="0.18" stop-color="#5a3016"/><stop offset="0.5" stop-color="#7a4420"/><stop offset="0.82" stop-color="#5a3016"/><stop offset="1" stop-color="#3a1e0c"/>
+                                <stop offset="0" stop-color="#0e0e0e"/>
+                                <stop offset="0.18" stop-color="#1f1f1f"/>
+                                <stop offset="0.5" stop-color="#2e2e2e"/>
+                                <stop offset="0.82" stop-color="#1f1f1f"/>
+                                <stop offset="1" stop-color="#0e0e0e"/>
                             </linearGradient>
                             <linearGradient id="clkL-strapShine" x1="0" y1="0" x2="1" y2="0">
-                                <stop offset="0" stop-color="#ffffff" stop-opacity="0"/><stop offset="0.45" stop-color="#ffffff" stop-opacity="0.22"/><stop offset="0.55" stop-color="#ffffff" stop-opacity="0.22"/><stop offset="1" stop-color="#ffffff" stop-opacity="0"/>
+                                <stop offset="0" stop-color="#ffffff" stop-opacity="0"/>
+                                <stop offset="0.45" stop-color="#ffffff" stop-opacity="0.18"/>
+                                <stop offset="0.55" stop-color="#ffffff" stop-opacity="0.18"/>
+                                <stop offset="1" stop-color="#ffffff" stop-opacity="0"/>
                             </linearGradient>
+
                             <linearGradient id="clkL-crownGrad" x1="0" y1="0" x2="0" y2="1">
-                                <stop offset="0" stop-color="#b8b8b8"/><stop offset="0.25" stop-color="#ececec"/><stop offset="0.5" stop-color="#ffffff"/><stop offset="0.75" stop-color="#d4d4d4"/><stop offset="1" stop-color="#888888"/>
+                                <stop offset="0" stop-color="#b8b8b8"/>
+                                <stop offset="0.3" stop-color="#f0f0f0"/>
+                                <stop offset="0.5" stop-color="#ffffff"/>
+                                <stop offset="0.75" stop-color="#d4d4d4"/>
+                                <stop offset="1" stop-color="#7a7a7a"/>
                             </linearGradient>
                             <linearGradient id="clkL-crownStem" x1="0" y1="0" x2="0" y2="1">
-                                <stop offset="0" stop-color="#8a8a8a"/><stop offset="0.5" stop-color="#c8c8c8"/><stop offset="1" stop-color="#787878"/>
+                                <stop offset="0" stop-color="#7a7a7a"/>
+                                <stop offset="0.5" stop-color="#c8c8c8"/>
+                                <stop offset="1" stop-color="#6e6e6e"/>
                             </linearGradient>
+
+                            <radialGradient id="clkL-rivetGrad" cx="0.35" cy="0.3" r="0.75">
+                                <stop offset="0" stop-color="#f0f0f0"/>
+                                <stop offset="0.5" stop-color="#c8c8c8"/>
+                                <stop offset="1" stop-color="#6a6a6a"/>
+                            </radialGradient>
                         </defs>
 
-                        <!-- ремешок сверху -->
+                        <!-- Ремешок сверху -->
                         <g>
                             <path d="M 138 -10 L 262 -10 L 272 105 L 128 105 Z" fill="url(#clkL-strapGrad)"/>
-                            <path d="M 138 -10 L 148 -10 L 138 105 L 128 105 Z" fill="rgba(0,0,0,0.35)"/>
-                            <path d="M 252 -10 L 262 -10 L 272 105 L 262 105 Z" fill="rgba(0,0,0,0.35)"/>
+                            <path d="M 138 -10 L 148 -10 L 138 105 L 128 105 Z" fill="rgba(0,0,0,0.5)"/>
+                            <path d="M 252 -10 L 262 -10 L 272 105 L 262 105 Z" fill="rgba(0,0,0,0.5)"/>
                             <path d="M 170 -10 L 230 -10 L 235 105 L 165 105 Z" fill="url(#clkL-strapShine)"/>
-                            <line x1="155" y1="-8" x2="146" y2="103" stroke="#c9a070" stroke-width="0.8" stroke-dasharray="3,4" opacity="0.55"/>
-                            <line x1="245" y1="-8" x2="254" y2="103" stroke="#c9a070" stroke-width="0.8" stroke-dasharray="3,4" opacity="0.55"/>
+                            <ellipse cx="200" cy="55" rx="18" ry="10" fill="url(#clkL-rivetGrad)" opacity="0.95"/>
                         </g>
-                        <!-- ремешок снизу -->
+                        <!-- Ремешок снизу -->
                         <g>
                             <path d="M 128 415 L 272 415 L 262 530 L 138 530 Z" fill="url(#clkL-strapGrad)"/>
-                            <path d="M 128 415 L 138 415 L 148 530 L 138 530 Z" fill="rgba(0,0,0,0.35)"/>
-                            <path d="M 262 415 L 272 415 L 262 530 L 252 530 Z" fill="rgba(0,0,0,0.35)"/>
+                            <path d="M 128 415 L 138 415 L 148 530 L 138 530 Z" fill="rgba(0,0,0,0.5)"/>
+                            <path d="M 262 415 L 272 415 L 262 530 L 252 530 Z" fill="rgba(0,0,0,0.5)"/>
                             <path d="M 165 415 L 235 415 L 230 530 L 170 530 Z" fill="url(#clkL-strapShine)"/>
-                            <line x1="146" y1="417" x2="155" y2="528" stroke="#c9a070" stroke-width="0.8" stroke-dasharray="3,4" opacity="0.55"/>
-                            <line x1="254" y1="417" x2="245" y2="528" stroke="#c9a070" stroke-width="0.8" stroke-dasharray="3,4" opacity="0.55"/>
+                            <ellipse cx="200" cy="465" rx="18" ry="10" fill="url(#clkL-rivetGrad)" opacity="0.95"/>
                         </g>
-                        <!-- ушки корпуса -->
+
+                        <!-- Ушки корпуса -->
                         <rect x="122" y="76" width="156" height="38" rx="13" fill="url(#clkL-caseGrad)"/>
                         <rect x="122" y="406" width="156" height="38" rx="13" fill="url(#clkL-caseGrad)"/>
 
-                        <!-- заводная головка -->
+                        <!-- Заводная головка -->
                         <g>
                             <rect x="366" y="253" width="6" height="14" fill="url(#clkL-crownStem)" stroke="#505050" stroke-width="0.4"/>
                             <rect x="372" y="248" width="22" height="24" rx="3" fill="url(#clkL-crownGrad)" stroke="#404040" stroke-width="0.7"/>
@@ -1068,136 +1103,198 @@ html.menu-open body {
                             <rect x="373" y="249" width="20" height="3" rx="1" fill="#ffffff" opacity="0.55"/>
                         </g>
 
-                        <!-- корпус -->
+                        <!-- Корпус -->
                         <circle cx="200" cy="260" r="170" fill="url(#clkL-caseGrad)"/>
                         <circle cx="200" cy="260" r="170" fill="url(#clkL-caseShine)"/>
-                        <circle cx="200" cy="260" r="159" fill="none" stroke="#2a2a2a" stroke-width="1.2" opacity="0.85"/>
+                        <circle cx="200" cy="260" r="159" fill="none" stroke="#2a2a2a" stroke-width="1" opacity="0.8"/>
                         <circle cx="200" cy="260" r="158" fill="url(#clkL-bezelGrad)"/>
-                        <circle cx="200" cy="260" r="158" fill="url(#clkL-bezelHighlight)"/>
                         <circle cx="200" cy="260" r="156" fill="none" stroke="#808080" stroke-width="0.4" opacity="0.5"/>
-                        <circle cx="200" cy="260" r="154" fill="none" stroke="#a0a0a0" stroke-width="0.4" opacity="0.4"/>
                         <circle cx="200" cy="260" r="152" fill="none" stroke="#707070" stroke-width="0.4" opacity="0.4"/>
                         <circle cx="200" cy="260" r="151" fill="#1a1a1a"/>
                         <circle cx="200" cy="260" r="147" fill="url(#clkL-dialGrad)"/>
                         <circle cx="200" cy="260" r="147" fill="url(#clkL-dialVignette)"/>
 
-                        <!-- Железнодорожная минутная шкала (двойной круг) -->
-                        <circle cx="200" cy="260" r="92"  fill="none" stroke="#1a1a1a" stroke-width="0.9"/>
-                        <circle cx="200" cy="260" r="100" fill="none" stroke="#1a1a1a" stroke-width="0.9"/>
+                        <!-- Риски -->
                         <g id="clkL-ticksGroup"></g>
-
-                        <!-- Римские цифры -->
+                        <!-- Цифры -->
                         <g id="clkL-numbersGroup"></g>
 
-                        <!-- надписи -->
-                        <text x="200" y="205" text-anchor="middle" font-family="Georgia, 'Times New Roman', serif" font-size="14" font-weight="700" letter-spacing="3" fill="#1a1a1a">ПОБЕДА</text>
-                        <text x="200" y="392" text-anchor="middle" font-family="Georgia, 'Times New Roman', serif" font-size="6.5" font-weight="700" letter-spacing="1.6" fill="#3a3a3a">СДЕЛАНО В СССР</text>
+                        <!-- Надписи -->
+                        <text x="200" y="196" text-anchor="middle" font-family="Georgia, 'Times New Roman', serif"
+                              font-size="15" font-weight="700" letter-spacing="3" fill="#1a1a1a">ПОБЕДА</text>
+                        <text x="200" y="392" text-anchor="middle" font-family="Georgia, 'Times New Roman', serif"
+                              font-size="6.5" font-weight="700" letter-spacing="1.6" fill="#3a3a3a">СДЕЛАНО В СССР</text>
 
-                        <!-- секундный субциферблат -->
+                        <!-- Секундный субциферблат -->
                         <g id="clkL-subdial">
-                            <circle cx="200" cy="352" r="30" fill="none" stroke="#1a1a1a" stroke-width="0.7" opacity="0.85"/>
+                            <circle cx="200" cy="345" r="34" fill="none" stroke="#1a1a1a" stroke-width="0.7" opacity="0.9"/>
                             <g id="clkL-subTicks"></g>
-                            <line id="clkL-secondHand" x1="200" y1="352" x2="200" y2="328" stroke="#1a1a1a" stroke-width="1" stroke-linecap="round"/>
-                            <circle cx="200" cy="352" r="1.4" fill="#1a1a1a"/>
+                            <line id="clkL-secondHand" x1="200" y1="345" x2="200" y2="318" stroke="#1a1a1a" stroke-width="1" stroke-linecap="round"/>
+                            <circle cx="200" cy="345" r="1.6" fill="#1a1a1a"/>
                         </g>
 
-                        <!-- стекло -->
+                        <!-- Стекло -->
                         <circle cx="200" cy="260" r="147" fill="url(#clkL-crystalGrad)" pointer-events="none"/>
 
-                        <!-- стрелки -->
+                        <!-- Стрелки -->
                         <g id="clkL-hands">
                             <g id="clkL-hourHand">
-                                <path d="M 200 170 L 205 230 L 204 256 L 200 272 L 196 256 L 195 230 Z" fill="url(#clkL-handGrad)"/>
+                                <path d="M 197 258 L 197 218 L 199 196 L 200 186 L 201 196 L 203 218 L 203 258 Z"
+                                      fill="url(#clkL-handGrad)"/>
+                                <ellipse cx="200" cy="196" rx="4" ry="7" fill="url(#clkL-handGrad)"/>
                             </g>
                             <g id="clkL-minuteHand">
-                                <path d="M 200 150 L 204 215 L 203 256 L 200 274 L 197 256 L 196 215 Z" fill="url(#clkL-handGrad)"/>
+                                <path d="M 198 258 L 198 190 L 199 148 L 200 138 L 201 148 L 202 190 L 202 258 Z"
+                                      fill="url(#clkL-handGrad)"/>
+                                <ellipse cx="200" cy="148" rx="3" ry="9" fill="url(#clkL-handGrad)"/>
                             </g>
                         </g>
-                        <circle cx="200" cy="260" r="5.5" fill="url(#clkL-bezelGrad)"/>
-                        <circle cx="200" cy="260" r="2.5" fill="#1a1a1a"/>
+
+                        <circle cx="200" cy="260" r="4" fill="url(#clkL-bezelGrad)"/>
+                        <circle cx="200" cy="260" r="2" fill="#1a1a1a"/>
                     </svg>
 
                     <!-- ====== ПОБЕДА ТЁМНЫЕ ====== -->
                     <svg id="watchSvgDark" class="watch-svg" viewBox="-20 0 440 520" xmlns="http://www.w3.org/2000/svg" style="display:none;">
                         <defs>
                             <radialGradient id="clkDk-caseGrad" cx="0.35" cy="0.28" r="0.9">
-                                <stop offset="0" stop-color="#f5f5f5"/><stop offset="0.15" stop-color="#d8d8d8"/><stop offset="0.4" stop-color="#a8a8a8"/><stop offset="0.7" stop-color="#787878"/><stop offset="0.9" stop-color="#585858"/><stop offset="1" stop-color="#3a3a3a"/>
+                                <stop offset="0" stop-color="#f7e7b0"/>
+                                <stop offset="0.25" stop-color="#e2c472"/>
+                                <stop offset="0.55" stop-color="#b8933e"/>
+                                <stop offset="0.8" stop-color="#8a6b22"/>
+                                <stop offset="1" stop-color="#5a4412"/>
                             </radialGradient>
+                            <linearGradient id="clkDk-caseShine" x1="0.15" y1="0" x2="0.85" y2="1">
+                                <stop offset="0" stop-color="#ffffff" stop-opacity="0.7"/>
+                                <stop offset="0.3" stop-color="#ffffff" stop-opacity="0.12"/>
+                                <stop offset="0.6" stop-color="#ffffff" stop-opacity="0"/>
+                                <stop offset="1" stop-color="#000000" stop-opacity="0.4"/>
+                            </linearGradient>
                             <linearGradient id="clkDk-bezelGrad" x1="0" y1="0" x2="0.25" y2="1">
-                                <stop offset="0" stop-color="#ffffff"/><stop offset="0.1" stop-color="#e8e8e8"/><stop offset="0.25" stop-color="#b0b0b0"/><stop offset="0.4" stop-color="#e0e0e0"/><stop offset="0.55" stop-color="#888888"/><stop offset="0.75" stop-color="#c0c0c0"/><stop offset="0.9" stop-color="#606060"/><stop offset="1" stop-color="#404040"/>
+                                <stop offset="0" stop-color="#fbeec1"/>
+                                <stop offset="0.12" stop-color="#e8cf83"/>
+                                <stop offset="0.35" stop-color="#c9a84d"/>
+                                <stop offset="0.55" stop-color="#f0d98a"/>
+                                <stop offset="0.75" stop-color="#a8862e"/>
+                                <stop offset="0.92" stop-color="#d8b95c"/>
+                                <stop offset="1" stop-color="#7a5f1c"/>
                             </linearGradient>
-                            <linearGradient id="clkDk-bezelHighlight" x1="0.2" y1="0" x2="0.8" y2="1">
-                                <stop offset="0" stop-color="#ffffff" stop-opacity="0.65"/><stop offset="0.3" stop-color="#ffffff" stop-opacity="0"/><stop offset="0.7" stop-color="#ffffff" stop-opacity="0"/><stop offset="1" stop-color="#ffffff" stop-opacity="0.25"/>
-                            </linearGradient>
-                            <radialGradient id="clkDk-dialGrad" cx="0.45" cy="0.38" r="0.8">
-                                <stop offset="0" stop-color="#181c16"/><stop offset="0.55" stop-color="#0d100c"/><stop offset="1" stop-color="#050705"/>
+
+                            <radialGradient id="clkDk-dialGrad" cx="0.48" cy="0.4" r="0.85">
+                                <stop offset="0" stop-color="#8a1f2a"/>
+                                <stop offset="0.4" stop-color="#6d1721"/>
+                                <stop offset="0.85" stop-color="#4c0f18"/>
+                                <stop offset="1" stop-color="#34080f"/>
                             </radialGradient>
                             <radialGradient id="clkDk-dialVignette" cx="0.5" cy="0.5" r="0.5">
-                                <stop offset="0.65" stop-color="#000000" stop-opacity="0"/><stop offset="0.9" stop-color="#000000" stop-opacity="0.15"/><stop offset="1" stop-color="#000000" stop-opacity="0.5"/>
+                                <stop offset="0.72" stop-color="#000000" stop-opacity="0"/>
+                                <stop offset="0.92" stop-color="#000000" stop-opacity="0.2"/>
+                                <stop offset="1" stop-color="#000000" stop-opacity="0.45"/>
                             </radialGradient>
+
                             <linearGradient id="clkDk-crystalGrad" x1="0" y1="0" x2="0.6" y2="0.6">
-                                <stop offset="0" stop-color="#ffffff" stop-opacity="0.2"/><stop offset="0.25" stop-color="#ffffff" stop-opacity="0"/><stop offset="0.6" stop-color="#ffffff" stop-opacity="0"/><stop offset="0.85" stop-color="#ffffff" stop-opacity="0"/><stop offset="1" stop-color="#ffffff" stop-opacity="0.07"/>
+                                <stop offset="0" stop-color="#ffffff" stop-opacity="0.25"/>
+                                <stop offset="0.3" stop-color="#ffffff" stop-opacity="0"/>
+                                <stop offset="0.85" stop-color="#ffffff" stop-opacity="0"/>
+                                <stop offset="1" stop-color="#ffffff" stop-opacity="0.1"/>
                             </linearGradient>
+
+                            <linearGradient id="clkDk-handGrad" x1="0" y1="0" x2="0" y2="1">
+                                <stop offset="0" stop-color="#fbeec1"/>
+                                <stop offset="0.45" stop-color="#e8c34a"/>
+                                <stop offset="1" stop-color="#a37a1c"/>
+                            </linearGradient>
+
                             <linearGradient id="clkDk-strapGrad" x1="0" y1="0" x2="1" y2="0">
-                                <stop offset="0" stop-color="#050505"/><stop offset="0.18" stop-color="#161616"/><stop offset="0.5" stop-color="#262626"/><stop offset="0.82" stop-color="#161616"/><stop offset="1" stop-color="#050505"/>
+                                <stop offset="0" stop-color="#1a0e06"/>
+                                <stop offset="0.2" stop-color="#3a2012"/>
+                                <stop offset="0.5" stop-color="#4a2a16"/>
+                                <stop offset="0.8" stop-color="#3a2012"/>
+                                <stop offset="1" stop-color="#1a0e06"/>
                             </linearGradient>
-                            <linearGradient id="clkDk-handGrad" x1="0" y1="0" x2="1" y2="0">
-                                <stop offset="0" stop-color="#a37a1c"/><stop offset="0.5" stop-color="#e8c34a"/><stop offset="1" stop-color="#a37a1c"/>
+                            <linearGradient id="clkDk-strapShine" x1="0" y1="0" x2="1" y2="0">
+                                <stop offset="0" stop-color="#ffffff" stop-opacity="0"/>
+                                <stop offset="0.45" stop-color="#ffffff" stop-opacity="0.15"/>
+                                <stop offset="0.55" stop-color="#ffffff" stop-opacity="0.15"/>
+                                <stop offset="1" stop-color="#ffffff" stop-opacity="0"/>
+                            </linearGradient>
+
+                            <linearGradient id="clkDk-crownGrad" x1="0" y1="0" x2="0" y2="1">
+                                <stop offset="0" stop-color="#d8b95c"/>
+                                <stop offset="0.3" stop-color="#f6e7a8"/>
+                                <stop offset="0.5" stop-color="#fbf2c4"/>
+                                <stop offset="0.75" stop-color="#c9a84d"/>
+                                <stop offset="1" stop-color="#7a5f1c"/>
+                            </linearGradient>
+                            <linearGradient id="clkDk-crownStem" x1="0" y1="0" x2="0" y2="1">
+                                <stop offset="0" stop-color="#7a5f1c"/>
+                                <stop offset="0.5" stop-color="#d8b95c"/>
+                                <stop offset="1" stop-color="#5a4412"/>
                             </linearGradient>
                         </defs>
 
                         <g>
                             <path d="M 138 -10 L 262 -10 L 272 105 L 128 105 Z" fill="url(#clkDk-strapGrad)"/>
-                            <path d="M 128 415 L 272 415 L 262 530 L 138 530 Z" fill="url(#clkDk-strapGrad)"/>
+                            <path d="M 138 -10 L 148 -10 L 138 105 L 128 105 Z" fill="rgba(0,0,0,0.55)"/>
+                            <path d="M 252 -10 L 262 -10 L 272 105 L 262 105 Z" fill="rgba(0,0,0,0.55)"/>
+                            <path d="M 170 -10 L 230 -10 L 235 105 L 165 105 Z" fill="url(#clkDk-strapShine)"/>
                         </g>
+                        <g>
+                            <path d="M 128 415 L 272 415 L 262 530 L 138 530 Z" fill="url(#clkDk-strapGrad)"/>
+                            <path d="M 128 415 L 138 415 L 148 530 L 138 530 Z" fill="rgba(0,0,0,0.55)"/>
+                            <path d="M 262 415 L 272 415 L 262 530 L 252 530 Z" fill="rgba(0,0,0,0.55)"/>
+                            <path d="M 165 415 L 235 415 L 230 530 L 170 530 Z" fill="url(#clkDk-strapShine)"/>
+                        </g>
+
                         <rect x="122" y="76" width="156" height="38" rx="13" fill="url(#clkDk-caseGrad)"/>
                         <rect x="122" y="406" width="156" height="38" rx="13" fill="url(#clkDk-caseGrad)"/>
 
-                        <!-- заводная головка -->
                         <g>
-                            <rect x="366" y="253" width="6" height="14" fill="url(#clkL-crownStem)" stroke="#505050" stroke-width="0.4"/>
-                            <rect x="372" y="248" width="22" height="24" rx="3" fill="url(#clkL-crownGrad)" stroke="#404040" stroke-width="0.7"/>
-                            <g stroke="#505050" stroke-width="0.6" opacity="0.75" stroke-linecap="round">
+                            <rect x="366" y="253" width="6" height="14" fill="url(#clkDk-crownStem)" stroke="#5a4412" stroke-width="0.4"/>
+                            <rect x="372" y="248" width="22" height="24" rx="3" fill="url(#clkDk-crownGrad)" stroke="#5a4412" stroke-width="0.7"/>
+                            <g stroke="#5a4412" stroke-width="0.6" opacity="0.75" stroke-linecap="round">
                                 <line x1="373" y1="251" x2="373" y2="269"/>
                                 <line x1="377" y1="251" x2="377" y2="269"/>
                                 <line x1="381" y1="251" x2="381" y2="269"/>
                                 <line x1="385" y1="251" x2="385" y2="269"/>
                                 <line x1="389" y1="251" x2="389" y2="269"/>
                             </g>
-                            <rect x="373" y="249" width="20" height="3" rx="1" fill="#ffffff" opacity="0.55"/>
                         </g>
 
                         <circle cx="200" cy="260" r="170" fill="url(#clkDk-caseGrad)"/>
+                        <circle cx="200" cy="260" r="170" fill="url(#clkDk-caseShine)"/>
+                        <circle cx="200" cy="260" r="159" fill="none" stroke="#5a4412" stroke-width="1" opacity="0.85"/>
                         <circle cx="200" cy="260" r="158" fill="url(#clkDk-bezelGrad)"/>
-                        <circle cx="200" cy="260" r="158" fill="url(#clkDk-bezelHighlight)"/>
-                        <circle cx="200" cy="260" r="151" fill="#050705"/>
+                        <circle cx="200" cy="260" r="156" fill="none" stroke="#a8862e" stroke-width="0.4" opacity="0.6"/>
+                        <circle cx="200" cy="260" r="151" fill="#2a0508"/>
                         <circle cx="200" cy="260" r="147" fill="url(#clkDk-dialGrad)"/>
                         <circle cx="200" cy="260" r="147" fill="url(#clkDk-dialVignette)"/>
 
-                        <!-- Железнодорожная минутная шкала -->
-                        <circle cx="200" cy="260" r="92"  fill="none" stroke="#a8d878" stroke-width="0.9" opacity="0.8"/>
-                        <circle cx="200" cy="260" r="100" fill="none" stroke="#a8d878" stroke-width="0.9" opacity="0.8"/>
                         <g id="clkDk-ticksGroup"></g>
                         <g id="clkDk-numbersGroup"></g>
-                        <text x="200" y="205" text-anchor="middle" font-family="Georgia, 'Times New Roman', serif" font-size="14" font-weight="700" letter-spacing="3.2" fill="#c9a227">ПОБЕДА</text>
-                        <text x="200" y="392" text-anchor="middle" font-family="Georgia, 'Times New Roman', serif" font-size="6.5" font-weight="700" letter-spacing="1.6" fill="#c9a227" opacity="0.75">СДЕЛАНО В СССР</text>
 
-                        <!-- субциферблат -->
+                        <text x="200" y="196" text-anchor="middle" font-family="Georgia, 'Times New Roman', serif"
+                              font-size="15" font-weight="700" letter-spacing="3" fill="#f5e6b8">ПОБЕДА</text>
+                        <text x="200" y="392" text-anchor="middle" font-family="Georgia, 'Times New Roman', serif"
+                              font-size="6" font-weight="700" letter-spacing="1.6" fill="#e8cf83" opacity="0.85">СДЕЛАНО В СССР</text>
+
                         <g id="clkDk-subdial">
-                            <circle cx="200" cy="355" r="42" fill="#050705"/>
-                            <circle cx="200" cy="355" r="42" fill="none" stroke="#a8d878" stroke-width="0.5" opacity="0.5"/>
+                            <circle cx="200" cy="345" r="32" fill="none" stroke="#e8cf83" stroke-width="0.6" opacity="0.85"/>
                             <g id="clkDk-subTicks"></g>
-                            <line id="clkDk-secondHand" x1="200" y1="355" x2="200" y2="323" stroke="#c9a227" stroke-width="1.1" stroke-linecap="round"/>
-                            <circle cx="200" cy="355" r="2" fill="#c9a227"/>
+                            <line id="clkDk-secondHand" x1="200" y1="345" x2="200" y2="319" stroke="#e8cf83" stroke-width="1" stroke-linecap="round"/>
+                            <circle cx="200" cy="345" r="1.6" fill="#e8cf83"/>
                         </g>
+
+                        <circle cx="200" cy="260" r="147" fill="url(#clkDk-crystalGrad)" pointer-events="none"/>
 
                         <g id="clkDk-hands">
-                            <path id="clkDk-hourHand" fill="url(#clkDk-handGrad)" d="M 200 170 L 205 230 L 204 256 L 200 272 L 196 256 L 195 230 Z"/>
-                            <path id="clkDk-minuteHand" fill="url(#clkDk-handGrad)" d="M 200 150 L 204 215 L 203 256 L 200 274 L 197 256 L 196 215 Z"/>
+                            <path id="clkDk-hourHand" fill="url(#clkDk-handGrad)"
+                                  d="M 198 258 L 198 200 L 199 168 L 200 158 L 201 168 L 202 200 L 202 258 Z"/>
+                            <path id="clkDk-minuteHand" fill="url(#clkDk-handGrad)"
+                                  d="M 198.5 258 L 198.5 180 L 199.5 128 L 200 118 L 200.5 128 L 201.5 180 L 201.5 258 Z"/>
                         </g>
-                        <circle cx="200" cy="260" r="147" fill="url(#clkDk-crystalGrad)" pointer-events="none"/>
-                        <circle cx="200" cy="260" r="5" fill="#c9a227"/>
-                        <circle cx="200" cy="260" r="2" fill="#1a1a1a"/>
+                        <circle cx="200" cy="260" r="4" fill="url(#clkDk-bezelGrad)"/>
+                        <circle cx="200" cy="260" r="2" fill="#5a4412"/>
                     </svg>
 
                 </div>
@@ -1744,7 +1841,6 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!ticks || !numbers) return;
         const isDark = (prefix === 'clkDk');
         const isMin  = (prefix === 'clkM');
-        const tickColor = isDark ? '#a8d878' : '#1a1a1a';
 
         if (isMin) {
             for (let i = 0; i < 60; i++) {
@@ -1778,33 +1874,39 @@ document.addEventListener('DOMContentLoaded', () => {
                 numbers.appendChild(t);
             }
         } else {
-            const rIn = 92, rOut = 100;
+            const numColor = isDark ? '#f5e6b8' : '#1a1a1a';
+
+            /* 60 рисок по краю */
             for (let i = 0; i < 60; i++) {
                 const a = (i * 6 - 90) * Math.PI / 180;
                 const big = i % 5 === 0;
+                const rIn = big ? 128 : 133;
+                const rOut = 141;
                 const l = document.createElementNS(NS, 'line');
                 l.setAttribute('x1', (CX + rIn * Math.cos(a)).toFixed(2));
                 l.setAttribute('y1', (CY + rIn * Math.sin(a)).toFixed(2));
                 l.setAttribute('x2', (CX + rOut * Math.cos(a)).toFixed(2));
                 l.setAttribute('y2', (CY + rOut * Math.sin(a)).toFixed(2));
-                l.setAttribute('stroke', tickColor);
-                l.setAttribute('stroke-width', big ? '1.6' : '1');
-                if (isDark) l.setAttribute('opacity', big ? '1' : '0.7');
+                l.setAttribute('stroke', numColor);
+                l.setAttribute('stroke-width', big ? '1.8' : '0.7');
+                l.setAttribute('opacity', big ? '1' : (isDark ? '0.75' : '0.6'));
                 l.setAttribute('stroke-linecap', 'butt');
                 ticks.appendChild(l);
             }
+
+            /* Арабские цифры 1..12, кроме 6 */
             for (let i = 1; i <= 12; i++) {
                 if (i === 6) continue;
                 const a = (i * 30 - 90) * Math.PI / 180;
                 const t = document.createElementNS(NS, 'text');
-                t.setAttribute('x', (CX + 125 * Math.cos(a)).toFixed(2));
-                t.setAttribute('y', (CY + 125 * Math.sin(a)).toFixed(2));
+                t.setAttribute('x', (CX + 108 * Math.cos(a)).toFixed(2));
+                t.setAttribute('y', (CY + 108 * Math.sin(a)).toFixed(2));
                 t.setAttribute('text-anchor', 'middle');
                 t.setAttribute('dominant-baseline', 'central');
-                t.setAttribute('font-family', "Georgia,'Times New Roman',serif");
-                t.setAttribute('font-size', '24');
+                t.setAttribute('font-family', "Georgia, 'Times New Roman', serif");
+                t.setAttribute('font-size', '26');
                 t.setAttribute('font-weight', '700');
-                t.setAttribute('fill', tickColor);
+                t.setAttribute('fill', numColor);
                 t.textContent = i;
                 numbers.appendChild(t);
             }
@@ -1820,10 +1922,10 @@ document.addEventListener('DOMContentLoaded', () => {
         const subTicks = svg.querySelector('#' + prefix + '-subTicks');
         if (!subTicks) return;
         const scx = 200;
-        const scy = isDark ? 355 : 352;
-        const rIn  = isDark ? 32 : 22;
-        const rOut = isDark ? 40 : 28;
-        const color = isDark ? '#a8d878' : '#1a1a1a';
+        const scy = 345;
+        const rIn  = isDark ? 24 : 26;
+        const rOut = isDark ? 31 : 33;
+        const color = isDark ? '#e8cf83' : '#1a1a1a';
         for (let i = 0; i < 60; i++) {
             const a = (i * 6 - 90) * Math.PI / 180;
             const big = i % 5 === 0;
@@ -1835,7 +1937,7 @@ document.addEventListener('DOMContentLoaded', () => {
             l.setAttribute('y2', (scy + rOut * Math.sin(a)).toFixed(2));
             l.setAttribute('stroke', color);
             l.setAttribute('stroke-width', big ? '1' : '0.5');
-            l.setAttribute('opacity', big ? '0.9' : '0.5');
+            l.setAttribute('opacity', big ? '0.95' : '0.55');
             l.setAttribute('stroke-linecap', 'round');
             subTicks.appendChild(l);
         }
@@ -1891,8 +1993,8 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
         let scx, scy, srad;
-        if (currentStyle === 'victory-dark')      { scx = 200; scy = 355; srad = 32; }
-        else if (currentStyle === 'victory-light'){ scx = 200; scy = 352; srad = 26; }
+        if (currentStyle === 'victory-dark')      { scx = 200; scy = 345; srad = 26; }
+        else if (currentStyle === 'victory-light'){ scx = 200; scy = 345; srad = 28; }
         else return;
         const deg = seconds * 6;
         const rad = (deg - 90) * Math.PI / 180;
