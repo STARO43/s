@@ -81,7 +81,7 @@ body::before {
 .shutter-bot { transform-origin: bottom; }
 
 /* ============================================================
-   ЖИВОПИСЬ — НА ВЕСЬ ЭКРАН
+   ЖИВОПИСЬ — НА ВЕСЬ ЭКРАН ПО МАКСИМУМУ
    ============================================================ */
 .art-section {
     position: fixed;
@@ -101,11 +101,12 @@ body::before {
     transition: opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1), visibility 0s linear 0s;
 }
 
+/* Мягкая виньетка — только по краям, центр не трогает */
 .art-section::before {
     content: '';
     position: absolute;
     inset: 0;
-    background: radial-gradient(ellipse 80% 70% at center, transparent 40%, rgba(0, 0, 0, 0.08) 100%);
+    background: radial-gradient(ellipse 100% 95% at center, transparent 65%, rgba(0, 0, 0, 0.07) 100%);
     pointer-events: none;
     z-index: 1;
 }
@@ -120,6 +121,9 @@ body::before {
     z-index: 2;
 }
 
+/* ============================================================
+   ПРОГРЕСС-ПОЛОСА СВЕРХУ
+   ============================================================ */
 .art-progress {
     position: absolute;
     top: 0; left: 0; right: 0;
@@ -137,6 +141,9 @@ body::before {
     opacity: 0.7;
 }
 
+/* ============================================================
+   ВЕРХНЯЯ ПАНЕЛЬ: счётчик слева, крестик справа
+   ============================================================ */
 .art-top {
     position: absolute;
     top: 0; left: 0; right: 0;
@@ -151,17 +158,15 @@ body::before {
 .art-top > * { pointer-events: auto; }
 
 .art-info {
-    font-family: var(--font-mono);
-    font-size: 0.62rem;
+    font-family: var(--font-display);
+    font-size: 0.72rem;
     font-weight: 700;
-    letter-spacing: 0.22em;
+    letter-spacing: 0.24em;
     text-transform: uppercase;
     color: var(--text);
-    padding: 8px 16px;
-    border: 1px solid rgba(10, 10, 10, 0.15);
-    background: rgba(244, 241, 234, 0.85);
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
+    padding: 9px 18px;
+    border: 2px solid var(--text);
+    background: var(--bg);
     user-select: none;
     font-variant-numeric: tabular-nums;
     opacity: 0;
@@ -173,14 +178,13 @@ body::before {
     transform: translateY(0);
 }
 
+/* Крестик в стиле главной: чёрный квадрат, при hover — красный */
 .art-close {
-    width: 48px;
-    height: 48px;
-    border-radius: 50%;
-    border: 1px solid rgba(10, 10, 10, 0.2);
-    background: rgba(244, 241, 234, 0.9);
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
+    width: 50px;
+    height: 50px;
+    border-radius: 0;
+    border: 2px solid var(--text);
+    background: var(--bg);
     color: var(--text);
     cursor: pointer;
     display: flex;
@@ -189,31 +193,37 @@ body::before {
     padding: 0 0 4px;
     font-family: var(--font-display);
     font-size: 1.7rem;
-    font-weight: 300;
+    font-weight: 400;
     line-height: 1;
-    transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
     -webkit-tap-highlight-color: transparent;
     opacity: 0;
-    transform: scale(0.5) rotate(-90deg);
+    transform: scale(0.5);
 }
 .art-section.show .art-close {
     opacity: 1;
-    transform: scale(1) rotate(0);
+    transform: scale(1);
     transition: opacity 0.35s ease 0.15s,
-                transform 0.7s cubic-bezier(0.16, 1, 0.3, 1) 0.15s,
-                background 0.2s ease,
-                color 0.2s ease;
+                transform 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.15s,
+                background 0.15s ease,
+                color 0.15s ease,
+                border-color 0.15s ease,
+                box-shadow 0.15s ease;
 }
 .art-close:hover {
     background: var(--text);
     color: var(--bg);
-    border-color: var(--text);
-    transform: scale(1.08) rotate(0);
+    transform: translate(-2px, -2px);
+    box-shadow: 4px 4px 0 var(--red);
 }
 .art-close:active {
-    transform: scale(0.94) rotate(0);
+    transform: translate(0, 0);
+    box-shadow: 2px 2px 0 var(--red);
 }
 
+/* ============================================================
+   СТРЕЛКИ НАВИГАЦИИ В СТИЛЕ ГЛАВНОЙ
+   ============================================================ */
 .art-nav {
     position: absolute;
     top: 50%;
@@ -227,44 +237,43 @@ body::before {
     padding: 0 0 6px;
     cursor: pointer;
     font-family: var(--font-display);
-    font-size: 2rem;
-    font-weight: 300;
+    font-size: 1.9rem;
+    font-weight: 400;
     line-height: 1;
     -webkit-tap-highlight-color: transparent;
     user-select: none;
-    background: rgba(244, 241, 234, 0.85);
-    border: 1px solid rgba(10, 10, 10, 0.2);
+    background: var(--bg);
+    border: 2px solid var(--text);
     color: var(--text);
-    border-radius: 50%;
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
+    border-radius: 0;
     opacity: 0;
     visibility: hidden;
     transition: opacity 0.5s ease 0.4s,
                 visibility 0s linear 0.4s,
-                transform 0.25s cubic-bezier(0.16, 1, 0.3, 1),
-                background 0.2s ease,
-                color 0.2s ease,
-                border-color 0.2s ease;
+                transform 0.2s cubic-bezier(0.16, 1, 0.3, 1),
+                background 0.15s ease,
+                color 0.15s ease,
+                box-shadow 0.15s ease;
 }
 .art-section.show .art-nav {
     opacity: 1;
     visibility: visible;
     transition: opacity 0.5s ease 0.4s,
                 visibility 0s linear 0s,
-                transform 0.25s cubic-bezier(0.16, 1, 0.3, 1),
-                background 0.2s ease,
-                color 0.2s ease,
-                border-color 0.2s ease;
+                transform 0.2s cubic-bezier(0.16, 1, 0.3, 1),
+                background 0.15s ease,
+                color 0.15s ease,
+                box-shadow 0.15s ease;
 }
 .art-nav:hover {
     background: var(--text);
     color: var(--bg);
-    border-color: var(--text);
-    transform: translateY(-50%) scale(1.08);
+    transform: translateY(-50%) translate(-2px, -2px);
+    box-shadow: 4px 4px 0 var(--red);
 }
 .art-nav:active {
-    transform: translateY(-50%) scale(0.94);
+    transform: translateY(-50%);
+    box-shadow: 2px 2px 0 var(--red);
 }
 .art-nav.prev { left: 18px; }
 .art-nav.next { right: 18px; }
@@ -277,35 +286,39 @@ body::before {
     .art-nav { display: none; }
 }
 
+/* ============================================================
+   КАРТИНА — НА ВЕСЬ ЭКРАН ПО МАКСИМУМУ
+   ============================================================ */
 .art-image-wrap {
     position: absolute;
     inset: 0;
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 60px 80px;
+    /* Минимальные паддинги — только под счётчик сверху и кнопки снизу */
+    padding: 76px 8px 88px;
     will-change: opacity, transform;
 }
 .art-image-wrap.art-exit-up {
     opacity: 0;
-    transform: translateY(-40px) scale(0.96);
+    transform: translateY(-40px) scale(0.98);
     pointer-events: none;
-    transition: opacity 0.5s ease, transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+    transition: opacity 0.45s ease, transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
 }
 .art-image-wrap.art-exit-down {
     opacity: 0;
-    transform: translateY(40px) scale(0.96);
+    transform: translateY(40px) scale(0.98);
     pointer-events: none;
-    transition: opacity 0.5s ease, transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+    transition: opacity 0.45s ease, transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
 }
 .art-image-wrap.art-enter-from-down {
     opacity: 0;
-    transform: translateY(50px) scale(0.96);
+    transform: translateY(50px) scale(0.98);
     transition: none;
 }
 .art-image-wrap.art-enter-from-up {
     opacity: 0;
-    transform: translateY(-50px) scale(0.96);
+    transform: translateY(-50px) scale(0.98);
     transition: none;
 }
 
@@ -319,12 +332,12 @@ body::before {
     user-select: none;
     -webkit-user-drag: none;
     -webkit-tap-highlight-color: transparent;
-    border-radius: 2px;
+    border-radius: 0;
     box-shadow:
-        0 2px 6px rgba(0, 0, 0, 0.06),
-        0 12px 32px rgba(0, 0, 0, 0.1),
-        0 40px 90px -20px rgba(0, 0, 0, 0.22),
-        0 80px 160px -40px rgba(0, 0, 0, 0.28);
+        0 4px 10px rgba(0, 0, 0, 0.08),
+        0 16px 40px rgba(0, 0, 0, 0.12),
+        0 50px 100px -24px rgba(0, 0, 0, 0.28),
+        0 90px 180px -50px rgba(0, 0, 0, 0.32);
 }
 
 .art-state {
@@ -356,64 +369,121 @@ body::before {
     touch-action: none;
 }
 
+/* Узкие экраны — совсем минимальные отступы */
+@media (max-width: 900px) {
+    .art-image-wrap { padding: 72px 4px 84px; }
+}
 @media (max-width: 640px) {
-    .art-image-wrap { padding: 56px 8px 24px; }
+    .art-image-wrap { padding: 68px 2px 78px; }
     .art-top { padding: 12px 14px; }
-    .art-info { font-size: 0.55rem; padding: 6px 12px; letter-spacing: 0.18em; }
-    .art-close { width: 42px; height: 42px; font-size: 1.5rem; }
+    .art-info { font-size: 0.6rem; padding: 6px 12px; letter-spacing: 0.16em; border-width: 1.5px; }
+    .art-close { width: 42px; height: 42px; font-size: 1.4rem; border-width: 1.5px; }
 }
 
-.art-bottom {
+/* ============================================================
+   ПЕРЕКЛЮЧАТЕЛЬ ПОРЯДКА — СПРАВА, ВЕРТИКАЛЬНО
+   ============================================================ */
+.art-controls-wrap {
     position: absolute;
-    left: 50%;
-    bottom: 24px;
-    transform: translateX(-50%) translateY(12px);
+    top: 50%;
+    right: 18px;
+    transform: translateY(-50%) translateX(20px);
     z-index: 20;
     opacity: 0;
-    transition: opacity 0.55s ease 0.5s,
-                transform 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.5s;
+    pointer-events: none;
+    transition: opacity 0.5s ease 0.5s, transform 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.5s;
 }
-.art-section.show .art-bottom {
+.art-section.show .art-controls-wrap {
     opacity: 1;
-    transform: translateX(-50%) translateY(0);
+    transform: translateY(-50%) translateX(0);
+    pointer-events: auto;
 }
 
 .art-controls {
-    display: inline-flex;
-    align-items: center;
-    gap: 4px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
     padding: 6px;
-    border-radius: 100px;
-    background: rgba(244, 241, 234, 0.85);
-    border: 1px solid rgba(10, 10, 10, 0.15);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-    box-shadow: 0 10px 30px -12px rgba(0, 0, 0, 0.2);
+    border: 2px solid var(--text);
+    background: var(--bg);
 }
+
 .art-order-btn {
     background: transparent;
     border: none;
-    color: rgba(10, 10, 10, 0.6);
-    padding: 10px 22px;
+    color: var(--text);
+    padding: 14px 22px;
     cursor: pointer;
-    font-family: var(--font-mono);
-    font-weight: 700;
-    font-size: 0.62rem;
-    letter-spacing: 0.22em;
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: 0.7rem;
+    letter-spacing: 0.2em;
     text-transform: uppercase;
-    transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    transition: all 0.15s cubic-bezier(0.16, 1, 0.3, 1);
     -webkit-tap-highlight-color: transparent;
-    border-radius: 100px;
     white-space: nowrap;
+    text-align: center;
+    min-width: 120px;
 }
-.art-order-btn:hover { color: var(--text); }
+.art-order-btn:hover {
+    background: var(--bg);
+    color: var(--red);
+}
 .art-order-btn.active {
     background: var(--text);
     color: var(--bg);
 }
+.art-order-btn.active:hover {
+    background: var(--red);
+    color: #FFFFFF;
+}
+
+/* На тач-устройствах переключатель переносим вниз по центру,
+   чтобы не мешал большим пальцам на краю экрана */
+@media (pointer: coarse) {
+    .art-controls-wrap {
+        top: auto;
+        bottom: 16px;
+        right: 50%;
+        transform: translate(50%, 16px);
+    }
+    .art-section.show .art-controls-wrap {
+        transform: translate(50%, 0);
+    }
+    .art-controls {
+        flex-direction: row;
+        padding: 5px;
+    }
+    .art-order-btn {
+        padding: 10px 18px;
+        font-size: 0.62rem;
+        min-width: 0;
+        letter-spacing: 0.16em;
+    }
+}
+
+/* Мелкие экраны — компактнее */
 @media (max-width: 640px) {
-    .art-bottom { bottom: 16px; }
-    .art-order-btn { padding: 9px 16px; font-size: 0.55rem; letter-spacing: 0.16em; }
+    .art-controls-wrap {
+        top: auto;
+        bottom: 14px;
+        right: 50%;
+        transform: translate(50%, 16px);
+    }
+    .art-section.show .art-controls-wrap {
+        transform: translate(50%, 0);
+    }
+    .art-controls {
+        flex-direction: row;
+        padding: 4px;
+        border-width: 1.5px;
+    }
+    .art-order-btn {
+        padding: 9px 14px;
+        font-size: 0.58rem;
+        min-width: 0;
+        letter-spacing: 0.14em;
+    }
 }
 
 /* BURGER */
@@ -760,7 +830,8 @@ body::before {
     <button class="art-nav prev" id="artPrev" type="button" aria-label="Предыдущая картина">‹</button>
     <button class="art-nav next" id="artNext" type="button" aria-label="Следующая картина">›</button>
 
-    <div class="art-bottom">
+    <!-- Переключатель порядка — справа по вертикали -->
+    <div class="art-controls-wrap">
         <div class="art-controls" id="artControls">
             <button class="art-order-btn" data-order="standard" type="button">Стандарт</button>
             <button class="art-order-btn active" data-order="random" type="button">Случайно</button>
@@ -1096,7 +1167,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 const loader = document.getElementById('loader');
                 if (loader) loader.style.display = 'none';
 
-                /* Запускаем галерею ТОЛЬКО после анимации появления */
                 if (window.artOpen) window.artOpen();
             }
         }, '-=0.2');
