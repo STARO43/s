@@ -229,18 +229,6 @@ body::before {
 }
 .watch-container.hidden { display: none; }
 
-.clock-style-label {
-    font-family: var(--font-mono);
-    font-size: 0.58rem;
-    font-weight: 700;
-    letter-spacing: 0.24em;
-    text-transform: uppercase;
-    color: rgba(10, 10, 10, 0.45);
-    text-align: center;
-    pointer-events: none;
-    margin-top: 1rem;
-}
-
 @media (max-width: 1024px) {
     .page-header {
         grid-template-columns: minmax(220px, 1fr) minmax(0, 1fr);
@@ -529,6 +517,31 @@ body::before {
 }
 
 /* ============================================================
+   МОБИЛЬНАЯ УПРОЩЁННАЯ АНИМАЦИЯ МЕНЮ
+   (только для мобильных — убираем тяжёлые эффекты)
+   ============================================================ */
+@media (max-width: 768px) {
+    .burger-menu::before { display: none; }
+    .burger-link {
+        transform: translateY(8px);
+        transition: color 0.18s ease, transform 0.22s ease, opacity 0.22s ease;
+        will-change: opacity, transform;
+    }
+    .burger-menu.open .burger-link {
+        transform: translateY(0);
+        transition: color 0.18s ease, transform 0.28s ease, opacity 0.28s ease;
+    }
+    .burger-menu.open .burger-menu-col-left .burger-link:nth-child(n),
+    .burger-menu.open .burger-menu-col-right .burger-link:nth-child(n) {
+        transition-delay: 0s;
+    }
+    .burger-menu-col-left  .burger-link:hover,
+    .burger-menu-col-right .burger-link:hover {
+        transform: translateY(0);
+    }
+}
+
+/* ============================================================
    ТЕРМИНАЛ
    ============================================================ */
 .evm-overlay {
@@ -772,7 +785,7 @@ body::before {
     box-shadow: 0 0 60px #C7E0C7, 0 0 120px rgba(199, 224, 199, 0.6);
 }
 
-/* CLOCK-SWITCH (переключатель стилей под бургером) */
+/* CLOCK-SWITCH */
 .clock-switch {
     position: fixed;
     top: 96px;
@@ -964,14 +977,14 @@ body::before {
                         </g>
                         <g id="clkM-ticksGroup"></g>
                         <g id="clkM-numbersGroup"></g>
-                        <line id="clkM-hourHand"   x1="200" y1="288" x2="200" y2="194" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
-                        <line id="clkM-minuteHand" x1="200" y1="296" x2="200" y2="158" stroke="currentColor" stroke-width="1.1" stroke-linecap="round"/>
-                        <line id="clkM-secondHand" x1="200" y1="290" x2="200" y2="134" stroke="currentColor" stroke-width="0.6" opacity="0.7" stroke-linecap="round"/>
+                        <line id="clkM-hourHand"   x1="200" y1="282" x2="200" y2="172" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                        <line id="clkM-minuteHand" x1="200" y1="290" x2="200" y2="130" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/>
+                        <line id="clkM-secondHand" x1="200" y1="292" x2="200" y2="122" stroke="#D90429" stroke-width="0.7" opacity="0.85" stroke-linecap="round"/>
                         <circle cx="200" cy="260" r="4.5" fill="none" stroke="currentColor" stroke-width="1"/>
                         <circle cx="200" cy="260" r="1.6" fill="currentColor"/>
                     </svg>
 
-                    <!-- ====== ПОБЕДА СВЕТЛЫЕ (реалистичная, старая советская) ====== -->
+                    <!-- ====== ПОБЕДА СВЕТЛЫЕ ====== -->
                     <svg id="watchSvgLight" class="watch-svg" viewBox="-20 0 440 520" xmlns="http://www.w3.org/2000/svg" style="display:none;">
                         <defs>
                             <radialGradient id="clkL-caseGrad" cx="0.35" cy="0.28" r="0.9">
@@ -1061,25 +1074,36 @@ body::before {
                         <circle cx="200" cy="260" r="147" fill="url(#clkL-dialGrad)"/>
                         <circle cx="200" cy="260" r="147" fill="url(#clkL-dialVignette)"/>
 
-                        <!-- метки и цифры -->
+                        <!-- Железнодорожная минутная шкала (двойной круг) -->
+                        <circle cx="200" cy="260" r="92"  fill="none" stroke="#1a1a1a" stroke-width="0.9"/>
+                        <circle cx="200" cy="260" r="100" fill="none" stroke="#1a1a1a" stroke-width="0.9"/>
                         <g id="clkL-ticksGroup"></g>
+
+                        <!-- Римские цифры -->
                         <g id="clkL-numbersGroup"></g>
 
-                        <!-- надписи как у настоящей Победы -->
-                        <text x="200" y="212" text-anchor="middle" font-family="Georgia, 'Times New Roman', serif" font-size="13" font-weight="700" letter-spacing="3" fill="#1a1a1a">ПОБЕДА</text>
-                        <text x="200" y="316" text-anchor="middle" font-family="Georgia, 'Times New Roman', serif" font-size="7" font-weight="700" letter-spacing="3.4" fill="#3a3a3a">СДЕЛАНО В СССР</text>
+                        <!-- надписи -->
+                        <text x="200" y="205" text-anchor="middle" font-family="Georgia, 'Times New Roman', serif" font-size="14" font-weight="700" letter-spacing="3" fill="#1a1a1a">ПОБЕДА</text>
+                        <text x="200" y="392" text-anchor="middle" font-family="Georgia, 'Times New Roman', serif" font-size="6.5" font-weight="700" letter-spacing="1.6" fill="#3a3a3a">СДЕЛАНО В СССР</text>
+
+                        <!-- секундный субциферблат -->
+                        <g id="clkL-subdial">
+                            <circle cx="200" cy="352" r="30" fill="none" stroke="#1a1a1a" stroke-width="0.7" opacity="0.85"/>
+                            <g id="clkL-subTicks"></g>
+                            <line id="clkL-secondHand" x1="200" y1="352" x2="200" y2="328" stroke="#1a1a1a" stroke-width="1" stroke-linecap="round"/>
+                            <circle cx="200" cy="352" r="1.4" fill="#1a1a1a"/>
+                        </g>
 
                         <!-- стекло -->
                         <circle cx="200" cy="260" r="147" fill="url(#clkL-crystalGrad)" pointer-events="none"/>
 
                         <!-- центральная гайка и стрелки -->
-                        <circle cx="200" cy="260" r="7" fill="url(#clkL-caseGrad)"/>
                         <g id="clkL-hands">
                             <g id="clkL-hourHand">
-                                <path d="M 200 158 L 207 222 L 205 252 L 200 268 L 195 252 L 193 222 Z" fill="url(#clkL-handGrad)"/>
+                                <path d="M 200 170 L 205 230 L 204 256 L 200 272 L 196 256 L 195 230 Z" fill="url(#clkL-handGrad)"/>
                             </g>
                             <g id="clkL-minuteHand">
-                                <path d="M 200 108 L 205 200 L 204 252 L 200 270 L 196 252 L 195 200 Z" fill="url(#clkL-handGrad)"/>
+                                <path d="M 200 150 L 204 215 L 203 256 L 200 274 L 197 256 L 196 215 Z" fill="url(#clkL-handGrad)"/>
                             </g>
                         </g>
                         <circle cx="200" cy="260" r="5.5" fill="url(#clkL-bezelGrad)"/>
@@ -1110,22 +1134,48 @@ body::before {
                             <linearGradient id="clkDk-strapGrad" x1="0" y1="0" x2="1" y2="0">
                                 <stop offset="0" stop-color="#050505"/><stop offset="0.18" stop-color="#161616"/><stop offset="0.5" stop-color="#262626"/><stop offset="0.82" stop-color="#161616"/><stop offset="1" stop-color="#050505"/>
                             </linearGradient>
+                            <linearGradient id="clkDk-handGrad" x1="0" y1="0" x2="1" y2="0">
+                                <stop offset="0" stop-color="#a37a1c"/><stop offset="0.5" stop-color="#e8c34a"/><stop offset="1" stop-color="#a37a1c"/>
+                            </linearGradient>
                         </defs>
+
                         <g>
                             <path d="M 138 -10 L 262 -10 L 272 105 L 128 105 Z" fill="url(#clkDk-strapGrad)"/>
                             <path d="M 128 415 L 272 415 L 262 530 L 138 530 Z" fill="url(#clkDk-strapGrad)"/>
                         </g>
                         <rect x="122" y="76" width="156" height="38" rx="13" fill="url(#clkDk-caseGrad)"/>
                         <rect x="122" y="406" width="156" height="38" rx="13" fill="url(#clkDk-caseGrad)"/>
+
+                        <!-- заводная головка -->
+                        <g>
+                            <rect x="366" y="253" width="6" height="14" fill="url(#clkL-crownStem)" stroke="#505050" stroke-width="0.4"/>
+                            <rect x="372" y="248" width="22" height="24" rx="3" fill="url(#clkL-crownGrad)" stroke="#404040" stroke-width="0.7"/>
+                            <g stroke="#505050" stroke-width="0.6" opacity="0.75" stroke-linecap="round">
+                                <line x1="373" y1="251" x2="373" y2="269"/>
+                                <line x1="377" y1="251" x2="377" y2="269"/>
+                                <line x1="381" y1="251" x2="381" y2="269"/>
+                                <line x1="385" y1="251" x2="385" y2="269"/>
+                                <line x1="389" y1="251" x2="389" y2="269"/>
+                            </g>
+                            <rect x="373" y="249" width="20" height="3" rx="1" fill="#ffffff" opacity="0.55"/>
+                        </g>
+
                         <circle cx="200" cy="260" r="170" fill="url(#clkDk-caseGrad)"/>
                         <circle cx="200" cy="260" r="158" fill="url(#clkDk-bezelGrad)"/>
                         <circle cx="200" cy="260" r="158" fill="url(#clkDk-bezelHighlight)"/>
                         <circle cx="200" cy="260" r="151" fill="#050705"/>
                         <circle cx="200" cy="260" r="147" fill="url(#clkDk-dialGrad)"/>
                         <circle cx="200" cy="260" r="147" fill="url(#clkDk-dialVignette)"/>
+
+                        <!-- Железнодорожная минутная шкала -->
+                        <circle cx="200" cy="260" r="92"  fill="none" stroke="#a8d878" stroke-width="0.9" opacity="0.8"/>
+                        <circle cx="200" cy="260" r="100" fill="none" stroke="#a8d878" stroke-width="0.9" opacity="0.8"/>
                         <g id="clkDk-ticksGroup"></g>
                         <g id="clkDk-numbersGroup"></g>
-                        <text x="200" y="210" text-anchor="middle" font-family="Georgia, 'Times New Roman', serif" font-size="13" font-weight="700" letter-spacing="3.2" fill="#c9a227">ПОБЕДА</text>
+                        <text x="200" y="205" text-anchor="middle" font-family="Georgia, 'Times New Roman', serif" font-size="14" font-weight="700" letter-spacing="3.2" fill="#c9a227">ПОБЕДА</text>
+                        <text x="200" y="392" text-anchor="middle" font-family="Georgia, 'Times New Roman', serif" font-size="6.5" font-weight="700" letter-spacing="1.6" fill="#c9a227" opacity="0.75">СДЕЛАНО В СССР</text>
+
+                        <!-- субциферблат -->
                         <g id="clkDk-subdial">
                             <circle cx="200" cy="355" r="42" fill="#050705"/>
                             <circle cx="200" cy="355" r="42" fill="none" stroke="#a8d878" stroke-width="0.5" opacity="0.5"/>
@@ -1133,9 +1183,10 @@ body::before {
                             <line id="clkDk-secondHand" x1="200" y1="355" x2="200" y2="323" stroke="#c9a227" stroke-width="1.1" stroke-linecap="round"/>
                             <circle cx="200" cy="355" r="2" fill="#c9a227"/>
                         </g>
+
                         <g id="clkDk-hands">
-                            <path id="clkDk-hourHand" fill="#c9a227" d="M 200 195 L 204 235 L 205 255 L 205 264 L 195 264 L 195 255 L 196 235 Z"/>
-                            <path id="clkDk-minuteHand" fill="#c9a227" d="M 200 155 L 203 200 L 204 250 L 204 264 L 196 264 L 196 250 L 197 200 Z"/>
+                            <path id="clkDk-hourHand" fill="url(#clkDk-handGrad)" d="M 200 170 L 205 230 L 204 256 L 200 272 L 196 256 L 195 230 Z"/>
+                            <path id="clkDk-minuteHand" fill="url(#clkDk-handGrad)" d="M 200 150 L 204 215 L 203 256 L 200 274 L 197 256 L 196 215 Z"/>
                         </g>
                         <circle cx="200" cy="260" r="147" fill="url(#clkDk-crystalGrad)" pointer-events="none"/>
                         <circle cx="200" cy="260" r="5" fill="#c9a227"/>
@@ -1150,7 +1201,6 @@ body::before {
 
             </div>
         </div>
-        <div class="clock-style-label" id="styleLabel">минималистичные</div>
     </div>
 </header>
 
@@ -1571,13 +1621,11 @@ document.addEventListener('DOMContentLoaded', () => {
     const clockDigitalEl = document.getElementById('clockDigital');
     if (!clockView || !watchView) return;
 
-    /* --- iOS detection --- */
     const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) ||
                   (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
 
     const NS = 'http://www.w3.org/2000/svg';
     const CX = 200, CY = 260, VIEWBOX_W = 440;
-    const SUBCX = 200, SUBCY = 355, SEC_RADIUS = 32;
     const MOVE_THRESHOLD = 5;
     const TAP_MIN_DURATION = 400, TAP_MAX_DURATION = 1200;
     const TAP_MAX_MOVE = 12, GRAB_RADIUS = 220;
@@ -1602,7 +1650,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let currentView = 'watch';
     let lastDragTime = 0;
 
-    /* --- Аудио Web Audio API --- */
+    /* --- Аудио --- */
     const AC_CTOR = window.AudioContext || window.webkitAudioContext;
     const audioCtx = AC_CTOR ? new AC_CTOR() : null;
     const audioBuffers = new Map();
@@ -1693,6 +1741,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const tickColor = isDark ? '#a8d878' : '#1a1a1a';
 
         if (isMin) {
+            /* Минимализм: 60 меток снаружи, арабские цифры */
             for (let i = 0; i < 60; i++) {
                 const a = (i * 6 - 90) * Math.PI / 180;
                 const big = i % 5 === 0;
@@ -1724,30 +1773,32 @@ document.addEventListener('DOMContentLoaded', () => {
                 numbers.appendChild(t);
             }
         } else {
+            /* Победа (светлая/тёмная): железнодорожная шкала внутри, римские цифры снаружи */
+            const rIn = 92, rOut = 100;
             for (let i = 0; i < 60; i++) {
                 const a = (i * 6 - 90) * Math.PI / 180;
                 const big = i % 5 === 0;
-                const r1 = big ? 131 : 133, r2 = big ? 142 : 138;
                 const l = document.createElementNS(NS, 'line');
-                l.setAttribute('x1', (CX + r1 * Math.cos(a)).toFixed(2));
-                l.setAttribute('y1', (CY + r1 * Math.sin(a)).toFixed(2));
-                l.setAttribute('x2', (CX + r2 * Math.cos(a)).toFixed(2));
-                l.setAttribute('y2', (CY + r2 * Math.sin(a)).toFixed(2));
+                l.setAttribute('x1', (CX + rIn * Math.cos(a)).toFixed(2));
+                l.setAttribute('y1', (CY + rIn * Math.sin(a)).toFixed(2));
+                l.setAttribute('x2', (CX + rOut * Math.cos(a)).toFixed(2));
+                l.setAttribute('y2', (CY + rOut * Math.sin(a)).toFixed(2));
                 l.setAttribute('stroke', tickColor);
-                l.setAttribute('stroke-width', big ? '1.6' : '0.55');
-                if (isDark) l.setAttribute('opacity', big ? '1' : '0.55');
-                l.setAttribute('stroke-linecap', 'round');
+                l.setAttribute('stroke-width', big ? '1.6' : '1');
+                if (isDark) l.setAttribute('opacity', big ? '1' : '0.7');
+                l.setAttribute('stroke-linecap', 'butt');
                 ticks.appendChild(l);
             }
             for (let i = 1; i <= 12; i++) {
+                if (i === 6) continue; /* VI пропускаем — там субциферблат */
                 const a = (i * 30 - 90) * Math.PI / 180;
                 const t = document.createElementNS(NS, 'text');
-                t.setAttribute('x', (CX + 110 * Math.cos(a)).toFixed(2));
-                t.setAttribute('y', (CY + 110 * Math.sin(a)).toFixed(2));
+                t.setAttribute('x', (CX + 125 * Math.cos(a)).toFixed(2));
+                t.setAttribute('y', (CY + 125 * Math.sin(a)).toFixed(2));
                 t.setAttribute('text-anchor', 'middle');
                 t.setAttribute('dominant-baseline', 'central');
                 t.setAttribute('font-family', "Georgia,'Times New Roman',serif");
-                t.setAttribute('font-size', '26');
+                t.setAttribute('font-size', '24');
                 t.setAttribute('font-weight', '700');
                 t.setAttribute('fill', tickColor);
                 t.textContent = i;
@@ -1757,27 +1808,34 @@ document.addEventListener('DOMContentLoaded', () => {
         builtDials.add(prefix);
     }
 
-    function buildSubDial() {
-        if (builtDials.has('clkDk-sub')) return;
-        const svg = SVGS['victory-dark'];
-        const subTicks = svg.querySelector('#clkDk-subTicks');
+    function buildSubDial(prefix) {
+        const key = prefix + '-sub';
+        if (builtDials.has(key)) return;
+        const isDark = prefix === 'clkDk';
+        const svg = isDark ? SVGS['victory-dark'] : SVGS['victory-light'];
+        const subTicks = svg.querySelector('#' + prefix + '-subTicks');
         if (!subTicks) return;
+        const scx = 200;
+        const scy = isDark ? 355 : 352;
+        const rIn  = isDark ? 32 : 22;
+        const rOut = isDark ? 40 : 28;
+        const color = isDark ? '#a8d878' : '#1a1a1a';
         for (let i = 0; i < 60; i++) {
             const a = (i * 6 - 90) * Math.PI / 180;
             const big = i % 5 === 0;
-            const r1 = big ? 32 : 36, r2 = 40;
+            const r1 = big ? rIn : rIn + 3;
             const l = document.createElementNS(NS, 'line');
-            l.setAttribute('x1', (SUBCX + r1 * Math.cos(a)).toFixed(2));
-            l.setAttribute('y1', (SUBCY + r1 * Math.sin(a)).toFixed(2));
-            l.setAttribute('x2', (SUBCX + r2 * Math.cos(a)).toFixed(2));
-            l.setAttribute('y2', (SUBCY + r2 * Math.sin(a)).toFixed(2));
-            l.setAttribute('stroke', '#a8d878');
+            l.setAttribute('x1', (scx + r1 * Math.cos(a)).toFixed(2));
+            l.setAttribute('y1', (scy + r1 * Math.sin(a)).toFixed(2));
+            l.setAttribute('x2', (scx + rOut * Math.cos(a)).toFixed(2));
+            l.setAttribute('y2', (scy + rOut * Math.sin(a)).toFixed(2));
+            l.setAttribute('stroke', color);
             l.setAttribute('stroke-width', big ? '1' : '0.5');
             l.setAttribute('opacity', big ? '0.9' : '0.5');
             l.setAttribute('stroke-linecap', 'round');
             subTicks.appendChild(l);
         }
-        builtDials.add('clkDk-sub');
+        builtDials.add(key);
     }
 
     let hourHandEl, minuteHandEl, activeSecondHand;
@@ -1797,7 +1855,7 @@ document.addEventListener('DOMContentLoaded', () => {
         activeSecondHand = SVGS[style].querySelector('#' + prefix + '-secondHand');
 
         buildDial(prefix);
-        if (style === 'victory-dark') buildSubDial();
+        if (style !== 'minimal') buildSubDial(prefix);
 
         if (styleLabel) styleLabel.textContent = STYLE_LABELS[style];
 
@@ -1818,17 +1876,21 @@ document.addEventListener('DOMContentLoaded', () => {
         if (dh) dh.textContent = hh;
         if (dm) dm.textContent = mm;
 
-        if (currentStyle === 'victory-dark') renderSecondHand();
+        renderSecondHand();
     }
 
     function renderSecondHand() {
-        if (currentStyle !== 'victory-dark' || !activeSecondHand) return;
+        if (!activeSecondHand) return;
+        let scx, scy, srad;
+        if (currentStyle === 'victory-dark') { scx = 200; scy = 355; srad = 32; }
+        else if (currentStyle === 'victory-light') { scx = 200; scy = 352; srad = 26; }
+        else return;
         const deg = seconds * 6;
         const rad = (deg - 90) * Math.PI / 180;
-        const x2 = SUBCX + SEC_RADIUS * Math.cos(rad);
-        const y2 = SUBCY + SEC_RADIUS * Math.sin(rad);
-        activeSecondHand.setAttribute('x1', SUBCX);
-        activeSecondHand.setAttribute('y1', SUBCY);
+        const x2 = scx + srad * Math.cos(rad);
+        const y2 = scy + srad * Math.sin(rad);
+        activeSecondHand.setAttribute('x1', scx);
+        activeSecondHand.setAttribute('y1', scy);
         activeSecondHand.setAttribute('x2', x2.toFixed(2));
         activeSecondHand.setAttribute('y2', y2.toFixed(2));
     }
@@ -1837,15 +1899,16 @@ document.addEventListener('DOMContentLoaded', () => {
     let isVisible = true;
     document.addEventListener('visibilitychange', () => { isVisible = !document.hidden; });
 
-    let tickIntervalId = setInterval(() => {
+    setInterval(() => {
         if (!isVisible) return;
         seconds = (seconds + 1) % 60;
         if (seconds === 0) {
             totalMinutes = Math.round(totalMinutes) + 1;
             applyTotal();
             render();
+        } else {
+            renderSecondHand();
         }
-        if (currentStyle === 'victory-dark') renderSecondHand();
     }, 1000);
 
     function applyTotal() {
@@ -1856,7 +1919,7 @@ document.addEventListener('DOMContentLoaded', () => {
         hour = h === 0 ? 12 : h;
     }
 
-    /* --- Переключение view: часы / схема --- */
+    /* --- Переключение view --- */
     function setView(view) {
         currentView = view;
         if (view === 'watch') {
@@ -1980,14 +2043,12 @@ document.addEventListener('DOMContentLoaded', () => {
     window.addEventListener('mousemove', e => { if (!gesture || gesture.source !== 'mouse') return; moveGesture(e, getPoint(e)); });
     window.addEventListener('mouseup', e => { if (!gesture || gesture.source !== 'mouse') return; endGesture(getPoint(e)); });
 
-    /* Клик по циферблату — озвучка (кроме iOS, где просто сработает как тап для драга) */
     clockView.addEventListener('click', e => {
         if (Date.now() - lastDragTime < 300) return;
         unlockAudioContext();
         if (!isIOS) speakTime();
     });
 
-    /* --- КЛИК ПО ЦИФРОВОМУ ВРЕМЕНИ = ОЗВУЧКА --- */
     if (clockDigitalEl) {
         clockDigitalEl.addEventListener('click', e => {
             e.stopPropagation();
@@ -1996,7 +2057,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    /* --- Кнопка-переключатель стиля --- */
+    /* --- Переключатель стиля --- */
     let clickTimer = null, clickCount = 0;
     function playSpin() {
         clockSwitch.classList.remove('spin');
@@ -2046,7 +2107,6 @@ document.addEventListener('DOMContentLoaded', () => {
     applyStyle('minimal');
     setView('watch');
 
-    /* Автоматическое воспроизведение на десктопе через 1.5 секунды после старта */
     if (!isIOS && audioCtx) {
         setTimeout(() => {
             try {
