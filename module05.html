@@ -3,13 +3,13 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<meta name="description" content="Грамотиньо. Поэзия.">
+<meta name="description" content="Грамотиньо. Мультфильмы.">
 <meta name="theme-color" content="#F4F1EA">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Space+Mono:ital,wght@0,400;0,700;1,400&family=PT+Mono&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
-<title>ГРАМОТИНЬО // ПОЭЗИЯ</title>
+<title>ГРАМОТИНЬО // МУЛЬТЫ</title>
 <style>
 :root {
     --bg: #F4F1EA;
@@ -60,6 +60,16 @@ body::before {
             radial-gradient(ellipse 130% 70% at 50% 0%, #FFFDF8 0%, rgba(255,253,248,0) 62%),
             radial-gradient(ellipse 110% 60% at 50% 100%, #EDE7D9 0%, rgba(237,231,217,0) 72%);
     }
+}
+
+/* Блокировка прокрутки при открытом меню */
+html.menu-open,
+html.menu-open body {
+    overflow: hidden !important;
+    height: 100% !important;
+    width: 100% !important;
+    overscroll-behavior: none;
+    touch-action: none;
 }
 
 /* LOADER */
@@ -193,18 +203,23 @@ body::before {
     .burger-icon span { width: 8px; height: 8px; }
 }
 
-/* ============================================================
-   БУРГЕР-МЕНЮ — ДВЕ КОЛОНКИ
-   ============================================================ */
+/* БУРГЕР-МЕНЮ — как в module02 */
 .burger-menu {
     position: fixed;
-    inset: 0;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100vh;
+    height: 100dvh;
+    min-height: 100vh;
+    min-height: 100dvh;
     z-index: 400;
-    background: var(--bg);
+    background: #FFFFFF;
     display: flex;
-    align-items: flex-start;
-    justify-content: center;
-    padding: 6rem 5vw 5rem;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-end;
+    padding: 6rem 5vw 2.5rem;
     opacity: 0;
     pointer-events: none;
     transition: opacity 0.4s ease;
@@ -222,17 +237,6 @@ body::before {
 }
 .burger-menu.open { opacity: 1; pointer-events: auto; }
 
-.burger-menu::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    pointer-events: none;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='360' height='360'%3E%3Cfilter id='n2'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.78' numOctaves='5' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n2)'/%3E%3C/svg%3E");
-    background-size: 360px 360px;
-    opacity: 0.18;
-    mix-blend-mode: multiply;
-}
-
 .burger-menu-inner {
     position: relative;
     display: grid;
@@ -241,7 +245,8 @@ body::before {
     width: 100%;
     max-width: 1400px;
     padding: 0;
-    margin: auto 0;
+    margin: 0;
+    margin-top: auto;
 }
 
 .burger-menu-col {
@@ -251,7 +256,6 @@ body::before {
     gap: 0.15em;
     min-width: 0;
 }
-
 .burger-menu-col-left  { justify-self: start; }
 .burger-menu-col-right { justify-self: end; align-items: flex-end; text-align: right; }
 
@@ -272,7 +276,6 @@ body::before {
     word-break: break-word;
     max-width: 100%;
 }
-
 .burger-menu.open .burger-link {
     transform: translateY(0);
     opacity: 1;
@@ -281,13 +284,11 @@ body::before {
         transform 0.55s cubic-bezier(0.16, 1, 0.3, 1),
         opacity 0.45s ease;
 }
-
 .burger-menu.open .burger-menu-col-left .burger-link:nth-child(1) { transition-delay: 0.10s; }
 .burger-menu.open .burger-menu-col-left .burger-link:nth-child(2) { transition-delay: 0.16s; }
 .burger-menu.open .burger-menu-col-left .burger-link:nth-child(3) { transition-delay: 0.22s; }
 .burger-menu.open .burger-menu-col-left .burger-link:nth-child(4) { transition-delay: 0.28s; }
 .burger-menu.open .burger-menu-col-left .burger-link:nth-child(5) { transition-delay: 0.34s; }
-
 .burger-menu.open .burger-menu-col-right .burger-link:nth-child(1) { transition-delay: 0.22s; }
 .burger-menu.open .burger-menu-col-right .burger-link:nth-child(2) { transition-delay: 0.28s; }
 .burger-menu.open .burger-menu-col-right .burger-link:nth-child(3) { transition-delay: 0.34s; }
@@ -301,7 +302,6 @@ body::before {
     font-style: italic;
     letter-spacing: -0.02em;
 }
-
 .burger-menu-col-left  .burger-link.active::before {
     content: '→';
     position: absolute;
@@ -324,10 +324,11 @@ body::before {
 }
 
 .burger-menu-foot {
-    position: absolute;
-    bottom: 3.5vh;
-    left: 50%;
-    transform: translateX(-50%);
+    position: relative;
+    margin-top: 1.5rem;
+    left: auto;
+    bottom: auto;
+    transform: none;
     font-family: var(--font-mono);
     font-size: 0.65rem;
     font-weight: 700;
@@ -337,21 +338,12 @@ body::before {
     white-space: nowrap;
     text-align: center;
 }
-
 @media (max-width: 900px) {
-    .burger-menu-inner {
-        gap: clamp(20px, 3vw, 40px);
-    }
-    .burger-link {
-        font-size: clamp(1.8rem, 5.2vw, 3.4rem);
-    }
+    .burger-menu-inner { gap: clamp(20px, 3vw, 40px); }
+    .burger-link { font-size: clamp(1.8rem, 5.2vw, 3.4rem); }
 }
-
 @media (max-width: 640px) {
-    .burger-menu {
-        padding: 5.5rem 5vw 4rem;
-        align-items: flex-start;
-    }
+    .burger-menu { padding: 5.5rem 5vw 2.5rem; align-items: stretch; justify-content: flex-end; }
     .burger-menu-inner {
         grid-template-columns: 1fr;
         gap: 0.4em;
@@ -371,41 +363,52 @@ body::before {
         border-top: 1px solid rgba(10, 10, 10, 0.15);
         width: 100%;
     }
-    .burger-link {
-        font-size: clamp(2rem, 9vw, 3.4rem);
-        line-height: 1.05;
-    }
+    .burger-link { font-size: clamp(2rem, 9vw, 3.4rem); line-height: 1.05; }
     .burger-menu-col-left  .burger-link:hover,
-    .burger-menu-col-right .burger-link:hover {
-        transform: translateX(10px);
-    }
+    .burger-menu-col-right .burger-link:hover { transform: translateX(10px); }
     .burger-menu-col-right .burger-link.active::after {
         content: '→';
         right: auto;
         left: -0.9em;
     }
-    .burger-menu-col-right .burger-link.active::before {
-        content: none;
-    }
+    .burger-menu-col-right .burger-link.active::before { content: none; }
     .burger-menu-foot {
-        bottom: 1.4rem;
-        font-size: 0.55rem;
-        letter-spacing: 0.16em;
-        left: 5vw;
-        right: 5vw;
+        position: relative;
+        bottom: auto; left: auto; right: auto;
         transform: none;
         text-align: left;
         white-space: normal;
+        margin-top: 1.2rem;
     }
 }
-
 @media (max-width: 420px) {
     .burger-link { font-size: clamp(1.7rem, 8vw, 2.6rem); }
     .burger-menu-inner { gap: 0.35em; }
 }
 
+/* УПРОЩЁННАЯ АНИМАЦИЯ МЕНЮ ДЛЯ МОБИЛЬНЫХ */
+@media (max-width: 768px) {
+    .burger-link {
+        transform: translateY(8px);
+        transition: color 0.18s ease, transform 0.22s ease, opacity 0.22s ease;
+        will-change: opacity, transform;
+    }
+    .burger-menu.open .burger-link {
+        transform: translateY(0);
+        transition: color 0.18s ease, transform 0.28s ease, opacity 0.28s ease;
+    }
+    .burger-menu.open .burger-menu-col-left .burger-link:nth-child(n),
+    .burger-menu.open .burger-menu-col-right .burger-link:nth-child(n) {
+        transition-delay: 0s;
+    }
+    .burger-menu-col-left  .burger-link:hover,
+    .burger-menu-col-right .burger-link:hover {
+        transform: translateY(0);
+    }
+}
+
 /* ============================================================
-   СЕТКА СТИХОВ
+   СЕТКА МУЛЬТФИЛЬМОВ — крупные карточки с превью
    ============================================================ */
 .media-wrapper {
     position: relative;
@@ -432,6 +435,7 @@ body::before {
     isolation: isolate;
 }
 
+/* Превью */
 .media-thumb {
     position: relative;
     width: 100%;
@@ -454,6 +458,7 @@ body::before {
     pointer-events: none;
 }
 
+/* Затемнение и градиент поверх превью */
 .media-thumb::after {
     content: '';
     position: absolute;
@@ -465,6 +470,7 @@ body::before {
     transition: opacity 0.4s ease;
 }
 
+/* Большой номер в углу */
 .media-num {
     position: absolute;
     top: 14px;
@@ -485,6 +491,7 @@ body::before {
     transform: translateY(-4px) scale(1.08);
 }
 
+/* Кнопка play по центру */
 .media-play {
     position: absolute;
     top: 50%;
@@ -527,12 +534,14 @@ body::before {
     border-left-color: #FFFFFF;
 }
 
+/* Информация под превью */
 .media-info {
     position: relative;
     padding: 22px 4px 6px;
     z-index: 2;
 }
 
+/* Маленький счётчик сверху названия */
 .media-info-top {
     display: flex;
     align-items: center;
@@ -556,6 +565,7 @@ body::before {
     transform: scale(1.6);
 }
 
+/* Название */
 .media-title {
     font-family: var(--font-display);
     font-weight: 700;
@@ -571,6 +581,7 @@ body::before {
     transform: translateX(6px);
 }
 
+/* Подчёркивание под названием — растёт при hover */
 .media-title-line {
     display: block;
     height: 2px;
@@ -583,6 +594,7 @@ body::before {
     width: 64px;
 }
 
+/* Стрелка справа от названия */
 .media-arrow {
     position: absolute;
     right: 4px;
@@ -739,11 +751,11 @@ body::before {
             <a href="module01.html" class="burger-link">УЧИ СЛОГИ</a>
             <a href="module02.html" class="burger-link">ИЗУЧАЙ ЧАСЫ</a>
             <a href="module03.html" class="burger-link">ЗНАКОМЬСЯ С ВЕЛИКИМИ</a>
-            <a href="module05.html" class="burger-link">МУЛЬТЫ</a>
+            <a href="module05.html" class="burger-link active">МУЛЬТЫ</a>
         </div>
         <div class="burger-menu-col burger-menu-col-right">
             <a href="module04.html" class="burger-link">ЖИВОПИСЬ</a>
-            <a href="module06.html" class="burger-link active">ПОЭЗИЯ</a>
+            <a href="module06.html" class="burger-link">ПОЭЗИЯ</a>
             <a href="module00.html" class="burger-link">ПЕДАГОГИКА</a>
         </div>
     </div>
@@ -752,13 +764,13 @@ body::before {
 
 <header class="page-header">
     <div class="page-logo">
-        <span class="l1">СТИХИ.</span>
-        <span class="l2">ДЛЯ ДУШИ</span>
+        <span class="l1">МУЛЬТЫ.</span>
+        <span class="l2">ХОРОШИЕ МУЛЬТФИЛЬМЫ</span>
     </div>
 </header>
 
 <section class="media-wrapper">
-    <div class="media-grid" id="poemsGrid"></div>
+    <div class="media-grid" id="cartoonsGrid"></div>
 </section>
 
 <div class="media-player-overlay" id="mediaPlayerModal" aria-hidden="true">
@@ -779,32 +791,32 @@ body::before {
     burgerBtn.addEventListener('click', () => {
         const isOpen = burgerMenu.classList.toggle('open');
         burgerBtn.classList.toggle('open', isOpen);
-        document.body.style.overflow = isOpen ? 'hidden' : '';
+
+        if (isOpen) {
+            document.documentElement.classList.add('menu-open');
+            document.body.style.overflow = 'hidden';
+            document.documentElement.style.overflow = 'hidden';
+        } else {
+            document.documentElement.classList.remove('menu-open');
+            document.body.style.overflow = '';
+            document.documentElement.style.overflow = '';
+        }
     });
 })();
 
 /* ============================================================
-   СПИСОК СТИХОВ
+   СПИСОК МУЛЬТФИЛЬМОВ
    ============================================================ */
 (function () {
-    const poetryVideos = [
-        { title: 'Сергей Есенин — «Письмо к женщине»',                       id: 'dc08664f71952500f4bc0440947fc491' },
-        { title: 'Константин Симонов — «Жди меня»',                          id: 'dc08664f71952500f4bc0440947fc491' },
-        { title: 'Александр Пушкин — «Письмо Татьяны»',                      id: 'b8c412a92afc0422b921253fbe2e0c55' },
-        { title: 'Михаил Лермонтов — «К *** (Я не унижусь пред тобою)»',     id: 'b634ebd5bfead10073766860d83c5ed9' },
-        { title: 'Николай Некрасов — «Ты всегда хороша несравненно…»',       id: '8ca305e0e8a8a4eabbdf76a6c9ffd111' },
-        { title: 'Сергей Есенин — «Ты меня не любишь, не жалеешь...»',       id: '099eb1da530d476cc58887631ec26a3b' },
-        { title: 'Светлана Бондарь — «Ночью я чинила глобус»',               id: 'b8b7fe121bba74e8379c5c72f1562d84' },
-        { title: 'Константин Симонов — «Открытое письмо»',                    id: '999594c3ae9cf70edefdf7f5de918b1e' },
-        { title: 'Яна Мкр — «Папа, смотри...»',                               id: '35f3e4547d8fda4788da95386a2d5c22' },
-        { title: 'Злата Маркина — «Как всё сложилось?»',                      id: '8aad257df3edbc8ea9691765455b5f38' },
-        { title: 'Наталья Дроздова — «Спасибо всем, кто нам мешает»',         id: '85af9336e91b8bfff7b440bc034c5403' },
-        { title: 'Андрей Гоголев — «Бросай филфак»',                          id: '0b6686b4ac680ab139f8b7347ef4fbf6' },
-        { title: '«Как работал Маяковский» (документальный фильм, 1947)',    id: '999594c3ae9cf70edefdf7f5de918b1e' },
-        { title: 'Сказка о Пете и Симе',                                      id: 'c62a174674bc4ab8497d7468b318ab24' }
+    const cartoonVideos = [
+        { title: 'Полёт на Луну',    id: 'e4028c9ad811b8a70b113b362d511950' },
+        { title: 'Сармико',          id: 'b6fba827c3ee4c79a1eda71471f33019' },
+        { title: 'Друзья-товарищи',  id: 'a5bf522e5b66677fc547ebf0be9c1f79' },
+        { title: 'Каштанка',         id: '1d3f8cd887b3591d3dbefd5267c327b5' },
+        { title: 'Кем быть?',        id: 'a68023b02d3e6ca8d96e89f34decf01d' }
     ];
 
-    const gridEl = document.getElementById('poemsGrid');
+    const gridEl = document.getElementById('cartoonsGrid');
     const modal  = document.getElementById('mediaPlayerModal');
     const frame  = document.getElementById('mediaPlayerFrame');
     const close  = document.getElementById('mediaPlayerClose');
@@ -820,9 +832,10 @@ body::before {
         items.forEach((v, i) => {
             const card = document.createElement('a');
             card.className = 'media-card';
-            card.href = '#poem/' + v.id;
+            card.href = '#cartoon/' + v.id;
             card.dataset.videoId = v.id;
 
+            /* Превью с постером */
             const thumb = document.createElement('div');
             thumb.className = 'media-thumb';
 
@@ -831,8 +844,10 @@ body::before {
             img.alt = v.title;
             img.loading = 'lazy';
             img.decoding = 'async';
+            /* Rutube постер по ID */
             img.src = 'https://rutube.ru/api/video/' + v.id + '/thumbnail/?redirect=1';
             img.onerror = function () {
+                /* fallback — если постер не подгрузился, оставляем чёрный фон */
                 img.style.display = 'none';
             };
 
@@ -847,6 +862,7 @@ body::before {
             thumb.appendChild(num);
             thumb.appendChild(play);
 
+            /* Информация */
             const info = document.createElement('div');
             info.className = 'media-info';
 
@@ -855,7 +871,7 @@ body::before {
             const dot = document.createElement('span');
             dot.className = 'dot';
             const label = document.createElement('span');
-            label.textContent = 'СТИХИ · RUTUBE';
+            label.textContent = 'МУЛЬТФИЛЬМ · RUTUBE';
             top.appendChild(dot);
             top.appendChild(label);
 
@@ -899,7 +915,7 @@ body::before {
     }
 
     function closeAndClearHash() {
-        if (window.location.hash.startsWith('#poem/')) {
+        if (window.location.hash.startsWith('#cartoon/')) {
             history.pushState('', document.title, window.location.pathname + window.location.search);
             closePlayer();
         } else {
@@ -909,8 +925,8 @@ body::before {
 
     function handleHash() {
         const hash = window.location.hash;
-        if (hash.startsWith('#poem/')) {
-            const id = hash.slice('#poem/'.length);
+        if (hash.startsWith('#cartoon/')) {
+            const id = hash.slice('#cartoon/'.length);
             if (id) openPlayer(id);
         } else {
             if (modal.classList.contains('show')) closePlayer();
@@ -934,7 +950,7 @@ body::before {
         }
     });
 
-    renderGrid(poetryVideos);
+    renderGrid(cartoonVideos);
     handleHash();
 })();
 
