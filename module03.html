@@ -1,0 +1,1259 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="description" content="Грамотиньо. Великие личности Родины.">
+<meta name="theme-color" content="#F4F1EA">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Space+Mono:ital,wght@0,400;0,700;1,400&family=PT+Mono&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+<title>ГРАМОТИНЬО // ВЕЛИКИЕ</title>
+<style>
+:root {
+    --bg: #F4F1EA;
+    --text: #0A0A0A;
+    --red: #D90429;
+    --font-display: 'Oswald', sans-serif;
+    --font-mono: 'Space Mono', monospace;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+
+body {
+    background-color: var(--bg);
+    color: var(--text);
+    font-family: var(--font-mono);
+    overflow-x: hidden;
+    line-height: 1.5;
+    min-height: 100vh;
+    position: relative;
+    -webkit-font-smoothing: antialiased;
+    -webkit-tap-highlight-color: transparent;
+}
+
+body {
+    background-image:
+        radial-gradient(ellipse 90% 70% at 12% 4%, rgba(255, 253, 246, 0.95), transparent 62%),
+        radial-gradient(ellipse 80% 60% at 88% 96%, rgba(214, 202, 180, 0.55), transparent 66%),
+        radial-gradient(ellipse 60% 50% at 50% 50%, rgba(248, 244, 235, 0.55), transparent 80%);
+    background-attachment: fixed;
+    background-repeat: no-repeat;
+}
+body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    z-index: 1;
+    pointer-events: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='280' height='280'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    background-size: 280px 280px;
+    opacity: 0.14;
+    mix-blend-mode: multiply;
+}
+@media (max-width: 768px) {
+    body::before { display: none; }
+    body {
+        background-image:
+            radial-gradient(ellipse 130% 70% at 50% 0%, #FFFDF8 0%, rgba(255,253,248,0) 62%),
+            radial-gradient(ellipse 110% 60% at 50% 100%, #EDE7D9 0%, rgba(237,231,217,0) 72%);
+    }
+}
+
+/* LOADER */
+.loader-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    display: flex;
+    flex-direction: column;
+    pointer-events: none;
+}
+.shutter {
+    flex: 1;
+    background: var(--text);
+    transform-origin: center;
+    will-change: transform;
+}
+.shutter-top { transform-origin: top; }
+.shutter-bot { transform-origin: bottom; }
+
+/* HEADER */
+.page-header {
+    position: relative;
+    z-index: 10;
+    max-width: 1300px;
+    margin: 0 auto;
+    padding: 3.4rem 5vw 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 2rem;
+}
+.page-logo {
+    font-family: var(--font-display);
+    font-weight: 700;
+    line-height: 0.92;
+    letter-spacing: -0.04em;
+    text-transform: uppercase;
+}
+.page-logo .l1 {
+    display: block;
+    font-size: clamp(2.4rem, 7.5vw, 6.4rem);
+    color: var(--red);
+}
+.page-logo .l2 {
+    display: block;
+    font-size: clamp(1.5rem, 5vw, 4.2rem);
+    color: var(--text);
+    margin-top: 0.05em;
+}
+@media (max-width: 640px) {
+    .page-header { padding: 2rem 5vw 0; }
+}
+
+/* BURGER */
+.burger-btn {
+    position: fixed;
+    top: 22px;
+    right: 22px;
+    width: 62px;
+    height: 62px;
+    z-index: 500;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    -webkit-tap-highlight-color: transparent;
+    opacity: 0;
+    padding: 0;
+}
+.burger-btn .ring {
+    position: absolute;
+    inset: 6px;
+    border: 1px solid rgba(10, 10, 10, 0.28);
+    border-radius: 50%;
+    transition: border-color 0.4s ease, transform 0.7s cubic-bezier(0.34, 1.56, 0.64, 1);
+    pointer-events: none;
+}
+.burger-btn .ring::before {
+    content: '';
+    position: absolute;
+    top: -1px;
+    left: 50%;
+    width: 6px;
+    height: 6px;
+    background: var(--red);
+    border-radius: 50%;
+    transform: translateX(-50%);
+    transition: top 0.5s ease, transform 0.5s ease;
+}
+.burger-btn:hover .ring { border-color: var(--red); transform: rotate(180deg); }
+.burger-icon {
+    position: relative;
+    width: 26px;
+    height: 26px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.burger-btn:hover .burger-icon { transform: rotate(90deg); }
+.burger-icon span {
+    position: absolute;
+    width: 9px;
+    height: 9px;
+    background: var(--text);
+    border-radius: 1px;
+    transition: all 0.45s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.burger-icon span:nth-child(1) { top: 0; left: 0; transform-origin: top left; }
+.burger-icon span:nth-child(2) { top: 0; right: 0; transform-origin: top right; background: var(--red); }
+.burger-icon span:nth-child(3) { bottom: 0; left: 0; transform-origin: bottom left; }
+.burger-icon span:nth-child(4) { bottom: 0; right: 0; transform-origin: bottom right; background: var(--red); }
+.burger-btn:hover .burger-icon span:nth-child(1) { transform: translate(-3px, -3px) scale(1.08); }
+.burger-btn:hover .burger-icon span:nth-child(2) { transform: translate(3px, -3px) scale(1.08); }
+.burger-btn:hover .burger-icon span:nth-child(3) { transform: translate(-3px, 3px) scale(1.08); }
+.burger-btn:hover .burger-icon span:nth-child(4) { transform: translate(3px, 3px) scale(1.08); }
+.burger-btn.open .burger-icon { transform: rotate(0deg); }
+.burger-btn.open .ring { border-color: var(--red); transform: rotate(405deg); }
+.burger-btn.open .ring::before { top: calc(100% - 5px); transform: translateX(-50%) scale(1.4); }
+.burger-btn.open .burger-icon span:nth-child(1) { transform: translate(8.5px, 8.5px) rotate(45deg); width: 26px; height: 2.5px; }
+.burger-btn.open .burger-icon span:nth-child(2) { transform: translate(-8.5px, 8.5px) rotate(-45deg); width: 26px; height: 2.5px; opacity: 0; }
+.burger-btn.open .burger-icon span:nth-child(3) { transform: translate(8.5px, -8.5px) rotate(-45deg); width: 26px; height: 2.5px; opacity: 0; }
+.burger-btn.open .burger-icon span:nth-child(4) { transform: translate(-8.5px, -8.5px) rotate(45deg); width: 26px; height: 2.5px; }
+@media (max-width: 768px) {
+    .burger-btn { top: 14px; right: 14px; width: 54px; height: 54px; }
+    .burger-btn .ring { inset: 5px; }
+    .burger-icon { width: 22px; height: 22px; }
+    .burger-icon span { width: 8px; height: 8px; }
+}
+
+/* ============================================================
+   БУРГЕР-МЕНЮ — ДВЕ КОЛОНКИ
+   ============================================================ */
+.burger-menu {
+    position: fixed;
+    inset: 0;
+    z-index: 400;
+    background: var(--bg);
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    padding: 6rem 5vw 5rem;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.4s ease;
+    overflow-y: auto;
+    overflow-x: hidden;
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior: contain;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(10, 10, 10, 0.25) transparent;
+}
+.burger-menu::-webkit-scrollbar { width: 8px; }
+.burger-menu::-webkit-scrollbar-thumb {
+    background: rgba(10, 10, 10, 0.25);
+    border-radius: 4px;
+}
+.burger-menu.open { opacity: 1; pointer-events: auto; }
+
+.burger-menu::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='360' height='360'%3E%3Cfilter id='n2'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.78' numOctaves='5' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n2)'/%3E%3C/svg%3E");
+    background-size: 360px 360px;
+    opacity: 0.18;
+    mix-blend-mode: multiply;
+}
+
+.burger-menu-inner {
+    position: relative;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: clamp(24px, 4vw, 64px);
+    width: 100%;
+    max-width: 1400px;
+    padding: 0;
+    margin: auto 0;
+}
+
+.burger-menu-col {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.15em;
+    min-width: 0;
+}
+
+.burger-menu-col-left  { justify-self: start; }
+.burger-menu-col-right { justify-self: end; align-items: flex-end; text-align: right; }
+
+.burger-link {
+    font-family: var(--font-display);
+    font-size: clamp(2.2rem, 6vw, 5.4rem);
+    font-weight: 700;
+    line-height: 1.02;
+    letter-spacing: -0.03em;
+    text-transform: uppercase;
+    color: var(--text);
+    text-decoration: none;
+    transition: color 0.25s ease, transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    position: relative;
+    display: inline-block;
+    transform: translateY(30px);
+    opacity: 0;
+    word-break: break-word;
+    max-width: 100%;
+}
+
+.burger-menu.open .burger-link {
+    transform: translateY(0);
+    opacity: 1;
+    transition:
+        color 0.25s ease,
+        transform 0.55s cubic-bezier(0.16, 1, 0.3, 1),
+        opacity 0.45s ease;
+}
+
+.burger-menu.open .burger-menu-col-left .burger-link:nth-child(1) { transition-delay: 0.10s; }
+.burger-menu.open .burger-menu-col-left .burger-link:nth-child(2) { transition-delay: 0.16s; }
+.burger-menu.open .burger-menu-col-left .burger-link:nth-child(3) { transition-delay: 0.22s; }
+.burger-menu.open .burger-menu-col-left .burger-link:nth-child(4) { transition-delay: 0.28s; }
+.burger-menu.open .burger-menu-col-left .burger-link:nth-child(5) { transition-delay: 0.34s; }
+
+.burger-menu.open .burger-menu-col-right .burger-link:nth-child(1) { transition-delay: 0.22s; }
+.burger-menu.open .burger-menu-col-right .burger-link:nth-child(2) { transition-delay: 0.28s; }
+.burger-menu.open .burger-menu-col-right .burger-link:nth-child(3) { transition-delay: 0.34s; }
+
+.burger-link:hover { color: var(--red); }
+.burger-menu-col-left  .burger-link:hover { transform: translateX(14px); }
+.burger-menu-col-right .burger-link:hover { transform: translateX(-14px); }
+
+.burger-link.active {
+    color: var(--red);
+    font-style: italic;
+    letter-spacing: -0.02em;
+}
+
+.burger-menu-col-left  .burger-link.active::before {
+    content: '→';
+    position: absolute;
+    left: -0.9em;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 0.55em;
+    opacity: 0.9;
+    font-style: normal;
+}
+.burger-menu-col-right .burger-link.active::after {
+    content: '←';
+    position: absolute;
+    right: -0.9em;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 0.55em;
+    opacity: 0.9;
+    font-style: normal;
+}
+
+.burger-menu-foot {
+    position: absolute;
+    bottom: 3.5vh;
+    left: 50%;
+    transform: translateX(-50%);
+    font-family: var(--font-mono);
+    font-size: 0.65rem;
+    font-weight: 700;
+    letter-spacing: 0.24em;
+    text-transform: uppercase;
+    color: rgba(10, 10, 10, 0.35);
+    white-space: nowrap;
+    text-align: center;
+}
+
+@media (max-width: 900px) {
+    .burger-menu-inner {
+        gap: clamp(20px, 3vw, 40px);
+    }
+    .burger-link {
+        font-size: clamp(1.8rem, 5.2vw, 3.4rem);
+    }
+}
+
+@media (max-width: 640px) {
+    .burger-menu {
+        padding: 5.5rem 5vw 4rem;
+        align-items: flex-start;
+    }
+    .burger-menu-inner {
+        grid-template-columns: 1fr;
+        gap: 0.4em;
+        padding: 0;
+        justify-items: start;
+    }
+    .burger-menu-col-left,
+    .burger-menu-col-right {
+        justify-self: start;
+        align-items: flex-start;
+        text-align: left;
+        width: 100%;
+    }
+    .burger-menu-col-right {
+        margin-top: 0.6em;
+        padding-top: 0.6em;
+        border-top: 1px solid rgba(10, 10, 10, 0.15);
+        width: 100%;
+    }
+    .burger-link {
+        font-size: clamp(2rem, 9vw, 3.4rem);
+        line-height: 1.05;
+    }
+    .burger-menu-col-left  .burger-link:hover,
+    .burger-menu-col-right .burger-link:hover {
+        transform: translateX(10px);
+    }
+    .burger-menu-col-right .burger-link.active::after {
+        content: '→';
+        right: auto;
+        left: -0.9em;
+    }
+    .burger-menu-col-right .burger-link.active::before {
+        content: none;
+    }
+    .burger-menu-foot {
+        bottom: 1.4rem;
+        font-size: 0.55rem;
+        letter-spacing: 0.16em;
+        left: 5vw;
+        right: 5vw;
+        transform: none;
+        text-align: left;
+        white-space: normal;
+    }
+}
+
+@media (max-width: 420px) {
+    .burger-link { font-size: clamp(1.7rem, 8vw, 2.6rem); }
+    .burger-menu-inner { gap: 0.35em; }
+}
+
+/* ============================================================
+   ТАЙМЛАЙН ВЕЛИКИХ
+   ============================================================ */
+.heroes-timeline {
+    position: relative;
+    z-index: 10;
+    max-width: 1300px;
+    margin: 0 auto;
+    padding: 3rem 5vw 6rem;
+}
+
+.century-header {
+    background: var(--text);
+    color: var(--bg);
+    padding: 20px 26px;
+    margin: 0 0 32px;
+    text-align: center;
+    position: relative;
+}
+.century-header:not(:first-child) {
+    margin-top: 72px;
+}
+.century-title {
+    font-family: var(--font-display);
+    font-size: clamp(1.6rem, 4.6vw, 2.4rem);
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+}
+
+.soviet-band {
+    background: var(--red);
+    color: #FFFFFF;
+    padding: 16px 26px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 22px;
+    font-family: var(--font-display);
+    font-size: clamp(1rem, 2.6vw, 1.25rem);
+    font-weight: 600;
+    letter-spacing: 0.24em;
+    text-transform: uppercase;
+    margin: 16px 0 32px;
+}
+
+.heroes-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 22px;
+    margin-bottom: 26px;
+}
+
+.hero-item {
+    border: 2px solid var(--text);
+    background: var(--bg);
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    transition: transform 0.22s cubic-bezier(0.16, 1, 0.3, 1),
+                box-shadow 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+    -webkit-tap-highlight-color: transparent;
+}
+.hero-item:hover {
+    transform: translate(-4px, -4px);
+    box-shadow: 6px 6px 0 var(--red);
+}
+
+.hero-photo {
+    position: relative;
+    aspect-ratio: 1 / 1;
+    border-bottom: 2px solid var(--text);
+    overflow: hidden;
+    background: var(--bg);
+}
+.hero-photo img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    filter: grayscale(1) contrast(1.15);
+    transition: filter 0.35s ease;
+}
+.hero-item:hover .hero-photo img {
+    filter: grayscale(0) contrast(1.15);
+}
+
+.hero-info {
+    padding: 14px 14px 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+.hero-name {
+    font-family: var(--font-display);
+    font-size: 1.15rem;
+    font-weight: 600;
+    line-height: 1.05;
+    letter-spacing: 0.03em;
+    text-transform: uppercase;
+    color: var(--text);
+}
+.hero-years {
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    color: rgba(10, 10, 10, 0.6);
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+}
+.hero-age {
+    color: var(--red);
+    font-weight: 700;
+}
+
+@media (max-width: 640px) {
+    .heroes-timeline { padding: 2rem 4vw 5rem; }
+    .heroes-grid {
+        grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+        gap: 14px;
+    }
+    .hero-name { font-size: 1rem; }
+    .hero-years { font-size: 0.64rem; }
+    .century-header { padding: 16px 18px; margin-bottom: 22px; }
+    .century-header:not(:first-child) { margin-top: 52px; }
+    .soviet-band { padding: 12px 18px; font-size: 0.92rem; letter-spacing: 0.18em; }
+}
+
+/* ============================================================
+   МОДАЛЬНОЕ ОКНО
+   ============================================================ */
+.hero-modal {
+    position: fixed;
+    inset: 0;
+    width: 100vw;
+    height: 100vh;
+    height: 100dvh;
+    background: var(--bg);
+    z-index: 5000;
+    display: flex;
+    flex-direction: column;
+    padding: 62px 8px 14px;
+    gap: 8px;
+    overflow-y: auto;
+    overflow-x: hidden;
+    box-sizing: border-box;
+}
+
+.hero-modal-close,
+.hero-modal-repeat {
+    position: fixed;
+    top: 10px;
+    width: 52px;
+    height: 52px;
+    border: none;
+    background: transparent;
+    color: var(--text);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.15s ease, color 0.15s ease;
+    z-index: 100;
+    padding: 0;
+    line-height: 1;
+    border-radius: 50%;
+    font-family: var(--font-display);
+    -webkit-tap-highlight-color: transparent;
+}
+.hero-modal-close {
+    right: 10px;
+    font-size: 2.6rem;
+    font-weight: 300;
+}
+.hero-modal-repeat {
+    left: 10px;
+    font-size: 1.6rem;
+}
+.hero-modal-close:hover,
+.hero-modal-repeat:hover {
+    color: var(--red);
+    transform: scale(1.12);
+}
+
+.hero-modal-portrait-wrap {
+    flex-shrink: 0;
+    width: 100%;
+    height: 78vh;
+    min-height: 280px;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+}
+.hero-modal-portrait {
+    max-width: 100%;
+    max-height: 100%;
+    width: auto;
+    height: auto;
+    object-fit: contain;
+    display: block;
+}
+.hero-portrait-placeholder {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+    font-family: var(--font-display);
+    font-size: clamp(6rem, 24vw, 16rem);
+    font-weight: 700;
+    color: var(--text);
+    background: rgba(10, 10, 10, 0.05);
+    text-transform: uppercase;
+    user-select: none;
+    letter-spacing: 0.04em;
+}
+
+.hero-nav {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    background: var(--bg);
+    border: 2px solid var(--text);
+    color: var(--text);
+    width: 46px;
+    height: 46px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    font-family: var(--font-display);
+    transition: all 0.15s ease;
+    z-index: 20;
+    padding: 0;
+    line-height: 1;
+}
+.hero-nav.prev { left: 8px; }
+.hero-nav.next { right: 8px; }
+.hero-nav:hover {
+    background: var(--text);
+    color: var(--bg);
+}
+
+.hero-modal-info {
+    text-align: center;
+    padding: 10px 0 4px;
+    flex-shrink: 0;
+}
+.hero-modal-info h3 {
+    font-family: var(--font-display);
+    font-size: clamp(2rem, 6.5vw, 3.4rem);
+    font-weight: 600;
+    letter-spacing: 0.03em;
+    text-transform: uppercase;
+    color: var(--text);
+    line-height: 1;
+}
+.hero-modal-years {
+    font-family: var(--font-mono);
+    font-size: clamp(0.95rem, 2.3vw, 1.15rem);
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    color: var(--red);
+    margin-top: 10px;
+    user-select: none;
+}
+
+.hero-modal-timeline {
+    flex-shrink: 0;
+    width: 100%;
+    margin-top: 10px;
+    padding-bottom: 24px;
+}
+.htl-panel {
+    border: 2px solid var(--text);
+    background: var(--bg);
+}
+.htl-head {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    border-bottom: 2px solid var(--text);
+    background: rgba(10, 10, 10, 0.05);
+}
+.htl-head-cell {
+    padding: 10px 16px 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    min-width: 0;
+}
+.htl-head-cell:last-child {
+    border-left: 2px solid var(--text);
+    text-align: right;
+    align-items: flex-end;
+}
+.htl-head-label {
+    font-family: var(--font-mono);
+    font-size: 0.56rem;
+    font-weight: 600;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: rgba(10, 10, 10, 0.55);
+}
+.htl-head-value {
+    font-family: var(--font-mono);
+    font-size: clamp(0.85rem, 2.2vw, 1.05rem);
+    font-weight: 700;
+    color: var(--text);
+    letter-spacing: 0.05em;
+}
+.htl-head-cell:last-child .htl-head-value {
+    color: var(--red);
+}
+.htl-body {
+    padding: 24px 20px 16px;
+    position: relative;
+}
+.htl {
+    position: relative;
+    width: 100%;
+    height: 310px;
+}
+.htl-axis {
+    position: absolute;
+    left: 0; right: 0;
+    top: 148px;
+    height: 1.5px;
+    background: var(--text);
+    z-index: 1;
+}
+.htl-life {
+    position: absolute;
+    top: 133px;
+    height: 31px;
+    background: var(--red);
+    border: 1.5px solid var(--text);
+    box-sizing: border-box;
+    z-index: 6;
+}
+.htl-life::before,
+.htl-life::after {
+    content: '';
+    position: absolute;
+    top: -5px; bottom: -5px;
+    width: 0.5px;
+    background: var(--text);
+}
+.htl-life::before { left: -1px; }
+.htl-life::after { right: -1px; }
+.htl-dtick {
+    position: absolute;
+    top: 148px;
+    width: 1px;
+    height: 4px;
+    background: var(--text);
+    transform: translateX(-50%);
+    opacity: 0.22;
+    z-index: 2;
+}
+.htl-htick {
+    position: absolute;
+    top: 148px;
+    width: 1px;
+    height: 9px;
+    background: var(--text);
+    transform: translateX(-50%);
+    opacity: 0.5;
+    z-index: 2;
+}
+.htl-ctick {
+    position: absolute;
+    top: 148px;
+    width: 2px;
+    height: 30px;
+    background: var(--text);
+    transform: translateX(-50%);
+    z-index: 3;
+}
+.htl-war {
+    position: absolute;
+    top: 0;
+    height: 148px;
+    transform: translateX(-50%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    z-index: 4;
+    padding: 0 2px;
+}
+.htl-war-label {
+    flex-shrink: 0;
+    text-align: center;
+    margin-bottom: 5px;
+    max-width: 100px;
+}
+.htl-war-year {
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    font-weight: 700;
+    color: var(--red);
+    letter-spacing: 0.02em;
+    line-height: 1;
+    margin-bottom: 3px;
+}
+.htl-war-name {
+    font-family: var(--font-display);
+    font-size: 0.54rem;
+    font-weight: 600;
+    color: var(--text);
+    text-transform: uppercase;
+    letter-spacing: 0.02em;
+    line-height: 1.14;
+}
+.htl-war-tick {
+    flex: 1 1 auto;
+    width: 2px;
+    background: var(--text);
+    opacity: 0.7;
+    min-height: 4px;
+}
+.htl-other {
+    position: absolute;
+    top: 148px;
+    height: 100px;
+    transform: translateX(-50%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    z-index: 4;
+    padding: 0 2px;
+}
+.htl-other-tick {
+    flex: 1 1 auto;
+    width: 2px;
+    background: var(--text);
+    opacity: 0.7;
+    min-height: 4px;
+    margin-bottom: 5px;
+}
+.htl-other-label {
+    flex-shrink: 0;
+    text-align: center;
+    max-width: 100px;
+}
+.htl-other-year {
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    font-weight: 700;
+    color: var(--red);
+    letter-spacing: 0.02em;
+    line-height: 1;
+    margin-bottom: 3px;
+}
+.htl-other-name {
+    font-family: var(--font-display);
+    font-size: 0.54rem;
+    font-weight: 600;
+    color: var(--text);
+    text-transform: uppercase;
+    letter-spacing: 0.02em;
+    line-height: 1.14;
+}
+.htl-cnum {
+    position: absolute;
+    top: 262px;
+    transform: translateX(-50%);
+    font-family: var(--font-display);
+    font-size: 1.15rem;
+    font-weight: 600;
+    letter-spacing: 0.03em;
+    color: var(--text);
+    background: var(--bg);
+    padding: 0 6px;
+    z-index: 7;
+    line-height: 1;
+}
+
+@media (max-width: 640px) {
+    .hero-modal { padding: 62px 6px 14px; gap: 4px; }
+    .hero-modal-close { right: 8px; width: 46px; height: 46px; font-size: 2.3rem; }
+    .hero-modal-repeat { left: 8px; width: 46px; height: 46px; font-size: 1.5rem; }
+    .hero-nav { width: 40px; height: 40px; font-size: 1.3rem; }
+    .hero-nav.prev { left: 5px; }
+    .hero-nav.next { right: 5px; }
+    .hero-modal-portrait-wrap { height: 72vh; min-height: 300px; }
+    .hero-modal-info h3 { font-size: 1.75rem; }
+    .hero-modal-years { font-size: 0.88rem; margin-top: 6px; }
+    .hero-modal-timeline { display: none; }
+}
+</style>
+</head>
+<body>
+
+<div class="loader-overlay" id="loader">
+    <div class="shutter shutter-top"></div>
+    <div class="shutter"></div>
+    <div class="shutter"></div>
+    <div class="shutter"></div>
+    <div class="shutter shutter-bot"></div>
+</div>
+
+<button class="burger-btn" id="burgerBtn" aria-label="Меню">
+    <span class="ring"></span>
+    <span class="burger-icon">
+        <span></span>
+        <span></span>
+        <span></span>
+        <span></span>
+    </span>
+</button>
+
+<div class="burger-menu" id="burgerMenu">
+    <div class="burger-menu-inner">
+        <div class="burger-menu-col burger-menu-col-left">
+            <a href="index.html" class="burger-link">ТИТУЛ</a>
+            <a href="module01.html" class="burger-link">УЧИ СЛОГИ</a>
+            <a href="module02.html" class="burger-link">ИЗУЧАЙ ЧАСЫ</a>
+            <a href="module03.html" class="burger-link active">ЗНАКОМЬСЯ С ВЕЛИКИМИ</a>
+            <a href="module05.html" class="burger-link">МУЛЬТЫ</a>
+        </div>
+        <div class="burger-menu-col burger-menu-col-right">
+            <a href="module04.html" class="burger-link">ЖИВОПИСЬ</a>
+            <a href="module06.html" class="burger-link">ПОЭЗИЯ</a>
+            <a href="module00.html" class="burger-link">ПЕДАГОГИКА</a>
+        </div>
+    </div>
+    <div class="burger-menu-foot">ГРАМОТИНЬО · ТЕРМИНАЛ КУЛЬТУРЫ · 2026</div>
+</div>
+
+<header class="page-header">
+    <div class="page-logo">
+        <span class="l1">ВЕЛИКИЕ.</span>
+        <span class="l2">ЛИЧНОСТИ РОДИНЫ</span>
+    </div>
+</header>
+
+<section class="heroes-timeline" id="heroesTimeline"></section>
+
+<script>
+/* ============================================================
+   БУРГЕР
+   ============================================================ */
+(function () {
+    const burgerBtn  = document.getElementById('burgerBtn');
+    const burgerMenu = document.getElementById('burgerMenu');
+    if (!burgerBtn || !burgerMenu) return;
+    burgerBtn.addEventListener('click', () => {
+        const isOpen = burgerMenu.classList.toggle('open');
+        burgerBtn.classList.toggle('open', isOpen);
+        document.body.style.overflow = isOpen ? 'hidden' : '';
+    });
+})();
+
+/* ============================================================
+   ДАННЫЕ ВЕЛИКИХ
+   ============================================================ */
+const heroesData = [
+    { name: "Александров",       birthYear: 1905, deathYear: 1994, images: ["Александров.jpg"],       audio: "Александров.mp3" },
+    { name: "Белинский",         birthYear: 1811, deathYear: 1848, images: ["Белинский.jpg"],         audio: "Белинский.mp3" },
+    { name: "Бородин",           birthYear: 1833, deathYear: 1887, images: ["Бородин.jpg"],           audio: "Бородин.mp3" },
+    { name: "Брежнев",           birthYear: 1906, deathYear: 1982, images: ["Брежнев.jpg"],           audio: "Брежнев.mp3" },
+    { name: "Ворошилов",         birthYear: 1881, deathYear: 1969, images: ["Ворошилов.jpg", "Ворошилов2.jpg", "Ворошилов3.jpg"], audio: "Ворошилов.mp3" },
+    { name: "Гагарин",           birthYear: 1934, deathYear: 1968, images: ["Гагарин.jpg"],           audio: "Гагарин.mp3" },
+    { name: "Глинка",            birthYear: 1804, deathYear: 1857, images: ["Глинка.jpg"],            audio: "Глинка.mp3" },
+    { name: "Гоголь",            birthYear: 1809, deathYear: 1852, images: ["Гоголь.jpg"],            audio: "Гоголь.mp3" },
+    { name: "Горький",           birthYear: 1868, deathYear: 1936, images: ["Горький.jpg", "Горький2.jpg", "Горький 3.jpg"], audio: "Горький.mp3" },
+    { name: "Даргомыжский",      birthYear: 1813, deathYear: 1869, images: ["Даргомыжский.jpg"],      audio: "Даргомыжский.mp3" },
+    { name: "Дзержинский",       birthYear: 1877, deathYear: 1926, images: ["Дзержинский.jpg"],       audio: "Дзержинский.mp3" },
+    { name: "Добролюбов",        birthYear: 1836, deathYear: 1861, images: ["Добролюбов.jpg"],        audio: "Добролюбов.mp3" },
+    { name: "Жуковский",         birthYear: 1847, deathYear: 1921, images: ["Жуковский.jpg"],         audio: "Жуковский.mp3" },
+    { name: "Карпинский",        birthYear: 1846, deathYear: 1936, images: ["Карпинкий.jpg"],         audio: "Карпинский.mp3" },
+    { name: "Курчатов",          birthYear: 1902, deathYear: 1960, images: ["Курчатов.jpg"],          audio: "Курчатов.mp3" },
+    { name: "Ленин",             birthYear: 1870, deathYear: 1924, images: ["Ленин.jpg", "Ленин2.jpg", "Ленин3.jpg", "Ленин4.jpg", "Ленин5.jpg"], audio: "Ленин.mp3" },
+    { name: "Лермонтов",         birthYear: 1814, deathYear: 1841, images: ["Лермонтов.jpg"],         audio: "Лермонтов.mp3" },
+    { name: "Ломоносов",         birthYear: 1711, deathYear: 1765, images: ["Ломоносов.jpeg"],        audio: "Ломоносов.mp3" },
+    { name: "Макаренко",         birthYear: 1888, deathYear: 1939, images: ["Макаренко.jpg"],         audio: "Макаренко.mp3" },
+    { name: "Маяковский",        birthYear: 1893, deathYear: 1930, images: ["Маяковский.jpg"],        audio: "Маяковский.mp3" },
+    { name: "Менделеев",         birthYear: 1834, deathYear: 1907, images: ["Менделеев.jpg"],         audio: "Менделеев.mp3" },
+    { name: "Мечников",          birthYear: 1845, deathYear: 1916, images: ["Мечников.jpg"],          audio: "Мечников.mp3" },
+    { name: "Мичурин",           birthYear: 1855, deathYear: 1935, images: ["Мичурин.jpg", "Мичурин2.jpg", "Мичурин3.jpg"], audio: "Мичурин.mp3" },
+    { name: "Молотов",           birthYear: 1890, deathYear: 1986, images: ["Молотов.jpg"],           audio: "Молотов.mp3" },
+    { name: "Мусоргский",        birthYear: 1839, deathYear: 1881, images: ["Мусоргский.jpg"],        audio: "Мусоргский.mp3" },
+    { name: "Некрасов",          birthYear: 1821, deathYear: 1878, images: ["Некрасов.jpg"],          audio: "Некрасов.mp3" },
+    { name: "Островский",        birthYear: 1904, deathYear: 1936, images: ["Островский.jpg"],        audio: "Островский.mp3" },
+    { name: "Павлов",            birthYear: 1849, deathYear: 1936, images: ["Павлов.png"],            audio: "Павлов.mp3" },
+    { name: "Папанин",           birthYear: 1894, deathYear: 1986, images: ["Папанин.jpg"],           audio: "Папанин.mp3" },
+    { name: "Пётр Великий",      birthYear: 1672, deathYear: 1725, images: ["Петр.jpg", "Пётр2.jpg"], audio: "Первый.mp3" },
+    { name: "Писарев",           birthYear: 1840, deathYear: 1868, images: ["Писарев.jpg"],           audio: "Писарев.mp3" },
+    { name: "Попов",             birthYear: 1859, deathYear: 1906, images: ["Попов.jpg"],             audio: "Попов.mp3" },
+    { name: "Пушкин",            birthYear: 1799, deathYear: 1837, images: ["Пушкин.jpg", "Пушкин3.jpg"], audio: "Пушкин.mp3" },
+    { name: "Репин",             birthYear: 1844, deathYear: 1930, overrideCentury: 19, images: ["Репин.jpg"], audio: "Репин.mp3" },
+    { name: "Римский-Корсаков",  birthYear: 1844, deathYear: 1908, images: ["Римский-Корсаков.jpg"],  audio: "Римский-Корсаков.mp3" },
+    { name: "Салтыков-Щедрин",   birthYear: 1826, deathYear: 1889, images: ["Салтыков-Щедрин.jpg"],   audio: "Салтыков-Щедрин.mp3" },
+    { name: "Семашко",           birthYear: 1874, deathYear: 1949, images: ["Семашко.jpg"],           audio: "Семашко.mp3" },
+    { name: "Сеченов",           birthYear: 1829, deathYear: 1905, images: ["Сеченов.jpg"],           audio: "Сеченов.mp3" },
+    { name: "Сталин",            birthYear: 1878, deathYear: 1953, images: ["Сталин.jpg", "Сталин2.jpg", "Сталин3.jpg", "Сталин4.jpg", "Сталин5.jpg", "Сталин6.jpg", "Сталин7.jpg", "Сталин8.jpg", "Сталин9.jpg"], audio: "Сталин.mp3" },
+    { name: "Суворов",           birthYear: 1729, deathYear: 1800, images: ["Суворов.jpg"],           audio: "Суворов.mp3" },
+    { name: "Толстой",           birthYear: 1828, deathYear: 1910, images: ["Толстой.jpg", "Толстой2.jpg", "Толстой3.jpg", "Толстой4.jpg"], audio: "Толстой.mp3" },
+    { name: "Тургенев",          birthYear: 1818, deathYear: 1883, images: ["Тургенев.jpg"],          audio: "Тургенев.mp3" },
+    { name: "Фрунзе",            birthYear: 1885, deathYear: 1925, images: ["Фрунзе.jpg"],            audio: "Фрунзе.mp3" },
+    { name: "Циолковский",       birthYear: 1857, deathYear: 1935, images: ["Циолковский.jpg"],       audio: "Циолковский.mp3" },
+    { name: "Чайковский",        birthYear: 1840, deathYear: 1893, images: ["Чайковский.jpg"],        audio: "Чайковский.mp3" },
+    { name: "Чернышевский",      birthYear: 1828, deathYear: 1889, images: ["Чернышевский.jpg"],      audio: "Чернышевский.mp3" },
+    { name: "Чехов",             birthYear: 1860, deathYear: 1904, images: ["Чехов.jpg"],             audio: "Чехов.mp3" },
+    { name: "Шишкин",            birthYear: 1832, deathYear: 1898, images: ["Шишкин.jpg"],            audio: "Шишкин.mp3" },
+    { name: "Шолохов",           birthYear: 1905, deathYear: 1984, images: ["Шолохов.jpg"],           audio: "Шолохов.mp3" }
+];
+
+const TL_START = 1650, TL_END = 2010, TL_RANGE = TL_END - TL_START;
+const tlPos = y => ((y - TL_START) / TL_RANGE) * 100;
+const TL_CENTURIES = [1700, 1800, 1900, 2000];
+const TL_HALVES = [1750, 1850, 1950];
+const TL_WARS = [
+    { year: 1721, name: 'Победа в<br>Северной<br>войне' },
+    { year: 1812, name: 'Отечественная<br>война' },
+    { year: 1914, name: 'Первая<br>мировая' },
+    { year: 1945, name: 'Победа<br>в Великой<br>Отечественной' }
+];
+const TL_OTHERS = [
+    { year: 1825, name: 'Восстание<br>декабристов' },
+    { year: 1861, name: 'Отмена<br>крепостного<br>права' },
+    { year: 1917, name: 'Октябрьская<br>революция' },
+    { year: 1991, name: 'Разрушение<br>СССР' }
+];
+
+function buildTimelineHTML(b, d) {
+    const bY = Math.max(b, TL_START), dY = Math.min(d, TL_END);
+    const l = tlPos(bY), w = tlPos(dY) - l;
+    let h = '<div class="htl-panel"><div class="htl-head"><div class="htl-head-cell"><div class="htl-head-label">ХРОНОЛОГИЯ ИСТОРИИ</div></div><div class="htl-head-cell"></div></div><div class="htl-body"><div class="htl">';
+
+    for (let y = 1700; y <= 2000; y += 10) {
+        if (y % 100 === 0 || y % 50 === 0) continue;
+        h += `<div class="htl-dtick" style="left:${tlPos(y)}%"></div>`;
+    }
+    TL_HALVES.forEach(y => { h += `<div class="htl-htick" style="left:${tlPos(y)}%"></div>`; });
+    h += '<div class="htl-axis"></div>';
+    TL_CENTURIES.forEach(y => { h += `<div class="htl-ctick" style="left:${tlPos(y)}%"></div>`; });
+    h += `<div class="htl-life" style="left:${l}%;width:${w}%"></div>`;
+
+    TL_WARS.forEach(e => {
+        h += `<div class="htl-war" style="left:${tlPos(e.year)}%"><div class="htl-war-label"><div class="htl-war-year">${e.year}</div><div class="htl-war-name">${e.name}</div></div><div class="htl-war-tick"></div></div>`;
+    });
+    TL_OTHERS.forEach(e => {
+        h += `<div class="htl-other" style="left:${tlPos(e.year)}%"><div class="htl-other-tick"></div><div class="htl-other-label"><div class="htl-other-year">${e.year}</div><div class="htl-other-name">${e.name}</div></div></div>`;
+    });
+    TL_CENTURIES.forEach(y => { h += `<div class="htl-cnum" style="left:${tlPos(y)}%">${y}</div>`; });
+
+    h += '</div></div></div>';
+    return h;
+}
+
+function encodePath(p) {
+    return p.split('/').map(s => encodeURIComponent(s)).join('/');
+}
+
+/* ============================================================
+   РЕНДЕР ТАЙМЛАЙНА
+   ============================================================ */
+function renderHeroesTimeline() {
+    const timeline = document.getElementById('heroesTimeline');
+    if (!timeline) return;
+
+    const centuries = [
+        { name: "XVIII век", filter: h => h.overrideCentury === 18 || (!h.overrideCentury && h.deathYear < 1801) },
+        { name: "XIX век", filter: h => h.overrideCentury === 19 || (!h.overrideCentury && h.deathYear >= 1801 && h.deathYear <= 1921) },
+        { name: "XX век", filter: h => h.overrideCentury === 20 || (!h.overrideCentury && h.deathYear > 1921) }
+    ];
+
+    let html = '';
+
+    centuries.forEach(c => {
+        const heroes = heroesData.filter(c.filter).sort((a, b) => a.deathYear - b.deathYear);
+        if (heroes.length === 0) return;
+
+        html += `<div class="century-header"><span class="century-title">${c.name}</span></div><div class="heroes-grid">`;
+        let sovietBandInserted = false;
+
+        heroes.forEach(hero => {
+            if (!sovietBandInserted && hero.name === "Ленин") {
+                html += `</div><div class="soviet-band"><span>★</span> СОВЕТСКИЙ ПЕРИОД <span>★</span></div><div class="heroes-grid">`;
+                sovietBandInserted = true;
+            }
+
+            const imgPath = encodePath('Great Rus/' + hero.images[0]);
+            const age = hero.deathYear - hero.birthYear;
+            const imagesJson = JSON.stringify(hero.images.map(i => encodePath('Great Rus/' + i)));
+            const audioPath = encodePath('Great Rus/' + hero.audio);
+
+            html += `<div class="hero-item" data-name="${hero.name}" data-birth="${hero.birthYear}" data-death="${hero.deathYear}" data-audio="${audioPath}" data-images='${imagesJson}'>
+                <div class="hero-photo"><img src="${imgPath}" alt="${hero.name}" loading="lazy" decoding="async"></div>
+                <div class="hero-info">
+                    <div class="hero-name">${hero.name}</div>
+                    <div class="hero-years">${hero.birthYear}—${hero.deathYear} <span class="hero-age">${age}</span></div>
+                </div>
+            </div>`;
+        });
+
+        html += `</div>`;
+    });
+
+    timeline.innerHTML = html;
+
+    timeline.querySelectorAll('.hero-item').forEach(item => {
+        item.addEventListener('click', function () {
+            openHeroModal(
+                this.dataset.name,
+                JSON.parse(this.dataset.images),
+                this.dataset.audio,
+                parseInt(this.dataset.birth, 10),
+                parseInt(this.dataset.death, 10)
+            );
+        });
+    });
+}
+
+/* ============================================================
+   МОДАЛЬНОЕ ОКНО
+   ============================================================ */
+let heroModal = null;
+let heroAudio = new Audio();
+let currentImageIndex = 0;
+let currentImages = [];
+
+function openHeroModal(name, images, audioSrc, birthYear, deathYear) {
+    if (heroModal) heroModal.remove();
+
+    currentImages = images;
+    currentImageIndex = 0;
+
+    const navHTML = images.length > 1
+        ? `<button class="hero-nav prev" type="button" aria-label="Предыдущий">‹</button><button class="hero-nav next" type="button" aria-label="Следующий">›</button>`
+        : '';
+
+    const initials = name.split(/\s+/).map(w => w.charAt(0)).join('').slice(0, 2).toUpperCase();
+
+    heroModal = document.createElement('div');
+    heroModal.className = 'hero-modal';
+    heroModal.innerHTML = `
+        <button class="hero-modal-repeat" type="button" aria-label="Повторить звук">♪</button>
+        <button class="hero-modal-close" type="button" aria-label="Закрыть">×</button>
+        <div class="hero-modal-portrait-wrap">
+            ${navHTML}
+            <img class="hero-modal-portrait" src="${images[0]}" alt="${name}" decoding="async">
+        </div>
+        <div class="hero-modal-info">
+            <h3>${name}</h3>
+            <div class="hero-modal-years">${birthYear} — ${deathYear}</div>
+        </div>
+        <div class="hero-modal-timeline">${buildTimelineHTML(birthYear, deathYear)}</div>
+    `;
+
+    const imgEl = heroModal.querySelector('.hero-modal-portrait');
+    imgEl.addEventListener('error', () => {
+        const placeholder = document.createElement('div');
+        placeholder.className = 'hero-portrait-placeholder';
+        placeholder.textContent = initials;
+        imgEl.replaceWith(placeholder);
+    });
+
+    document.body.appendChild(heroModal);
+
+    playHeroAudio(audioSrc);
+
+    heroModal.querySelector('.hero-modal-close').addEventListener('click', () => {
+        heroModal.remove();
+        heroAudio.pause();
+        heroAudio.currentTime = 0;
+    });
+
+    heroModal.querySelector('.hero-modal-repeat').addEventListener('click', () => playHeroAudio(audioSrc));
+
+    const prevBtn = heroModal.querySelector('.hero-nav.prev');
+    const nextBtn = heroModal.querySelector('.hero-nav.next');
+
+    if (prevBtn) {
+        prevBtn.addEventListener('click', () => {
+            currentImageIndex = (currentImageIndex - 1 + currentImages.length) % currentImages.length;
+            const im = heroModal.querySelector('.hero-modal-portrait');
+            if (im) im.src = currentImages[currentImageIndex];
+        });
+    }
+    if (nextBtn) {
+        nextBtn.addEventListener('click', () => {
+            currentImageIndex = (currentImageIndex + 1) % currentImages.length;
+            const im = heroModal.querySelector('.hero-modal-portrait');
+            if (im) im.src = currentImages[currentImageIndex];
+        });
+    }
+}
+
+function playHeroAudio(src) {
+    heroAudio.pause();
+    heroAudio.src = src;
+    heroAudio.currentTime = 0;
+    heroAudio.play().catch(e => console.log('Ошибка воспроизведения', e));
+}
+
+/* ============================================================
+   СТАРТ + АНИМАЦИЯ ПОЯВЛЕНИЯ
+   ============================================================ */
+document.addEventListener('DOMContentLoaded', () => {
+    renderHeroesTimeline();
+
+    const tl = gsap.timeline({ defaults: { ease: 'power4.out' } });
+
+    tl.to('.shutter', {
+            duration: 0.8,
+            scaleY: 0,
+            stagger: { amount: 0.3, from: 'center' },
+            ease: 'expo.inOut'
+        })
+        .fromTo('.page-logo .l1',
+            { opacity: 0, y: 30, skewX: -6 },
+            { opacity: 1, y: 0, skewX: 0, duration: 0.9, ease: 'power3.out' },
+            '-=0.5'
+        )
+        .fromTo('.page-logo .l2',
+            { opacity: 0, y: 24 },
+            { opacity: 1, y: 0, duration: 0.85, ease: 'power3.out' },
+            '-=0.65'
+        )
+        .fromTo('.burger-btn',
+            { opacity: 0, scale: 0.6, rotate: -90 },
+            { opacity: 1, scale: 1, rotate: 0, duration: 0.65, ease: 'back.out(1.8)' },
+            '-=0.55'
+        )
+        .fromTo('.century-header',
+            { opacity: 0, y: 24 },
+            { opacity: 1, y: 0, duration: 0.7, stagger: 0.08, ease: 'power3.out' },
+            '-=0.5'
+        )
+        .fromTo('.hero-item',
+            { opacity: 0, y: 30, scale: 0.94 },
+            { opacity: 1, y: 0, scale: 1, duration: 0.5, stagger: 0.02, ease: 'back.out(1.5)' },
+            '-=0.4'
+        )
+        .to('#loader', {
+            opacity: 0,
+            duration: 0.3,
+            onComplete: () => {
+                const loader = document.getElementById('loader');
+                if (loader) loader.style.display = 'none';
+            }
+        }, '-=0.2');
+});
+</script>
+</body>
+</html>
