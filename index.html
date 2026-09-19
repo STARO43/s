@@ -9,14 +9,106 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Space+Mono:ital,wght@0,400;0,700;1,400&family=PT+Mono&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
-<link rel="stylesheet" href="shared.css">
-<title>Грамотиньо</title>
+<title>ГРАМОТИНЬО</title>
 <style>
-/* ============================================================
-   УНИКАЛЬНЫЕ СТИЛИ ГЛАВНОЙ
-   ============================================================ */
+:root {
+    --bg: #F4F1EA;
+    --text: #0A0A0A;
+    --red: #D90429;
+    --font-display: 'Oswald', sans-serif;
+    --font-mono: 'Space Mono', monospace;
 
-/* ---------- LAYOUT ---------- */
+    /* СОВЕТСКАЯ ЭВМ */
+    --evm-bg:      #0B0F0B;
+    --evm-text:    #C7E0C7;
+    --evm-dim:     #6B826B;
+    --evm-bright:  #E8FFE8;
+    --evm-border:  #4A6A4A;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+html { scroll-behavior: smooth; }
+
+body {
+    background-color: var(--bg);
+    color: var(--text);
+    font-family: var(--font-mono);
+    overflow-x: hidden;
+    line-height: 1.5;
+    min-height: 100vh;
+    position: relative;
+    -webkit-font-smoothing: antialiased;
+}
+
+/* ============================================================
+   ФОН: бумага
+   ============================================================ */
+body {
+    background-image:
+        radial-gradient(ellipse 90% 70% at 12% 4%, rgba(255, 253, 246, 0.95), transparent 62%),
+        radial-gradient(ellipse 80% 60% at 88% 96%, rgba(214, 202, 180, 0.55), transparent 66%),
+        radial-gradient(ellipse 60% 50% at 50% 50%, rgba(248, 244, 235, 0.55), transparent 80%);
+    background-attachment: fixed;
+    background-repeat: no-repeat;
+}
+
+body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    z-index: 1;
+    pointer-events: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='360' height='360'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.78' numOctaves='5' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    background-size: 360px 360px;
+    opacity: 0.2;
+    mix-blend-mode: multiply;
+}
+
+body::after {
+    content: '';
+    position: fixed;
+    inset: 0;
+    z-index: 1;
+    pointer-events: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='700' height='700'%3E%3Cfilter id='m'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.007' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23m)'/%3E%3C/svg%3E");
+    background-size: 700px 700px;
+    opacity: 0.42;
+    mix-blend-mode: soft-light;
+}
+
+@media (max-width: 768px) {
+    body {
+        background-image:
+            radial-gradient(ellipse 130% 70% at 50% 0%, #FFFDF8 0%, rgba(255,253,248,0) 62%),
+            radial-gradient(ellipse 110% 60% at 50% 100%, #EDE7D9 0%, rgba(237,231,217,0) 72%);
+    }
+    body::before { opacity: 0.07; }
+    body::after  { opacity: 0.18; }
+}
+
+/* ============================================================
+   LOADER
+   ============================================================ */
+.loader-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    display: flex;
+    flex-direction: column;
+    pointer-events: none;
+}
+.shutter {
+    flex: 1;
+    background: var(--text);
+    transform-origin: center;
+}
+.shutter-top { transform-origin: top; }
+.shutter-bot { transform-origin: bottom; }
+
+/* ============================================================
+   LAYOUT
+   ============================================================ */
 .wrapper {
     position: relative;
     z-index: 2;
@@ -26,7 +118,9 @@
     opacity: 0;
 }
 
-/* ---------- HERO ---------- */
+/* ============================================================
+   HERO
+   ============================================================ */
 .hero {
     min-height: 92vh;
     display: flex;
@@ -72,7 +166,7 @@
 .line-2 { color: var(--text); }
 
 .hero-title .terminal-word {
-    cursor: pointer;
+    cursor: default;
     user-select: none;
     -webkit-tap-highlight-color: transparent;
     position: relative;
@@ -130,7 +224,341 @@
     margin: 2rem 0;
 }
 
-/* ---------- ТЕРМИНАЛ ---------- */
+/* ============================================================
+   БУРГЕР-МЕНЮ — ДВЕ КОЛОНКИ
+   ============================================================ */
+.burger-btn {
+    position: fixed;
+    top: 22px;
+    right: 22px;
+    width: 62px;
+    height: 62px;
+    z-index: 500;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    -webkit-tap-highlight-color: transparent;
+    opacity: 0;
+    padding: 0;
+}
+
+.burger-btn .ring {
+    position: absolute;
+    inset: 6px;
+    border: 1px solid rgba(10, 10, 10, 0.28);
+    border-radius: 50%;
+    transition: border-color 0.4s ease, transform 0.7s cubic-bezier(0.34, 1.56, 0.64, 1);
+    pointer-events: none;
+}
+
+.burger-btn .ring::before {
+    content: '';
+    position: absolute;
+    top: -1px;
+    left: 50%;
+    width: 6px;
+    height: 6px;
+    background: var(--red);
+    border-radius: 50%;
+    transform: translateX(-50%);
+    transition: top 0.5s ease, transform 0.5s ease;
+}
+
+.burger-btn:hover .ring {
+    border-color: var(--red);
+    transform: rotate(180deg);
+}
+
+.burger-icon {
+    position: relative;
+    width: 26px;
+    height: 26px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.burger-btn:hover .burger-icon {
+    transform: rotate(90deg);
+}
+
+.burger-icon span {
+    position: absolute;
+    width: 9px;
+    height: 9px;
+    background: var(--text);
+    border-radius: 1px;
+    transition: all 0.45s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.burger-icon span:nth-child(1) { top: 0;    left: 0;    transform-origin: top left; }
+.burger-icon span:nth-child(2) { top: 0;    right: 0;   transform-origin: top right; background: var(--red); }
+.burger-icon span:nth-child(3) { bottom: 0; left: 0;    transform-origin: bottom left; }
+.burger-icon span:nth-child(4) { bottom: 0; right: 0;   transform-origin: bottom right; background: var(--red); }
+
+.burger-btn:hover .burger-icon span:nth-child(1) { transform: translate(-3px, -3px) scale(1.08); }
+.burger-btn:hover .burger-icon span:nth-child(2) { transform: translate(3px, -3px) scale(1.08); }
+.burger-btn:hover .burger-icon span:nth-child(3) { transform: translate(-3px, 3px) scale(1.08); }
+.burger-btn:hover .burger-icon span:nth-child(4) { transform: translate(3px, 3px) scale(1.08); }
+
+.burger-btn.open .burger-icon {
+    transform: rotate(0deg);
+}
+
+.burger-btn.open .ring {
+    border-color: var(--red);
+    transform: rotate(405deg);
+}
+.burger-btn.open .ring::before {
+    top: calc(100% - 5px);
+    transform: translateX(-50%) scale(1.4);
+}
+
+.burger-btn.open .burger-icon span:nth-child(1) {
+    transform: translate(8.5px, 8.5px) rotate(45deg);
+    width: 26px;
+    height: 2.5px;
+}
+.burger-btn.open .burger-icon span:nth-child(2) {
+    transform: translate(-8.5px, 8.5px) rotate(-45deg);
+    width: 26px;
+    height: 2.5px;
+    opacity: 0;
+}
+.burger-btn.open .burger-icon span:nth-child(3) {
+    transform: translate(8.5px, -8.5px) rotate(-45deg);
+    width: 26px;
+    height: 2.5px;
+    opacity: 0;
+}
+.burger-btn.open .burger-icon span:nth-child(4) {
+    transform: translate(-8.5px, -8.5px) rotate(45deg);
+    width: 26px;
+    height: 2.5px;
+}
+
+@media (max-width: 768px) {
+    .burger-btn {
+        top: 14px;
+        right: 14px;
+        width: 54px;
+        height: 54px;
+    }
+    .burger-btn .ring { inset: 5px; }
+    .burger-icon { width: 22px; height: 22px; }
+    .burger-icon span { width: 8px; height: 8px; }
+}
+
+/* Полноэкранное меню — ДВЕ КОЛОНКИ */
+.burger-menu {
+    position: fixed;
+    inset: 0;
+    z-index: 400;
+    background: var(--bg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 4vw 5vw;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.4s ease;
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+.burger-menu.open { opacity: 1; pointer-events: auto; }
+
+.burger-menu::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='360' height='360'%3E%3Cfilter id='n2'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.78' numOctaves='5' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n2)'/%3E%3C/svg%3E");
+    background-size: 360px 360px;
+    opacity: 0.18;
+    mix-blend-mode: multiply;
+}
+
+.burger-menu-inner {
+    position: relative;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: clamp(24px, 4vw, 64px);
+    width: 100%;
+    max-width: 1400px;
+    padding: 2rem 0;
+}
+
+.burger-menu-col {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.15em;
+    min-width: 0;
+}
+
+.burger-menu-col-left  { justify-self: start; }
+.burger-menu-col-right { justify-self: end; align-items: flex-end; text-align: right; }
+
+.burger-link {
+    font-family: var(--font-display);
+    font-size: clamp(5rem, 4.4vw, 4.2rem);
+    font-weight: 700;
+    line-height: 1.05;
+    letter-spacing: -0.03em;
+    text-transform: uppercase;
+    color: var(--text);
+    text-decoration: none;
+    transition: color 0.25s ease, transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    position: relative;
+    display: inline-block;
+    transform: translateY(30px);
+    opacity: 0;
+    word-break: break-word;
+    max-width: 100%;
+}
+
+.burger-menu.open .burger-link {
+    transform: translateY(0);
+    opacity: 1;
+    transition:
+        color 0.25s ease,
+        transform 0.55s cubic-bezier(0.16, 1, 0.3, 1),
+        opacity 0.45s ease;
+}
+
+/* Каскадное появление — левая колонка */
+.burger-menu.open .burger-menu-col-left .burger-link:nth-child(1) { transition-delay: 0.10s; }
+.burger-menu.open .burger-menu-col-left .burger-link:nth-child(2) { transition-delay: 0.16s; }
+.burger-menu.open .burger-menu-col-left .burger-link:nth-child(3) { transition-delay: 0.22s; }
+.burger-menu.open .burger-menu-col-left .burger-link:nth-child(4) { transition-delay: 0.28s; }
+.burger-menu.open .burger-menu-col-left .burger-link:nth-child(5) { transition-delay: 0.34s; }
+
+/* Каскадное появление — правая колонка (чуть позже) */
+.burger-menu.open .burger-menu-col-right .burger-link:nth-child(1) { transition-delay: 0.22s; }
+.burger-menu.open .burger-menu-col-right .burger-link:nth-child(2) { transition-delay: 0.28s; }
+.burger-menu.open .burger-menu-col-right .burger-link:nth-child(3) { transition-delay: 0.34s; }
+
+/* Hover — разные направления для колонок */
+.burger-link:hover { color: var(--red); }
+.burger-menu-col-left  .burger-link:hover { transform: translateX(14px); }
+.burger-menu-col-right .burger-link:hover { transform: translateX(-14px); }
+
+/* Активная ссылка */
+.burger-link.active {
+    color: var(--red);
+    font-style: italic;
+    letter-spacing: -0.02em;
+}
+
+.burger-menu-col-left  .burger-link.active::before {
+    content: '→';
+    position: absolute;
+    left: -0.9em;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 0.55em;
+    opacity: 0.9;
+    font-style: normal;
+}
+.burger-menu-col-right .burger-link.active::after {
+    content: '←';
+    position: absolute;
+    right: -0.9em;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 0.55em;
+    opacity: 0.9;
+    font-style: normal;
+}
+
+.burger-menu-foot {
+    position: absolute;
+    bottom: 3.5vh;
+    left: 50%;
+    transform: translateX(-50%);
+    font-family: var(--font-mono);
+    font-size: 0.65rem;
+    font-weight: 700;
+    letter-spacing: 0.24em;
+    text-transform: uppercase;
+    color: rgba(10, 10, 10, 0.35);
+    white-space: nowrap;
+    text-align: center;
+}
+
+@media (max-width: 900px) {
+    .burger-menu-inner {
+        gap: clamp(20px, 3vw, 40px);
+    }
+    .burger-link {
+        font-size: clamp(1.5rem, 4.2vw, 2.8rem);
+    }
+}
+
+@media (max-width: 640px) {
+    .burger-menu {
+        padding: 5rem 5vw 3rem;
+        align-items: flex-start;
+    }
+    .burger-menu-inner {
+        grid-template-columns: 1fr;
+        gap: 0.4em;
+        padding: 0;
+        justify-items: start;
+    }
+    .burger-menu-col-left,
+    .burger-menu-col-right {
+        justify-self: start;
+        align-items: flex-start;
+        text-align: left;
+        width: 100%;
+    }
+    .burger-menu-col-right {
+        margin-top: 0.6em;
+        padding-top: 0.6em;
+        border-top: 1px solid rgba(10, 10, 10, 0.15);
+        width: 100%;
+    }
+    .burger-link {
+        font-size: clamp(1.7rem, 7.4vw, 2.6rem);
+        line-height: 1.1;
+    }
+    .burger-menu-col-left  .burger-link:hover,
+    .burger-menu-col-right .burger-link:hover {
+        transform: translateX(10px);
+    }
+    .burger-menu-col-right .burger-link.active::after {
+        content: '→';
+        right: auto;
+        left: -0.9em;
+    }
+    .burger-menu-col-right .burger-link.active::before {
+        content: none;
+    }
+    .burger-menu-foot {
+        bottom: 1.4rem;
+        font-size: 0.55rem;
+        letter-spacing: 0.16em;
+        left: 5vw;
+        right: 5vw;
+        transform: none;
+        text-align: left;
+        white-space: normal;
+    }
+}
+
+@media (max-width: 420px) {
+    .burger-link { font-size: clamp(1.5rem, 6.8vw, 2.1rem); }
+    .burger-menu-inner { gap: 0.35em; }
+}
+
+/* ============================================================
+   СОВЕТСКАЯ ЭВМ
+   ============================================================ */
 .evm-overlay {
     position: fixed;
     inset: 0;
@@ -278,6 +706,7 @@
     letter-spacing: 0;
 }
 
+/* Строка ввода */
 .term-input-line {
     display: flex;
     align-items: baseline;
@@ -374,6 +803,20 @@
         gap: 0;
     }
 }
+
+/* ============================================================
+   CRT-ПЕРЕХОД
+   ============================================================ */
+.crt-overlay {
+    position: fixed;
+    inset: 0;
+    background: #C7E0C7;
+    z-index: 99999;
+    transform: scaleY(0);
+    transform-origin: center center;
+    pointer-events: none;
+    box-shadow: 0 0 60px #C7E0C7, 0 0 120px rgba(199, 224, 199, 0.6);
+}
 </style>
 </head>
 <body>
@@ -399,38 +842,22 @@
 <div class="burger-menu" id="burgerMenu">
     <div class="burger-menu-inner">
         <div class="burger-menu-col burger-menu-col-left">
-            <a href="index.html"    class="burger-link active" data-ns="home">ТИТУЛ.</a>
-            <a href="reading.html"  class="burger-link" data-ns="reading">УЧИ СЛОГИ,</a>
-            <a href="tools.html"    class="burger-link" data-ns="tools">УЧИСЬ ЧАСАМ,</a>
-            <a href="heroes.html"   class="burger-link" data-ns="heroes">БЕРИ ПРИМЕР С ВЕЛИКИХ</a>
-            <a href="cinema.html"   class="burger-link" data-ns="cinema">МУЛЬТЫ</a>
+            <a href="index.html" class="burger-link active">ТИТУЛ</a>
+            <a href="module01.html" class="burger-link">УЧИ СЛОГИ</a>
+            <a href="module02.html" class="burger-link">ИЗУЧАЙ ЧАСЫ</a>
+            <a href="module03.html" class="burger-link">ЗНАКОМЬСЯ С ВЕЛИКИМИ</a>
+            <a href="module05.html" class="burger-link">МУЛЬТЫ</a>
         </div>
         <div class="burger-menu-col burger-menu-col-right">
-            <a href="art.html"      class="burger-link" data-ns="art">ЖИВОПИСЬ,</a>
-            <a href="poetry.html"   class="burger-link" data-ns="poetry">ПОЭЗИЯ,</a>
-            <a href="articles.html" class="burger-link" data-ns="articles">ПЕДАГОГИКА.</a>
+            <a href="module04.html" class="burger-link">ЖИВОПИСЬ</a>
+            <a href="module06.html" class="burger-link">ПОЭЗИЯ</a>
+            <a href="module00.html" class="burger-link">ПЕДАГОГИКА</a>
         </div>
     </div>
     <div class="burger-menu-foot">ГРАМОТИНЬО · ТЕРМИНАЛ КУЛЬТУРЫ · 2026</div>
 </div>
 
-<div class="evm-overlay" id="evmOverlay">
-    <div class="evm-window">
-        <div class="evm-header">
-            <div class="evm-header-row">
-                <span class="evm-title-main">ТЕЛЕМОНИТОР КАМА · МОДЕЛЬ 1.0 · ГОСТ 10859-64</span>
-                <span id="evmClock">--:--:--</span>
-            </div>
-            <div class="evm-header-row" style="margin-top:6px;">
-                <span>ТЕРМИНАЛ КОЛЛЕКТИВНОГО ПОЛЬЗОВАНИЯ · ГОСТЬ</span>
-                <span id="evmDate">--.--.----</span>
-            </div>
-        </div>
-        <div class="evm-body" id="evmBody"></div>
-    </div>
-</div>
-
-<div class="wrapper" id="mainContent" data-page-content>
+<div class="wrapper" id="mainContent">
     <section class="hero">
         <div class="hero-meta">
             <span>Россия, Москва · 2026</span>
@@ -454,18 +881,37 @@
     </section>
 </div>
 
+<div class="evm-overlay" id="evmOverlay">
+    <div class="evm-window">
+        <div class="evm-header">
+            <div class="evm-header-row">
+                <span class="evm-title-main">ТЕЛЕМОНИТОР КАМА · МОДЕЛЬ 1.0 · ГОСТ 10859-64</span>
+                <span id="evmClock">--:--:--</span>
+            </div>
+            <div class="evm-header-row" style="margin-top:6px;">
+                <span>ТЕРМИНАЛ КОЛЛЕКТИВНОГО ПОЛЬЗОВАНИЯ · ГОСТЬ</span>
+                <span id="evmDate">--.--.----</span>
+            </div>
+        </div>
+        <div class="evm-body" id="evmBody"></div>
+    </div>
+</div>
+
 <script>
 /* ============================================================
-   УНИКАЛЬНЫЙ СКРИПТ ГЛАВНОЙ
+   УТИЛИТЫ
    ============================================================ */
+const sleep = (ms) => new Promise(r => setTimeout(r, ms));
 
-const evmOverlay   = document.getElementById('evmOverlay');
-const evmBody      = document.getElementById('evmBody');
-const evmClock     = document.getElementById('evmClock');
-const evmDate      = document.getElementById('evmDate');
-const termWord     = document.getElementById('terminalWord');
+const evmOverlay = document.getElementById('evmOverlay');
+const evmBody    = document.getElementById('evmBody');
+const termWord   = document.getElementById('terminalWord');
+const evmClock   = document.getElementById('evmClock');
+const evmDate    = document.getElementById('evmDate');
+const burgerBtn  = document.getElementById('burgerBtn');
+const burgerMenu = document.getElementById('burgerMenu');
 
-let terminalOpened  = false;
+let terminalOpened = false;
 let terminalStarted = false;
 
 function updateClock() {
@@ -512,7 +958,9 @@ function printLine(text, cls = '') {
     return line;
 }
 
-/* ASCII-АРТ */
+/* ============================================================
+   ASCII-АРТ
+   ============================================================ */
 const ASCII_ART = [
     '█████ ████   ███  █   █  ███  █████ █   █ █   █ █      ███ ',
     '█     █   █ █   █ ██ ██ █   █   █   ██  █ █   █ █     █   █',
@@ -521,15 +969,17 @@ const ASCII_ART = [
     '█     █   █ █   █ █   █  ███    █   █   █ █   █ ████   ███ '
 ];
 
-/* МАРШРУТЫ И КОМАНДЫ */
+/* ============================================================
+   МАРШРУТЫ И КОМАНДЫ
+   ============================================================ */
 const ROUTES = {
-    'слоги':      'reading.html',
-    'часы':       'tools.html',
-    'личности':   'heroes.html',
-    'картины':    'art.html',
-    'мульты':     'cinema.html',
-    'стихи':      'poetry.html',
-    'воспитание': 'articles.html'
+    'слоги':      'module01.html',
+    'часы':       'module02.html',
+    'личности':   'module03.html',
+    'картины':    'module04.html',
+    'мульты':     'module05.html',
+    'стихи':      'module06.html',
+    'воспитание': 'module00.html'
 };
 
 const COMMANDS_LIST = [
@@ -543,28 +993,37 @@ const COMMANDS_LIST = [
     ['ВЫХОД',      'ЗАВЕРШИТЬ РАБОТУ']
 ];
 
-/* ОТКРЫТИЕ / ЗАКРЫТИЕ ТЕРМИНАЛА */
-document.addEventListener('click', (e) => {
-    if (e.target.closest('#terminalWord')) openTerminal();
+/* ============================================================
+   БУРГЕР-МЕНЮ
+   ============================================================ */
+burgerBtn.addEventListener('click', () => {
+    const isOpen = burgerMenu.classList.toggle('open');
+    burgerBtn.classList.toggle('open', isOpen);
+    document.body.style.overflow = isOpen ? 'hidden' : '';
 });
 
-function openTerminal() {
+/* ============================================================
+   ОТКРЫТИЕ / ЗАКРЫТИЕ ТЕРМИНАЛА
+   ============================================================ */
+termWord.addEventListener('click', () => {
     if (terminalOpened) return;
     terminalOpened = true;
+
     evmOverlay.style.display = 'block';
     document.body.style.overflow = 'hidden';
+
     startTerminal();
-}
+});
 
 function closeTerminal() {
     evmOverlay.style.display = 'none';
     document.body.style.overflow = '';
-    terminalOpened  = false;
-    terminalStarted = false;
-    if (evmBody) evmBody.innerHTML = '';
+    terminalOpened = false;
 }
 
-/* СЦЕНАРИЙ ПЕЧАТИ */
+/* ============================================================
+   СЦЕНАРИЙ ПЕЧАТИ
+   ============================================================ */
 async function startTerminal() {
     if (terminalStarted) return;
     terminalStarted = true;
@@ -588,33 +1047,35 @@ async function startTerminal() {
 
     await sleep(420);
 
-    await typeLine('ЭЛЕКТРОННО-ВЫЧИСЛИТЕЛЬНАЯ МАШИНА ----- ПУСК СИСТЕМЫ', { speed: 20 });
+    await typeLine('ЭЛЕКТРОННО-ВЫЧИСЛИТЕЛЬНАЯ МАШИНА: ПУСК СИСТЕМЫ', { speed: 12 });
     await sleep(180);
     await typeLine('ДАТА: ' + formatRuDate(new Date()), { speed: 10 });
-    await typeLine('ОПЕРАТОР ---------- ГОСТЬ@ГРАМОТИНЬО', { speed: 19 });
+    await typeLine('ОПЕРАТОР: ГОСТЬ@ГРАМОТИНЬО', { speed: 10 });
     await sleep(300);
 
-    await typeLine('ТЕСТ ОЗУ ---------- БЕЗ ДЕФЕКТОВ', { speed: 9 });
+    await typeLine('ТЕСТ ОЗУ... БЕЗ ДЕФЕКТОВ', { speed: 12 });
     await sleep(200);
-    await typeLine('ТЕСТ ПЗУ ---------- БЕЗ ДЕФЕКТОВ', { speed: 19 });
+    await typeLine('ТЕСТ ПЗУ... БЕЗ ДЕФЕКТОВ', { speed: 12 });
     await sleep(200);
-    await typeLine('ТЕСТ ПРОЦЕССОРА --- БЕЗ ДЕФЕКТОВ', { speed: 30 });
+    await typeLine('ТЕСТ ПРОЦЕССОРА... БЕЗ ДЕФЕКТОВ', { speed: 12 });
     await sleep(200);
-    await typeLine('ЗАГРУЗКА МОДУЛЕЙ ------------ МОДУЛИ ЗАГРУЖЕНЫ', { speed: 25 });
+    await typeLine('ЗАГРУЗКА МОДУЛЕЙ... МОДУЛИ ЗАГРУЖЕНЫ', { speed: 12 });
     await sleep(320);
 
-    await typeLine('СОСТАВИТЕЛЬ ----------------- @VNVAX ДЛЯ ТЕЛЕГРАМ.', { speed: 33 });
+    await typeLine('СОСТАВИТЕЛЬ: @VNVAX. БЛАГОДАРИТЬ В ТЕЛЕГРАМ.', { speed: 10 });
     await sleep(220);
 
-    await typeLine('СПИСОК КОМАНД --------------- СПРАВКА', { speed: 15 });
-    await typeLine('ЗАВЕРШЕНИЕ РАБОТЫ ----------- ВЫХОД', { speed: 15 });
+    await typeLine('ДЛЯ СПИСКА КОМАНД ВВЕДИТЕ "СПРАВКА"', { speed: 12 });
+    await typeLine('ДЛЯ ЗАВЕРШЕНИЯ РАБОТЫ ВВЕДИТЕ "ВЫХОД"', { speed: 12 });
 
     await sleep(420);
 
     createInputLine();
 }
 
-/* СТРОКА ВВОДА */
+/* ============================================================
+   СТРОКА ВВОДА С ТОЛСТЫМ КУРСОРОМ
+   ============================================================ */
 function createInputLine() {
     const line = document.createElement('div');
     line.className = 'term-line term-input-line';
@@ -658,6 +1119,7 @@ function createInputLine() {
     }, 50);
 }
 
+/* Enter */
 async function handleInputKey(e, mirror) {
     if (e.key !== 'Enter') return;
     const input = e.target;
@@ -677,21 +1139,25 @@ async function handleInputKey(e, mirror) {
     await processCommand(value);
 }
 
-/* ОБРАБОТКА КОМАНД */
+/* ============================================================
+   ОБРАБОТКА КОМАНД
+   ============================================================ */
 async function processCommand(raw) {
     const cmd = raw.toLowerCase().replace(/\s+/g, ' ').trim();
 
     if (!cmd) { createInputLine(); return; }
 
+    /* ВЫХОД */
     if (cmd === 'выход' || cmd === 'exit' || cmd === 'quit') {
         await typeLine('ЗАВЕРШЕНИЕ РАБОТЫ...', { speed: 12 });
         await sleep(300);
-        await typeLine('СЕАНС ОКОНЧЕН ---- 000', { speed: 14 });
+        await typeLine('СЕАНС ОКОНЧЕН---- 000', { speed: 14 });
         await sleep(600);
         closeTerminal();
         return;
     }
 
+    /* СПРАВКА */
     if (cmd === 'справка' || cmd === 'help' || cmd === '?' || cmd === 'помощь') {
         await sleep(120);
         await typeLine('СПИСОК ДОСТУПНЫХ КОМАНД:', { speed: 10 });
@@ -727,8 +1193,8 @@ async function processCommand(raw) {
                     const inp = document.getElementById('termInput');
                     if (inp) {
                         inp.value = 'выход';
-                        const m = document.getElementById('termMirror');
-                        if (m) m.textContent = 'выход';
+                        const mirror = document.getElementById('termMirror');
+                        if (mirror) mirror.textContent = 'выход';
                         inp.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', bubbles: true }));
                     } else {
                         processCommand('выход');
@@ -743,12 +1209,14 @@ async function processCommand(raw) {
         return;
     }
 
+    /* ОЧИСТКА */
     if (cmd === 'очистить' || cmd === 'clear' || cmd === 'cls') {
         evmBody.innerHTML = '';
         createInputLine();
         return;
     }
 
+    /* ПЕРЕХОД */
     if (ROUTES[cmd]) {
         await typeLine(`ЗАПУСК МОДУЛЯ «${cmd.toUpperCase()}»...`, { speed: 12 });
         await sleep(320);
@@ -756,6 +1224,7 @@ async function processCommand(raw) {
         return;
     }
 
+    /* НЕИЗВЕСТНАЯ */
     await sleep(90);
     await typeLine(`НЕИЗВЕСТНАЯ КОМАНДА: ${raw}`, { speed: 12 });
     await sleep(80);
@@ -763,10 +1232,42 @@ async function processCommand(raw) {
     createInputLine();
 }
 
-/* НАВИГАЦИЯ */
+/* ============================================================
+   CRT-ПЕРЕХОД
+   ============================================================ */
 function navigateWithEffect(href) {
-    closeTerminal();
-    window.location.href = href;
+    const inp = document.getElementById('termInput');
+    if (inp) inp.disabled = true;
+
+    const overlay = document.createElement('div');
+    overlay.className = 'crt-overlay';
+    document.body.appendChild(overlay);
+
+    const rect = evmOverlay.getBoundingClientRect();
+    const ox = rect.left + rect.width / 2;
+    const oy = rect.top + rect.height / 2;
+
+    gsap.set(overlay, { transformOrigin: `${ox}px ${oy}px` });
+
+    const tl = gsap.timeline({
+        onComplete: () => { window.location.href = href; }
+    });
+
+    tl.to(evmOverlay, {
+            scaleY: 0.04,
+            filter: 'brightness(2.2)',
+            duration: 0.35,
+            ease: 'power4.in'
+        })
+        .to(overlay, {
+            scaleY: 1, duration: 0.55, ease: 'power4.inOut'
+        }, '-=0.1')
+        .to(evmOverlay, {
+            opacity: 0, duration: 0.2
+        }, '-=0.35')
+        .to(overlay, {
+            backgroundColor: '#FFFFFF', duration: 0.18, ease: 'power2.out'
+        });
 }
 
 evmBody.addEventListener('click', (e) => {
@@ -781,16 +1282,53 @@ document.addEventListener('keydown', (e) => {
     }
 });
 
-/* ---------- КИБЕР-МЕРЦАНИЕ ---------- */
+/* ============================================================
+   СТАРТОВАЯ АНИМАЦИЯ + КИБЕР-МЕРЦАНИЕ
+   ============================================================ */
 document.addEventListener('DOMContentLoaded', () => {
-    setTimeout(() => {
-        if (!termWord) return;
-        termWord.classList.add('cyber-flicker');
-        setTimeout(() => termWord.classList.remove('cyber-flicker'), 1700);
-    }, 1400);
+    const tl = gsap.timeline({ defaults: { ease: 'power4.out' } });
+
+    tl.to('.shutter', {
+            duration: 0.8,
+            scaleY: 0,
+            stagger: { amount: 0.3, from: 'center' },
+            ease: 'expo.inOut'
+        })
+        .set('#mainContent', { opacity: 1 })
+        .to('.word-inner', {
+            y: '0%',
+            duration: 1.1,
+            stagger: 0.08,
+            ease: 'elastic.out(1, 0.6)'
+        }, '-=0.4')
+        .to('.hero-meta', {
+            opacity: 1, y: 0, duration: 0.6, ease: 'power2.out'
+        }, '-=0.8')
+        .to('#accentLine', {
+            width: '120px', duration: 0.8, ease: 'power3.inOut'
+        }, '-=0.4')
+        .to('.hero-sub', {
+            opacity: 1, x: 0, duration: 0.8, ease: 'power3.out'
+        }, '-=0.6')
+        .to('.burger-btn', {
+            opacity: 1, duration: 0.6, ease: 'power2.out'
+        }, '-=0.5')
+        .to('#loader', {
+            opacity: 0,
+            duration: 0.3,
+            onComplete: () => {
+                const loader = document.getElementById('loader');
+                if (loader) loader.style.display = 'none';
+
+                setTimeout(() => {
+                    termWord.classList.add('cyber-flicker');
+                    setTimeout(() => {
+                        termWord.classList.remove('cyber-flicker');
+                    }, 1700);
+                }, 500);
+            }
+        });
 });
 </script>
-
-<script src="shared.js" defer></script>
 </body>
 </html>
