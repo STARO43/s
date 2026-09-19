@@ -745,7 +745,7 @@ body::before {
     <div class="burger-menu-foot">ГРАМОТИНЬО · ТЕРМИНАЛ КУЛЬТУРЫ · 2026</div>
 </div>
 
-<section class="art-section show" id="artCanvas">
+<section class="art-section" id="artCanvas">
     <div class="art-progress"><div class="art-progress-fill" id="artProgressFill"></div></div>
 
     <div class="art-canvas" id="artCanvasInner">
@@ -813,8 +813,8 @@ body::before {
     let current = 0;
     let currentImgEl = null;
     let lastWheelTime = 0;
-    let touchStart = null;
     let closing = false;
+    let started = false;
 
     async function loadIndex() {
         const res = await fetch(INDEX_URL, { cache: 'no-cache' });
@@ -931,22 +931,24 @@ body::before {
     }
 
     function openArt() {
-        if (canvas.classList.contains('show')) return;
+        if (started) {
+            canvas.classList.add('show');
+            document.body.style.overflow = 'hidden';
+            return;
+        }
+        started = true;
         canvas.classList.add('show');
         document.body.style.overflow = 'hidden';
-        if (!items.length) {
-            showState('Загрузка…');
-            loadIndex().then(list => {
-                items = list;
-                if (!items.length) { showState('Пока нет картин'); return; }
-                clearState();
-                buildOrder();
-                current = 0;
-                showImage(0, null);
-            }).catch(err => showState(err.message || 'Ошибка загрузки', true));
-        } else {
-            showImage(current, null);
-        }
+
+        showState('Загрузка…');
+        loadIndex().then(list => {
+            items = list;
+            if (!items.length) { showState('Пока нет картин'); return; }
+            clearState();
+            buildOrder();
+            current = 0;
+            showImage(0, null);
+        }).catch(err => showState(err.message || 'Ошибка загрузки', true));
     }
     function closeArt() {
         if (!canvas.classList.contains('show')) return;
@@ -1069,11 +1071,10 @@ body::before {
     updateNav();
     window.artOpen  = openArt;
     window.artClose = closeArt;
-    openArt();
 })();
 
 /* ============================================================
-   АНИМАЦИЯ ПОЯВЛЕНИЯ — как у главной
+   СТАРТОВАЯ АНИМАЦИЯ + ЗАПУСК ГАЛЕРЕИ ПОСЛЕ НЕЁ
    ============================================================ */
 document.addEventListener('DOMContentLoaded', () => {
     const tl = gsap.timeline({ defaults: { ease: 'power4.out' } });
@@ -1088,32 +1089,15 @@ document.addEventListener('DOMContentLoaded', () => {
             { opacity: 1, scale: 1, rotate: 0, duration: 0.65, ease: 'back.out(1.8)' },
             '-=0.5'
         )
-        .fromTo('#artInfo',
-            { opacity: 0, y: -8 },
-            { opacity: 1, y: 0, duration: 0.55, ease: 'power3.out' },
-            '-=0.4'
-        )
-        .fromTo('#artClose',
-            { opacity: 0, scale: 0.5, rotate: -90 },
-            { opacity: 1, scale: 1, rotate: 0, duration: 0.65, ease: 'back.out(1.8)' },
-            '-=0.55'
-        )
-        .fromTo('.art-nav',
-            { opacity: 0, scale: 0.7 },
-            { opacity: 1, scale: 1, duration: 0.5, stagger: 0.08, ease: 'back.out(1.6)' },
-            '-=0.5'
-        )
-        .fromTo('#artControls',
-            { opacity: 0, y: 12 },
-            { opacity: 1, y: 0, duration: 0.55, ease: 'power3.out' },
-            '-=0.5'
-        )
         .to('#loader', {
             opacity: 0,
             duration: 0.3,
             onComplete: () => {
                 const loader = document.getElementById('loader');
                 if (loader) loader.style.display = 'none';
+
+                /* Запускаем галерею ТОЛЬКО после анимации появления */
+                if (window.artOpen) window.artOpen();
             }
         }, '-=0.2');
 });
