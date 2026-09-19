@@ -62,7 +62,9 @@ body::before {
     }
 }
 
-/* LOADER */
+/* ============================================================
+   LOADER — как на главной
+   ============================================================ */
 .loader-overlay {
     position: fixed;
     inset: 0;
@@ -81,7 +83,7 @@ body::before {
 .shutter-bot { transform-origin: bottom; }
 
 /* ============================================================
-   ЖИВОПИСЬ — НА ВЕСЬ ЭКРАН ПО МАКСИМУМУ
+   ЖИВОПИСЬ — НА ВЕСЬ ЭКРАН
    ============================================================ */
 .art-section {
     position: fixed;
@@ -101,12 +103,11 @@ body::before {
     transition: opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1), visibility 0s linear 0s;
 }
 
-/* Мягкая виньетка — только по краям, центр не трогает */
 .art-section::before {
     content: '';
     position: absolute;
     inset: 0;
-    background: radial-gradient(ellipse 100% 95% at center, transparent 65%, rgba(0, 0, 0, 0.07) 100%);
+    background: radial-gradient(ellipse 110% 100% at center, transparent 75%, rgba(0, 0, 0, 0.06) 100%);
     pointer-events: none;
     z-index: 1;
 }
@@ -138,11 +139,11 @@ body::before {
     width: 0%;
     background: var(--red);
     transition: width 0.7s cubic-bezier(0.16, 1, 0.3, 1);
-    opacity: 0.7;
+    opacity: 0.85;
 }
 
 /* ============================================================
-   ВЕРХНЯЯ ПАНЕЛЬ: счётчик слева, крестик справа
+   ВЕРХНЯЯ ПАНЕЛЬ
    ============================================================ */
 .art-top {
     position: absolute;
@@ -151,132 +152,145 @@ body::before {
     justify-content: space-between;
     align-items: center;
     gap: 14px;
-    padding: 18px 22px;
+    padding: 20px 24px;
     z-index: 20;
     pointer-events: none;
 }
 .art-top > * { pointer-events: auto; }
 
+/* Счётчик — модный, с уголком-акцентом */
 .art-info {
+    position: relative;
     font-family: var(--font-display);
     font-size: 0.72rem;
     font-weight: 700;
     letter-spacing: 0.24em;
     text-transform: uppercase;
     color: var(--text);
-    padding: 9px 18px;
-    border: 2px solid var(--text);
+    padding: 10px 18px;
     background: var(--bg);
+    border: 2px solid var(--text);
     user-select: none;
     font-variant-numeric: tabular-nums;
     opacity: 0;
-    transform: translateY(-4px);
-    transition: opacity 0.5s ease 0.35s, transform 0.5s cubic-bezier(0.16, 1, 0.3, 1) 0.35s;
+    transform: translateY(-6px);
+    transition: opacity 0.5s ease 0.4s, transform 0.5s cubic-bezier(0.16, 1, 0.3, 1) 0.4s;
+}
+.art-info::before {
+    content: '';
+    position: absolute;
+    top: -6px;
+    left: -6px;
+    width: 12px;
+    height: 12px;
+    border-top: 2px solid var(--red);
+    border-left: 2px solid var(--red);
 }
 .art-section.show .art-info {
     opacity: 1;
     transform: translateY(0);
 }
 
-/* Крестик в стиле главной: чёрный квадрат, при hover — красный */
-.art-close {
-    width: 50px;
-    height: 50px;
-    border-radius: 0;
-    border: 2px solid var(--text);
+/* ============================================================
+   КНОПКИ — МОДНЫЕ, С РАМКОЙ И ПОДЪЁМОМ
+   ============================================================ */
+.art-close,
+.art-nav {
+    position: relative;
     background: var(--bg);
+    border: 2px solid var(--text);
     color: var(--text);
     cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 0 0 4px;
+    padding: 0;
     font-family: var(--font-display);
-    font-size: 1.7rem;
-    font-weight: 400;
     line-height: 1;
-    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    transition:
+        transform 0.25s cubic-bezier(0.16, 1, 0.3, 1),
+        box-shadow 0.25s cubic-bezier(0.16, 1, 0.3, 1),
+        background 0.2s ease,
+        color 0.2s ease,
+        border-color 0.2s ease;
     -webkit-tap-highlight-color: transparent;
-    opacity: 0;
-    transform: scale(0.5);
 }
-.art-section.show .art-close {
-    opacity: 1;
-    transform: scale(1);
-    transition: opacity 0.35s ease 0.15s,
-                transform 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.15s,
-                background 0.15s ease,
-                color 0.15s ease,
-                border-color 0.15s ease,
-                box-shadow 0.15s ease;
-}
-.art-close:hover {
+
+.art-close:hover,
+.art-nav:hover:not([disabled]) {
     background: var(--text);
     color: var(--bg);
-    transform: translate(-2px, -2px);
-    box-shadow: 4px 4px 0 var(--red);
+    transform: translate(-3px, -3px);
+    box-shadow: 5px 5px 0 var(--red);
 }
-.art-close:active {
+.art-close:active,
+.art-nav:active:not([disabled]) {
     transform: translate(0, 0);
     box-shadow: 2px 2px 0 var(--red);
 }
 
-/* ============================================================
-   СТРЕЛКИ НАВИГАЦИИ В СТИЛЕ ГЛАВНОЙ
-   ============================================================ */
+/* Крестик */
+.art-close {
+    width: 52px;
+    height: 52px;
+    padding: 0 0 4px;
+    font-size: 1.6rem;
+    font-weight: 400;
+    opacity: 0;
+    transform: scale(0.6) rotate(-45deg);
+}
+.art-section.show .art-close {
+    opacity: 1;
+    transform: scale(1) rotate(0);
+    transition:
+        opacity 0.4s ease 0.25s,
+        transform 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.25s,
+        background 0.2s ease,
+        color 0.2s ease,
+        box-shadow 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Стрелки */
 .art-nav {
     position: absolute;
     top: 50%;
-    transform: translateY(-50%);
-    z-index: 20;
-    width: 60px;
-    height: 60px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 0 0 6px;
-    cursor: pointer;
-    font-family: var(--font-display);
+    width: 64px;
+    height: 64px;
     font-size: 1.9rem;
-    font-weight: 400;
-    line-height: 1;
-    -webkit-tap-highlight-color: transparent;
-    user-select: none;
-    background: var(--bg);
-    border: 2px solid var(--text);
-    color: var(--text);
-    border-radius: 0;
     opacity: 0;
     visibility: hidden;
-    transition: opacity 0.5s ease 0.4s,
-                visibility 0s linear 0.4s,
-                transform 0.2s cubic-bezier(0.16, 1, 0.3, 1),
-                background 0.15s ease,
-                color 0.15s ease,
-                box-shadow 0.15s ease;
 }
 .art-section.show .art-nav {
     opacity: 1;
     visibility: visible;
-    transition: opacity 0.5s ease 0.4s,
-                visibility 0s linear 0s,
-                transform 0.2s cubic-bezier(0.16, 1, 0.3, 1),
-                background 0.15s ease,
-                color 0.15s ease,
-                box-shadow 0.15s ease;
+    transition:
+        opacity 0.5s ease 0.45s,
+        visibility 0s linear 0s,
+        transform 0.25s cubic-bezier(0.16, 1, 0.3, 1),
+        box-shadow 0.25s cubic-bezier(0.16, 1, 0.3, 1),
+        background 0.2s ease,
+        color 0.2s ease;
 }
-.art-nav:hover {
-    background: var(--text);
-    color: var(--bg);
-    transform: translateY(-50%) translate(-2px, -2px);
-    box-shadow: 4px 4px 0 var(--red);
+.art-nav.prev {
+    left: 26px;
+    transform: translateY(-50%) translateX(-30px);
 }
-.art-nav:active {
-    transform: translateY(-50%);
-    box-shadow: 2px 2px 0 var(--red);
+.art-section.show .art-nav.prev {
+    transform: translateY(-50%) translateX(0);
 }
-.art-nav.prev { left: 18px; }
-.art-nav.next { right: 18px; }
+.art-nav.next {
+    right: 26px;
+    transform: translateY(-50%) translateX(30px);
+}
+.art-section.show .art-nav.next {
+    transform: translateY(-50%) translateX(0);
+}
+.art-nav.prev:hover:not([disabled]) {
+    transform: translateY(-50%) translate(-3px, -3px);
+}
+.art-nav.next:hover:not([disabled]) {
+    transform: translateY(-50%) translate(3px, -3px);
+}
 .art-nav[disabled] {
     pointer-events: none;
     opacity: 0.15;
@@ -287,7 +301,7 @@ body::before {
 }
 
 /* ============================================================
-   КАРТИНА — НА ВЕСЬ ЭКРАН ПО МАКСИМУМУ
+   КАРТИНА — МАКСИМАЛЬНО БОЛЬШАЯ
    ============================================================ */
 .art-image-wrap {
     position: absolute;
@@ -295,8 +309,7 @@ body::before {
     display: flex;
     align-items: center;
     justify-content: center;
-    /* Минимальные паддинги — только под счётчик сверху и кнопки снизу */
-    padding: 76px 8px 88px;
+    padding: 84px 12px 92px;
     will-change: opacity, transform;
 }
 .art-image-wrap.art-exit-up {
@@ -369,64 +382,63 @@ body::before {
     touch-action: none;
 }
 
-/* Узкие экраны — совсем минимальные отступы */
 @media (max-width: 900px) {
-    .art-image-wrap { padding: 72px 4px 84px; }
+    .art-image-wrap { padding: 78px 6px 88px; }
 }
 @media (max-width: 640px) {
-    .art-image-wrap { padding: 68px 2px 78px; }
-    .art-top { padding: 12px 14px; }
-    .art-info { font-size: 0.6rem; padding: 6px 12px; letter-spacing: 0.16em; border-width: 1.5px; }
-    .art-close { width: 42px; height: 42px; font-size: 1.4rem; border-width: 1.5px; }
+    .art-image-wrap { padding: 72px 2px 84px; }
+    .art-top { padding: 14px 16px; }
+    .art-info { font-size: 0.6rem; padding: 7px 12px; letter-spacing: 0.16em; border-width: 1.5px; }
+    .art-info::before { width: 9px; height: 9px; top: -5px; left: -5px; border-width: 1.5px; }
+    .art-close { width: 44px; height: 44px; font-size: 1.35rem; border-width: 1.5px; }
 }
 
 /* ============================================================
-   ПЕРЕКЛЮЧАТЕЛЬ ПОРЯДКА — СПРАВА, ВЕРТИКАЛЬНО
+   ПЕРЕКЛЮЧАТЕЛЬ ПОРЯДКА — СНИЗУ ПО ЦЕНТРУ
    ============================================================ */
 .art-controls-wrap {
     position: absolute;
-    top: 50%;
-    right: 18px;
-    transform: translateY(-50%) translateX(20px);
+    left: 50%;
+    bottom: 22px;
+    transform: translateX(-50%) translateY(16px);
     z-index: 20;
     opacity: 0;
     pointer-events: none;
-    transition: opacity 0.5s ease 0.5s, transform 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.5s;
+    transition: opacity 0.5s ease 0.55s, transform 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.55s;
 }
 .art-section.show .art-controls-wrap {
     opacity: 1;
-    transform: translateY(-50%) translateX(0);
+    transform: translateX(-50%) translateY(0);
     pointer-events: auto;
 }
 
 .art-controls {
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
-    padding: 6px;
+    display: inline-flex;
+    align-items: center;
+    gap: 0;
+    padding: 4px;
     border: 2px solid var(--text);
     background: var(--bg);
+    position: relative;
 }
 
 .art-order-btn {
+    position: relative;
     background: transparent;
     border: none;
     color: var(--text);
-    padding: 14px 22px;
+    padding: 11px 26px;
     cursor: pointer;
     font-family: var(--font-display);
     font-weight: 600;
-    font-size: 0.7rem;
-    letter-spacing: 0.2em;
+    font-size: 0.68rem;
+    letter-spacing: 0.24em;
     text-transform: uppercase;
-    transition: all 0.15s cubic-bezier(0.16, 1, 0.3, 1);
+    transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
     -webkit-tap-highlight-color: transparent;
     white-space: nowrap;
-    text-align: center;
-    min-width: 120px;
 }
 .art-order-btn:hover {
-    background: var(--bg);
     color: var(--red);
 }
 .art-order-btn.active {
@@ -438,52 +450,35 @@ body::before {
     color: #FFFFFF;
 }
 
-/* На тач-устройствах переключатель переносим вниз по центру,
-   чтобы не мешал большим пальцам на краю экрана */
-@media (pointer: coarse) {
-    .art-controls-wrap {
-        top: auto;
-        bottom: 16px;
-        right: 50%;
-        transform: translate(50%, 16px);
-    }
-    .art-section.show .art-controls-wrap {
-        transform: translate(50%, 0);
-    }
-    .art-controls {
-        flex-direction: row;
-        padding: 5px;
-    }
-    .art-order-btn {
-        padding: 10px 18px;
-        font-size: 0.62rem;
-        min-width: 0;
-        letter-spacing: 0.16em;
-    }
+/* Точка-индикатор у активной кнопки */
+.art-order-btn.active::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 10px;
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: var(--red);
+    transform: translateY(-50%);
+    animation: orderPulse 2s ease-in-out infinite;
+}
+.art-order-btn.active:hover::before {
+    background: #FFFFFF;
+}
+@keyframes orderPulse {
+    0%, 100% { opacity: 1; transform: translateY(-50%) scale(1); }
+    50%      { opacity: 0.4; transform: translateY(-50%) scale(0.7); }
 }
 
-/* Мелкие экраны — компактнее */
 @media (max-width: 640px) {
-    .art-controls-wrap {
-        top: auto;
-        bottom: 14px;
-        right: 50%;
-        transform: translate(50%, 16px);
-    }
-    .art-section.show .art-controls-wrap {
-        transform: translate(50%, 0);
-    }
-    .art-controls {
-        flex-direction: row;
-        padding: 4px;
-        border-width: 1.5px;
-    }
+    .art-controls-wrap { bottom: 14px; }
     .art-order-btn {
-        padding: 9px 14px;
-        font-size: 0.58rem;
-        min-width: 0;
-        letter-spacing: 0.14em;
+        padding: 9px 16px;
+        font-size: 0.6rem;
+        letter-spacing: 0.16em;
     }
+    .art-order-btn.active::before { left: 6px; width: 4px; height: 4px; }
 }
 
 /* BURGER */
@@ -830,7 +825,6 @@ body::before {
     <button class="art-nav prev" id="artPrev" type="button" aria-label="Предыдущая картина">‹</button>
     <button class="art-nav next" id="artNext" type="button" aria-label="Следующая картина">›</button>
 
-    <!-- Переключатель порядка — справа по вертикали -->
     <div class="art-controls-wrap">
         <div class="art-controls" id="artControls">
             <button class="art-order-btn" data-order="standard" type="button">Стандарт</button>
@@ -1145,7 +1139,7 @@ body::before {
 })();
 
 /* ============================================================
-   СТАРТОВАЯ АНИМАЦИЯ + ЗАПУСК ГАЛЕРЕИ ПОСЛЕ НЕЁ
+   СТАРТОВАЯ АНИМАЦИЯ — КАК НА ГЛАВНОЙ
    ============================================================ */
 document.addEventListener('DOMContentLoaded', () => {
     const tl = gsap.timeline({ defaults: { ease: 'power4.out' } });
