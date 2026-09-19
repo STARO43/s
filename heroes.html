@@ -54,13 +54,97 @@ body::before {
     mix-blend-mode: multiply;
 }
 body.menu-open::before { display: none; }
+
+/* ============================================================
+   МОБИЛЬНЫЕ: ОТКЛЮЧАЕМ ФОН И ВСЕ АНИМАЦИИ, КРОМЕ СТАРТОВОЙ И МЕНЮ
+   ============================================================ */
 @media (max-width: 768px) {
-    body::before { display: none; }
     body {
-        background-image:
-            radial-gradient(ellipse 130% 70% at 50% 0%, #FFFDF8 0%, rgba(255,253,248,0) 62%),
-            radial-gradient(ellipse 110% 60% at 50% 100%, #EDE7D9 0%, rgba(237,231,217,0) 72%);
+        background-image: none;
+        background-attachment: scroll;
     }
+    body::before,
+    body::after { display: none; }
+
+    /* Отключаем ВСЕ transition, кроме тех, что нужны для появления страницы и бургера */
+    *,
+    *::before,
+    *::after {
+        transition: none !important;
+    }
+
+    /* СТАРТОВАЯ АНИМАЦИЯ — оставляем шторки живыми */
+    .shutter {
+        transition: transform 0.8s cubic-bezier(0.85, 0, 0.15, 1) !important;
+    }
+
+    /* КРУЖОЧОК МЕНЮ — бургер и ring остаются анимированными */
+    .burger-btn,
+    .burger-btn .ring,
+    .burger-btn .ring::before,
+    .burger-btn .burger-icon,
+    .burger-btn .burger-icon span {
+        transition: all 0.4s ease !important;
+    }
+    .burger-btn .ring {
+        transition: border-color 0.4s ease, transform 0.7s cubic-bezier(0.34, 1.56, 0.64, 1) !important;
+    }
+    .burger-btn .ring::before {
+        transition: top 0.5s ease, transform 0.5s ease !important;
+    }
+    .burger-btn .burger-icon {
+        transition: transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) !important;
+    }
+    .burger-btn .burger-icon span {
+        transition: all 0.45s cubic-bezier(0.34, 1.56, 0.64, 1) !important;
+    }
+
+    /* МЕНЮ: появление ссылок — быстро, без стаггера */
+    .burger-menu {
+        transition: opacity 0.2s ease !important;
+    }
+    .burger-link {
+        transition: color 0.15s ease, opacity 0.18s ease !important;
+        transform: none !important;
+    }
+    .burger-menu.open .burger-link {
+        transition: color 0.15s ease, opacity 0.18s ease !important;
+        transform: none !important;
+        opacity: 1;
+    }
+    /* Отключаем все стаггер-задержки */
+    .burger-menu.open .burger-menu-col-left .burger-link:nth-child(n),
+    .burger-menu.open .burger-menu-col-right .burger-link:nth-child(n) {
+        transition-delay: 0s !important;
+    }
+
+    /* Убираем все hover-эффекты (карточки, ссылки, кнопки) */
+    .burger-link:hover,
+    .burger-menu-col-left .burger-link:hover,
+    .burger-menu-col-right .burger-link:hover { transform: none !important; }
+
+    .hero-item,
+    .hero-item:hover,
+    .hero-photo img,
+    .hero-item:hover .hero-photo img,
+    .century-header,
+    .soviet-band,
+    .page-logo .l1,
+    .page-logo .l2 { transition: none !important; transform: none !important; }
+
+    .hero-item:hover { box-shadow: none !important; }
+    .hero-photo img { filter: grayscale(1) contrast(1.15) !important; }
+
+    /* Модальное окно героя — без анимаций появления изображений */
+    .hero-modal,
+    .hero-modal-portrait,
+    .hero-nav,
+    .hero-modal-close,
+    .hero-modal-repeat { transition: none !important; }
+
+    .hero-nav:hover { background: var(--bg) !important; color: var(--text) !important; }
+    .hero-modal-close:hover,
+    .hero-modal-repeat:hover { color: var(--text) !important; transform: none !important; }
 }
 
 /* LOADER */
@@ -201,7 +285,7 @@ body.menu-open::before { display: none; }
     .burger-btn.open .burger-icon span:nth-child(4) { transform: translate(-7px, -7px) rotate(45deg); }
 }
 
-/* МЕНЮ — две колонки, как в остальных */
+/* МЕНЮ */
 .burger-menu {
     position: fixed;
     inset: 0;
@@ -354,35 +438,7 @@ body.menu-open::before { display: none; }
     .burger-link {
         font-size: clamp(1.7rem, 7.4vw, 2.6rem);
         line-height: 1.12;
-        transform: translate3d(0, 10px, 0);
-        transition:
-            color 0.18s ease,
-            transform 0.2s ease,
-            opacity 0.16s ease;
     }
-    .burger-menu.open .burger-link {
-        transform: translate3d(0, 0, 0);
-        transition:
-            color 0.2s ease,
-            transform 0.28s cubic-bezier(0.22, 1, 0.36, 1),
-            opacity 0.22s ease;
-    }
-    .burger-menu.open .burger-menu-col-left .burger-link:nth-child(1) { transition-delay: 0.02s; }
-    .burger-menu.open .burger-menu-col-left .burger-link:nth-child(2) { transition-delay: 0.05s; }
-    .burger-menu.open .burger-menu-col-left .burger-link:nth-child(3) { transition-delay: 0.08s; }
-    .burger-menu.open .burger-menu-col-left .burger-link:nth-child(4) { transition-delay: 0.11s; }
-    .burger-menu.open .burger-menu-col-left .burger-link:nth-child(5) { transition-delay: 0.14s; }
-    .burger-menu.open .burger-menu-col-right .burger-link:nth-child(1) { transition-delay: 0.06s; }
-    .burger-menu.open .burger-menu-col-right .burger-link:nth-child(2) { transition-delay: 0.09s; }
-    .burger-menu.open .burger-menu-col-right .burger-link:nth-child(3) { transition-delay: 0.12s; }
-    .burger-menu-col-left  .burger-link:hover,
-    .burger-menu-col-right .burger-link:hover { transform: translate3d(0, 0, 0); }
-    .burger-menu-col-right .burger-link.active::after {
-        content: '→';
-        right: auto;
-        left: -0.9em;
-    }
-    .burger-menu-col-right .burger-link.active::before { content: none; }
     .burger-menu-foot {
         bottom: 1.4rem;
         font-size: 0.55rem;
@@ -399,9 +455,7 @@ body.menu-open::before { display: none; }
     .burger-menu-inner { gap: 0.35em; }
 }
 
-/* ============================================================
-   ТАЙМЛАЙН ВЕЛИКИХ
-   ============================================================ */
+/* ТАЙМЛАЙН ВЕЛИКИХ */
 .heroes-timeline {
     position: relative;
     z-index: 10;
@@ -529,9 +583,7 @@ body.menu-open::before { display: none; }
     .soviet-band { padding: 12px 18px; font-size: 0.92rem; letter-spacing: 0.18em; }
 }
 
-/* ============================================================
-   МОДАЛЬНОЕ ОКНО
-   ============================================================ */
+/* МОДАЛЬНОЕ ОКНО */
 .hero-modal {
     position: fixed;
     inset: 0;
@@ -1224,6 +1276,7 @@ function playHeroAudio(src) {
 document.addEventListener('DOMContentLoaded', () => {
     renderHeroesTimeline();
 
+    const isMobile = window.matchMedia('(max-width: 768px)').matches;
     const tl = gsap.timeline({ defaults: { ease: 'power4.out' } });
 
     tl.to('.shutter', {
@@ -1231,40 +1284,41 @@ document.addEventListener('DOMContentLoaded', () => {
             scaleY: 0,
             stagger: { amount: 0.3, from: 'center' },
             ease: 'expo.inOut'
-        })
-        .fromTo('.page-logo .l1',
-            { opacity: 0, y: 30, skewX: -6 },
-            { opacity: 1, y: 0, skewX: 0, duration: 0.9, ease: 'power3.out' },
-            '-=0.5'
-        )
-        .fromTo('.page-logo .l2',
-            { opacity: 0, y: 24 },
-            { opacity: 1, y: 0, duration: 0.85, ease: 'power3.out' },
-            '-=0.65'
-        )
-        .fromTo('.burger-btn',
-            { opacity: 0, scale: 0.6, rotate: -90 },
-            { opacity: 1, scale: 1, rotate: 0, duration: 0.65, ease: 'back.out(1.8)' },
-            '-=0.55'
-        )
-        .fromTo('.century-header',
-            { opacity: 0, y: 24 },
-            { opacity: 1, y: 0, duration: 0.7, stagger: 0.08, ease: 'power3.out' },
-            '-=0.5'
-        )
-        .fromTo('.hero-item',
-            { opacity: 0, y: 30, scale: 0.94 },
-            { opacity: 1, y: 0, scale: 1, duration: 0.5, stagger: 0.02, ease: 'back.out(1.5)' },
-            '-=0.4'
-        )
-        .to('#loader', {
-            opacity: 0,
-            duration: 0.3,
-            onComplete: () => {
-                const loader = document.getElementById('loader');
-                if (loader) loader.style.display = 'none';
-            }
-        }, '-=0.2');
+        });
+
+    if (!isMobile) {
+        tl.fromTo('.page-logo .l1',
+                { opacity: 0, y: 30, skewX: -6 },
+                { opacity: 1, y: 0, skewX: 0, duration: 0.9, ease: 'power3.out' },
+                '-=0.5')
+            .fromTo('.page-logo .l2',
+                { opacity: 0, y: 24 },
+                { opacity: 1, y: 0, duration: 0.85, ease: 'power3.out' },
+                '-=0.65')
+            .fromTo('.burger-btn',
+                { opacity: 0, scale: 0.6, rotate: -90 },
+                { opacity: 1, scale: 1, rotate: 0, duration: 0.65, ease: 'back.out(1.8)' },
+                '-=0.55')
+            .fromTo('.century-header',
+                { opacity: 0, y: 24 },
+                { opacity: 1, y: 0, duration: 0.7, stagger: 0.08, ease: 'power3.out' },
+                '-=0.5')
+            .fromTo('.hero-item',
+                { opacity: 0, y: 30, scale: 0.94 },
+                { opacity: 1, y: 0, scale: 1, duration: 0.5, stagger: 0.02, ease: 'back.out(1.5)' },
+                '-=0.4');
+    } else {
+        tl.set('.burger-btn', { opacity: 1 });
+    }
+
+    tl.to('#loader', {
+        opacity: 0,
+        duration: 0.3,
+        onComplete: () => {
+            const loader = document.getElementById('loader');
+            if (loader) loader.style.display = 'none';
+        }
+    }, '-=0.2');
 });
 </script>
 </body>
