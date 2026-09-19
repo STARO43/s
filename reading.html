@@ -9,13 +9,14 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Space+Mono:ital,wght@0,400;0,700;1,400&family=PT+Mono&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+<link rel="stylesheet" href="shared.css">
 <title>Грамотиньо. Чтение</title>
 <style>
 /* ============================================================
    УНИКАЛЬНЫЕ СТИЛИ СТРАНИЦЫ «СЛОГИ»
    ============================================================ */
 
-/* ---------- КНОПКИ ---------- */
+/* ---------- КНОПКИ (иконки без рамок, справа) ---------- */
 .controls {
     position: relative;
     z-index: 10;
@@ -32,11 +33,7 @@
     .controls { padding: 1.6rem 8vw 1rem 5vw; gap: 1rem 1.2rem; }
 }
 @media (max-width: 640px) {
-    .controls {
-        padding: 1rem 5vw 0.6rem;
-        gap: 0.6rem 0.9rem;
-        justify-content: flex-end;
-    }
+    .controls { padding: 1.2rem 6vw 0.8rem 5vw; gap: 0.8rem 1rem; }
 }
 
 .ibtn-wrap {
@@ -105,59 +102,13 @@
 .ibtn-wrap.active .ibtn-caption { color: var(--red); }
 
 @media (max-width: 900px) {
-    .ibtn { width: 56px; height: 56px; }
-    .ibtn-caption { font-size: 0.5rem; letter-spacing: 0.16em; }
+    .ibtn { width: 60px; height: 60px; }
+    .ibtn-caption { font-size: 0.52rem; letter-spacing: 0.18em; }
 }
 @media (max-width: 640px) {
-    .ibtn { width: 40px; height: 40px; }
-    .ibtn svg { stroke-width: 1.7; }
-    .ibtn.underline::after { bottom: -5px; height: 1.5px; left: 20%; right: 20%; }
-    .ibtn-caption { font-size: 0.42rem; letter-spacing: 0.12em; }
-    .ibtn-wrap { gap: 0.35rem; }
-}
-
-/* ---------- МОБИЛЬНАЯ ШАПКА-СТАТИСТИКА ---------- */
-.mobile-stats {
-    display: none;
-}
-@media (max-width: 640px) {
-    .mobile-stats {
-        display: block;
-        position: relative;
-        z-index: 10;
-        max-width: 1300px;
-        margin: 0 auto;
-        padding: 0 5vw 1rem;
-    }
-    .mobile-stats-row {
-        display: flex;
-        align-items: baseline;
-        justify-content: space-between;
-        gap: 12px;
-        margin-bottom: 8px;
-        font-family: var(--font-mono);
-        font-size: 0.6rem;
-        font-weight: 700;
-        letter-spacing: 0.22em;
-        text-transform: uppercase;
-        color: rgba(10, 10, 10, 0.5);
-    }
-    .mobile-stats-row b {
-        color: var(--red);
-        font-weight: 700;
-        letter-spacing: 0.14em;
-    }
-    .mobile-stats-bar {
-        height: 2px;
-        background: rgba(10, 10, 10, 0.1);
-        overflow: hidden;
-    }
-    .mobile-stats-fill {
-        height: 100%;
-        width: 0;
-        background: var(--red);
-        transition: width 0.5s cubic-bezier(0.16, 1, 0.3, 1);
-    }
+    .ibtn { width: 48px; height: 48px; }
+    .ibtn svg { stroke-width: 1.6; }
+    .ibtn-caption { font-size: 0.48rem; letter-spacing: 0.14em; }
 }
 
 /* ---------- СЛОГИ ---------- */
@@ -204,9 +155,14 @@
     align-self: center;
     cursor: pointer;
 }
-.syllable-item:hover .syllable-dot { border-color: var(--red); transform: scale(1.6); }
-.syllable-item.learned .syllable-dot { background: var(--red); border-color: var(--red); }
-
+.syllable-item:hover .syllable-dot {
+    border-color: var(--red);
+    transform: scale(1.6);
+}
+.syllable-item.learned .syllable-dot {
+    background: var(--red);
+    border-color: var(--red);
+}
 .syllable-text {
     position: relative;
     display: inline-block;
@@ -273,126 +229,13 @@
 @media (max-width: 900px) {
     .syllable-item, .syllable-sep { font-size: clamp(2rem, 8vw, 3.4rem); }
 }
-
-/* ============================================================
-   МОБИЛЬНАЯ ВЕРСИЯ СЛОГОВ — ПЛИТКИ
-   ============================================================ */
 @media (max-width: 640px) {
-    .syllable-grid {
-        display: grid;
-        grid-template-columns: repeat(2, 1fr);
-        gap: 10px;
-        padding: 1rem 5vw 120px;
-        align-items: stretch;
-        column-gap: 0;
-        row-gap: 0;
-        line-height: 1;
-    }
-    /* Прячем старые разделители-точки */
-    .syllable-sep { display: none; }
-
-    /* Плитка */
-    .syllable-item {
-        position: relative;
-        display: flex;
-        flex-direction: column;
-        align-items: flex-start;
-        justify-content: center;
-        padding: 16px 14px 14px;
-        min-height: 84px;
-        border-radius: 6px;
-        background: linear-gradient(180deg, rgba(255,255,255,0.55) 0%, rgba(244,241,234,0.9) 100%);
-        border: 1px solid rgba(10, 10, 10, 0.10);
-        box-shadow:
-            0 1px 0 rgba(255, 255, 255, 0.7) inset,
-            0 -1px 0 rgba(10, 10, 10, 0.04) inset,
-            0 2px 4px rgba(10, 10, 10, 0.03);
-        font-size: 1.6rem;
-        letter-spacing: -0.03em;
-        color: var(--text);
-        transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
-        overflow: hidden;
-    }
-    .syllable-item:active {
-        transform: scale(0.97);
-        box-shadow:
-            0 1px 0 rgba(255, 255, 255, 0.5) inset,
-            0 1px 2px rgba(10, 10, 10, 0.05);
-    }
-
-    /* Индекс-номер справа сверху */
-    .syllable-item::before {
-        content: attr(data-index);
-        position: absolute;
-        top: 8px;
-        right: 10px;
-        font-family: var(--font-mono);
-        font-size: 0.5rem;
-        font-weight: 700;
-        letter-spacing: 0.1em;
-        color: rgba(10, 10, 10, 0.28);
-        line-height: 1;
-        transition: color 0.2s ease;
-    }
-
-    /* Верхняя красная риска — выезжает при нажатии/активном */
-    .syllable-item::after {
-        content: '';
-        position: absolute;
-        left: 0;
-        top: 0;
-        height: 2px;
-        width: 0;
-        background: var(--red);
-        transition: width 0.35s cubic-bezier(0.16, 1, 0.3, 1);
-    }
-    .syllable-item.playing::after,
-    .syllable-item:active::after {
-        width: 100%;
-    }
-
-    /* Точка-индикатор «изучено» в углу */
-    .syllable-dot {
-        position: absolute;
-        top: 10px;
-        left: 10px;
-        width: 8px;
-        height: 8px;
-        margin: 0;
-        border: 1px solid rgba(10, 10, 10, 0.22);
-        background: transparent;
-        border-radius: 50%;
-        align-self: auto;
-        z-index: 2;
-    }
-    .syllable-item.learned .syllable-dot {
-        background: var(--red);
-        border-color: var(--red);
-    }
-
-    /* Текст слога */
-    .syllable-text {
-        font-family: var(--font-display);
-        font-weight: 700;
-        font-size: 1.6rem;
-        line-height: 1;
-        letter-spacing: -0.03em;
-        color: var(--text);
-        margin-top: 14px;
-    }
-    .syllable-text::before,
-    .syllable-text::after {
-        display: none;
-    }
-    .syllable-item.learned .syllable-text {
-        color: rgba(10, 10, 10, 0.35);
-    }
-
-    /* Скрытое состояние — прячем */
-    .syllable-grid.hide-learned .syllable-item.learned { display: none; }
+    .syllable-grid { padding: 1rem 5vw 100px; row-gap: 0.05em; }
+    .syllable-item { font-size: clamp(1.8rem, 9vw, 2.8rem); }
+    .syllable-sep { font-size: clamp(1.8rem, 9vw, 2.8rem); margin: 0 0.1em; }
 }
 
-/* ---------- ПРОГРЕСС (десктоп) ---------- */
+/* ---------- ПРОГРЕСС ---------- */
 .progress-container {
     position: fixed;
     left: 0; right: 0; bottom: 0;
@@ -429,11 +272,6 @@
     background: var(--red);
     width: 0%;
     transition: width 0.5s cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-/* На мобиле нижний прогресс не нужен — он заменён на mobile-stats */
-@media (max-width: 640px) {
-    .progress-container { display: none !important; }
 }
 
 /* ---------- ТЕРМИНАЛ (викторина и диктант) ---------- */
@@ -668,21 +506,14 @@
     <div class="burger-menu-foot">ГРАМОТИНЬО · ТЕРМИНАЛ КУЛЬТУРЫ · 2026</div>
 </div>
 
-<div class="term-overlay" id="termOverlay">
-    <div class="term-header">
-        <button class="term-exit" id="termExit" aria-label="Выход">[=====]</button>
-    </div>
-    <div class="term-body" id="termBody"></div>
-</div>
-
 <header class="page-header">
-    <div class="page-logo">
+    <div class="page-logo" id="pageLogo">
         <span class="l1">СЛОГИ.</span>
-        <span class="l2">УЧИСЬ ЧИТАТЬ</span>
+        <span class="l2">УЧИ ЧИТАТЬ</span>
     </div>
 </header>
 
-<div class="controls" id="controls">
+<div class="controls" id="controls" data-page-content>
     <div class="ibtn-wrap active">
         <button class="ibtn underline active" id="normalBtn" title="Все слоги">
             <svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="0.5"/><rect x="14" y="3" width="7" height="7" rx="0.5"/><rect x="3" y="14" width="7" height="7" rx="0.5"/><rect x="14" y="14" width="7" height="7" rx="0.5"/></svg>
@@ -698,7 +529,7 @@
     </div>
 
     <div class="ibtn-wrap">
-        <button class="ibtn underline" id="hideLearnedBtn" title="Скрыть отмеченные">
+        <button class="ibtn underline" id="hideLearnedBtn" title="Скрыть изученные">
             <svg viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
         </button>
         <span class="ibtn-caption">СКРЫТЬ</span>
@@ -728,7 +559,7 @@
     </div>
 </div>
 
-<div class="syllable-grid" id="syllableGrid"></div>
+<div class="syllable-grid" id="syllableGrid" data-page-content></div>
 
 <div class="progress-container" id="progressContainer">
     <div class="progress-label">
@@ -738,10 +569,24 @@
     <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
 </div>
 
+<div class="term-overlay" id="termOverlay">
+    <div class="term-header">
+        <button class="term-exit" id="termExit" aria-label="Выход">[=====]</button>
+    </div>
+    <div class="term-body" id="termBody"></div>
+</div>
+
 <script>
 /* ============================================================
-   ДАННЫЕ
+   УНИКАЛЬНЫЙ СКРИПТ СТРАНИЦЫ «СЛОГИ»
    ============================================================ */
+
+/* Локальный sleep — чтобы не зависеть от порядка загрузки shared.js */
+if (typeof sleep === 'undefined') {
+    var sleep = (ms) => new Promise(r => setTimeout(r, ms));
+}
+
+/* ---------- ДАННЫЕ ---------- */
 const rawItems = ['ЁЖ', 'ёлка', 'ЁН', 'АБ', 'АВ', 'АГ', 'АЗ', 'АК', 'АЛ', 'Алла', 'АМ', 'АН', 'Анна', 'АП', 'арка', 'арфа', 'АС', 'АТ', 'АХ', 'АЧ', 'АШ', 'БА', 'БАК', 'БАЯН', 'БЕ', 'БИ', 'БО', 'БОК', 'БОР', 'Боря', 'БЫ', 'БЫК', 'БЭ', 'БЯ', 'ВА', 'Валя', 'ВЕ', 'ВЕЕР', 'ВИ', 'Витя', 'Вова', 'ВОЗ', 'ВОЛ', 'ВОЛК', 'ВУ', 'ВЫ', 'ВЭ', 'ВЮ', 'ГА', 'ГАЗ', 'Галя', 'ГЕ', 'Гена', 'ГИ', 'ГО', 'ГОД', 'ГЫ', 'ГЭ', 'ДА', 'ДИ', 'ДОМ', 'ДУ', 'ДУБ', 'ДУШ', 'ДЫ', 'ДЫМ', 'ДЭ', 'ДЮ', 'ДЯ', 'ЕГ', 'ЕЖ', 'ЕЛ', 'ЕМ', 'ЕН', 'ЕР', 'ЕС', 'если', 'ЕТ', 'ЕФ', 'ЕХ', 'ЕЦ', 'ЕЧ', 'ЕШ', 'ЖА', 'Женя', 'ЖИ', 'ЖО', 'ЖУ', 'ЖУК', 'ЖЭ', 'ЗА', 'ЗИ', 'Зина', 'ЗО', 'ЗУ', 'ЗЫ', 'ЗЭ', 'ЗЮ', 'ЗЯ', 'ИБ', 'ИВ', 'игра', 'ИЖ', 'ИК', 'икра', 'ИЛ', 'ИМ', 'ИН', 'ИР', 'ИС', 'ИТ', 'ИФ', 'ИЧ', 'ИШ', 'ЙОД', 'КА', 'Катя', 'КЕ', 'КИ', 'КИТ', 'КОЛ', 'Коля', 'КОМ', 'КОТ', 'КОФЕ', 'КРАЙ', 'КРАН', 'КУ', 'КЫ', 'КЭ', 'ЛЁ', 'Лёва', 'Лёша', 'ЛАК', 'ЛЕ', 'ЛЕВ', 'Лена', 'ЛЕС', 'ЛЕЩ', 'ЛИ', 'ЛИФТ', 'ЛО', 'ЛОМ', 'ЛУ', 'ЛЫ', 'ЛЫЖИ', 'ЛЭ', 'ЛЮ', 'Люба', 'Люда', 'ЛЮК', 'ЛЯ', 'МА', 'МАК', 'МЕ', 'МЕЛ', 'МЕХ', 'МЕЧ', 'МИ', 'Миша', 'МО', 'МОХ', 'МУ', 'МУХА', 'МЫ', 'МЫЛО', 'МЫС', 'МЭ', 'МЯ', 'МЯЧ', 'НЁ', 'НА', 'НЕ', 'Нина', 'НО', 'НОЖ', 'НОС', 'НУ', 'НЫ', 'НЭ', 'НЯ', 'одна', 'ОЖ', 'ОКНО', 'ОЛ', 'ОМ', 'ОН', 'ОП', 'ОР', 'ОС', 'ОФ', 'ОХ', 'ОЧ', 'очки', 'ОШ', 'ПА', 'ПАУК', 'ПЕРО', 'Петя', 'ПИ', 'ПУ', 'ПУХ', 'ПЫ', 'ПЭ', 'ПЯ', 'РА', 'РАК', 'РИ', 'РИС', 'РО', 'Рома', 'РОТ', 'РУ', 'РЫ', 'РЫБА', 'РЭ', 'РЮ', 'РЯ', 'СЁ', 'СА', 'Саша', 'СЕ', 'СИ', 'СОК', 'СОМ', 'СОР', 'СТУЛ', 'СУ', 'СУК', 'СУП', 'СЫ', 'СЫР', 'СЭ', 'СЮ', 'СЯ', 'Тёма', 'ТА', 'ТАЗ', 'Таня', 'ТЕ', 'ТИ', 'ТО', 'Толя', 'Тома', 'ТОРТ', 'ТРОС', 'ТУ', 'ТЫ', 'ТЭ', 'ТЮ', 'ТЯ', 'УБ', 'УГОЛ', 'УЖ', 'УЛ', 'УМ', 'УН', 'УР', 'урна', 'УС', 'УТ', 'утка', 'утро', 'УФ', 'УХ', 'УХО', 'УЧ', 'УШ', 'ушко', 'ФА', 'ФЕ', 'Федя', 'ФИ', 'ФО', 'ФУ', 'ФЫ', 'ФЭ', 'ХА', 'ХЕ', 'ХО', 'ХУ', 'ХЫ', 'ХЭ', 'ЦА', 'ЦЕ', 'ЦИ', 'ЦО', 'ЦУ', 'ЦЭ', 'ЧА', 'ЧАЙ', 'ЧЕК', 'ЧИ', 'ЧУ', 'ЧЭ', 'ША', 'ШАГ', 'ШЕ', 'ШИ', 'ШОВ', 'ШУ', 'ШЭ', 'ЩИ', 'ЩИТ', 'ЫВ', 'ЫК', 'ЫМ', 'ЫН', 'ЫС', 'ЫТ', 'ЫХ', 'ЭБ', 'ЭК', 'ЭЛ', 'ЭМ', 'ЭН', 'ЭП', 'ЭР', 'ЭС', 'ЭТ', 'ЭФ', 'ЭХ', 'ЭЦ', 'юбка', 'ЮГ', 'юнга', 'ЯБ', 'ЯВ', 'ЯД', 'ЯК', 'ЯЛ', 'ЯМ', 'ЯН', 'ЯП', 'ЯР', 'ЯС', 'ЯТ', 'ЯХ', 'яхта', 'ЯЦ'];
 const syllables = rawItems.sort((a, b) => {
     const l = a.length - b.length;
@@ -769,8 +614,6 @@ const progressFill      = document.getElementById('progressFill');
 const termOverlay       = document.getElementById('termOverlay');
 const termBody          = document.getElementById('termBody');
 const termExit          = document.getElementById('termExit');
-const burgerBtn         = document.getElementById('burgerBtn');
-const burgerMenu        = document.getElementById('burgerMenu');
 
 let currentMode = 'all';
 let randomItems = [];
@@ -785,9 +628,7 @@ let termMode = null;
 const audioCache = {};
 const AUDIO_CACHE_LIMIT = 60;
 
-/* ============================================================
-   ПРОГРЕСС
-   ============================================================ */
+/* ---------- ПРОГРЕСС ---------- */
 function loadLearnedSet() {
     try { return new Set(JSON.parse(localStorage.getItem('learned_syllables') || '[]')); }
     catch { return new Set(); }
@@ -809,9 +650,7 @@ function flashProgress() {
     progressTimer = setTimeout(() => progressContainer.classList.remove('show'), 2200);
 }
 
-/* ============================================================
-   РЕНДЕР СЛОГОВ
-   ============================================================ */
+/* ---------- РЕНДЕР СЛОГОВ ---------- */
 function renderGrid() {
     const items = currentMode === 'random' ? randomItems : syllables;
     const frag = document.createDocumentFragment();
@@ -860,9 +699,7 @@ function toggleLearned(s, item) {
     flashProgress();
 }
 
-/* ============================================================
-   АУДИО
-   ============================================================ */
+/* ---------- АУДИО ---------- */
 function playAudio(s, vol) {
     if (currentAudio) { try { currentAudio.pause(); } catch (e) {} }
     let a = audioCache[s];
@@ -891,9 +728,7 @@ function handleSyllableClick(s, item) {
     playAudio(s);
 }
 
-/* ============================================================
-   РЕЖИМЫ
-   ============================================================ */
+/* ---------- РЕЖИМЫ ---------- */
 function setModeActive(wrapEl, btnEl) {
     [normalBtnWrap, randomBtnWrap].forEach(w => w.classList.remove('active'));
     [normalBtn, randomBtn].forEach(b => b.classList.remove('active'));
@@ -927,9 +762,7 @@ clearLearnedBtn.addEventListener('click', () => {
     showToast('ПРОГРЕСС ОЧИЩЕН');
 });
 
-/* ============================================================
-   ТОСТ
-   ============================================================ */
+/* ---------- ТОСТ ---------- */
 function showToast(m) {
     const t = document.createElement('div');
     t.className = 'toast';
@@ -946,32 +779,7 @@ function showToast(m) {
     }, 2100);
 }
 
-/* ============================================================
-   МЕНЮ
-   ============================================================ */
-function openMenu() {
-    burgerMenu.classList.add('open');
-    burgerBtn.classList.add('open');
-    document.body.style.overflow = 'hidden';
-    document.body.classList.add('menu-open');
-}
-function closeMenu() {
-    burgerMenu.classList.remove('open');
-    burgerBtn.classList.remove('open');
-    document.body.style.overflow = '';
-    document.body.classList.remove('menu-open');
-}
-burgerBtn.addEventListener('click', () => {
-    if (burgerMenu.classList.contains('open')) closeMenu();
-    else openMenu();
-});
-document.querySelectorAll('.burger-link').forEach(link => {
-    link.addEventListener('click', () => closeMenu());
-});
-
-/* ============================================================
-   ТЕРМИНАЛ
-   ============================================================ */
+/* ---------- ТЕРМИНАЛ ---------- */
 function openTerm() {
     termOverlay.classList.add('show');
     document.body.style.overflow = 'hidden';
@@ -986,7 +794,6 @@ function closeTerm() {
 termExit.addEventListener('click', closeTerm);
 document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && termMode) closeTerm(); });
 
-const sleep = (ms) => new Promise(r => setTimeout(r, ms));
 function termScroll() { termBody.scrollTop = termBody.scrollHeight; }
 function printTerm(text, cls = '') {
     const line = document.createElement('div');
@@ -1011,7 +818,7 @@ async function typeTerm(text, speed = 10, cls = '') {
 }
 function clearTerm() { termBody.innerHTML = ''; }
 
-/* ВИКТОРИНА */
+/* ---------- ВИКТОРИНА ---------- */
 async function startExam() {
     openTerm();
     termMode = 'exam';
@@ -1053,7 +860,7 @@ async function showExamQuestion() {
     currentExamCorrect = correct;
     await typeTerm(`ВОПРОС ${examIndex + 1}: ЧТО ЗВУЧАЛО?`, 10);
     await sleep(100);
-    const cmdLine = await printTerm('& ПОВТОР', 'cmd-underline');
+    const cmdLine = await printTerm('$ ПРОИГРЫШЬ', 'cmd-underline');
     cmdLine.addEventListener('click', () => playAudio(correct));
 
     const variants = new Set([correct]);
@@ -1109,7 +916,7 @@ function handleExamAnswer(btn, sel, correct, opts) {
 
 examBtn.addEventListener('click', startExam);
 
-/* ДИКТАНТ */
+/* ---------- ДИКТАНТ ---------- */
 const ALPHA_LAYOUT = ['А','Б','В','Г','Д','Е','Ё','Ж','З','И','Й','К','Л','М','Н','О','П','Р','С','Т','У','Ф','Х','Ц','Ч','Ш','Щ','Ъ','Ы','Ь','Э','Ю','Я'];
 const QWERTY_ROW1 = ['Й','Ц','У','К','Е','Н','Г','Ш','Щ','З','Х','Ъ'];
 const QWERTY_ROW2 = ['Ф','Ы','В','А','П','Р','О','Л','Д','Ж','Э'];
@@ -1159,7 +966,7 @@ async function showDictationTask() {
     dictationInput = [];
     await typeTerm(`ЗАДАНИЕ ${dictationIndex + 1}: СОСТАВЬ СЛОГ.`, 10);
     await sleep(100);
-    const cmdLine = await printTerm('& ПОВТОР', 'cmd-underline');
+    const cmdLine = await printTerm('$ ПРОИГРЫШЬ', 'cmd-underline');
     cmdLine.addEventListener('click', (e) => playDictAudio(e.currentTarget));
     renderDictAnswer();
     renderDictKeyboard();
@@ -1329,41 +1136,13 @@ function createExitLine() {
     termScroll();
 }
 
-/* ============================================================
-   СТАРТ
-   ============================================================ */
+/* ---------- СТАРТ ---------- */
 document.addEventListener('DOMContentLoaded', () => {
     renderGrid();
-
-    const tl = gsap.timeline({ defaults: { ease: 'power4.out' } });
-
-    tl.to('.shutter', {
-            duration: 0.8,
-            scaleY: 0,
-            stagger: { amount: 0.3, from: 'center' },
-            ease: 'expo.inOut'
-        })
-        .fromTo('.page-logo .l1',
-            { opacity: 0, y: 30, skewX: -6 },
-            { opacity: 1, y: 0, skewX: 0, duration: 0.9, ease: 'power3.out' }, '-=0.5')
-        .fromTo('.page-logo .l2',
-            { opacity: 0, y: 24 },
-            { opacity: 1, y: 0, duration: 0.85, ease: 'power3.out' }, '-=0.65')
-        .fromTo('.burger-btn',
-            { opacity: 0, scale: 0.6, rotate: -90 },
-            { opacity: 1, scale: 1, rotate: 0, duration: 0.65, ease: 'back.out(1.8)' }, '-=0.55')
-        .fromTo('.ibtn-wrap',
-            { opacity: 0, y: 20, scale: 0.85 },
-            { opacity: 1, y: 0, scale: 1, duration: 0.45, stagger: 0.06, ease: 'back.out(1.6)' }, '-=0.4')
-        .to('#loader', {
-            opacity: 0,
-            duration: 0.3,
-            onComplete: () => {
-                const loader = document.getElementById('loader');
-                if (loader) loader.style.display = 'none';
-            }
-        }, '-=0.2');
+    /* Стартовая анимация появления — из shared.js */
 });
 </script>
+
+<script src="shared.js" defer></script>
 </body>
 </html>
