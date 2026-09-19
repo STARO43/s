@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#F4F1EA">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Space+Mono:ital,wght@0,400;0,700;1,400&family=PT+Mono&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Space+Mono:ital,wght@0,400;0,700;1,400&family=PT+Mono&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
 <title>Грамотиньо. Время</title>
 <style>
@@ -17,6 +17,7 @@
     --red: #D90429;
     --font-display: 'Oswald', sans-serif;
     --font-mono: 'Space Mono', monospace;
+    --font-serif: 'Playfair Display', serif; /* Для цифр Победы */
 
     --evm-bg:      #0B0F0B;
     --evm-text:    #C7E0C7;
@@ -493,8 +494,10 @@ body::before {
         width: 100%;
     }
     .burger-link { font-size: clamp(2rem, 9vw, 3.4rem); line-height: 1.05; }
+    /* УБРАНЫ ТЯЖЕЛЫЕ АНИМАЦИИ ДЛЯ МОБИЛЬНЫХ */
     .burger-menu-col-left  .burger-link:hover,
-    .burger-menu-col-right .burger-link:hover { transform: translateX(10px); }
+    .burger-menu-col-right .burger-link:hover { transform: none; } 
+    
     .burger-menu-col-right .burger-link.active::after {
         content: '→';
         right: auto;
