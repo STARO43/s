@@ -956,7 +956,7 @@ body.menu-open::before { display: none; }
     </div>
 
     <div class="ibtn-wrap">
-        <button class="ibtn underline" id="hideLearnedBtn" title="Скрыть изученные">
+        <button class="ibtn underline" id="hideLearnedBtn" title="Скрыть отмеченные">
             <svg viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
         </button>
         <span class="ibtn-caption">СКРЫТЬ</span>
@@ -1311,7 +1311,7 @@ async function showExamQuestion() {
     currentExamCorrect = correct;
     await typeTerm(`ВОПРОС ${examIndex + 1}: ЧТО ЗВУЧАЛО?`, 10);
     await sleep(100);
-    const cmdLine = await printTerm('$ ПРОИГРЫШЬ', 'cmd-underline');
+    const cmdLine = await printTerm('& ПОВТОР', 'cmd-underline');
     cmdLine.addEventListener('click', () => playAudio(correct));
 
     const variants = new Set([correct]);
@@ -1417,7 +1417,7 @@ async function showDictationTask() {
     dictationInput = [];
     await typeTerm(`ЗАДАНИЕ ${dictationIndex + 1}: СОСТАВЬ СЛОГ.`, 10);
     await sleep(100);
-    const cmdLine = await printTerm('$ ПРОИГРЫШЬ', 'cmd-underline');
+    const cmdLine = await printTerm('& ПОВТОР', 'cmd-underline');
     cmdLine.addEventListener('click', (e) => playDictAudio(e.currentTarget));
     renderDictAnswer();
     renderDictKeyboard();
