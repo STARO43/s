@@ -1,7 +1,5 @@
 /* ============================================================
    SHARED.JS — общий слой для всех страниц
-   Здесь: утилиты, бургер-меню, стартовая анимация появления.
-   Правки в этом файле применяются сразу на всех страницах.
    ============================================================ */
 
 /* ---------- УТИЛИТЫ ---------- */
@@ -41,28 +39,37 @@ function initBurger() {
 
 /* ============================================================
    СТАРТОВАЯ АНИМАЦИЯ ПОЯВЛЕНИЯ СТРАНИЦЫ
-   На десктопе — полный набор. На мобиле — только шторки + логотип + бургер.
    ============================================================ */
 function playPageEntryAnimation() {
     if (typeof gsap === 'undefined') return;
 
     const tl = gsap.timeline({ defaults: { ease: 'power4.out' } });
 
-    /* Шторки — всегда */
+    /* 1. Шторки уезжают */
     tl.to('.shutter', {
         duration: 0.8,
         scaleY: 0,
         stagger: { amount: 0.3, from: 'center' },
         ease: 'expo.inOut'
     });
-   // проявляем контейнер страницы
-const pageContent = document.querySelector('[data-page-content]') || document.querySelector('.wrapper');
-if (pageContent) {
-    tl.set(pageContent, { opacity: 1 }, '-=0.4');
-}
 
+    /* 2. Проявляем ГЛАВНЫЙ контейнер страницы.
+       У разных страниц он может называться по-разному:
+       — .wrapper (index, heroes, art)
+       — .page-header (tools)
+       — другие элементы с [data-page-content]
+       Универсально: сначала ищем [data-page-content], иначе .wrapper, иначе .page-header. */
+    const pageContent =
+        document.querySelector('[data-page-content]') ||
+        document.querySelector('.wrapper') ||
+        document.querySelector('.page-header');
+
+    if (pageContent) {
+        tl.set(pageContent, { opacity: 1 }, '-=0.4');
+    }
+
+    /* 3. Десктопная анимация логотипа и бургера */
     if (!IS_MOBILE) {
-        /* Десктоп — полная анимация появления */
         if (document.querySelector('.page-logo .l1')) {
             tl.fromTo('.page-logo .l1',
                     { opacity: 0, y: 30, skewX: -6 },
@@ -80,26 +87,17 @@ if (pageContent) {
                 { opacity: 1, scale: 1, rotate: 0, duration: 0.65, ease: 'back.out(1.8)' },
                 '-=0.55');
         }
-
-        /* Если на странице есть content-селектор — можно мягко проявить */
-        if (document.querySelector('[data-page-content]')) {
-            tl.fromTo('[data-page-content]',
-                { opacity: 0, y: 24 },
-                { opacity: 1, y: 0, duration: 0.7, ease: 'power3.out' },
-                '-=0.5');
-        }
     } else {
-        /* Мобила — только лёгкие fade-появления, без transform */
+        /* Мобила — лёгкий fade логотипа и мгновенный показ бургера */
         if (document.querySelector('.page-logo')) {
-            tl.set('.page-logo', { opacity: 0 }, '+=0.05')
-              .to('.page-logo', { opacity: 1, duration: 0.5, ease: 'power2.out' });
+            tl.to('.page-logo', { opacity: 1, duration: 0.5, ease: 'power2.out' }, '-=0.3');
         }
         if (document.querySelector('.burger-btn')) {
             tl.set('.burger-btn', { opacity: 1 });
         }
     }
 
-    /* Лоадер уходит */
+    /* 4. Лоадер уходит */
     if (document.getElementById('loader')) {
         tl.to('#loader', {
             opacity: 0,
