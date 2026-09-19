@@ -9,6 +9,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Space+Mono:ital,wght@0,400;0,700;1,400&family=PT+Mono&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@barba/core@2.10.3/dist/barba.umd.js"></script>
 <title>Грамотиньо</title>
 <style>
 :root {
@@ -18,7 +19,6 @@
     --font-display: 'Oswald', sans-serif;
     --font-mono: 'Space Mono', monospace;
 
-    /* СОВЕТСКАЯ ЭВМ */
     --evm-bg:      #0B0F0B;
     --evm-text:    #C7E0C7;
     --evm-dim:     #6B826B;
@@ -41,9 +41,6 @@ body {
     -webkit-font-smoothing: antialiased;
 }
 
-/* ============================================================
-   ФОН: бумага
-   ============================================================ */
 body {
     background-image:
         radial-gradient(ellipse 90% 70% at 12% 4%, rgba(255, 253, 246, 0.95), transparent 62%),
@@ -77,19 +74,22 @@ body::after {
     mix-blend-mode: soft-light;
 }
 
+body.menu-open::before,
+body.menu-open::after { display: none; }
+
+body.is-transitioning { overflow: hidden; }
+
 @media (max-width: 768px) {
     body {
         background-image:
             radial-gradient(ellipse 130% 70% at 50% 0%, #FFFDF8 0%, rgba(255,253,248,0) 62%),
             radial-gradient(ellipse 110% 60% at 50% 100%, #EDE7D9 0%, rgba(237,231,217,0) 72%);
     }
-    body::before { opacity: 0.07; }
-    body::after  { opacity: 0.18; }
+    body::before { opacity: 0.06; mix-blend-mode: normal; }
+    body::after  { opacity: 0.14; mix-blend-mode: normal; }
 }
 
-/* ============================================================
-   LOADER
-   ============================================================ */
+/* LOADER */
 .loader-overlay {
     position: fixed;
     inset: 0;
@@ -106,9 +106,7 @@ body::after {
 .shutter-top { transform-origin: top; }
 .shutter-bot { transform-origin: bottom; }
 
-/* ============================================================
-   LAYOUT
-   ============================================================ */
+/* LAYOUT */
 .wrapper {
     position: relative;
     z-index: 2;
@@ -118,9 +116,7 @@ body::after {
     opacity: 0;
 }
 
-/* ============================================================
-   HERO
-   ============================================================ */
+/* HERO */
 .hero {
     min-height: 92vh;
     display: flex;
@@ -165,20 +161,8 @@ body::after {
 .line-1 { color: var(--red); }
 .line-2 { color: var(--text); }
 
-/* Деформируемая точка в конце "ГРАМОТИНЬО." */
-.dot-deform {
-    display: inline-block;
-    transform-origin: center center;
-    will-change: transform;
-    transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
-    pointer-events: none;
-}
-@media (pointer: coarse) {
-    .dot-deform { transform: none !important; transition: none; }
-}
-
 .hero-title .terminal-word {
-    cursor: default;
+    cursor: pointer;
     user-select: none;
     -webkit-tap-highlight-color: transparent;
     position: relative;
@@ -236,9 +220,7 @@ body::after {
     margin: 2rem 0;
 }
 
-/* ============================================================
-   БУРГЕР-МЕНЮ — ДВЕ КОЛОНКИ
-   ============================================================ */
+/* БУРГЕР-КНОПКА */
 .burger-btn {
     position: fixed;
     top: 22px;
@@ -279,7 +261,7 @@ body::after {
     transition: top 0.5s ease, transform 0.5s ease;
 }
 
-.burger-btn:hover .ring {
+.burger-btn:not(.open):hover .ring {
     border-color: var(--red);
     transform: rotate(180deg);
 }
@@ -294,7 +276,7 @@ body::after {
     transition: transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
-.burger-btn:hover .burger-icon {
+.burger-btn:not(.open):hover .burger-icon {
     transform: rotate(90deg);
 }
 
@@ -312,14 +294,12 @@ body::after {
 .burger-icon span:nth-child(3) { bottom: 0; left: 0;    transform-origin: bottom left; }
 .burger-icon span:nth-child(4) { bottom: 0; right: 0;   transform-origin: bottom right; background: var(--red); }
 
-.burger-btn:hover .burger-icon span:nth-child(1) { transform: translate(-3px, -3px) scale(1.08); }
-.burger-btn:hover .burger-icon span:nth-child(2) { transform: translate(3px, -3px) scale(1.08); }
-.burger-btn:hover .burger-icon span:nth-child(3) { transform: translate(-3px, 3px) scale(1.08); }
-.burger-btn:hover .burger-icon span:nth-child(4) { transform: translate(3px, 3px) scale(1.08); }
+.burger-btn:not(.open):hover .burger-icon span:nth-child(1) { transform: translate(-3px, -3px) scale(1.08); }
+.burger-btn:not(.open):hover .burger-icon span:nth-child(2) { transform: translate(3px, -3px) scale(1.08); }
+.burger-btn:not(.open):hover .burger-icon span:nth-child(3) { transform: translate(-3px, 3px) scale(1.08); }
+.burger-btn:not(.open):hover .burger-icon span:nth-child(4) { transform: translate(3px, 3px) scale(1.08); }
 
-.burger-btn.open .burger-icon {
-    transform: rotate(0deg);
-}
+.burger-btn.open .burger-icon { transform: rotate(0deg); }
 
 .burger-btn.open .ring {
     border-color: var(--red);
@@ -353,19 +333,25 @@ body::after {
     height: 2.5px;
 }
 
+.burger-btn.open:hover .ring {
+    transform: rotate(585deg);
+}
+.burger-btn.open:hover .burger-icon {
+    transform: rotate(0deg) scale(1.12);
+}
+
 @media (max-width: 768px) {
-    .burger-btn {
-        top: 14px;
-        right: 14px;
-        width: 54px;
-        height: 54px;
-    }
+    .burger-btn { top: 14px; right: 14px; width: 54px; height: 54px; }
     .burger-btn .ring { inset: 5px; }
     .burger-icon { width: 22px; height: 22px; }
     .burger-icon span { width: 8px; height: 8px; }
+    .burger-btn.open .burger-icon span:nth-child(1),
+    .burger-btn.open .burger-icon span:nth-child(4) { width: 22px; }
+    .burger-btn.open .burger-icon span:nth-child(1) { transform: translate(7px, 7px) rotate(45deg); }
+    .burger-btn.open .burger-icon span:nth-child(4) { transform: translate(-7px, -7px) rotate(45deg); }
 }
 
-/* Полноэкранное меню — ДВЕ КОЛОНКИ */
+/* ПОЛНОЭКРАННОЕ МЕНЮ */
 .burger-menu {
     position: fixed;
     inset: 0;
@@ -377,9 +363,10 @@ body::after {
     padding: 4vw 5vw;
     opacity: 0;
     pointer-events: none;
-    transition: opacity 0.4s ease;
+    transition: opacity 0.22s ease;
     overflow-y: auto;
     overflow-x: hidden;
+    contain: layout paint;
 }
 .burger-menu.open { opacity: 1; pointer-events: auto; }
 
@@ -390,12 +377,13 @@ body::after {
     pointer-events: none;
     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='360' height='360'%3E%3Cfilter id='n2'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.78' numOctaves='5' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n2)'/%3E%3C/svg%3E");
     background-size: 360px 360px;
-    opacity: 0.18;
-    mix-blend-mode: multiply;
+    opacity: 0.09;
+    z-index: 0;
 }
 
 .burger-menu-inner {
     position: relative;
+    z-index: 1;
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: clamp(24px, 4vw, 64px);
@@ -408,7 +396,7 @@ body::after {
     display: flex;
     flex-direction: column;
     align-items: flex-start;
-    gap: 0.15em;
+    gap: 0.1em;
     min-width: 0;
 }
 
@@ -417,40 +405,45 @@ body::after {
 
 .burger-link {
     font-family: var(--font-display);
-    font-size: clamp(5rem, 4.4vw, 4.2rem);
+    font-size: clamp(1.8rem, 3.6vw, 3.8rem);
     font-weight: 700;
     line-height: 1.05;
     letter-spacing: -0.03em;
     text-transform: uppercase;
     color: var(--text);
     text-decoration: none;
-    transition: color 0.25s ease, transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
     position: relative;
     display: inline-block;
-    transform: translateY(30px);
+    transform: translate3d(0, 22px, 0);
     opacity: 0;
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
     word-break: break-word;
     max-width: 100%;
+    transition:
+        color 0.2s ease,
+        transform 0.22s ease,
+        opacity 0.18s ease;
 }
 
 .burger-menu.open .burger-link {
-    transform: translateY(0);
+    transform: translate3d(0, 0, 0);
     opacity: 1;
     transition:
         color 0.25s ease,
-        transform 0.55s cubic-bezier(0.16, 1, 0.3, 1),
-        opacity 0.45s ease;
+        transform 0.5s cubic-bezier(0.16, 1, 0.3, 1),
+        opacity 0.4s ease;
 }
 
-.burger-menu.open .burger-menu-col-left .burger-link:nth-child(1) { transition-delay: 0.10s; }
-.burger-menu.open .burger-menu-col-left .burger-link:nth-child(2) { transition-delay: 0.16s; }
-.burger-menu.open .burger-menu-col-left .burger-link:nth-child(3) { transition-delay: 0.22s; }
-.burger-menu.open .burger-menu-col-left .burger-link:nth-child(4) { transition-delay: 0.28s; }
-.burger-menu.open .burger-menu-col-left .burger-link:nth-child(5) { transition-delay: 0.34s; }
+.burger-menu.open .burger-menu-col-left .burger-link:nth-child(1) { transition-delay: 0.06s; }
+.burger-menu.open .burger-menu-col-left .burger-link:nth-child(2) { transition-delay: 0.11s; }
+.burger-menu.open .burger-menu-col-left .burger-link:nth-child(3) { transition-delay: 0.16s; }
+.burger-menu.open .burger-menu-col-left .burger-link:nth-child(4) { transition-delay: 0.21s; }
+.burger-menu.open .burger-menu-col-left .burger-link:nth-child(5) { transition-delay: 0.26s; }
 
-.burger-menu.open .burger-menu-col-right .burger-link:nth-child(1) { transition-delay: 0.22s; }
-.burger-menu.open .burger-menu-col-right .burger-link:nth-child(2) { transition-delay: 0.28s; }
-.burger-menu.open .burger-menu-col-right .burger-link:nth-child(3) { transition-delay: 0.34s; }
+.burger-menu.open .burger-menu-col-right .burger-link:nth-child(1) { transition-delay: 0.14s; }
+.burger-menu.open .burger-menu-col-right .burger-link:nth-child(2) { transition-delay: 0.19s; }
+.burger-menu.open .burger-menu-col-right .burger-link:nth-child(3) { transition-delay: 0.24s; }
 
 .burger-link:hover { color: var(--red); }
 .burger-menu-col-left  .burger-link:hover { transform: translateX(14px); }
@@ -496,22 +489,21 @@ body::after {
     color: rgba(10, 10, 10, 0.35);
     white-space: nowrap;
     text-align: center;
+    z-index: 1;
 }
 
 @media (max-width: 900px) {
-    .burger-menu-inner {
-        gap: clamp(20px, 3vw, 40px);
-    }
-    .burger-link {
-        font-size: clamp(1.5rem, 4.2vw, 2.8rem);
-    }
+    .burger-menu-inner { gap: clamp(20px, 3vw, 40px); }
+    .burger-link { font-size: clamp(1.6rem, 4.4vw, 2.8rem); }
 }
 
 @media (max-width: 640px) {
     .burger-menu {
-        padding: 5rem 5vw 3rem;
+        padding: 5rem 6vw 3rem;
         align-items: flex-start;
+        transition: opacity 0.18s ease;
     }
+    .burger-menu::before { display: none; }
     .burger-menu-inner {
         grid-template-columns: 1fr;
         gap: 0.4em;
@@ -526,33 +518,52 @@ body::after {
         width: 100%;
     }
     .burger-menu-col-right {
-        margin-top: 0.6em;
-        padding-top: 0.6em;
+        margin-top: 0.5em;
+        padding-top: 0.5em;
         border-top: 1px solid rgba(10, 10, 10, 0.15);
         width: 100%;
     }
     .burger-link {
         font-size: clamp(1.7rem, 7.4vw, 2.6rem);
-        line-height: 1.1;
+        line-height: 1.12;
+        transform: translate3d(0, 10px, 0);
+        transition:
+            color 0.18s ease,
+            transform 0.2s ease,
+            opacity 0.16s ease;
     }
+    .burger-menu.open .burger-link {
+        transform: translate3d(0, 0, 0);
+        transition:
+            color 0.2s ease,
+            transform 0.28s cubic-bezier(0.22, 1, 0.36, 1),
+            opacity 0.22s ease;
+    }
+    .burger-menu.open .burger-menu-col-left .burger-link:nth-child(1) { transition-delay: 0.02s; }
+    .burger-menu.open .burger-menu-col-left .burger-link:nth-child(2) { transition-delay: 0.05s; }
+    .burger-menu.open .burger-menu-col-left .burger-link:nth-child(3) { transition-delay: 0.08s; }
+    .burger-menu.open .burger-menu-col-left .burger-link:nth-child(4) { transition-delay: 0.11s; }
+    .burger-menu.open .burger-menu-col-left .burger-link:nth-child(5) { transition-delay: 0.14s; }
+    .burger-menu.open .burger-menu-col-right .burger-link:nth-child(1) { transition-delay: 0.06s; }
+    .burger-menu.open .burger-menu-col-right .burger-link:nth-child(2) { transition-delay: 0.09s; }
+    .burger-menu.open .burger-menu-col-right .burger-link:nth-child(3) { transition-delay: 0.12s; }
+
     .burger-menu-col-left  .burger-link:hover,
-    .burger-menu-col-right .burger-link:hover {
-        transform: translateX(10px);
-    }
+    .burger-menu-col-right .burger-link:hover { transform: translate3d(0, 0, 0); }
+
     .burger-menu-col-right .burger-link.active::after {
         content: '→';
         right: auto;
         left: -0.9em;
     }
-    .burger-menu-col-right .burger-link.active::before {
-        content: none;
-    }
+    .burger-menu-col-right .burger-link.active::before { content: none; }
+
     .burger-menu-foot {
         bottom: 1.4rem;
         font-size: 0.55rem;
         letter-spacing: 0.16em;
-        left: 5vw;
-        right: 5vw;
+        left: 6vw;
+        right: 6vw;
         transform: none;
         text-align: left;
         white-space: normal;
@@ -560,13 +571,11 @@ body::after {
 }
 
 @media (max-width: 420px) {
-    .burger-link { font-size: clamp(1.5rem, 6.8vw, 2.1rem); }
+    .burger-link { font-size: clamp(1.5rem, 7vw, 2.1rem); }
     .burger-menu-inner { gap: 0.35em; }
 }
 
-/* ============================================================
-   СОВЕТСКАЯ ЭВМ
-   ============================================================ */
+/* СОВЕТСКАЯ ЭВМ */
 .evm-overlay {
     position: fixed;
     inset: 0;
@@ -714,7 +723,6 @@ body::after {
     letter-spacing: 0;
 }
 
-/* Строка ввода */
 .term-input-line {
     display: flex;
     align-items: baseline;
@@ -812,18 +820,19 @@ body::after {
     }
 }
 
-/* ============================================================
-   CRT-ПЕРЕХОД
-   ============================================================ */
-.crt-overlay {
-    position: fixed;
-    inset: 0;
-    background: #C7E0C7;
-    z-index: 99999;
-    transform: scaleY(0);
-    transform-origin: center center;
-    pointer-events: none;
-    box-shadow: 0 0 60px #C7E0C7, 0 0 120px rgba(199, 224, 199, 0.6);
+/* BARBA */
+[data-barba="container"] {
+    opacity: 0;
+    will-change: transform, opacity;
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+}
+
+[data-barba="wrapper"] {
+    position: relative;
+    overflow: hidden;
+    width: 100%;
+    min-height: 100vh;
 }
 </style>
 </head>
@@ -850,43 +859,19 @@ body::after {
 <div class="burger-menu" id="burgerMenu">
     <div class="burger-menu-inner">
         <div class="burger-menu-col burger-menu-col-left">
-            <a href="index.html" class="burger-link active">ТИТУЛ</a>
-            <a href="module01.html" class="burger-link">УЧИ СЛОГИ</a>
-            <a href="module02.html" class="burger-link">ИЗУЧАЙ ЧАСЫ</a>
-            <a href="module03.html" class="burger-link">ЗНАКОМЬСЯ С ВЕЛИКИМИ</a>
-            <a href="module05.html" class="burger-link">МУЛЬТЫ</a>
+            <a href="index.html"    class="burger-link active" data-ns="home">ТИТУЛ.</a>
+            <a href="reading.html"  class="burger-link" data-ns="reading">УЧИ СЛОГИ,</a>
+            <a href="tools.html"    class="burger-link" data-ns="tools">УЧИСЬ ЧАСАМ,</a>
+            <a href="heroes.html"   class="burger-link" data-ns="heroes">БЕРИ ПРИМЕР С ВЕЛИКИХ</a>
+            <a href="cinema.html"   class="burger-link" data-ns="cinema">МУЛЬТЫ</a>
         </div>
         <div class="burger-menu-col burger-menu-col-right">
-            <a href="module04.html" class="burger-link">ЖИВОПИСЬ</a>
-            <a href="module06.html" class="burger-link">ПОЭЗИЯ</a>
-            <a href="module00.html" class="burger-link">ПЕДАГОГИКА</a>
+            <a href="art.html"      class="burger-link" data-ns="art">ЖИВОПИСЬ,</a>
+            <a href="poetry.html"   class="burger-link" data-ns="poetry">ПОЭЗИЯ,</a>
+            <a href="articles.html" class="burger-link" data-ns="articles">ПЕДАГОГИКА.</a>
         </div>
     </div>
     <div class="burger-menu-foot">ГРАМОТИНЬО · ТЕРМИНАЛ КУЛЬТУРЫ · 2026</div>
-</div>
-
-<div class="wrapper" id="mainContent">
-    <section class="hero">
-        <div class="hero-meta">
-            <span>Россия, Москва · 2026</span>
-        </div>
-
-        <h1 class="hero-title">
-            <div class="word"><span class="word-inner line-1">ГРАМОТИНЬО<span class="dot-deform" id="deformDot">.</span></span></div><br>
-            <div class="word"><span class="word-inner line-2 terminal-word" id="terminalWord">ТЕРМИНАЛ</span></div>
-            <div class="word"><span class="word-inner line-2">КУЛЬТУРЫ</span></div>
-        </h1>
-
-        <div class="accent-line" id="accentLine"></div>
-
-        <div class="hero-sub">
-            <span>Язык</span>
-            <span>Мышление</span>
-            <span>Познание</span>
-            <span>История</span>
-            <span>Искусство</span>
-        </div>
-    </section>
 </div>
 
 <div class="evm-overlay" id="evmOverlay">
@@ -905,21 +890,51 @@ body::after {
     </div>
 </div>
 
+<div data-barba="wrapper">
+    <div class="wrapper" id="mainContent"
+         data-barba="container"
+         data-barba-namespace="home">
+        <section class="hero">
+            <div class="hero-meta">
+                <span>Россия, Москва · 2026</span>
+            </div>
+
+            <h1 class="hero-title">
+                <div class="word"><span class="word-inner line-1">ГРАМОТИНЬО.</span></div><br>
+                <div class="word"><span class="word-inner line-2 terminal-word" id="terminalWord">ТЕРМИНАЛ</span></div>
+                <div class="word"><span class="word-inner line-2">КУЛЬТУРЫ</span></div>
+            </h1>
+
+            <div class="accent-line" id="accentLine"></div>
+
+            <div class="hero-sub">
+                <span>Язык</span>
+                <span>Мышление</span>
+                <span>Познание</span>
+                <span>История</span>
+                <span>Искусство</span>
+            </div>
+        </section>
+    </div>
+</div>
+
 <script>
 /* ============================================================
    УТИЛИТЫ
    ============================================================ */
 const sleep = (ms) => new Promise(r => setTimeout(r, ms));
 
-const evmOverlay = document.getElementById('evmOverlay');
-const evmBody    = document.getElementById('evmBody');
-const termWord   = document.getElementById('terminalWord');
-const evmClock   = document.getElementById('evmClock');
-const evmDate    = document.getElementById('evmDate');
-const burgerBtn  = document.getElementById('burgerBtn');
-const burgerMenu = document.getElementById('burgerMenu');
+const IS_MOBILE  = window.matchMedia('(max-width: 768px)').matches;
+const SPEED_MULT = IS_MOBILE ? 0.65 : 1;
 
-let terminalOpened = false;
+const evmOverlay   = document.getElementById('evmOverlay');
+const evmBody      = document.getElementById('evmBody');
+const evmClock     = document.getElementById('evmClock');
+const evmDate      = document.getElementById('evmDate');
+const burgerBtn    = document.getElementById('burgerBtn');
+const burgerMenu   = document.getElementById('burgerMenu');
+
+let terminalOpened  = false;
 let terminalStarted = false;
 
 function updateClock() {
@@ -943,6 +958,7 @@ function formatRuDate(d) {
 
 async function typeLine(text, opts = {}) {
     const { speed = 18, cls = '' } = opts;
+    const realSpeed = Math.max(1, Math.round(speed * SPEED_MULT));
     const line = document.createElement('div');
     line.className = 'term-line ' + cls;
     evmBody.appendChild(line);
@@ -951,7 +967,7 @@ async function typeLine(text, opts = {}) {
     for (let i = 0; i < chars.length; i++) {
         line.textContent += chars[i];
         scrollTerm();
-        await sleep(speed);
+        await sleep(realSpeed);
     }
     scrollTerm();
     return line;
@@ -966,9 +982,7 @@ function printLine(text, cls = '') {
     return line;
 }
 
-/* ============================================================
-   ASCII-АРТ
-   ============================================================ */
+/* ASCII-АРТ */
 const ASCII_ART = [
     '█████ ████   ███  █   █  ███  █████ █   █ █   █ █      ███ ',
     '█     █   █ █   █ ██ ██ █   █   █   ██  █ █   █ █     █   █',
@@ -977,17 +991,15 @@ const ASCII_ART = [
     '█     █   █ █   █ █   █  ███    █   █   █ █   █ ████   ███ '
 ];
 
-/* ============================================================
-   МАРШРУТЫ И КОМАНДЫ
-   ============================================================ */
+/* МАРШРУТЫ И КОМАНДЫ */
 const ROUTES = {
-    'слоги':      'module01.html',
-    'часы':       'module02.html',
-    'личности':   'module03.html',
-    'картины':    'module04.html',
-    'мульты':     'module05.html',
-    'стихи':      'module06.html',
-    'воспитание': 'module00.html'
+    'слоги':      'reading.html',
+    'часы':       'tools.html',
+    'личности':   'heroes.html',
+    'картины':    'art.html',
+    'мульты':     'cinema.html',
+    'стихи':      'poetry.html',
+    'воспитание': 'articles.html'
 };
 
 const COMMANDS_LIST = [
@@ -1001,37 +1013,58 @@ const COMMANDS_LIST = [
     ['ВЫХОД',      'ЗАВЕРШИТЬ РАБОТУ']
 ];
 
-/* ============================================================
-   БУРГЕР-МЕНЮ
-   ============================================================ */
+/* БУРГЕР-МЕНЮ */
+function openMenu() {
+    burgerMenu.classList.add('open');
+    burgerBtn.classList.add('open');
+    document.body.style.overflow = 'hidden';
+    document.body.classList.add('menu-open');
+}
+
+function closeMenu() {
+    burgerMenu.classList.remove('open');
+    burgerBtn.classList.remove('open');
+    document.body.style.overflow = '';
+    document.body.classList.remove('menu-open');
+}
+
 burgerBtn.addEventListener('click', () => {
-    const isOpen = burgerMenu.classList.toggle('open');
-    burgerBtn.classList.toggle('open', isOpen);
-    document.body.style.overflow = isOpen ? 'hidden' : '';
+    if (burgerMenu.classList.contains('open')) closeMenu();
+    else openMenu();
 });
 
-/* ============================================================
-   ОТКРЫТИЕ / ЗАКРЫТИЕ ТЕРМИНАЛА
-   ============================================================ */
-termWord.addEventListener('click', () => {
+document.querySelectorAll('.burger-link').forEach(link => {
+    link.addEventListener('click', () => closeMenu());
+});
+
+function updateActiveLink(namespace) {
+    document.querySelectorAll('.burger-link').forEach(a => a.classList.remove('active'));
+    const cur = document.querySelector(`.burger-link[data-ns="${namespace}"]`);
+    if (cur) cur.classList.add('active');
+}
+
+/* ОТКРЫТИЕ / ЗАКРЫТИЕ ТЕРМИНАЛА */
+document.addEventListener('click', (e) => {
+    if (e.target.closest('#terminalWord')) openTerminal();
+});
+
+function openTerminal() {
     if (terminalOpened) return;
     terminalOpened = true;
-
     evmOverlay.style.display = 'block';
     document.body.style.overflow = 'hidden';
-
     startTerminal();
-});
+}
 
 function closeTerminal() {
     evmOverlay.style.display = 'none';
     document.body.style.overflow = '';
-    terminalOpened = false;
+    terminalOpened  = false;
+    terminalStarted = false;
+    if (evmBody) evmBody.innerHTML = '';
 }
 
-/* ============================================================
-   СЦЕНАРИЙ ПЕЧАТИ
-   ============================================================ */
+/* СЦЕНАРИЙ ПЕЧАТИ */
 async function startTerminal() {
     if (terminalStarted) return;
     terminalStarted = true;
@@ -1081,9 +1114,7 @@ async function startTerminal() {
     createInputLine();
 }
 
-/* ============================================================
-   СТРОКА ВВОДА С ТОЛСТЫМ КУРСОРОМ
-   ============================================================ */
+/* СТРОКА ВВОДА */
 function createInputLine() {
     const line = document.createElement('div');
     line.className = 'term-line term-input-line';
@@ -1127,7 +1158,6 @@ function createInputLine() {
     }, 50);
 }
 
-/* Enter */
 async function handleInputKey(e, mirror) {
     if (e.key !== 'Enter') return;
     const input = e.target;
@@ -1147,15 +1177,12 @@ async function handleInputKey(e, mirror) {
     await processCommand(value);
 }
 
-/* ============================================================
-   ОБРАБОТКА КОМАНД
-   ============================================================ */
+/* ОБРАБОТКА КОМАНД */
 async function processCommand(raw) {
     const cmd = raw.toLowerCase().replace(/\s+/g, ' ').trim();
 
     if (!cmd) { createInputLine(); return; }
 
-    /* ВЫХОД */
     if (cmd === 'выход' || cmd === 'exit' || cmd === 'quit') {
         await typeLine('ЗАВЕРШЕНИЕ РАБОТЫ...', { speed: 12 });
         await sleep(300);
@@ -1165,7 +1192,6 @@ async function processCommand(raw) {
         return;
     }
 
-    /* СПРАВКА */
     if (cmd === 'справка' || cmd === 'help' || cmd === '?' || cmd === 'помощь') {
         await sleep(120);
         await typeLine('СПИСОК ДОСТУПНЫХ КОМАНД:', { speed: 10 });
@@ -1201,8 +1227,8 @@ async function processCommand(raw) {
                     const inp = document.getElementById('termInput');
                     if (inp) {
                         inp.value = 'выход';
-                        const mirror = document.getElementById('termMirror');
-                        if (mirror) mirror.textContent = 'выход';
+                        const m = document.getElementById('termMirror');
+                        if (m) m.textContent = 'выход';
                         inp.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', bubbles: true }));
                     } else {
                         processCommand('выход');
@@ -1217,14 +1243,12 @@ async function processCommand(raw) {
         return;
     }
 
-    /* ОЧИСТКА */
     if (cmd === 'очистить' || cmd === 'clear' || cmd === 'cls') {
         evmBody.innerHTML = '';
         createInputLine();
         return;
     }
 
-    /* ПЕРЕХОД */
     if (ROUTES[cmd]) {
         await typeLine(`ЗАПУСК МОДУЛЯ «${cmd.toUpperCase()}»...`, { speed: 12 });
         await sleep(320);
@@ -1232,7 +1256,6 @@ async function processCommand(raw) {
         return;
     }
 
-    /* НЕИЗВЕСТНАЯ */
     await sleep(90);
     await typeLine(`НЕИЗВЕСТНАЯ КОМАНДА: ${raw}`, { speed: 12 });
     await sleep(80);
@@ -1240,42 +1263,14 @@ async function processCommand(raw) {
     createInputLine();
 }
 
-/* ============================================================
-   CRT-ПЕРЕХОД
-   ============================================================ */
+/* НАВИГАЦИЯ */
 function navigateWithEffect(href) {
-    const inp = document.getElementById('termInput');
-    if (inp) inp.disabled = true;
-
-    const overlay = document.createElement('div');
-    overlay.className = 'crt-overlay';
-    document.body.appendChild(overlay);
-
-    const rect = evmOverlay.getBoundingClientRect();
-    const ox = rect.left + rect.width / 2;
-    const oy = rect.top + rect.height / 2;
-
-    gsap.set(overlay, { transformOrigin: `${ox}px ${oy}px` });
-
-    const tl = gsap.timeline({
-        onComplete: () => { window.location.href = href; }
-    });
-
-    tl.to(evmOverlay, {
-            scaleY: 0.04,
-            filter: 'brightness(2.2)',
-            duration: 0.35,
-            ease: 'power4.in'
-        })
-        .to(overlay, {
-            scaleY: 1, duration: 0.55, ease: 'power4.inOut'
-        }, '-=0.1')
-        .to(evmOverlay, {
-            opacity: 0, duration: 0.2
-        }, '-=0.35')
-        .to(overlay, {
-            backgroundColor: '#FFFFFF', duration: 0.18, ease: 'power2.out'
-        });
+    closeTerminal();
+    if (window.barba) {
+        barba.go(href);
+    } else {
+        window.location.href = href;
+    }
 }
 
 evmBody.addEventListener('click', (e) => {
@@ -1290,111 +1285,40 @@ document.addEventListener('keydown', (e) => {
     }
 });
 
-/* ============================================================
-   ДЕФОРМАЦИЯ ТОЧКИ В "ГРАМОТИНЬО." — ТОЛЬКО ДЕСКТОП
-   ============================================================ */
-(function () {
-    const dot = document.getElementById('deformDot');
-    if (!dot) return;
-
-    const MQ_COARSE = window.matchMedia('(pointer: coarse)');
-    const MQ_NARROW = window.matchMedia('(max-width: 900px)');
-    function isDesktop() { return !MQ_COARSE.matches && !MQ_NARROW.matches; }
-
-    let rafId = null;
-    let mouseX = 0;
-    let mouseY = 0;
-
-    function update() {
-        rafId = null;
-        if (!isDesktop()) {
-            dot.style.transform = '';
-            return;
-        }
-
-        const rect = dot.getBoundingClientRect();
-        const cx = rect.left + rect.width / 2;
-        const cy = rect.top + rect.height / 2;
-
-        const dx = mouseX - cx;
-        const dy = mouseY - cy;
-        const dist = Math.hypot(dx, dy);
-
-        const RANGE = 320;
-        if (dist > RANGE) {
-            dot.style.transform = '';
-            return;
-        }
-
-        const t = 1 - dist / RANGE;
-        const MAX = 6;
-        const ratio = Math.min(1, dist / 220);
-        const offsetX = (dx / (dist || 1)) * MAX * t * ratio;
-        const offsetY = (dy / (dist || 1)) * MAX * t * ratio;
-
-        const skewX = (offsetX / MAX) * 4;
-        const skewY = (offsetY / MAX) * 4;
-
-        const scaleX = 1 + Math.abs(offsetX) / (MAX * 6);
-        const scaleY = 1 + Math.abs(offsetY) / (MAX * 6);
-
-        dot.style.transform =
-            `translate(${offsetX.toFixed(2)}px, ${offsetY.toFixed(2)}px) ` +
-            `skew(${skewX.toFixed(2)}deg, ${skewY.toFixed(2)}deg) ` +
-            `scale(${scaleX.toFixed(3)}, ${scaleY.toFixed(3)})`;
-    }
-
-    function schedule() {
-        if (rafId !== null) return;
-        rafId = requestAnimationFrame(update);
-    }
-
-    document.addEventListener('mousemove', (e) => {
-        mouseX = e.clientX;
-        mouseY = e.clientY;
-        schedule();
-    }, { passive: true });
-
-    window.addEventListener('resize', schedule, { passive: true });
-    window.addEventListener('scroll', schedule, { passive: true });
-
-    document.addEventListener('mouseleave', () => {
-        dot.style.transform = '';
-    });
-})();
-
-/* ============================================================
-   СТАРТОВАЯ АНИМАЦИЯ + КИБЕР-МЕРЦАНИЕ
-   ============================================================ */
-document.addEventListener('DOMContentLoaded', () => {
+/* СТАРТОВАЯ АНИМАЦИЯ ГЛАВНОЙ + КИБЕР-МЕРЦАНИЕ */
+function animateHomeEntry(useLoader) {
     const tl = gsap.timeline({ defaults: { ease: 'power4.out' } });
+    const container = document.querySelector('[data-barba="container"]');
 
-    tl.to('.shutter', {
-            duration: 0.8,
-            scaleY: 0,
-            stagger: { amount: 0.3, from: 'center' },
-            ease: 'expo.inOut'
-        })
-        .set('#mainContent', { opacity: 1 })
-        .to('.word-inner', {
-            y: '0%',
-            duration: 1.1,
-            stagger: 0.08,
-            ease: 'elastic.out(1, 0.6)'
-        }, '-=0.4')
-        .to('.hero-meta', {
-            opacity: 1, y: 0, duration: 0.6, ease: 'power2.out'
-        }, '-=0.8')
-        .to('#accentLine', {
-            width: '120px', duration: 0.8, ease: 'power3.inOut'
-        }, '-=0.4')
-        .to('.hero-sub', {
-            opacity: 1, x: 0, duration: 0.8, ease: 'power3.out'
-        }, '-=0.6')
-        .to('.burger-btn', {
-            opacity: 1, duration: 0.6, ease: 'power2.out'
-        }, '-=0.5')
-        .to('#loader', {
+    if (useLoader) {
+        tl.to('.shutter', {
+                duration: 0.8,
+                scaleY: 0,
+                stagger: { amount: 0.3, from: 'center' },
+                ease: 'expo.inOut'
+            })
+            .set(container, { opacity: 1 });
+    } else {
+        tl.set(container, { opacity: 1 });
+    }
+
+    tl.fromTo('.word-inner',
+            { y: '110%' },
+            { y: '0%', duration: 1.1, stagger: 0.08, ease: 'elastic.out(1, 0.6)' },
+            useLoader ? '-=0.4' : 0)
+        .fromTo('.hero-meta',
+            { opacity: 0, y: 10 },
+            { opacity: 1, y: 0, duration: 0.6, ease: 'power2.out' }, '-=0.8')
+        .fromTo('#accentLine',
+            { width: 0 },
+            { width: '120px', duration: 0.8, ease: 'power3.inOut' }, '-=0.4')
+        .fromTo('.hero-sub',
+            { opacity: 0, x: -10 },
+            { opacity: 1, x: 0, duration: 0.8, ease: 'power3.out' }, '-=0.6')
+        .to('.burger-btn', { opacity: 1, duration: 0.6, ease: 'power2.out' }, '-=0.5');
+
+    if (useLoader) {
+        tl.to('#loader', {
             opacity: 0,
             duration: 0.3,
             onComplete: () => {
@@ -1402,14 +1326,75 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (loader) loader.style.display = 'none';
 
                 setTimeout(() => {
-                    termWord.classList.add('cyber-flicker');
-                    setTimeout(() => {
-                        termWord.classList.remove('cyber-flicker');
-                    }, 1700);
+                    const tw = document.getElementById('terminalWord');
+                    if (!tw) return;
+                    tw.classList.add('cyber-flicker');
+                    setTimeout(() => tw.classList.remove('cyber-flicker'), 1700);
                 }, 500);
             }
         });
+    }
+
+    return tl;
+}
+
+/* BARBA INIT — СЛАЙД СПРАВА */
+let appBooted = false;
+
+document.addEventListener('DOMContentLoaded', () => {
+    appBooted = true;
+    animateHomeEntry(true);
 });
+
+if (window.barba) {
+    barba.init({
+        debug: false,
+        timeout: 8000,
+        preventRunning: true,
+        transitions: [{
+            name: 'slide',
+            leave(data) {
+                document.body.classList.add('is-transitioning');
+                return gsap.to(data.current.container, {
+                    x: '-100vw',
+                    duration: 0.6,
+                    ease: 'power2.inOut'
+                });
+            },
+            enter(data) {
+                gsap.set(data.next.container, { opacity: 1 });
+                return gsap.fromTo(data.next.container,
+                    { x: '100vw' },
+                    {
+                        x: 0,
+                        duration: 0.6,
+                        ease: 'power2.inOut',
+                        onComplete: () => {
+                            document.body.classList.remove('is-transitioning');
+                        }
+                    }
+                );
+            }
+        }],
+        views: [{
+            namespace: 'home',
+            afterEnter() {
+                if (!appBooted) return;
+                gsap.set('[data-barba="container"]', { opacity: 1, clearProps: 'transform' });
+            }
+        }]
+    });
+
+    barba.hooks.beforeEnter(() => {
+        gsap.set('.burger-btn', { opacity: 1 });
+    });
+
+    barba.hooks.after((data) => {
+        const ns = data && data.current && data.current.namespace;
+        if (ns) updateActiveLink(ns);
+        document.body.classList.remove('is-transitioning');
+    });
+}
 </script>
 </body>
 </html>
