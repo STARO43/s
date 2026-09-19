@@ -56,7 +56,7 @@ body::before {
 body.menu-open::before { display: none; }
 
 /* ============================================================
-   МОБИЛЬНЫЕ: ОТКЛЮЧАЕМ ФОН И ВСЕ АНИМАЦИИ, КРОМЕ СТАРТОВОЙ И МЕНЮ
+   МОБИЛЬНЫЕ: облегчённый фон и лёгкие анимации
    ============================================================ */
 @media (max-width: 768px) {
     body {
@@ -66,19 +66,15 @@ body.menu-open::before { display: none; }
     body::before,
     body::after { display: none; }
 
-    /* Отключаем ВСЕ transition, кроме тех, что нужны для появления страницы и бургера */
+    /* Оставляем анимированными только: шторки (старт), бургер-кружок, меню, лёгкий fade у контента */
     *,
     *::before,
     *::after {
         transition: none !important;
     }
-
-    /* СТАРТОВАЯ АНИМАЦИЯ — оставляем шторки живыми */
     .shutter {
         transition: transform 0.8s cubic-bezier(0.85, 0, 0.15, 1) !important;
     }
-
-    /* КРУЖОЧОК МЕНЮ — бургер и ring остаются анимированными */
     .burger-btn,
     .burger-btn .ring,
     .burger-btn .ring::before,
@@ -98,8 +94,6 @@ body.menu-open::before { display: none; }
     .burger-btn .burger-icon span {
         transition: all 0.45s cubic-bezier(0.34, 1.56, 0.64, 1) !important;
     }
-
-    /* МЕНЮ: появление ссылок — быстро, без стаггера */
     .burger-menu {
         transition: opacity 0.2s ease !important;
     }
@@ -112,36 +106,53 @@ body.menu-open::before { display: none; }
         transform: none !important;
         opacity: 1;
     }
-    /* Отключаем все стаггер-задержки */
     .burger-menu.open .burger-menu-col-left .burger-link:nth-child(n),
     .burger-menu.open .burger-menu-col-right .burger-link:nth-child(n) {
         transition-delay: 0s !important;
     }
-
-    /* Убираем все hover-эффекты (карточки, ссылки, кнопки) */
     .burger-link:hover,
     .burger-menu-col-left .burger-link:hover,
     .burger-menu-col-right .burger-link:hover { transform: none !important; }
 
-    .hero-item,
-    .hero-item:hover,
-    .hero-photo img,
-    .hero-item:hover .hero-photo img,
+    /* Карточки героев на мобиле: без transform, только лёгкий fade при появлении */
+    .hero-item {
+        transition: none !important;
+        opacity: 0;
+    }
+    .hero-item.is-visible {
+        opacity: 1;
+        transition: opacity 0.35s ease !important;
+    }
+    .hero-item:hover { transform: none !important; box-shadow: none !important; }
+    .hero-photo img { transition: none !important; }
+
     .century-header,
+    .century-header::before,
+    .century-header::after,
     .soviet-band,
+    .soviet-band::before,
+    .soviet-band::after {
+        opacity: 0;
+    }
+    .century-header.is-visible,
+    .soviet-band.is-visible {
+        opacity: 1;
+        transition: opacity 0.4s ease !important;
+    }
+
     .page-logo .l1,
-    .page-logo .l2 { transition: none !important; transform: none !important; }
+    .page-logo .l2 { opacity: 0; }
+    .page-logo.is-visible .l1,
+    .page-logo.is-visible .l2 {
+        opacity: 1;
+        transition: opacity 0.5s ease !important;
+    }
 
-    .hero-item:hover { box-shadow: none !important; }
-    .hero-photo img { filter: grayscale(1) contrast(1.15) !important; }
-
-    /* Модальное окно героя — без анимаций появления изображений */
     .hero-modal,
     .hero-modal-portrait,
     .hero-nav,
     .hero-modal-close,
     .hero-modal-repeat { transition: none !important; }
-
     .hero-nav:hover { background: var(--bg) !important; color: var(--text) !important; }
     .hero-modal-close:hover,
     .hero-modal-repeat:hover { color: var(--text) !important; transform: none !important; }
@@ -455,7 +466,9 @@ body.menu-open::before { display: none; }
     .burger-menu-inner { gap: 0.35em; }
 }
 
-/* ТАЙМЛАЙН ВЕЛИКИХ */
+/* ============================================================
+   ТАЙМЛАЙН ВЕЛИКИХ — обновлённый дизайн
+   ============================================================ */
 .heroes-timeline {
     position: relative;
     z-index: 10;
@@ -464,94 +477,168 @@ body.menu-open::before { display: none; }
     padding: 3rem 5vw 6rem;
 }
 
+/* ЗАГОЛОВОК ВЕКА — новая версия: линия сверху, крупный заголовок, счётчик справа */
 .century-header {
-    background: var(--text);
-    color: var(--bg);
-    padding: 20px 26px;
-    margin: 0 0 32px;
-    text-align: center;
     position: relative;
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 20px;
+    padding: 28px 0 18px;
+    margin: 0 0 28px;
+    border-top: 2px solid var(--text);
+    background: none;
+    color: var(--text);
 }
 .century-header:not(:first-child) {
     margin-top: 72px;
 }
+.century-header::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    bottom: -1px;
+    width: 64px;
+    height: 4px;
+    background: var(--red);
+}
 .century-title {
     font-family: var(--font-display);
-    font-size: clamp(1.6rem, 4.6vw, 2.4rem);
-    font-weight: 600;
-    letter-spacing: 0.1em;
+    font-size: clamp(1.8rem, 5.2vw, 3rem);
+    font-weight: 700;
+    letter-spacing: 0.06em;
     text-transform: uppercase;
+    color: var(--text);
+    line-height: 1;
 }
-
-.soviet-band {
-    background: var(--red);
-    color: #FFFFFF;
-    padding: 16px 26px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 22px;
-    font-family: var(--font-display);
-    font-size: clamp(1rem, 2.6vw, 1.25rem);
-    font-weight: 600;
+.century-count {
+    font-family: var(--font-mono);
+    font-size: 0.68rem;
+    font-weight: 700;
     letter-spacing: 0.24em;
     text-transform: uppercase;
-    margin: 16px 0 32px;
+    color: rgba(10, 10, 10, 0.45);
+    white-space: nowrap;
+    margin-left: auto;
+    padding-left: 20px;
+}
+.century-count b {
+    color: var(--red);
+    font-weight: 700;
+    margin-left: 6px;
 }
 
+/* СОВЕТСКАЯ ПОЛОСА — тонкая, с точками */
+.soviet-band {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    padding: 16px 0;
+    margin: 20px 0 32px;
+    background: none;
+    color: var(--red);
+    font-family: var(--font-display);
+    font-size: clamp(0.95rem, 2.4vw, 1.15rem);
+    font-weight: 600;
+    letter-spacing: 0.32em;
+    text-transform: uppercase;
+    justify-content: center;
+    border-top: 1px solid rgba(217, 4, 41, 0.25);
+    border-bottom: 1px solid rgba(217, 4, 41, 0.25);
+}
+.soviet-band::before,
+.soviet-band::after {
+    content: '★';
+    color: var(--red);
+    font-size: 0.85em;
+    letter-spacing: 0;
+    opacity: 0.8;
+}
+
+/* СЕТКА */
 .heroes-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-    gap: 22px;
+    grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+    gap: 20px;
     margin-bottom: 26px;
 }
 
+/* КАРТОЧКА ГЕРОЯ — новая версия: тонкая рамка, линии-акценты, спокойные тени */
 .hero-item {
-    border: 2px solid var(--text);
-    background: var(--bg);
-    cursor: pointer;
+    position: relative;
     display: flex;
     flex-direction: column;
-    transition: transform 0.22s cubic-bezier(0.16, 1, 0.3, 1),
-                box-shadow 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+    background: var(--bg);
+    border: 1px solid rgba(10, 10, 10, 0.14);
+    border-radius: 2px;
+    cursor: pointer;
+    overflow: hidden;
+    transition:
+        transform 0.28s cubic-bezier(0.16, 1, 0.3, 1),
+        border-color 0.28s ease,
+        box-shadow 0.28s ease;
     -webkit-tap-highlight-color: transparent;
+    isolation: isolate;
+}
+/* Красная линия сверху, растёт при наведении */
+.hero-item::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 3px;
+    width: 0;
+    background: var(--red);
+    transition: width 0.45s cubic-bezier(0.16, 1, 0.3, 1);
+    z-index: 3;
 }
 .hero-item:hover {
-    transform: translate(-4px, -4px);
-    box-shadow: 6px 6px 0 var(--red);
+    transform: translateY(-4px);
+    border-color: rgba(10, 10, 10, 0.28);
+    box-shadow:
+        0 2px 6px rgba(0, 0, 0, 0.05),
+        0 14px 32px -10px rgba(0, 0, 0, 0.16);
+}
+.hero-item:hover::before {
+    width: 100%;
 }
 
+/* ФОТО */
 .hero-photo {
     position: relative;
     aspect-ratio: 1 / 1;
-    border-bottom: 2px solid var(--text);
+    background: linear-gradient(180deg, #E9E3D6 0%, #F4F1EA 100%);
     overflow: hidden;
-    background: var(--bg);
 }
 .hero-photo img {
     width: 100%;
     height: 100%;
     object-fit: cover;
     display: block;
-    filter: grayscale(1) contrast(1.15);
-    transition: filter 0.35s ease;
+    filter: contrast(1.05) saturate(0.92);
+    transition: filter 0.4s ease, transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
 }
 .hero-item:hover .hero-photo img {
-    filter: grayscale(0) contrast(1.15);
+    filter: contrast(1.08) saturate(1.05);
+    transform: scale(1.03);
 }
 
+/* ИНФО */
 .hero-info {
-    padding: 14px 14px 16px;
+    position: relative;
+    padding: 16px 16px 18px;
     display: flex;
     flex-direction: column;
-    gap: 6px;
+    gap: 8px;
+    background: var(--bg);
 }
 .hero-name {
     font-family: var(--font-display);
     font-size: 1.15rem;
     font-weight: 600;
-    line-height: 1.05;
-    letter-spacing: 0.03em;
+    line-height: 1.08;
+    letter-spacing: 0.02em;
     text-transform: uppercase;
     color: var(--text);
 }
@@ -559,31 +646,63 @@ body.menu-open::before { display: none; }
     font-family: var(--font-mono);
     font-size: 0.7rem;
     font-weight: 600;
-    letter-spacing: 0.05em;
-    color: rgba(10, 10, 10, 0.6);
+    letter-spacing: 0.06em;
+    color: rgba(10, 10, 10, 0.55);
     display: flex;
     align-items: baseline;
-    gap: 8px;
+    gap: 10px;
+    padding-top: 6px;
+    border-top: 1px solid rgba(10, 10, 10, 0.08);
+}
+.hero-years > span:first-child {
+    color: rgba(10, 10, 10, 0.75);
 }
 .hero-age {
     color: var(--red);
     font-weight: 700;
+    margin-left: auto;
+    letter-spacing: 0.04em;
+}
+.hero-age::before {
+    content: '· ';
+    color: rgba(10, 10, 10, 0.3);
+    font-weight: 400;
 }
 
+/* Мобильная адаптация карточек */
 @media (max-width: 640px) {
     .heroes-timeline { padding: 2rem 4vw 5rem; }
     .heroes-grid {
-        grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-        gap: 14px;
+        grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+        gap: 12px;
     }
-    .hero-name { font-size: 1rem; }
-    .hero-years { font-size: 0.64rem; }
-    .century-header { padding: 16px 18px; margin-bottom: 22px; }
-    .century-header:not(:first-child) { margin-top: 52px; }
-    .soviet-band { padding: 12px 18px; font-size: 0.92rem; letter-spacing: 0.18em; }
+    .hero-item { border-radius: 2px; }
+    .hero-item:hover { transform: none; }
+    .hero-item::before { display: none; }
+    .hero-name { font-size: 0.98rem; letter-spacing: 0.01em; }
+    .hero-info { padding: 12px 12px 14px; gap: 6px; }
+    .hero-years { font-size: 0.62rem; padding-top: 5px; gap: 8px; }
+
+    .century-header {
+        padding: 20px 0 14px;
+        margin-bottom: 20px;
+        flex-wrap: wrap;
+    }
+    .century-header:not(:first-child) { margin-top: 48px; }
+    .century-title { font-size: 1.5rem; }
+    .century-count { font-size: 0.6rem; padding-left: 12px; }
+    .century-header::after { width: 48px; height: 3px; }
+
+    .soviet-band {
+        padding: 12px 0;
+        font-size: 0.88rem;
+        letter-spacing: 0.22em;
+        margin: 16px 0 22px;
+        gap: 12px;
+    }
 }
 
-/* МОДАЛЬНОЕ ОКНО */
+/* МОДАЛЬНОЕ ОКНО (без изменений) */
 .hero-modal {
     position: fixed;
     inset: 0;
@@ -986,7 +1105,7 @@ body.menu-open::before { display: none; }
 </div>
 
 <header class="page-header">
-    <div class="page-logo">
+    <div class="page-logo" id="pageLogo">
         <span class="l1">ВЕЛИКИЕ.</span>
         <span class="l2">ЛИЧНОСТИ РОДИНЫ</span>
     </div>
@@ -1147,12 +1266,12 @@ function renderHeroesTimeline() {
         const heroes = heroesData.filter(c.filter).sort((a, b) => a.deathYear - b.deathYear);
         if (heroes.length === 0) return;
 
-        html += `<div class="century-header"><span class="century-title">${c.name}</span></div><div class="heroes-grid">`;
+        html += `<div class="century-header"><span class="century-title">${c.name}</span><span class="century-count">ГЕРОЕВ<b>${heroes.length}</b></span></div><div class="heroes-grid">`;
         let sovietBandInserted = false;
 
         heroes.forEach(hero => {
             if (!sovietBandInserted && hero.name === "Ленин") {
-                html += `</div><div class="soviet-band"><span>★</span> СОВЕТСКИЙ ПЕРИОД <span>★</span></div><div class="heroes-grid">`;
+                html += `</div><div class="soviet-band">СОВЕТСКИЙ ПЕРИОД</div><div class="heroes-grid">`;
                 sovietBandInserted = true;
             }
 
@@ -1165,7 +1284,7 @@ function renderHeroesTimeline() {
                 <div class="hero-photo"><img src="${imgPath}" alt="${hero.name}" loading="lazy" decoding="async"></div>
                 <div class="hero-info">
                     <div class="hero-name">${hero.name}</div>
-                    <div class="hero-years">${hero.birthYear}—${hero.deathYear} <span class="hero-age">${age}</span></div>
+                    <div class="hero-years"><span>${hero.birthYear}—${hero.deathYear}</span><span class="hero-age">${age}</span></div>
                 </div>
             </div>`;
         });
@@ -1279,14 +1398,16 @@ document.addEventListener('DOMContentLoaded', () => {
     const isMobile = window.matchMedia('(max-width: 768px)').matches;
     const tl = gsap.timeline({ defaults: { ease: 'power4.out' } });
 
+    /* Шторки — всегда */
     tl.to('.shutter', {
-            duration: 0.8,
-            scaleY: 0,
-            stagger: { amount: 0.3, from: 'center' },
-            ease: 'expo.inOut'
-        });
+        duration: 0.8,
+        scaleY: 0,
+        stagger: { amount: 0.3, from: 'center' },
+        ease: 'expo.inOut'
+    });
 
     if (!isMobile) {
+        /* Десктоп — полная анимация появления */
         tl.fromTo('.page-logo .l1',
                 { opacity: 0, y: 30, skewX: -6 },
                 { opacity: 1, y: 0, skewX: 0, duration: 0.9, ease: 'power3.out' },
@@ -1308,7 +1429,23 @@ document.addEventListener('DOMContentLoaded', () => {
                 { opacity: 1, y: 0, scale: 1, duration: 0.5, stagger: 0.02, ease: 'back.out(1.5)' },
                 '-=0.4');
     } else {
+        /* Мобила — только лёгкий fade (opacity) */
         tl.set('.burger-btn', { opacity: 1 });
+
+        /* Плавный fade-in логотипа */
+        tl.set('#pageLogo', { opacity: 0 }, '+=0.05')
+          .to('#pageLogo', { opacity: 1, duration: 0.5, ease: 'power2.out' })
+          .add(() => {
+              /* Плавное появление карточек и заголовков через лёгкий fade (opacity) */
+              const fadeEls = document.querySelectorAll('.century-header, .soviet-band, .hero-item');
+              fadeEls.forEach((el, i) => {
+                  el.style.transition = 'opacity 0.35s ease';
+                  el.style.opacity = '0';
+                  setTimeout(() => {
+                      el.style.opacity = '1';
+                  }, i * 12);
+              });
+          }, '-=0.3');
     }
 
     tl.to('#loader', {
