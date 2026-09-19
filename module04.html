@@ -62,9 +62,7 @@ body::before {
     }
 }
 
-/* ============================================================
-   LOADER — как на главной
-   ============================================================ */
+/* LOADER */
 .loader-overlay {
     position: fixed;
     inset: 0;
@@ -90,8 +88,6 @@ body::before {
     inset: 0;
     z-index: 9000;
     background: var(--bg);
-    display: flex;
-    flex-direction: column;
     overflow: hidden;
     opacity: 0;
     visibility: hidden;
@@ -103,15 +99,17 @@ body::before {
     transition: opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1), visibility 0s linear 0s;
 }
 
+/* Мягкая виньетка только по самым краям */
 .art-section::before {
     content: '';
     position: absolute;
     inset: 0;
-    background: radial-gradient(ellipse 110% 100% at center, transparent 75%, rgba(0, 0, 0, 0.06) 100%);
+    background: radial-gradient(ellipse 120% 110% at center, transparent 82%, rgba(0, 0, 0, 0.06) 100%);
     pointer-events: none;
     z-index: 1;
 }
 
+/* Картина — во весь экран, никаких паддингов */
 .art-canvas {
     position: absolute;
     inset: 0;
@@ -122,13 +120,11 @@ body::before {
     z-index: 2;
 }
 
-/* ============================================================
-   ПРОГРЕСС-ПОЛОСА СВЕРХУ
-   ============================================================ */
+/* Прогресс-полоса */
 .art-progress {
     position: absolute;
     top: 0; left: 0; right: 0;
-    height: 3px;
+    height: 2px;
     background: transparent;
     z-index: 15;
     pointer-events: none;
@@ -143,165 +139,7 @@ body::before {
 }
 
 /* ============================================================
-   ВЕРХНЯЯ ПАНЕЛЬ
-   ============================================================ */
-.art-top {
-    position: absolute;
-    top: 0; left: 0; right: 0;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: 14px;
-    padding: 20px 24px;
-    z-index: 20;
-    pointer-events: none;
-}
-.art-top > * { pointer-events: auto; }
-
-/* Счётчик — модный, с уголком-акцентом */
-.art-info {
-    position: relative;
-    font-family: var(--font-display);
-    font-size: 0.72rem;
-    font-weight: 700;
-    letter-spacing: 0.24em;
-    text-transform: uppercase;
-    color: var(--text);
-    padding: 10px 18px;
-    background: var(--bg);
-    border: 2px solid var(--text);
-    user-select: none;
-    font-variant-numeric: tabular-nums;
-    opacity: 0;
-    transform: translateY(-6px);
-    transition: opacity 0.5s ease 0.4s, transform 0.5s cubic-bezier(0.16, 1, 0.3, 1) 0.4s;
-}
-.art-info::before {
-    content: '';
-    position: absolute;
-    top: -6px;
-    left: -6px;
-    width: 12px;
-    height: 12px;
-    border-top: 2px solid var(--red);
-    border-left: 2px solid var(--red);
-}
-.art-section.show .art-info {
-    opacity: 1;
-    transform: translateY(0);
-}
-
-/* ============================================================
-   КНОПКИ — МОДНЫЕ, С РАМКОЙ И ПОДЪЁМОМ
-   ============================================================ */
-.art-close,
-.art-nav {
-    position: relative;
-    background: var(--bg);
-    border: 2px solid var(--text);
-    color: var(--text);
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 0;
-    font-family: var(--font-display);
-    line-height: 1;
-    transition:
-        transform 0.25s cubic-bezier(0.16, 1, 0.3, 1),
-        box-shadow 0.25s cubic-bezier(0.16, 1, 0.3, 1),
-        background 0.2s ease,
-        color 0.2s ease,
-        border-color 0.2s ease;
-    -webkit-tap-highlight-color: transparent;
-}
-
-.art-close:hover,
-.art-nav:hover:not([disabled]) {
-    background: var(--text);
-    color: var(--bg);
-    transform: translate(-3px, -3px);
-    box-shadow: 5px 5px 0 var(--red);
-}
-.art-close:active,
-.art-nav:active:not([disabled]) {
-    transform: translate(0, 0);
-    box-shadow: 2px 2px 0 var(--red);
-}
-
-/* Крестик */
-.art-close {
-    width: 52px;
-    height: 52px;
-    padding: 0 0 4px;
-    font-size: 1.6rem;
-    font-weight: 400;
-    opacity: 0;
-    transform: scale(0.6) rotate(-45deg);
-}
-.art-section.show .art-close {
-    opacity: 1;
-    transform: scale(1) rotate(0);
-    transition:
-        opacity 0.4s ease 0.25s,
-        transform 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.25s,
-        background 0.2s ease,
-        color 0.2s ease,
-        box-shadow 0.25s cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-/* Стрелки */
-.art-nav {
-    position: absolute;
-    top: 50%;
-    width: 64px;
-    height: 64px;
-    font-size: 1.9rem;
-    opacity: 0;
-    visibility: hidden;
-}
-.art-section.show .art-nav {
-    opacity: 1;
-    visibility: visible;
-    transition:
-        opacity 0.5s ease 0.45s,
-        visibility 0s linear 0s,
-        transform 0.25s cubic-bezier(0.16, 1, 0.3, 1),
-        box-shadow 0.25s cubic-bezier(0.16, 1, 0.3, 1),
-        background 0.2s ease,
-        color 0.2s ease;
-}
-.art-nav.prev {
-    left: 26px;
-    transform: translateY(-50%) translateX(-30px);
-}
-.art-section.show .art-nav.prev {
-    transform: translateY(-50%) translateX(0);
-}
-.art-nav.next {
-    right: 26px;
-    transform: translateY(-50%) translateX(30px);
-}
-.art-section.show .art-nav.next {
-    transform: translateY(-50%) translateX(0);
-}
-.art-nav.prev:hover:not([disabled]) {
-    transform: translateY(-50%) translate(-3px, -3px);
-}
-.art-nav.next:hover:not([disabled]) {
-    transform: translateY(-50%) translate(3px, -3px);
-}
-.art-nav[disabled] {
-    pointer-events: none;
-    opacity: 0.15;
-}
-
-@media (pointer: coarse) {
-    .art-nav { display: none; }
-}
-
-/* ============================================================
-   КАРТИНА — МАКСИМАЛЬНО БОЛЬШАЯ
+   КАРТИНА
    ============================================================ */
 .art-image-wrap {
     position: absolute;
@@ -309,9 +147,13 @@ body::before {
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 84px 12px 92px;
+    /* Правая часть резервируется под панель кнопок (56px), но не паддингом,
+       а через max-width самого изображения — так картинка не сплющится,
+       а просто получит чуть больше места слева. */
+    padding: 0 64px 0 0;
     will-change: opacity, transform;
 }
+
 .art-image-wrap.art-exit-up {
     opacity: 0;
     transform: translateY(-40px) scale(0.98);
@@ -345,12 +187,10 @@ body::before {
     user-select: none;
     -webkit-user-drag: none;
     -webkit-tap-highlight-color: transparent;
-    border-radius: 0;
     box-shadow:
-        0 4px 10px rgba(0, 0, 0, 0.08),
-        0 16px 40px rgba(0, 0, 0, 0.12),
-        0 50px 100px -24px rgba(0, 0, 0, 0.28),
-        0 90px 180px -50px rgba(0, 0, 0, 0.32);
+        0 6px 14px rgba(0, 0, 0, 0.08),
+        0 20px 50px rgba(0, 0, 0, 0.14),
+        0 60px 120px -30px rgba(0, 0, 0, 0.3);
 }
 
 .art-state {
@@ -382,103 +222,201 @@ body::before {
     touch-action: none;
 }
 
-@media (max-width: 900px) {
-    .art-image-wrap { padding: 78px 6px 88px; }
+/* ============================================================
+   ВЕРХНИЙ ЛЕВЫЙ СЧЁТЧИК
+   ============================================================ */
+.art-info {
+    position: absolute;
+    top: 20px;
+    left: 24px;
+    z-index: 20;
+    font-family: var(--font-display);
+    font-size: 0.7rem;
+    font-weight: 600;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: var(--text);
+    font-variant-numeric: tabular-nums;
+    padding: 6px 0;
+    opacity: 0;
+    transform: translateX(-10px);
+    transition: opacity 0.5s ease 0.35s, transform 0.5s cubic-bezier(0.16, 1, 0.3, 1) 0.35s;
+    pointer-events: none;
+    user-select: none;
 }
-@media (max-width: 640px) {
-    .art-image-wrap { padding: 72px 2px 84px; }
-    .art-top { padding: 14px 16px; }
-    .art-info { font-size: 0.6rem; padding: 7px 12px; letter-spacing: 0.16em; border-width: 1.5px; }
-    .art-info::before { width: 9px; height: 9px; top: -5px; left: -5px; border-width: 1.5px; }
-    .art-close { width: 44px; height: 44px; font-size: 1.35rem; border-width: 1.5px; }
+.art-info::before {
+    content: '◆ ';
+    color: var(--red);
+    font-size: 0.8em;
+    letter-spacing: 0;
+}
+.art-section.show .art-info {
+    opacity: 1;
+    transform: translateX(0);
 }
 
 /* ============================================================
-   ПЕРЕКЛЮЧАТЕЛЬ ПОРЯДКА — СНИЗУ ПО ЦЕНТРУ
+   ПРАВАЯ ПАНЕЛЬ: стрелки и переключатель
    ============================================================ */
-.art-controls-wrap {
+.art-side {
     position: absolute;
-    left: 50%;
-    bottom: 22px;
-    transform: translateX(-50%) translateY(16px);
+    top: 0;
+    right: 0;
+    bottom: 0;
+    width: 64px;
     z-index: 20;
-    opacity: 0;
-    pointer-events: none;
-    transition: opacity 0.5s ease 0.55s, transform 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.55s;
-}
-.art-section.show .art-controls-wrap {
-    opacity: 1;
-    transform: translateX(-50%) translateY(0);
-    pointer-events: auto;
-}
-
-.art-controls {
-    display: inline-flex;
+    display: flex;
+    flex-direction: column;
     align-items: center;
-    gap: 0;
-    padding: 4px;
-    border: 2px solid var(--text);
-    background: var(--bg);
-    position: relative;
+    justify-content: space-between;
+    padding: 20px 0;
+    pointer-events: none;
 }
+.art-side > * { pointer-events: auto; }
 
-.art-order-btn {
-    position: relative;
+/* Стрелки — просто большие символы без рамки */
+.art-nav {
+    width: 40px;
+    height: 40px;
     background: transparent;
     border: none;
     color: var(--text);
-    padding: 11px 26px;
     cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
     font-family: var(--font-display);
-    font-weight: 600;
-    font-size: 0.68rem;
-    letter-spacing: 0.24em;
-    text-transform: uppercase;
-    transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    font-size: 1.8rem;
+    font-weight: 300;
+    line-height: 1;
+    transition: color 0.2s ease, transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
     -webkit-tap-highlight-color: transparent;
-    white-space: nowrap;
+    opacity: 0;
+    visibility: hidden;
+}
+.art-section.show .art-nav {
+    opacity: 1;
+    visibility: visible;
+    transition: opacity 0.5s ease 0.45s, visibility 0s linear 0s, color 0.2s ease, transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.art-nav:hover:not([disabled]) {
+    color: var(--red);
+    transform: scale(1.25);
+}
+.art-nav[disabled] {
+    pointer-events: none;
+    opacity: 0.15;
+}
+
+/* Группа в середине — вертикальная */
+.art-side-center {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+}
+
+/* Крестик — минималистичный символ */
+.art-close {
+    width: 40px;
+    height: 40px;
+    background: transparent;
+    border: none;
+    color: var(--text);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    font-family: var(--font-display);
+    font-size: 1.6rem;
+    font-weight: 300;
+    line-height: 1;
+    transition: color 0.2s ease, transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    -webkit-tap-highlight-color: transparent;
+    opacity: 0;
+    transform: rotate(-45deg);
+}
+.art-section.show .art-close {
+    opacity: 1;
+    transform: rotate(0);
+    transition: opacity 0.5s ease 0.3s, transform 0.7s cubic-bezier(0.16, 1, 0.3, 1) 0.3s, color 0.2s ease;
+}
+.art-close:hover {
+    color: var(--red);
+    transform: rotate(90deg) scale(1.15);
+}
+
+/* Переключатель порядка — вертикальный столбик с двумя кнопками */
+.art-order {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    align-items: center;
+    opacity: 0;
+    transform: translateX(10px);
+    transition: opacity 0.5s ease 0.55s, transform 0.55s cubic-bezier(0.16, 1, 0.3, 1) 0.55s;
+}
+.art-section.show .art-order {
+    opacity: 1;
+    transform: translateX(0);
+}
+
+.art-order-btn {
+    width: 40px;
+    height: 40px;
+    background: transparent;
+    border: none;
+    color: var(--text);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    transition: color 0.2s ease, transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    -webkit-tap-highlight-color: transparent;
+}
+.art-order-btn svg {
+    width: 18px;
+    height: 18px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.6;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    display: block;
 }
 .art-order-btn:hover {
     color: var(--red);
+    transform: scale(1.2);
 }
 .art-order-btn.active {
-    background: var(--text);
-    color: var(--bg);
+    color: var(--red);
 }
-.art-order-btn.active:hover {
-    background: var(--red);
-    color: #FFFFFF;
-}
-
-/* Точка-индикатор у активной кнопки */
-.art-order-btn.active::before {
+.art-order-btn.active::after {
     content: '';
     position: absolute;
-    top: 50%;
-    left: 10px;
-    width: 5px;
-    height: 5px;
+    width: 4px;
+    height: 4px;
     border-radius: 50%;
     background: var(--red);
-    transform: translateY(-50%);
-    animation: orderPulse 2s ease-in-out infinite;
-}
-.art-order-btn.active:hover::before {
-    background: #FFFFFF;
-}
-@keyframes orderPulse {
-    0%, 100% { opacity: 1; transform: translateY(-50%) scale(1); }
-    50%      { opacity: 0.4; transform: translateY(-50%) scale(0.7); }
+    margin-top: 34px;
 }
 
-@media (max-width: 640px) {
-    .art-controls-wrap { bottom: 14px; }
-    .art-order-btn {
-        padding: 9px 16px;
-        font-size: 0.6rem;
-        letter-spacing: 0.16em;
-    }
-    .art-order-btn.active::before { left: 6px; width: 4px; height: 4px; }
+/* Мобильные: панель снизу, но узкая — не отнимает высоту картины */
+@media (max-width: 768px) {
+    .art-image-wrap { padding: 0 52px 0 0; }
+    .art-side { width: 52px; padding: 14px 0; }
+    .art-nav, .art-close { width: 36px; height: 36px; font-size: 1.5rem; }
+    .art-order-btn { width: 36px; height: 36px; }
+    .art-order-btn svg { width: 16px; height: 16px; }
+    .art-info { top: 14px; left: 14px; font-size: 0.6rem; letter-spacing: 0.22em; }
+}
+
+/* На тач-устройствах стрелки скрываем — листается свайпом */
+@media (pointer: coarse) {
+    .art-nav { display: none !important; }
 }
 
 /* BURGER */
@@ -813,23 +751,44 @@ body::before {
 <section class="art-section" id="artCanvas">
     <div class="art-progress"><div class="art-progress-fill" id="artProgressFill"></div></div>
 
+    <!-- Картина на весь экран -->
     <div class="art-canvas" id="artCanvasInner">
         <div class="art-scroll-catcher" id="artScrollCatcher"></div>
     </div>
 
-    <div class="art-top">
-        <div class="art-info" id="artInfo">1 / —</div>
-        <button class="art-close" id="artClose" type="button" aria-label="Закрыть">×</button>
-    </div>
+    <!-- Счётчик сверху слева -->
+    <div class="art-info" id="artInfo">1 / —</div>
 
-    <button class="art-nav prev" id="artPrev" type="button" aria-label="Предыдущая картина">‹</button>
-    <button class="art-nav next" id="artNext" type="button" aria-label="Следующая картина">›</button>
+    <!-- Правая панель: стрелки, крестик, переключатель -->
+    <div class="art-side">
+        <button class="art-nav" id="artPrev" type="button" aria-label="Предыдущая картина">‹</button>
 
-    <div class="art-controls-wrap">
-        <div class="art-controls" id="artControls">
-            <button class="art-order-btn" data-order="standard" type="button">Стандарт</button>
-            <button class="art-order-btn active" data-order="random" type="button">Случайно</button>
+        <div class="art-side-center">
+            <div class="art-order" id="artControls">
+                <!-- Стандарт — иконка порядка по возрастанию -->
+                <button class="art-order-btn" data-order="standard" type="button" aria-label="По порядку" title="По порядку">
+                    <svg viewBox="0 0 24 24">
+                        <line x1="4" y1="6" x2="20" y2="6"/>
+                        <line x1="4" y1="12" x2="16" y2="12"/>
+                        <line x1="4" y1="18" x2="12" y2="18"/>
+                    </svg>
+                </button>
+                <!-- Случайно — иконка с перепутанными линиями -->
+                <button class="art-order-btn active" data-order="random" type="button" aria-label="Случайно" title="Случайно">
+                    <svg viewBox="0 0 24 24">
+                        <polyline points="16 3 21 3 21 8"/>
+                        <line x1="4" y1="20" x2="21" y2="3"/>
+                        <polyline points="21 16 21 21 16 21"/>
+                        <line x1="15" y1="15" x2="21" y2="21"/>
+                        <line x1="4" y1="4" x2="9" y2="9"/>
+                    </svg>
+                </button>
+            </div>
+
+            <button class="art-close" id="artClose" type="button" aria-label="Закрыть">×</button>
         </div>
+
+        <button class="art-nav" id="artNext" type="button" aria-label="Следующая картина">›</button>
     </div>
 </section>
 
@@ -1023,9 +982,10 @@ body::before {
         setTimeout(() => { closing = false; }, 300);
     }
 
-    if (prevBtn) prevBtn.addEventListener('click', e => { e.preventDefault(); step(-1); });
-    if (nextBtn) nextBtn.addEventListener('click', e => { e.preventDefault(); step(1); });
-    if (closeBtn) closeBtn.addEventListener('click', closeArt);
+    /* Слушатели навешиваем ОДИН РАЗ, без клонирования элементов */
+    if (prevBtn) prevBtn.addEventListener('click', (e) => { e.preventDefault(); e.stopPropagation(); step(-1); });
+    if (nextBtn) nextBtn.addEventListener('click', (e) => { e.preventDefault(); e.stopPropagation(); step(1); });
+    if (closeBtn) closeBtn.addEventListener('click', (e) => { e.preventDefault(); e.stopPropagation(); closeArt(); });
 
     function onWheel(e) {
         if (isTouchMode()) return;
@@ -1118,8 +1078,11 @@ body::before {
     catcher.addEventListener('touchend', finishSwipe, { passive: true });
     catcher.addEventListener('touchcancel', () => { swipe = null; }, { passive: true });
 
+    /* Переключатель порядка — тоже с stopPropagation */
     controls.querySelectorAll('.art-order-btn').forEach(btn => {
-        btn.addEventListener('click', () => {
+        btn.addEventListener('click', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
             const newOrder = btn.dataset.order;
             if (newOrder === order) return;
             order = newOrder;
@@ -1130,6 +1093,11 @@ body::before {
             inner.querySelectorAll('.art-image-wrap').forEach(el => el.remove());
             showImage(0, null);
         });
+    });
+
+    /* Не даём клику по кнопкам "провалиться" в catcher */
+    document.querySelectorAll('.art-side').forEach(el => {
+        el.addEventListener('click', (e) => e.stopPropagation());
     });
 
     updateProgress();
