@@ -855,3 +855,762 @@ body::before {
     transform: translateX(-50%);
     transition: top 0.5s ease, transform 0.5s ease;
 }
+</style>
+</head>
+<body>
+
+<!-- LOADER -->
+<div class="loader-overlay" id="loaderOverlay">
+    <div class="shutter shutter-top"></div>
+    <div class="shutter shutter-bot"></div>
+</div>
+
+<!-- BURGER BUTTON -->
+<button class="burger-btn" id="burgerBtn" aria-label="Меню">
+    <span class="ring"></span>
+    <div class="burger-icon">
+        <span></span><span></span><span></span><span></span>
+    </div>
+</button>
+
+<!-- CLOCK SWITCH -->
+<button class="clock-switch" id="clockSwitch" aria-label="Сменить стиль">
+    <span class="switch-ring"></span>
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:var(--text);position:relative;z-index:1;pointer-events:none;">
+        <circle cx="12" cy="12" r="9"></circle>
+        <polyline points="12 7 12 12 15 15"></polyline>
+    </svg>
+</button>
+
+<!-- BURGER MENU -->
+<div class="burger-menu" id="burgerMenu">
+    <div class="burger-menu-inner">
+        <div class="burger-menu-col burger-menu-col-left">
+            <a href="#" class="burger-link active">Время</a>
+            <a href="#" class="burger-link">Победы</a>
+            <a href="#" class="burger-link">Техно</a>
+            <a href="#" class="burger-link">Космос</a>
+            <a href="#" class="burger-link">Архив</a>
+        </div>
+        <div class="burger-menu-col burger-menu-col-right">
+            <a href="#" class="burger-link">Мастер</a>
+            <a href="#" class="burger-link">Кодекс</a>
+            <a href="#" class="burger-link">Связь</a>
+        </div>
+    </div>
+    <div class="burger-menu-foot">ГРАМОТИНЬО · ЗНАЙ ВРЕМЯ · MMXXV</div>
+</div>
+
+<!-- TERMINAL OVERLAY -->
+<div class="evm-overlay" id="evmOverlay">
+    <div class="evm-window">
+        <div class="evm-header">
+            <div class="evm-header-row">
+                <span class="evm-title-main">ГРАМОТИНЬО // ТЕРМИНАЛ</span>
+                <span>СЕАНС: <span id="evmSession">#0000</span></span>
+                <span>СТАТУС: <span id="evmStatus">АКТИВЕН</span></span>
+            </div>
+        </div>
+        <div class="evm-body" id="evmBody"></div>
+    </div>
+</div>
+
+<!-- CRT OVERLAY -->
+<div class="crt-overlay" id="crtOverlay"></div>
+
+<!-- HERO -->
+<header class="page-header">
+    <div class="page-logo">
+        <span class="l1 terminal-word" id="terminalWord">ГРАМОТИНЬО</span>
+        <span class="l2">ВРЕМЯ</span>
+    </div>
+    <div class="clock-side">
+        <div class="clock-view-wrap">
+            <div class="clock-view view-watch" id="clockView">
+                <div class="watch-container" id="watchContainer">
+                    <!-- SVG-часы вставляются скриптом -->
+                </div>
+                <div class="scheme-view" id="schemeView">
+                    <!-- SVG-схема вставляется скриптом -->
+                </div>
+            </div>
+        </div>
+        <div class="clock-digital" id="digitalClock">
+            <span id="hours">00</span>
+            <span class="clock-digital-sep">:</span>
+            <span id="minutes">00</span>
+            <span class="clock-digital-sep">:</span>
+            <span id="seconds">00</span>
+        </div>
+        <div class="clock-style-label" id="styleLabel">НАРУЧНЫЕ · СТАЛЬ</div>
+    </div>
+</header>
+
+<script>
+/* ============================================================
+   LOADER + GSAP
+   ============================================================ */
+gsap.set('.shutter-top', { scaleY: 0 });
+gsap.set('.shutter-bot', { scaleY: 0 });
+
+window.addEventListener('load', () => {
+    gsap.timeline()
+        .to('.shutter-top', { scaleY: 1, duration: 0.5, ease: 'power2.inOut' })
+        .to('.shutter-bot', { scaleY: 1, duration: 0.5, ease: 'power2.inOut' }, '-=0.45')
+        .to('.shutter-top', { scaleY: 0, duration: 0.7, ease: 'power2.inOut', transformOrigin: 'top' })
+        .to('.shutter-bot', { scaleY: 0, duration: 0.7, ease: 'power2.inOut', transformOrigin: 'bottom' }, '-=0.6')
+        .set('.loader-overlay', { display: 'none' })
+        .to('.burger-btn', { opacity: 1, duration: 0.5 })
+        .to('.clock-switch', { opacity: 1, duration: 0.5 }, '-=0.4');
+});
+
+/* ============================================================
+   ЗВУК (только по тапу на цифровые часы)
+   ============================================================ */
+let audioCtx = null;
+let soundEnabled = true;
+
+function initAudio() {
+    if (!audioCtx) {
+        try {
+            audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        } catch(e) { soundEnabled = false; }
+    }
+    if (audioCtx && audioCtx.state === 'suspended') {
+        audioCtx.resume();
+    }
+}
+
+function playTick() {
+    if (!soundEnabled || !audioCtx) return;
+    try {
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(880, audioCtx.currentTime);
+        osc.frequency.exponentialRampToValueAtTime(440, audioCtx.currentTime + 0.05);
+        gain.gain.setValueAtTime(0.04, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.08);
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.start();
+        osc.stop(audioCtx.currentTime + 0.1);
+    } catch(e) {}
+}
+
+function playTickSequence() {
+    if (!soundEnabled || !audioCtx) return;
+    for (let i = 0; i < 6; i++) {
+        setTimeout(() => playTick(), i * 110);
+    }
+}
+
+/* ============================================================
+   ЧАСЫ — состояние
+   ============================================================ */
+const HOUR_HAND_RATIO = 0.50;
+const MIN_HAND_RATIO  = 0.72;
+const SEC_HAND_RATIO  = 0.86;
+
+const CLOCK_STYLES = [
+    { id: 'watch-light',  label: 'НАРУЧНЫЕ · СВЕТЛЫЕ' },
+    { id: 'watch-dark',   label: 'НАРУЧНЫЕ · ТЁМНЫЕ' },
+    { id: 'minimal',      label: 'МИНИМАЛИЗМ' },
+    { id: 'scheme',       label: 'СХЕМА' }
+];
+let currentStyleIndex = 0;
+
+/* ============================================================
+   SVG-ГЕНЕРАЦИЯ: СВЕТЛЫЕ "ПОБЕДЫ"
+   ============================================================ */
+function buildLightWatch(cx, cy, R) {
+    const stroke = '#0A0A0A';
+    let s = '';
+
+    /* корпус */
+    s += `<circle cx="${cx}" cy="${cy}" r="${R}" fill="#FBF8F2" stroke="${stroke}" stroke-width="3"/>`;
+    s += `<circle cx="${cx}" cy="${cy}" r="${R-6}" fill="none" stroke="${stroke}" stroke-width="0.8" opacity="0.4"/>`;
+
+    /* МИНУТНАЯ ДОРОЖКА — РИСКИ ПОЕЗДА */
+    for (let i = 0; i < 60; i++) {
+        const a = (i * 6 - 90) * Math.PI / 180;
+        const rOuter = R - 12;
+        const rInner = R - 18;
+        const x1 = cx + Math.cos(a) * rOuter;
+        const y1 = cy + Math.sin(a) * rOuter;
+        const x2 = cx + Math.cos(a) * rInner;
+        const y2 = cy + Math.sin(a) * rInner;
+        const w = (i % 5 === 0) ? 2.2 : 0.9;
+        const op = (i % 5 === 0) ? 0.9 : 0.35;
+        s += `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="${stroke}" stroke-width="${w}" opacity="${op}" stroke-linecap="round"/>`;
+    }
+
+    /* цифры */
+    const numerals = [12,1,2,3,4,5,6,7,8,9,10,11];
+    numerals.forEach((n, i) => {
+        const a = (i * 30 - 90) * Math.PI / 180;
+        const rN = R - 34;
+        const x = cx + Math.cos(a) * rN;
+        const y = cy + Math.sin(a) * rN;
+        s += `<text x="${x}" y="${y}" fill="${stroke}" font-family="Oswald, sans-serif" font-size="${R*0.12}" font-weight="600" text-anchor="middle" dominant-baseline="central" opacity="0.85">${n}</text>`;
+    });
+
+    /* часовая */
+    s += `<line id="lightHour" x1="${cx}" y1="${cy}" x2="${cx}" y2="${cy - R*HOUR_HAND_RATIO}" stroke="${stroke}" stroke-width="4.5" stroke-linecap="round"/>`;
+    /* минутная (укорочена) */
+    s += `<line id="lightMin" x1="${cx}" y1="${cy}" x2="${cx}" y2="${cy - R*MIN_HAND_RATIO}" stroke="${stroke}" stroke-width="3" stroke-linecap="round"/>`;
+    /* секундная — тонкая красная с противовесом */
+    s += `<line id="lightSec" x1="${cx}" y1="${cy + R*0.20}" x2="${cx}" y2="${cy - R*SEC_HAND_RATIO}" stroke="#D90429" stroke-width="1.2" stroke-linecap="round"/>`;
+    s += `<circle id="lightSecPivot" cx="${cx}" cy="${cy}" r="4.5" fill="#D90429"/>`;
+    s += `<circle cx="${cx}" cy="${cy}" r="2" fill="#FBF8F2"/>`;
+
+    return s;
+}
+
+/* ============================================================
+   SVG-ГЕНЕРАЦИЯ: ТЁМНЫЕ "ПОБЕДЫ" (улучшенные)
+   ============================================================ */
+function buildDarkWatch(cx, cy, R) {
+    const darkBg = '#0A0A0A';
+    const accent = '#C7E0C7';
+    let s = '';
+
+    s += `<circle cx="${cx}" cy="${cy}" r="${R}" fill="${darkBg}" stroke="#1A1A1A" stroke-width="3"/>`;
+    s += `<circle cx="${cx}" cy="${cy}" r="${R-6}" fill="none" stroke="#2A2A2A" stroke-width="0.8" opacity="0.6"/>`;
+
+    /* минутные риски */
+    for (let i = 0; i < 60; i++) {
+        const a = (i * 6 - 90) * Math.PI / 180;
+        const rOuter = R - 12;
+        const rInner = R - 18;
+        const x1 = cx + Math.cos(a) * rOuter;
+        const y1 = cy + Math.sin(a) * rOuter;
+        const x2 = cx + Math.cos(a) * rInner;
+        const y2 = cy + Math.sin(a) * rInner;
+        const w = (i % 5 === 0) ? 2.2 : 0.9;
+        const op = (i % 5 === 0) ? 0.7 : 0.25;
+        s += `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="${accent}" stroke-width="${w}" opacity="${op}" stroke-linecap="round"/>`;
+    }
+
+    const numerals = [12,1,2,3,4,5,6,7,8,9,10,11];
+    numerals.forEach((n, i) => {
+        const a = (i * 30 - 90) * Math.PI / 180;
+        const rN = R - 34;
+        const x = cx + Math.cos(a) * rN;
+        const y = cy + Math.sin(a) * rN;
+        s += `<text x="${x}" y="${y}" fill="${accent}" font-family="Oswald, sans-serif" font-size="${R*0.12}" font-weight="600" text-anchor="middle" dominant-baseline="central" opacity="0.9">${n}</text>`;
+    });
+
+    s += `<line id="darkHour" x1="${cx}" y1="${cy}" x2="${cx}" y2="${cy - R*HOUR_HAND_RATIO}" stroke="#FFFFFF" stroke-width="4.5" stroke-linecap="round"/>`;
+    s += `<line id="darkMin" x1="${cx}" y1="${cy}" x2="${cx}" y2="${cy - R*MIN_HAND_RATIO}" stroke="#FFFFFF" stroke-width="3" stroke-linecap="round"/>`;
+    s += `<line id="darkSec" x1="${cx}" y1="${cy + R*0.20}" x2="${cx}" y2="${cy - R*SEC_HAND_RATIO}" stroke="#D90429" stroke-width="1.2" stroke-linecap="round"/>`;
+    s += `<circle id="darkSecPivot" cx="${cx}" cy="${cy}" r="4.5" fill="#D90429"/>`;
+    s += `<circle cx="${cx}" cy="${cy}" r="2" fill="${darkBg}"/>`;
+
+    return s;
+}
+
+/* ============================================================
+   SVG-ГЕНЕРАЦИЯ: МИНИМАЛИЗМ (улучшенный)
+   ============================================================ */
+function buildMinimalWatch(cx, cy, R) {
+    let s = '';
+    s += `<circle cx="${cx}" cy="${cy}" r="${R}" fill="none" stroke="#0A0A0A" stroke-width="1.5"/>`;
+    s += `<circle cx="${cx}" cy="${cy}" r="${R-4}" fill="none" stroke="#0A0A0A" stroke-width="0.4" opacity="0.3"/>`;
+
+    /* только 12, 3, 6, 9 */
+    [0, 3, 6, 9].forEach((pos) => {
+        const a = (pos * 30 - 90) * Math.PI / 180;
+        const rN = R - 28;
+        const x = cx + Math.cos(a) * rN;
+        const y = cy + Math.sin(a) * rN;
+        const labels = {0:'12',3:'3',6:'6',9:'9'};
+        s += `<text x="${x}" y="${y}" fill="#0A0A0A" font-family="Space Mono, monospace" font-size="${R*0.11}" font-weight="700" text-anchor="middle" dominant-baseline="central">${labels[pos]}</text>`;
+    });
+
+    /* редкие риски */
+    for (let i = 0; i < 12; i++) {
+        const a = (i * 30 - 90) * Math.PI / 180;
+        const rOuter = R - 10;
+        const rInner = R - 14;
+        const x1 = cx + Math.cos(a) * rOuter;
+        const y1 = cy + Math.sin(a) * rOuter;
+        const x2 = cx + Math.cos(a) * rInner;
+        const y2 = cy + Math.sin(a) * rInner;
+        s += `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="#0A0A0A" stroke-width="1.2" opacity="0.5"/>`;
+    }
+
+    s += `<line id="minHour" x1="${cx}" y1="${cy}" x2="${cx}" y2="${cy - R*HOUR_HAND_RATIO}" stroke="#0A0A0A" stroke-width="3.5" stroke-linecap="round"/>`;
+    s += `<line id="minMin" x1="${cx}" y1="${cy}" x2="${cx}" y2="${cy - R*MIN_HAND_RATIO}" stroke="#0A0A0A" stroke-width="2.2" stroke-linecap="round"/>`;
+    s += `<line id="minSec" x1="${cx}" y1="${cy + R*0.18}" x2="${cx}" y2="${cy - R*SEC_HAND_RATIO}" stroke="#D90429" stroke-width="1" stroke-linecap="round"/>`;
+    s += `<circle id="minSecPivot" cx="${cx}" cy="${cy}" r="3.5" fill="#D90429"/>`;
+    s += `<circle cx="${cx}" cy="${cy}" r="1.8" fill="#F4F1EA"/>`;
+
+    return s;
+}
+
+/* ============================================================
+   SVG-ГЕНЕРАЦИЯ: СХЕМА
+   ============================================================ */
+function buildScheme(cx, cy, R) {
+    let s = '';
+    s += `<circle cx="${cx}" cy="${cy}" r="${R}" fill="none" stroke="#0A0A0A" stroke-width="1" stroke-dasharray="4 4"/>`;
+    s += `<circle cx="${cx}" cy="${cy}" r="${R-8}" fill="none" stroke="#0A0A0A" stroke-width="0.5" opacity="0.4"/>`;
+    s += `<line x1="${cx-R-10}" y1="${cy}" x2="${cx+R+10}" y2="${cy}" stroke="#0A0A0A" stroke-width="0.5" opacity="0.3"/>`;
+    s += `<line x1="${cx}" y1="${cy-R-10}" x2="${cx}" y2="${cy+R+10}" stroke="#0A0A0A" stroke-width="0.5" opacity="0.3"/>`;
+
+    for (let i = 0; i < 12; i++) {
+        const a = (i * 30 - 90) * Math.PI / 180;
+        const r1 = R - 12;
+        const r2 = R - 20;
+        const x1 = cx + Math.cos(a) * r1;
+        const y1 = cy + Math.sin(a) * r1;
+        const x2 = cx + Math.cos(a) * r2;
+        const y2 = cy + Math.sin(a) * r2;
+        s += `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="#0A0A0A" stroke-width="0.8" opacity="0.5"/>`;
+    }
+
+    s += `<line id="schHour" x1="${cx}" y1="${cy}" x2="${cx}" y2="${cy - R*HOUR_HAND_RATIO}" stroke="#0A0A0A" stroke-width="1.5" stroke-dasharray="3 3"/>`;
+    s += `<line id="schMin" x1="${cx}" y1="${cy}" x2="${cx}" y2="${cy - R*MIN_HAND_RATIO}" stroke="#0A0A0A" stroke-width="1" stroke-dasharray="2 4"/>`;
+    s += `<line id="schSec" x1="${cx}" y1="${cy}" x2="${cx}" y2="${cy - R*SEC_HAND_RATIO}" stroke="#D90429" stroke-width="0.6" stroke-dasharray="1 3"/>`;
+
+    s += `<circle cx="${cx}" cy="${cy}" r="2" fill="#0A0A0A"/>`;
+    s += `<text x="${cx + R + 18}" y="${cy - R + 20}" fill="#0A0A0A" font-family="Space Mono, monospace" font-size="10" opacity="0.6">X</text>`;
+    s += `<text x="${cx + R + 18}" y="${cy + R - 6}" fill="#0A0A0A" font-family="Space Mono, monospace" font-size="10" opacity="0.6">Y</text>`;
+
+    return s;
+}
+
+/* ============================================================
+   РЕНДЕР ЧАСОВ
+   ============================================================ */
+let currentStyle = 'watch-light';
+
+function renderClock() {
+    const viewBox = '0 0 440 520';
+    const cx = 220;
+    const cy = 260;
+    const R = 175;
+
+    const watchContainer = document.getElementById('watchContainer');
+    const schemeView = document.getElementById('schemeView');
+
+    let svgContent = '';
+
+    if (currentStyle === 'scheme') {
+        svgContent = buildScheme(cx, cy, R);
+        schemeView.innerHTML = `<svg viewBox="${viewBox}" xmlns="http://www.w3.org/2000/svg">${svgContent}</svg>`;
+        schemeView.classList.add('active');
+        watchContainer.classList.add('hidden');
+        document.getElementById('clockView').className = 'clock-view view-scheme';
+    } else {
+        if (currentStyle === 'watch-light') {
+            svgContent = buildLightWatch(cx, cy, R);
+        } else if (currentStyle === 'watch-dark') {
+            svgContent = buildDarkWatch(cx, cy, R);
+        } else if (currentStyle === 'minimal') {
+            svgContent = buildMinimalWatch(cx, cy, R);
+        }
+
+        watchContainer.innerHTML = `<svg viewBox="${viewBox}" xmlns="http://www.w3.org/2000/svg" class="watch-svg">${svgContent}</svg>`;
+        watchContainer.classList.remove('hidden');
+        schemeView.classList.remove('active');
+        document.getElementById('clockView').className = 'clock-view view-watch';
+    }
+
+    document.getElementById('styleLabel').textContent = CLOCK_STYLES[currentStyleIndex].label;
+}
+
+/* ============================================================
+   ОБНОВЛЕНИЕ СТРЕЛОК
+   ============================================================ */
+function updateHands() {
+    const now = new Date();
+    const h = now.getHours() % 12;
+    const m = now.getMinutes();
+    const sec = now.getSeconds();
+    const ms = now.getMilliseconds();
+
+    const secAngle = (sec + ms / 1000) * 6;
+    const minAngle = (m + sec / 60) * 6;
+    const hourAngle = (h + m / 60 + sec / 3600) * 30;
+
+    const cx = 220, cy = 260, R = 175;
+    const hourLen = R * HOUR_HAND_RATIO;
+    const minLen = R * MIN_HAND_RATIO;
+    const secLen = R * SEC_HAND_RATIO;
+    const secTail = R * 0.20;
+
+    /* светлые */
+    const lh = document.getElementById('lightHour');
+    const lm = document.getElementById('lightMin');
+    const ls = document.getElementById('lightSec');
+    if (lh) {
+        const a = (hourAngle - 90) * Math.PI / 180;
+        lh.setAttribute('x2', cx + Math.cos(a) * hourLen);
+        lh.setAttribute('y2', cy + Math.sin(a) * hourLen);
+    }
+    if (lm) {
+        const a = (minAngle - 90) * Math.PI / 180;
+        lm.setAttribute('x2', cx + Math.cos(a) * minLen);
+        lm.setAttribute('y2', cy + Math.sin(a) * minLen);
+    }
+    if (ls) {
+        const a = (secAngle - 90) * Math.PI / 180;
+        ls.setAttribute('x2', cx + Math.cos(a) * secLen);
+        ls.setAttribute('y2', cy + Math.sin(a) * secLen);
+        ls.setAttribute('x1', cx - Math.cos(a) * secTail);
+        ls.setAttribute('y1', cy - Math.sin(a) * secTail);
+    }
+
+    /* тёмные */
+    const dh = document.getElementById('darkHour');
+    const dm = document.getElementById('darkMin');
+    const ds = document.getElementById('darkSec');
+    if (dh) {
+        const a = (hourAngle - 90) * Math.PI / 180;
+        dh.setAttribute('x2', cx + Math.cos(a) * hourLen);
+        dh.setAttribute('y2', cy + Math.sin(a) * hourLen);
+    }
+    if (dm) {
+        const a = (minAngle - 90) * Math.PI / 180;
+        dm.setAttribute('x2', cx + Math.cos(a) * minLen);
+        dm.setAttribute('y2', cy + Math.sin(a) * minLen);
+    }
+    if (ds) {
+        const a = (secAngle - 90) * Math.PI / 180;
+        ds.setAttribute('x2', cx + Math.cos(a) * secLen);
+        ds.setAttribute('y2', cy + Math.sin(a) * secLen);
+        ds.setAttribute('x1', cx - Math.cos(a) * secTail);
+        ds.setAttribute('y1', cy - Math.sin(a) * secTail);
+    }
+
+    /* минимализм */
+    const mh = document.getElementById('minHour');
+    const mm = document.getElementById('minMin');
+    const ms2 = document.getElementById('minSec');
+    if (mh) {
+        const a = (hourAngle - 90) * Math.PI / 180;
+        mh.setAttribute('x2', cx + Math.cos(a) * hourLen);
+        mh.setAttribute('y2', cy + Math.sin(a) * hourLen);
+    }
+    if (mm) {
+        const a = (minAngle - 90) * Math.PI / 180;
+        mm.setAttribute('x2', cx + Math.cos(a) * minLen);
+        mm.setAttribute('y2', cy + Math.sin(a) * minLen);
+    }
+    if (ms2) {
+        const a = (secAngle - 90) * Math.PI / 180;
+        ms2.setAttribute('x2', cx + Math.cos(a) * secLen);
+        ms2.setAttribute('y2', cy + Math.sin(a) * secLen);
+        ms2.setAttribute('x1', cx - Math.cos(a) * secTail);
+        ms2.setAttribute('y1', cy - Math.sin(a) * secTail);
+    }
+
+    /* схема */
+    const sh = document.getElementById('schHour');
+    const sm = document.getElementById('schMin');
+    const ss = document.getElementById('schSec');
+    if (sh) {
+        const a = (hourAngle - 90) * Math.PI / 180;
+        sh.setAttribute('x2', cx + Math.cos(a) * hourLen);
+        sh.setAttribute('y2', cy + Math.sin(a) * hourLen);
+    }
+    if (sm) {
+        const a = (minAngle - 90) * Math.PI / 180;
+        sm.setAttribute('x2', cx + Math.cos(a) * minLen);
+        sm.setAttribute('y2', cy + Math.sin(a) * minLen);
+    }
+    if (ss) {
+        const a = (secAngle - 90) * Math.PI / 180;
+        ss.setAttribute('x2', cx + Math.cos(a) * secLen);
+        ss.setAttribute('y2', cy + Math.sin(a) * secLen);
+    }
+
+    /* цифры */
+    document.getElementById('hours').textContent = String(now.getHours()).padStart(2, '0');
+    document.getElementById('minutes').textContent = String(now.getMinutes()).padStart(2, '0');
+    document.getElementById('seconds').textContent = String(now.getSeconds()).padStart(2, '0');
+}
+
+/* ============================================================
+   ЗАПУСК
+   ============================================================ */
+renderClock();
+updateHands();
+setInterval(updateHands, 50);
+
+/* ============================================================
+   ПЕРЕКЛЮЧАТЕЛЬ СТИЛЕЙ
+   ============================================================ */
+document.getElementById('clockSwitch').addEventListener('click', () => {
+    currentStyleIndex = (currentStyleIndex + 1) % CLOCK_STYLES.length;
+    currentStyle = CLOCK_STYLES[currentStyleIndex].id;
+    renderClock();
+    updateHands();
+});
+
+/* ============================================================
+   ТЕРМИНАЛ
+   ============================================================ */
+const overlay = document.getElementById('evmOverlay');
+const body = document.getElementById('evmBody');
+let evmActive = false;
+let evmPaused = false;
+
+const BOOT_LINES = [
+    '> ЗАГРУЗКА СИСТЕМЫ...',
+    '> ПРОВЕРКА ЦЕЛОСТНОСТИ ЯДРА... ОК',
+    '> ИНИЦИАЛИЗАЦИЯ МОДУЛЯ ВРЕМЕНИ... ОК',
+    '> СИНХРОНИЗАЦИЯ С NTP-СЕРВЕРОМ... ОК',
+    '> ЗАГРУЗКА ПРОТОКОЛА ГРАМОТИНЬО v2.5... ОК',
+    '',
+    '> ТЕРМИНАЛ ГОТОВ. ВВЕДИТЕ help ДЛЯ СПИСКА КОМАНД.',
+    ''
+];
+
+const COMMANDS = {
+    'help': {
+        desc: 'Список доступных команд',
+        action: showHelp
+    },
+    'time': {
+        desc: 'Текущее время (UTC+3)',
+        action: showTime
+    },
+    'about': {
+        desc: 'О проекте',
+        action: showAbout
+    },
+    'clear': {
+        desc: 'Очистить экран',
+        action: () => { body.innerHTML = ''; }
+    },
+    'exit': {
+        desc: 'Выход из терминала',
+        action: closeTerminal
+    }
+};
+
+function showHelp() {
+    let html = '<div class="term-prose"><p>ДОСТУПНЫЕ КОМАНДЫ:</p></div>';
+    html += '<ul class="term-list">';
+    for (const [cmd, data] of Object.entries(COMMANDS)) {
+        html += `<li class="term-list-item" data-cmd="${cmd}"><span class="cmd-name">${cmd.toUpperCase()}</span> — ${data.desc}</li>`;
+    }
+    html += '</ul>';
+    addLine(html, true);
+}
+
+function showTime() {
+    const now = new Date();
+    const h = String(now.getHours()).padStart(2, '0');
+    const m = String(now.getMinutes()).padStart(2, '0');
+    const s = String(now.getSeconds()).padStart(2, '0');
+    addLine(`<div class="term-line">ТЕКУЩЕЕ ВРЕМЯ: ${h}:${m}:${s}</div>`);
+}
+
+function showAbout() {
+    const html = `
+        <div class="term-frame">
+            <pre class="term-ascii">
+    ██████╗ ██████╗  █████╗ ███╗   ███╗ ██████╗ ████████╗██╗███╗   ██╗██╗  ██╗ ██████╗ 
+    ██╔══██╗██╔══██╗██╔══██╗████╗ ████║██╔═══██╗╚══██╔══╝██║████╗  ██║██║  ██║██╔═══██╗
+    ██║  ██║██████╔╝███████║██╔████╔██║██║   ██║   ██║   ██║██╔██╗ ██║███████║██║   ██║
+    ██║  ██║██╔══██╗██╔══██║██║╚██╔╝██║██║   ██║   ██║   ██║██║╚██╗██║██╔══██║██║   ██║
+    ██████╔╝██║  ██║██║  ██║██║ ╚═╝ ██║╚██████╔╝   ██║   ██║██║ ╚████║██║  ██║╚██████╔╝
+    ╚═════╝ ╚═╝  ╚═╝╚═╝  ╚═╝╚═╝     ╚═╝ ╚═════╝    ╚═╝   ╚═╝╚═╝  ╚═══╝╚═╝  ╚═╝ ╚═════╝ 
+            </pre>
+        </div>
+        <div class="term-prose">
+            <p>ГРАМОТИНЬО — ЭТО ПРОЕКТ О ВРЕМЕНИ. О ТОМ, КАК ОНО УСТРОЕНО, КАК ЕГО ЧИТАТЬ И КАК ОНО ЧИТАЕТ НАС.</p>
+            <p>ЗДЕСЬ СОБРАНЫ ЧАСЫ РАЗНЫХ ЭПОХ И СТИЛЕЙ: ОТ КЛАССИЧЕСКИХ "ПОБЕД" ДО МИНИМАЛИСТИЧНЫХ СХЕМ.</p>
+            <p>ВЕРСИЯ: 2.5 · СБОРКА: 2025.03</p>
+        </div>
+    `;
+    addLine(html, true);
+}
+
+function addLine(html, isHtml = false) {
+    const div = document.createElement('div');
+    if (isHtml) {
+        div.innerHTML = html;
+    } else {
+        div.textContent = html;
+    }
+    body.appendChild(div);
+    body.scrollTop = body.scrollHeight;
+}
+
+function addInputLine() {
+    const line = document.createElement('div');
+    line.className = 'term-input-line';
+    line.innerHTML = `
+        <span class="term-mirror">> </span>
+        <input class="term-input" type="text" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
+        <span class="term-caret"></span>
+    `;
+    body.appendChild(line);
+    const input = line.querySelector('.term-input');
+    input.focus();
+    input.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+            const val = input.value.trim().toLowerCase();
+            line.querySelector('.term-mirror').textContent = '> ' + input.value;
+            input.remove();
+            line.querySelector('.term-caret').remove();
+            if (val) {
+                const cmd = COMMANDS[val];
+                if (cmd) {
+                    cmd.action();
+                } else {
+                    addLine(`<div class="term-line" style="color:var(--red)">НЕИЗВЕСТНАЯ КОМАНДА: ${val}</div>`);
+                }
+            }
+            addInputLine();
+        }
+    });
+}
+
+function openTerminal() {
+    if (evmActive) return;
+    evmActive = true;
+    overlay.style.display = 'block';
+    body.innerHTML = '';
+    gsap.fromTo('#crtOverlay',
+        { scaleY: 0 },
+        { scaleY: 1, duration: 0.35, ease: 'power2.in', onComplete: () => {
+            gsap.to('#crtOverlay', { scaleY: 0, duration: 0.35, ease: 'power2.out', delay: 0.1 });
+        }}
+    );
+    BOOT_LINES.forEach((line, i) => {
+        setTimeout(() => {
+            addLine(`<div class="term-line">${line}</div>`);
+            if (i === BOOT_LINES.length - 1) {
+                addInputLine();
+            }
+        }, i * 120);
+    });
+}
+
+function closeTerminal() {
+    if (!evmActive) return;
+    evmActive = false;
+    gsap.to('#crtOverlay', {
+        scaleY: 1,
+        duration: 0.3,
+        ease: 'power2.in',
+        onComplete: () => {
+            overlay.style.display = 'none';
+            gsap.to('#crtOverlay', { scaleY: 0, duration: 0.3, ease: 'power2.out' });
+        }
+    });
+}
+
+document.getElementById('terminalWord').addEventListener('click', () => {
+    const el = document.getElementById('terminalWord');
+    el.classList.add('cyber-flicker');
+    setTimeout(() => el.classList.remove('cyber-flicker'), 1700);
+    openTerminal();
+});
+
+/* ============================================================
+   БУРГЕР
+   ============================================================ */
+const burgerBtn = document.getElementById('burgerBtn');
+const burgerMenu = document.getElementById('burgerMenu');
+
+burgerBtn.addEventListener('click', () => {
+    burgerBtn.classList.toggle('open');
+    burgerMenu.classList.toggle('open');
+});
+
+document.querySelectorAll('.burger-link').forEach(link => {
+    link.addEventListener('click', (e) => {
+        e.preventDefault();
+        document.querySelectorAll('.burger-link').forEach(l => l.classList.remove('active'));
+        link.classList.add('active');
+        burgerBtn.classList.remove('open');
+        burgerMenu.classList.remove('open');
+    });
+});
+
+/* ============================================================
+   ЗВУК — ТОЛЬКО ПО ТАПУ НА ЦИФРОВЫЕ ЧАСЫ
+   ============================================================ */
+document.getElementById('digitalClock').addEventListener('click', () => {
+    initAudio();
+    playTickSequence();
+});
+
+/* ============================================================
+   ПЕРЕТАСКИВАНИЕ ЧАСОВ
+   ============================================================ */
+const clockView = document.getElementById('clockView');
+let isDragging = false;
+let startX = 0;
+let startY = 0;
+let currentRotation = 0;
+
+clockView.addEventListener('mousedown', (e) => {
+    if (currentStyle === 'scheme') return;
+    isDragging = true;
+    clockView.classList.add('dragging');
+    startX = e.clientX;
+    startY = e.clientY;
+});
+
+window.addEventListener('mousemove', (e) => {
+    if (!isDragging) return;
+    const dx = e.clientX - startX;
+    const dy = e.clientY - startY;
+    currentRotation = dx * 0.3;
+    const svg = clockView.querySelector('.watch-svg');
+    if (svg) {
+        svg.style.transform = `rotate(${currentRotation}deg)`;
+        svg.style.transformOrigin = 'center';
+    }
+});
+
+window.addEventListener('mouseup', () => {
+    if (!isDragging) return;
+    isDragging = false;
+    clockView.classList.remove('dragging');
+    const svg = clockView.querySelector('.watch-svg');
+    if (svg) {
+        svg.style.transform = '';
+    }
+    currentRotation = 0;
+});
+
+/* touch */
+clockView.addEventListener('touchstart', (e) => {
+    if (currentStyle === 'scheme') return;
+    isDragging = true;
+    startX = e.touches[0].clientX;
+    startY = e.touches[0].clientY;
+}, { passive: true });
+
+clockView.addEventListener('touchmove', (e) => {
+    if (!isDragging) return;
+    const dx = e.touches[0].clientX - startX;
+    currentRotation = dx * 0.3;
+    const svg = clockView.querySelector('.watch-svg');
+    if (svg) {
+        svg.style.transform = `rotate(${currentRotation}deg)`;
+        svg.style.transformOrigin = 'center';
+    }
+}, { passive: true });
+
+clockView.addEventListener('touchend', () => {
+    if (!isDragging) return;
+    isDragging = false;
+    const svg = clockView.querySelector('.watch-svg');
+    if (svg) {
+        svg.style.transform = '';
+    }
+    currentRotation = 0;
+});
+</script>
+</body>
+</html>
