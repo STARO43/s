@@ -1073,8 +1073,8 @@ async function startTerminal() {
     await typeLine('СОСТАВИТЕЛЬ ----------------- @VNVAX ДЛЯ ТЕЛЕГРАМ.', { speed: 33 });
     await sleep(220);
 
-    await typeLine('СПИСОК КОМАНД ---------------- СПРАВКА', { speed: 15 });
-    await typeLine('ЗАВЕРШЕНИЕ РАБОТЫ ------------ ВЫХОД', { speed: 15 });
+    await typeLine('СПИСОК КОМАНД --------------- СПРАВКА', { speed: 15 });
+    await typeLine('ЗАВЕРШЕНИЕ РАБОТЫ ----------- ВЫХОД', { speed: 15 });
 
     await sleep(420);
 
@@ -1159,7 +1159,7 @@ async function processCommand(raw) {
     if (cmd === 'выход' || cmd === 'exit' || cmd === 'quit') {
         await typeLine('ЗАВЕРШЕНИЕ РАБОТЫ...', { speed: 12 });
         await sleep(300);
-        await typeLine('СЕАНС ОКОНЧЕН---- 000', { speed: 14 });
+        await typeLine('СЕАНС ОКОНЧЕН ---- 000', { speed: 14 });
         await sleep(600);
         closeTerminal();
         return;
