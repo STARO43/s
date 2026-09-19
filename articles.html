@@ -3,13 +3,13 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<meta name="description" content="Грамотиньо. Родителям.">
+<meta name="description" content="Грамотиньо. Педагогика.">
 <meta name="theme-color" content="#F4F1EA">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Space+Mono:ital,wght@0,400;0,700;1,400&family=PT+Mono&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
-<title>ГРАМОТИНЬО // РОДИТЕЛЯМ</title>
+<title>Грамотиньо. Статьи</title>
 <style>
 :root {
     --bg: #F4F1EA;
@@ -53,6 +53,7 @@ body::before {
     opacity: 0.14;
     mix-blend-mode: multiply;
 }
+body.menu-open::before { display: none; }
 @media (max-width: 768px) {
     body::before { display: none; }
     body {
@@ -152,7 +153,7 @@ body::before {
     transform: translateX(-50%);
     transition: top 0.5s ease, transform 0.5s ease;
 }
-.burger-btn:hover .ring { border-color: var(--red); transform: rotate(180deg); }
+.burger-btn:not(.open):hover .ring { border-color: var(--red); transform: rotate(180deg); }
 .burger-icon {
     position: relative;
     width: 26px;
@@ -162,7 +163,7 @@ body::before {
     justify-content: center;
     transition: transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
-.burger-btn:hover .burger-icon { transform: rotate(90deg); }
+.burger-btn:not(.open):hover .burger-icon { transform: rotate(90deg); }
 .burger-icon span {
     position: absolute;
     width: 9px;
@@ -175,10 +176,10 @@ body::before {
 .burger-icon span:nth-child(2) { top: 0; right: 0; transform-origin: top right; background: var(--red); }
 .burger-icon span:nth-child(3) { bottom: 0; left: 0; transform-origin: bottom left; }
 .burger-icon span:nth-child(4) { bottom: 0; right: 0; transform-origin: bottom right; background: var(--red); }
-.burger-btn:hover .burger-icon span:nth-child(1) { transform: translate(-3px, -3px) scale(1.08); }
-.burger-btn:hover .burger-icon span:nth-child(2) { transform: translate(3px, -3px) scale(1.08); }
-.burger-btn:hover .burger-icon span:nth-child(3) { transform: translate(-3px, 3px) scale(1.08); }
-.burger-btn:hover .burger-icon span:nth-child(4) { transform: translate(3px, 3px) scale(1.08); }
+.burger-btn:not(.open):hover .burger-icon span:nth-child(1) { transform: translate(-3px, -3px) scale(1.08); }
+.burger-btn:not(.open):hover .burger-icon span:nth-child(2) { transform: translate(3px, -3px) scale(1.08); }
+.burger-btn:not(.open):hover .burger-icon span:nth-child(3) { transform: translate(-3px, 3px) scale(1.08); }
+.burger-btn:not(.open):hover .burger-icon span:nth-child(4) { transform: translate(3px, 3px) scale(1.08); }
 .burger-btn.open .burger-icon { transform: rotate(0deg); }
 .burger-btn.open .ring { border-color: var(--red); transform: rotate(405deg); }
 .burger-btn.open .ring::before { top: calc(100% - 5px); transform: translateX(-50%) scale(1.4); }
@@ -186,13 +187,21 @@ body::before {
 .burger-btn.open .burger-icon span:nth-child(2) { transform: translate(-8.5px, 8.5px) rotate(-45deg); width: 26px; height: 2.5px; opacity: 0; }
 .burger-btn.open .burger-icon span:nth-child(3) { transform: translate(8.5px, -8.5px) rotate(-45deg); width: 26px; height: 2.5px; opacity: 0; }
 .burger-btn.open .burger-icon span:nth-child(4) { transform: translate(-8.5px, -8.5px) rotate(45deg); width: 26px; height: 2.5px; }
+.burger-btn.open:hover .ring { transform: rotate(585deg); }
+.burger-btn.open:hover .burger-icon { transform: rotate(0deg) scale(1.12); }
+
 @media (max-width: 768px) {
     .burger-btn { top: 14px; right: 14px; width: 54px; height: 54px; }
     .burger-btn .ring { inset: 5px; }
     .burger-icon { width: 22px; height: 22px; }
     .burger-icon span { width: 8px; height: 8px; }
+    .burger-btn.open .burger-icon span:nth-child(1),
+    .burger-btn.open .burger-icon span:nth-child(4) { width: 22px; }
+    .burger-btn.open .burger-icon span:nth-child(1) { transform: translate(7px, 7px) rotate(45deg); }
+    .burger-btn.open .burger-icon span:nth-child(4) { transform: translate(-7px, -7px) rotate(45deg); }
 }
 
+/* БУРГЕР-МЕНЮ */
 .burger-menu {
     position: fixed;
     inset: 0;
@@ -201,73 +210,194 @@ body::before {
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 5vw;
+    padding: 4vw 5vw;
     opacity: 0;
     pointer-events: none;
-    transition: opacity 0.4s ease;
+    transition: opacity 0.22s ease;
+    overflow-y: auto;
+    overflow-x: hidden;
+    contain: layout paint;
 }
 .burger-menu.open { opacity: 1; pointer-events: auto; }
+
 .burger-menu-inner {
     position: relative;
+    z-index: 1;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: clamp(24px, 4vw, 64px);
+    width: 100%;
+    max-width: 1400px;
+    padding: 2rem 0;
+}
+.burger-menu-col {
     display: flex;
     flex-direction: column;
     align-items: flex-start;
-    gap: 0.4em;
-    width: 100%;
-    max-width: 1200px;
+    gap: 0.1em;
+    min-width: 0;
 }
+.burger-menu-col-left  { justify-self: start; }
+.burger-menu-col-right { justify-self: end; align-items: flex-end; text-align: right; }
 .burger-link {
     font-family: var(--font-display);
-    font-size: clamp(2.5rem, 8vw, 7rem);
+    font-size: clamp(1.8rem, 3.6vw, 3.8rem);
     font-weight: 700;
-    line-height: 1;
+    line-height: 1.05;
     letter-spacing: -0.03em;
     text-transform: uppercase;
     color: var(--text);
     text-decoration: none;
-    transition: color 0.25s, transform 0.35s;
     position: relative;
     display: inline-block;
-    transform: translateY(30px);
+    transform: translate3d(0, 22px, 0);
     opacity: 0;
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+    word-break: break-word;
+    max-width: 100%;
+    transition:
+        color 0.2s ease,
+        transform 0.22s ease,
+        opacity 0.18s ease;
 }
 .burger-menu.open .burger-link {
-    transform: translateY(0);
+    transform: translate3d(0, 0, 0);
     opacity: 1;
-    transition: color 0.25s, transform 0.5s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.4s;
+    transition:
+        color 0.25s ease,
+        transform 0.5s cubic-bezier(0.16, 1, 0.3, 1),
+        opacity 0.4s ease;
 }
-.burger-menu.open .burger-link:nth-child(1) { transition-delay: 0.06s; }
-.burger-menu.open .burger-link:nth-child(2) { transition-delay: 0.12s; }
-.burger-menu.open .burger-link:nth-child(3) { transition-delay: 0.18s; }
-.burger-menu.open .burger-link:nth-child(4) { transition-delay: 0.24s; }
-.burger-menu.open .burger-link:nth-child(5) { transition-delay: 0.30s; }
-.burger-menu.open .burger-link:nth-child(6) { transition-delay: 0.36s; }
-.burger-menu.open .burger-link:nth-child(7) { transition-delay: 0.42s; }
-.burger-link:hover { color: var(--red); transform: translateX(12px); }
-.burger-link.active { color: var(--red); }
-.burger-link.active::before {
+.burger-menu.open .burger-menu-col-left .burger-link:nth-child(1) { transition-delay: 0.06s; }
+.burger-menu.open .burger-menu-col-left .burger-link:nth-child(2) { transition-delay: 0.11s; }
+.burger-menu.open .burger-menu-col-left .burger-link:nth-child(3) { transition-delay: 0.16s; }
+.burger-menu.open .burger-menu-col-left .burger-link:nth-child(4) { transition-delay: 0.21s; }
+.burger-menu.open .burger-menu-col-left .burger-link:nth-child(5) { transition-delay: 0.26s; }
+.burger-menu.open .burger-menu-col-right .burger-link:nth-child(1) { transition-delay: 0.14s; }
+.burger-menu.open .burger-menu-col-right .burger-link:nth-child(2) { transition-delay: 0.19s; }
+.burger-menu.open .burger-menu-col-right .burger-link:nth-child(3) { transition-delay: 0.24s; }
+.burger-link:hover { color: var(--red); }
+.burger-menu-col-left  .burger-link:hover { transform: translateX(14px); }
+.burger-menu-col-right .burger-link:hover { transform: translateX(-14px); }
+.burger-link.active {
+    color: var(--red);
+    font-style: italic;
+    letter-spacing: -0.02em;
+}
+.burger-menu-col-left  .burger-link.active::before {
     content: '→';
     position: absolute;
-    left: -0.85em;
+    left: -0.9em;
     top: 50%;
     transform: translateY(-50%);
     font-size: 0.55em;
-    opacity: 0.85;
+    opacity: 0.9;
+    font-style: normal;
+}
+.burger-menu-col-right .burger-link.active::after {
+    content: '←';
+    position: absolute;
+    right: -0.9em;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 0.55em;
+    opacity: 0.9;
+    font-style: normal;
 }
 .burger-menu-foot {
     position: absolute;
-    bottom: 5vh;
-    left: 5vw;
+    bottom: 3.5vh;
+    left: 50%;
+    transform: translateX(-50%);
     font-family: var(--font-mono);
-    font-size: 0.7rem;
-    letter-spacing: 0.22em;
+    font-size: 0.65rem;
+    font-weight: 700;
+    letter-spacing: 0.24em;
     text-transform: uppercase;
     color: rgba(10, 10, 10, 0.35);
+    white-space: nowrap;
+    text-align: center;
+    z-index: 1;
+}
+@media (max-width: 900px) {
+    .burger-menu-inner { gap: clamp(20px, 3vw, 40px); }
+    .burger-link { font-size: clamp(1.6rem, 4.4vw, 2.8rem); }
+}
+@media (max-width: 640px) {
+    .burger-menu {
+        padding: 5rem 6vw 3rem;
+        align-items: flex-start;
+        transition: opacity 0.18s ease;
+    }
+    .burger-menu-inner {
+        grid-template-columns: 1fr;
+        gap: 0.4em;
+        padding: 0;
+        justify-items: start;
+    }
+    .burger-menu-col-left,
+    .burger-menu-col-right {
+        justify-self: start;
+        align-items: flex-start;
+        text-align: left;
+        width: 100%;
+    }
+    .burger-menu-col-right {
+        margin-top: 0.5em;
+        padding-top: 0.5em;
+        border-top: 1px solid rgba(10, 10, 10, 0.15);
+        width: 100%;
+    }
+    .burger-link {
+        font-size: clamp(1.7rem, 7.4vw, 2.6rem);
+        line-height: 1.12;
+        transform: translate3d(0, 10px, 0);
+        transition:
+            color 0.18s ease,
+            transform 0.2s ease,
+            opacity 0.16s ease;
+    }
+    .burger-menu.open .burger-link {
+        transform: translate3d(0, 0, 0);
+        transition:
+            color 0.2s ease,
+            transform 0.28s cubic-bezier(0.22, 1, 0.36, 1),
+            opacity 0.22s ease;
+    }
+    .burger-menu.open .burger-menu-col-left .burger-link:nth-child(1) { transition-delay: 0.02s; }
+    .burger-menu.open .burger-menu-col-left .burger-link:nth-child(2) { transition-delay: 0.05s; }
+    .burger-menu.open .burger-menu-col-left .burger-link:nth-child(3) { transition-delay: 0.08s; }
+    .burger-menu.open .burger-menu-col-left .burger-link:nth-child(4) { transition-delay: 0.11s; }
+    .burger-menu.open .burger-menu-col-left .burger-link:nth-child(5) { transition-delay: 0.14s; }
+    .burger-menu.open .burger-menu-col-right .burger-link:nth-child(1) { transition-delay: 0.06s; }
+    .burger-menu.open .burger-menu-col-right .burger-link:nth-child(2) { transition-delay: 0.09s; }
+    .burger-menu.open .burger-menu-col-right .burger-link:nth-child(3) { transition-delay: 0.12s; }
+    .burger-menu-col-left  .burger-link:hover,
+    .burger-menu-col-right .burger-link:hover { transform: translate3d(0, 0, 0); }
+    .burger-menu-col-right .burger-link.active::after {
+        content: '→';
+        right: auto;
+        left: -0.9em;
+    }
+    .burger-menu-col-right .burger-link.active::before { content: none; }
+    .burger-menu-foot {
+        bottom: 1.4rem;
+        font-size: 0.55rem;
+        letter-spacing: 0.16em;
+        left: 6vw;
+        right: 6vw;
+        transform: none;
+        text-align: left;
+        white-space: normal;
+    }
+}
+@media (max-width: 420px) {
+    .burger-link { font-size: clamp(1.5rem, 7vw, 2.1rem); }
+    .burger-menu-inner { gap: 0.35em; }
 }
 
-/* ============================================================
-   СПИСОК СТАТЕЙ — СУПЕР-МОДНЫЙ
-   ============================================================ */
+/* СПИСОК СТАТЕЙ */
 .parents-wrapper {
     position: relative;
     z-index: 10;
@@ -276,7 +406,6 @@ body::before {
     padding: 3rem 5vw 8rem;
 }
 
-/* Верхняя линия-маркер раздела */
 .parents-list {
     display: flex;
     flex-direction: column;
@@ -284,7 +413,6 @@ body::before {
     counter-reset: article;
 }
 
-/* Каждая статья — большая строка-карточка */
 .parents-card {
     position: relative;
     display: grid;
@@ -302,7 +430,6 @@ body::before {
     isolation: isolate;
 }
 
-/* Красная полоса слева — растёт при hover */
 .parents-card::before {
     content: '';
     position: absolute;
@@ -322,7 +449,6 @@ body::before {
     width: 8px;
 }
 
-/* Номер — большой, в стиле журнала */
 .parents-num {
     position: relative;
     z-index: 1;
@@ -344,7 +470,6 @@ body::before {
     transform: translateX(6px) scale(1.05);
 }
 
-/* Основной блок — метка + название */
 .parents-body {
     position: relative;
     z-index: 1;
@@ -354,7 +479,6 @@ body::before {
     gap: 14px;
 }
 
-/* Метка над названием */
 .parents-label {
     display: flex;
     align-items: center;
@@ -382,7 +506,6 @@ body::before {
     transform: scale(1.8);
 }
 
-/* Название — крупно, Oswald */
 .parents-title {
     font-family: var(--font-display);
     font-weight: 600;
@@ -399,7 +522,6 @@ body::before {
     transform: translateX(8px);
 }
 
-/* Подчёркивание под названием */
 .parents-title-line {
     display: block;
     height: 2px;
@@ -411,7 +533,6 @@ body::before {
     width: 84px;
 }
 
-/* Стрелка */
 .parents-arrow {
     position: relative;
     z-index: 1;
@@ -430,7 +551,6 @@ body::before {
     transform: translateX(0);
 }
 
-/* Пустые состояния */
 .parents-state {
     padding: 90px 20px;
     text-align: center;
@@ -499,9 +619,7 @@ body::before {
     .parents-arrow { font-size: 1.3rem; }
 }
 
-/* ============================================================
-   МОДАЛЬНОЕ ОКНО ЧТЕНИЯ — большая книжная страница
-   ============================================================ */
+/* МОДАЛЬНОЕ ОКНО ЧТЕНИЯ */
 .parents-reader-overlay {
     position: fixed;
     inset: 0;
@@ -731,7 +849,6 @@ body::before {
     border-radius: 4px;
 }
 
-/* Буквица в первом абзаце */
 .parents-reader-content > p:first-of-type::first-letter {
     font-family: var(--font-display);
     font-weight: 700;
@@ -791,21 +908,25 @@ body::before {
 
 <div class="burger-menu" id="burgerMenu">
     <div class="burger-menu-inner">
-        <a href="index.html" class="burger-link">ТИТУЛ</a>
-        <a href="syllables.html" class="burger-link">УЧИ СЛОГИ</a>
-        <a href="clock.html" class="burger-link">ВРЕМЯ</a>
-        <a href="personalities.html" class="burger-link">ВЕЛИКИЕ</a>
-        <a href="paintings.html" class="burger-link">ЖИВОПИСЬ</a>
-        <a href="cartoons.html" class="burger-link">МУЛЬТЫ</a>
-        <a href="poems.html" class="burger-link">ПОЭЗИЯ</a>
-        <a href="parents.html" class="burger-link active">РОДИТЕЛЯМ</a>
+        <div class="burger-menu-col burger-menu-col-left">
+            <a href="index.html"    class="burger-link" data-ns="home">ТИТУЛ.</a>
+            <a href="reading.html"  class="burger-link" data-ns="reading">УЧИ СЛОГИ,</a>
+            <a href="tools.html"    class="burger-link" data-ns="tools">УЧИСЬ ЧАСАМ,</a>
+            <a href="heroes.html"   class="burger-link" data-ns="heroes">БЕРИ ПРИМЕР С ВЕЛИКИХ</a>
+            <a href="cinema.html"   class="burger-link" data-ns="cinema">МУЛЬТЫ</a>
+        </div>
+        <div class="burger-menu-col burger-menu-col-right">
+            <a href="art.html"      class="burger-link" data-ns="art">ЖИВОПИСЬ,</a>
+            <a href="poetry.html"   class="burger-link" data-ns="poetry">ПОЭЗИЯ,</a>
+            <a href="articles.html" class="burger-link active" data-ns="articles">ПЕДАГОГИКА.</a>
+        </div>
     </div>
     <div class="burger-menu-foot">ГРАМОТИНЬО · ТЕРМИНАЛ КУЛЬТУРЫ · 2026</div>
 </div>
 
 <header class="page-header">
     <div class="page-logo">
-        <span class="l1">РОДИТЕЛЯМ.</span>
+        <span class="l1">ПЕДАГОГИКА.</span>
         <span class="l2">СТАТЬИ О ВОСПИТАНИИ</span>
     </div>
 </header>
@@ -834,15 +955,33 @@ body::before {
     const burgerBtn  = document.getElementById('burgerBtn');
     const burgerMenu = document.getElementById('burgerMenu');
     if (!burgerBtn || !burgerMenu) return;
+
+    function openMenu() {
+        burgerMenu.classList.add('open');
+        burgerBtn.classList.add('open');
+        document.body.style.overflow = 'hidden';
+        document.body.classList.add('menu-open');
+    }
+    function closeMenu() {
+        burgerMenu.classList.remove('open');
+        burgerBtn.classList.remove('open');
+        document.body.style.overflow = '';
+        document.body.classList.remove('menu-open');
+    }
+
     burgerBtn.addEventListener('click', () => {
-        const isOpen = burgerMenu.classList.toggle('open');
-        burgerBtn.classList.toggle('open', isOpen);
-        document.body.style.overflow = isOpen ? 'hidden' : '';
+        if (burgerMenu.classList.contains('open')) closeMenu();
+        else openMenu();
+    });
+
+    document.querySelectorAll('.burger-link').forEach(link => {
+        link.addEventListener('click', () => closeMenu());
     });
 })();
 
 /* ============================================================
-   РОДИТЕЛЯМ — статьи   ============================================================ */
+   ПЕДАГОГИКА — статьи
+   ============================================================ */
 (function () {
     const INDEX_URL      = 'articles/index.json';
     const ARTICLE_DIR    = 'articles/';
@@ -862,7 +1001,6 @@ body::before {
     const articleCache = new Map();
     let readingSlug    = null;
 
-    /* ---------- Утилиты ---------- */
     function esc(s) {
         return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
     }
@@ -949,7 +1087,6 @@ body::before {
         return String(md || '').replace(/^\s*#\s+.*?(?:\r?\n|$)/, '');
     }
 
-    /* ---------- Загрузка ---------- */
     async function loadIndex(force) {
         if (indexCache.loaded && !force) return indexCache.data;
         const res = await fetch(INDEX_URL, { cache: 'no-cache' });
@@ -980,7 +1117,6 @@ body::before {
         return text;
     }
 
-    /* ---------- Рендер ---------- */
     function renderLoading() {
         list.innerHTML = '<div class="parents-state">ЗАГРУЗКА…</div>';
     }
@@ -1015,11 +1151,9 @@ body::before {
             card.href = HASH_PREFIX + encodeURIComponent(slug);
             card.dataset.slug = slug;
 
-            /* Номер */
             const num = document.createElement('span');
             num.className = 'parents-num';
 
-            /* Тело: метка + название + линия */
             const body = document.createElement('div');
             body.className = 'parents-body';
 
@@ -1043,7 +1177,6 @@ body::before {
             body.appendChild(titleEl);
             body.appendChild(line);
 
-            /* Стрелка */
             const arrow = document.createElement('span');
             arrow.className = 'parents-arrow';
             arrow.textContent = '→';
@@ -1065,7 +1198,6 @@ body::before {
         list.appendChild(frag);
     }
 
-    /* ---------- Открытие статьи ---------- */
     async function openBySlug(slug) {
         if (!slug) return;
         if (readingSlug === slug && readerModal.classList.contains('show')) return;
@@ -1144,7 +1276,6 @@ body::before {
         if (readerModal.classList.contains('show') && e.key === 'Escape') closeArticle();
     });
 
-    /* ---------- Инициализация ---------- */
     renderLoading();
     loadIndex()
         .then(items => renderList(items))
@@ -1156,7 +1287,7 @@ body::before {
 })();
 
 /* ============================================================
-   АНИМАЦИЯ ПОЯВЛЕНИЯ — как у главной
+   АНИМАЦИЯ ПОЯВЛЕНИЯ
    ============================================================ */
 document.addEventListener('DOMContentLoaded', () => {
     const tl = gsap.timeline({ defaults: { ease: 'power4.out' } });
