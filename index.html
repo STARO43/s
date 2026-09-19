@@ -165,6 +165,18 @@ body::after {
 .line-1 { color: var(--red); }
 .line-2 { color: var(--text); }
 
+/* Деформируемая точка в конце "ГРАМОТИНЬО." */
+.dot-deform {
+    display: inline-block;
+    transform-origin: center center;
+    will-change: transform;
+    transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    pointer-events: none;
+}
+@media (pointer: coarse) {
+    .dot-deform { transform: none !important; transition: none; }
+}
+
 .hero-title .terminal-word {
     cursor: default;
     user-select: none;
@@ -430,24 +442,20 @@ body::after {
         opacity 0.45s ease;
 }
 
-/* Каскадное появление — левая колонка */
 .burger-menu.open .burger-menu-col-left .burger-link:nth-child(1) { transition-delay: 0.10s; }
 .burger-menu.open .burger-menu-col-left .burger-link:nth-child(2) { transition-delay: 0.16s; }
 .burger-menu.open .burger-menu-col-left .burger-link:nth-child(3) { transition-delay: 0.22s; }
 .burger-menu.open .burger-menu-col-left .burger-link:nth-child(4) { transition-delay: 0.28s; }
 .burger-menu.open .burger-menu-col-left .burger-link:nth-child(5) { transition-delay: 0.34s; }
 
-/* Каскадное появление — правая колонка (чуть позже) */
 .burger-menu.open .burger-menu-col-right .burger-link:nth-child(1) { transition-delay: 0.22s; }
 .burger-menu.open .burger-menu-col-right .burger-link:nth-child(2) { transition-delay: 0.28s; }
 .burger-menu.open .burger-menu-col-right .burger-link:nth-child(3) { transition-delay: 0.34s; }
 
-/* Hover — разные направления для колонок */
 .burger-link:hover { color: var(--red); }
 .burger-menu-col-left  .burger-link:hover { transform: translateX(14px); }
 .burger-menu-col-right .burger-link:hover { transform: translateX(-14px); }
 
-/* Активная ссылка */
 .burger-link.active {
     color: var(--red);
     font-style: italic;
@@ -864,7 +872,7 @@ body::after {
         </div>
 
         <h1 class="hero-title">
-            <div class="word"><span class="word-inner line-1">ГРАМОТИНЬО.</span></div><br>
+            <div class="word"><span class="word-inner line-1">ГРАМОТИНЬО<span class="dot-deform" id="deformDot">.</span></span></div><br>
             <div class="word"><span class="word-inner line-2 terminal-word" id="terminalWord">ТЕРМИНАЛ</span></div>
             <div class="word"><span class="word-inner line-2">КУЛЬТУРЫ</span></div>
         </h1>
@@ -1281,6 +1289,79 @@ document.addEventListener('keydown', (e) => {
         closeTerminal();
     }
 });
+
+/* ============================================================
+   ДЕФОРМАЦИЯ ТОЧКИ В "ГРАМОТИНЬО." — ТОЛЬКО ДЕСКТОП
+   ============================================================ */
+(function () {
+    const dot = document.getElementById('deformDot');
+    if (!dot) return;
+
+    const MQ_COARSE = window.matchMedia('(pointer: coarse)');
+    const MQ_NARROW = window.matchMedia('(max-width: 900px)');
+    function isDesktop() { return !MQ_COARSE.matches && !MQ_NARROW.matches; }
+
+    let rafId = null;
+    let mouseX = 0;
+    let mouseY = 0;
+
+    function update() {
+        rafId = null;
+        if (!isDesktop()) {
+            dot.style.transform = '';
+            return;
+        }
+
+        const rect = dot.getBoundingClientRect();
+        const cx = rect.left + rect.width / 2;
+        const cy = rect.top + rect.height / 2;
+
+        const dx = mouseX - cx;
+        const dy = mouseY - cy;
+        const dist = Math.hypot(dx, dy);
+
+        const RANGE = 320;
+        if (dist > RANGE) {
+            dot.style.transform = '';
+            return;
+        }
+
+        const t = 1 - dist / RANGE;
+        const MAX = 6;
+        const ratio = Math.min(1, dist / 220);
+        const offsetX = (dx / (dist || 1)) * MAX * t * ratio;
+        const offsetY = (dy / (dist || 1)) * MAX * t * ratio;
+
+        const skewX = (offsetX / MAX) * 4;
+        const skewY = (offsetY / MAX) * 4;
+
+        const scaleX = 1 + Math.abs(offsetX) / (MAX * 6);
+        const scaleY = 1 + Math.abs(offsetY) / (MAX * 6);
+
+        dot.style.transform =
+            `translate(${offsetX.toFixed(2)}px, ${offsetY.toFixed(2)}px) ` +
+            `skew(${skewX.toFixed(2)}deg, ${skewY.toFixed(2)}deg) ` +
+            `scale(${scaleX.toFixed(3)}, ${scaleY.toFixed(3)})`;
+    }
+
+    function schedule() {
+        if (rafId !== null) return;
+        rafId = requestAnimationFrame(update);
+    }
+
+    document.addEventListener('mousemove', (e) => {
+        mouseX = e.clientX;
+        mouseY = e.clientY;
+        schedule();
+    }, { passive: true });
+
+    window.addEventListener('resize', schedule, { passive: true });
+    window.addEventListener('scroll', schedule, { passive: true });
+
+    document.addEventListener('mouseleave', () => {
+        dot.style.transform = '';
+    });
+})();
 
 /* ============================================================
    СТАРТОВАЯ АНИМАЦИЯ + КИБЕР-МЕРЦАНИЕ
