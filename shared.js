@@ -55,6 +55,11 @@ function playPageEntryAnimation() {
         stagger: { amount: 0.3, from: 'center' },
         ease: 'expo.inOut'
     });
+   // проявляем контейнер страницы
+const pageContent = document.querySelector('[data-page-content]') || document.querySelector('.wrapper');
+if (pageContent) {
+    tl.set(pageContent, { opacity: 1 }, '-=0.4');
+}
 
     if (!IS_MOBILE) {
         /* Десктоп — полная анимация появления */
