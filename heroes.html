@@ -9,7 +9,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Space+Mono:ital,wght@0,400;0,700;1,400&family=PT+Mono&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
-<title>ГРАМОТИНЬО // ВЕЛИКИЕ</title>
+<title>Грамотиньо. Великие</title>
 <style>
 :root {
     --bg: #F4F1EA;
@@ -511,22 +511,6 @@ body.menu-open::before { display: none; }
     color: var(--text);
     line-height: 1;
 }
-.century-count {
-    font-family: var(--font-mono);
-    font-size: 0.68rem;
-    font-weight: 700;
-    letter-spacing: 0.24em;
-    text-transform: uppercase;
-    color: rgba(10, 10, 10, 0.45);
-    white-space: nowrap;
-    margin-left: auto;
-    padding-left: 20px;
-}
-.century-count b {
-    color: var(--red);
-    font-weight: 700;
-    margin-left: 6px;
-}
 
 /* СОВЕТСКАЯ ПОЛОСА — тонкая, с точками */
 .soviet-band {
@@ -690,7 +674,6 @@ body.menu-open::before { display: none; }
     }
     .century-header:not(:first-child) { margin-top: 48px; }
     .century-title { font-size: 1.5rem; }
-    .century-count { font-size: 0.6rem; padding-left: 12px; }
     .century-header::after { width: 48px; height: 3px; }
 
     .soviet-band {
@@ -1266,8 +1249,7 @@ function renderHeroesTimeline() {
         const heroes = heroesData.filter(c.filter).sort((a, b) => a.deathYear - b.deathYear);
         if (heroes.length === 0) return;
 
-        html += `<div class="century-header"><span class="century-title">${c.name}</span><span class="century-count">ГЕРОЕВ<b>${heroes.length}</b></span></div><div class="heroes-grid">`;
-        let sovietBandInserted = false;
+html += `<div class="century-header"><span class="century-title">${c.name}</span></div><div class="heroes-grid">`;        let sovietBandInserted = false;
 
         heroes.forEach(hero => {
             if (!sovietBandInserted && hero.name === "Ленин") {
