@@ -153,7 +153,7 @@ html.menu-open body {
     32%  { color: var(--text); text-shadow: 4px 0 var(--text), -4px 0 #00E5FF; transform: translateX(-4px); }
     38%  { color: var(--red); text-shadow: none; transform: translateX(0); }
     46%  { color: var(--text); text-shadow: 0 0 12px var(--text); transform: scaleX(1.04); }
-    52%  { color: var(--red); text-shadow: none; transform: scaleX(1); }
+    52%  { color: var(--red); text-shadow: none; transform: translateX(0); }
     60%  { color: var(--text); text-shadow: -2px 0 #00E5FF, 2px 0 var(--text); transform: translateX(2px); }
     66%  { color: var(--red); text-shadow: none; transform: translateX(0); }
     74%  { color: var(--text); text-shadow: 3px 0 var(--text); transform: translateX(-1px); }
@@ -372,7 +372,6 @@ html.menu-open body {
 }
 .burger-menu.open { opacity: 1; pointer-events: auto; }
 
-/* Фон-текстура полностью убран */
 .burger-menu::before { content: none; }
 
 .burger-menu-inner {
@@ -1010,16 +1009,26 @@ html.menu-open body {
                                 <stop offset="1" stop-color="#5c5c5c"/>
                             </linearGradient>
 
-                            <radialGradient id="clkL-dialGrad" cx="0.48" cy="0.42" r="0.8">
-                                <stop offset="0" stop-color="#f7efd8"/>
-                                <stop offset="0.55" stop-color="#eee1be"/>
-                                <stop offset="1" stop-color="#d8c79a"/>
+                            <!-- фон циферблата: тёплый кремовый с лёгкой зернистостью -->
+                            <radialGradient id="clkL-dialGrad" cx="0.46" cy="0.4" r="0.85">
+                                <stop offset="0" stop-color="#f8efd3"/>
+                                <stop offset="0.45" stop-color="#eee0b6"/>
+                                <stop offset="0.8" stop-color="#dfcb94"/>
+                                <stop offset="1" stop-color="#c8b173"/>
                             </radialGradient>
                             <radialGradient id="clkL-dialVignette" cx="0.5" cy="0.5" r="0.5">
                                 <stop offset="0.7" stop-color="#000000" stop-opacity="0"/>
-                                <stop offset="0.92" stop-color="#000000" stop-opacity="0.08"/>
-                                <stop offset="1" stop-color="#000000" stop-opacity="0.22"/>
+                                <stop offset="0.9" stop-color="#000000" stop-opacity="0.12"/>
+                                <stop offset="1" stop-color="#000000" stop-opacity="0.32"/>
                             </radialGradient>
+                            <filter id="clkL-paperGrain" x="-5%" y="-5%" width="110%" height="110%">
+                                <feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="2" stitchTiles="stitch"/>
+                                <feColorMatrix type="saturate" values="0"/>
+                                <feComponentTransfer>
+                                    <feFuncA type="linear" slope="0.12"/>
+                                </feComponentTransfer>
+                                <feBlend mode="multiply" in2="SourceGraphic"/>
+                            </filter>
 
                             <linearGradient id="clkL-crystalGrad" x1="0" y1="0" x2="0.6" y2="0.6">
                                 <stop offset="0" stop-color="#ffffff" stop-opacity="0.4"/>
@@ -1028,25 +1037,36 @@ html.menu-open body {
                                 <stop offset="1" stop-color="#ffffff" stop-opacity="0.15"/>
                             </linearGradient>
 
+                            <!-- Стрелки: классические, чёрная сталь, с воронением -->
                             <linearGradient id="clkL-handGrad" x1="0" y1="0" x2="0" y2="1">
-                                <stop offset="0" stop-color="#2b2b2b"/>
-                                <stop offset="0.5" stop-color="#0b0b0b"/>
-                                <stop offset="1" stop-color="#2b2b2b"/>
+                                <stop offset="0" stop-color="#3a3a3a"/>
+                                <stop offset="0.5" stop-color="#111111"/>
+                                <stop offset="1" stop-color="#3a3a3a"/>
                             </linearGradient>
 
+                            <!-- Ремешок: кожа с продольными волокнами и потертостями -->
                             <linearGradient id="clkL-strapGrad" x1="0" y1="0" x2="1" y2="0">
-                                <stop offset="0" stop-color="#0e0e0e"/>
-                                <stop offset="0.18" stop-color="#1f1f1f"/>
-                                <stop offset="0.5" stop-color="#2e2e2e"/>
-                                <stop offset="0.82" stop-color="#1f1f1f"/>
-                                <stop offset="1" stop-color="#0e0e0e"/>
+                                <stop offset="0" stop-color="#0a0a0a"/>
+                                <stop offset="0.18" stop-color="#232323"/>
+                                <stop offset="0.45" stop-color="#3a3a3a"/>
+                                <stop offset="0.55" stop-color="#3a3a3a"/>
+                                <stop offset="0.82" stop-color="#232323"/>
+                                <stop offset="1" stop-color="#0a0a0a"/>
                             </linearGradient>
                             <linearGradient id="clkL-strapShine" x1="0" y1="0" x2="1" y2="0">
                                 <stop offset="0" stop-color="#ffffff" stop-opacity="0"/>
-                                <stop offset="0.45" stop-color="#ffffff" stop-opacity="0.18"/>
-                                <stop offset="0.55" stop-color="#ffffff" stop-opacity="0.18"/>
+                                <stop offset="0.45" stop-color="#ffffff" stop-opacity="0.22"/>
+                                <stop offset="0.55" stop-color="#ffffff" stop-opacity="0.22"/>
                                 <stop offset="1" stop-color="#ffffff" stop-opacity="0"/>
                             </linearGradient>
+                            <pattern id="clkL-leatherGrain" x="0" y="0" width="14" height="14" patternUnits="userSpaceOnUse">
+                                <rect width="14" height="14" fill="none"/>
+                                <circle cx="3" cy="4" r="0.7" fill="#000" opacity="0.28"/>
+                                <circle cx="9" cy="6" r="0.5" fill="#000" opacity="0.22"/>
+                                <circle cx="5" cy="11" r="0.6" fill="#000" opacity="0.25"/>
+                                <circle cx="12" cy="12" r="0.5" fill="#000" opacity="0.2"/>
+                                <circle cx="7" cy="1" r="0.4" fill="#000" opacity="0.18"/>
+                            </pattern>
 
                             <linearGradient id="clkL-crownGrad" x1="0" y1="0" x2="0" y2="1">
                                 <stop offset="0" stop-color="#b8b8b8"/>
@@ -1071,17 +1091,23 @@ html.menu-open body {
                         <!-- Ремешок сверху -->
                         <g>
                             <path d="M 138 -10 L 262 -10 L 272 105 L 128 105 Z" fill="url(#clkL-strapGrad)"/>
-                            <path d="M 138 -10 L 148 -10 L 138 105 L 128 105 Z" fill="rgba(0,0,0,0.5)"/>
-                            <path d="M 252 -10 L 262 -10 L 272 105 L 262 105 Z" fill="rgba(0,0,0,0.5)"/>
+                            <path d="M 138 -10 L 262 -10 L 272 105 L 128 105 Z" fill="url(#clkL-leatherGrain)"/>
+                            <path d="M 138 -10 L 148 -10 L 138 105 L 128 105 Z" fill="rgba(0,0,0,0.55)"/>
+                            <path d="M 252 -10 L 262 -10 L 272 105 L 262 105 Z" fill="rgba(0,0,0,0.55)"/>
                             <path d="M 170 -10 L 230 -10 L 235 105 L 165 105 Z" fill="url(#clkL-strapShine)"/>
+                            <line x1="150" y1="-8" x2="140" y2="104" stroke="#000" stroke-width="0.5" opacity="0.4" stroke-dasharray="2,3"/>
+                            <line x1="250" y1="-8" x2="260" y2="104" stroke="#000" stroke-width="0.5" opacity="0.4" stroke-dasharray="2,3"/>
                             <ellipse cx="200" cy="55" rx="18" ry="10" fill="url(#clkL-rivetGrad)" opacity="0.95"/>
                         </g>
                         <!-- Ремешок снизу -->
                         <g>
                             <path d="M 128 415 L 272 415 L 262 530 L 138 530 Z" fill="url(#clkL-strapGrad)"/>
-                            <path d="M 128 415 L 138 415 L 148 530 L 138 530 Z" fill="rgba(0,0,0,0.5)"/>
-                            <path d="M 262 415 L 272 415 L 262 530 L 252 530 Z" fill="rgba(0,0,0,0.5)"/>
+                            <path d="M 128 415 L 272 415 L 262 530 L 138 530 Z" fill="url(#clkL-leatherGrain)"/>
+                            <path d="M 128 415 L 138 415 L 148 530 L 138 530 Z" fill="rgba(0,0,0,0.55)"/>
+                            <path d="M 262 415 L 272 415 L 262 530 L 252 530 Z" fill="rgba(0,0,0,0.55)"/>
                             <path d="M 165 415 L 235 415 L 230 530 L 170 530 Z" fill="url(#clkL-strapShine)"/>
+                            <line x1="140" y1="417" x2="150" y2="528" stroke="#000" stroke-width="0.5" opacity="0.4" stroke-dasharray="2,3"/>
+                            <line x1="260" y1="417" x2="250" y2="528" stroke="#000" stroke-width="0.5" opacity="0.4" stroke-dasharray="2,3"/>
                             <ellipse cx="200" cy="465" rx="18" ry="10" fill="url(#clkL-rivetGrad)" opacity="0.95"/>
                         </g>
 
@@ -1112,6 +1138,7 @@ html.menu-open body {
                         <circle cx="200" cy="260" r="152" fill="none" stroke="#707070" stroke-width="0.4" opacity="0.4"/>
                         <circle cx="200" cy="260" r="151" fill="#1a1a1a"/>
                         <circle cx="200" cy="260" r="147" fill="url(#clkL-dialGrad)"/>
+                        <circle cx="200" cy="260" r="147" fill="url(#clkL-paperGrain)" opacity="0.55"/>
                         <circle cx="200" cy="260" r="147" fill="url(#clkL-dialVignette)"/>
 
                         <!-- Риски -->
@@ -1120,10 +1147,15 @@ html.menu-open body {
                         <g id="clkL-numbersGroup"></g>
 
                         <!-- Надписи -->
-                        <text x="200" y="196" text-anchor="middle" font-family="Georgia, 'Times New Roman', serif"
-                              font-size="15" font-weight="700" letter-spacing="3" fill="#1a1a1a">ПОБЕДА</text>
-                        <text x="200" y="392" text-anchor="middle" font-family="Georgia, 'Times New Roman', serif"
-                              font-size="6.5" font-weight="700" letter-spacing="1.6" fill="#3a3a3a">СДЕЛАНО В СССР</text>
+                        <!-- ПОБЕДА: ровно между центром (260) и цифрой 12 (108+... примерно 260 - 108/2 = 206) -->
+                        <text x="200" y="212" text-anchor="middle"
+                              font-family="Georgia, 'Times New Roman', serif"
+                              font-size="13" font-weight="700" letter-spacing="2.6" fill="#1a1a1a">ПОБЕДА</text>
+
+                        <!-- Сделано в СССР: между риской "6" (r=141) и субциферблатом (r=34) -->
+                        <text x="200" y="386" text-anchor="middle"
+                              font-family="Georgia, 'Times New Roman', serif"
+                              font-size="4.6" font-weight="700" letter-spacing="1" fill="#2a2a2a" opacity="0.85">СДЕЛАНО В СССР</text>
 
                         <!-- Секундный субциферблат -->
                         <g id="clkL-subdial">
@@ -1136,17 +1168,15 @@ html.menu-open body {
                         <!-- Стекло -->
                         <circle cx="200" cy="260" r="147" fill="url(#clkL-crystalGrad)" pointer-events="none"/>
 
-                        <!-- Стрелки -->
+                        <!-- Стрелки классические: часовая короче и шире, минутная длиннее -->
                         <g id="clkL-hands">
                             <g id="clkL-hourHand">
-                                <path d="M 197 258 L 197 218 L 199 196 L 200 186 L 201 196 L 203 218 L 203 258 Z"
+                                <path d="M 197.5 262 L 197.5 218 L 199 195 L 200 186 L 201 195 L 202.5 218 L 202.5 262 Z"
                                       fill="url(#clkL-handGrad)"/>
-                                <ellipse cx="200" cy="196" rx="4" ry="7" fill="url(#clkL-handGrad)"/>
                             </g>
                             <g id="clkL-minuteHand">
-                                <path d="M 198 258 L 198 190 L 199 148 L 200 138 L 201 148 L 202 190 L 202 258 Z"
+                                <path d="M 198.5 262 L 198.5 200 L 199.5 148 L 200 138 L 200.5 148 L 201.5 200 L 201.5 262 Z"
                                       fill="url(#clkL-handGrad)"/>
-                                <ellipse cx="200" cy="148" rx="3" ry="9" fill="url(#clkL-handGrad)"/>
                             </g>
                         </g>
 
@@ -1218,6 +1248,14 @@ html.menu-open body {
                                 <stop offset="0.55" stop-color="#ffffff" stop-opacity="0.15"/>
                                 <stop offset="1" stop-color="#ffffff" stop-opacity="0"/>
                             </linearGradient>
+                            <pattern id="clkDk-leatherGrain" x="0" y="0" width="14" height="14" patternUnits="userSpaceOnUse">
+                                <rect width="14" height="14" fill="none"/>
+                                <circle cx="3" cy="4" r="0.7" fill="#000" opacity="0.3"/>
+                                <circle cx="9" cy="6" r="0.5" fill="#000" opacity="0.24"/>
+                                <circle cx="5" cy="11" r="0.6" fill="#000" opacity="0.26"/>
+                                <circle cx="12" cy="12" r="0.5" fill="#000" opacity="0.22"/>
+                                <circle cx="7" cy="1" r="0.4" fill="#000" opacity="0.2"/>
+                            </pattern>
 
                             <linearGradient id="clkDk-crownGrad" x1="0" y1="0" x2="0" y2="1">
                                 <stop offset="0" stop-color="#d8b95c"/>
@@ -1235,12 +1273,14 @@ html.menu-open body {
 
                         <g>
                             <path d="M 138 -10 L 262 -10 L 272 105 L 128 105 Z" fill="url(#clkDk-strapGrad)"/>
+                            <path d="M 138 -10 L 262 -10 L 272 105 L 128 105 Z" fill="url(#clkDk-leatherGrain)"/>
                             <path d="M 138 -10 L 148 -10 L 138 105 L 128 105 Z" fill="rgba(0,0,0,0.55)"/>
                             <path d="M 252 -10 L 262 -10 L 272 105 L 262 105 Z" fill="rgba(0,0,0,0.55)"/>
                             <path d="M 170 -10 L 230 -10 L 235 105 L 165 105 Z" fill="url(#clkDk-strapShine)"/>
                         </g>
                         <g>
                             <path d="M 128 415 L 272 415 L 262 530 L 138 530 Z" fill="url(#clkDk-strapGrad)"/>
+                            <path d="M 128 415 L 272 415 L 262 530 L 138 530 Z" fill="url(#clkDk-leatherGrain)"/>
                             <path d="M 128 415 L 138 415 L 148 530 L 138 530 Z" fill="rgba(0,0,0,0.55)"/>
                             <path d="M 262 415 L 272 415 L 262 530 L 252 530 Z" fill="rgba(0,0,0,0.55)"/>
                             <path d="M 165 415 L 235 415 L 230 530 L 170 530 Z" fill="url(#clkDk-strapShine)"/>
@@ -1273,10 +1313,14 @@ html.menu-open body {
                         <g id="clkDk-ticksGroup"></g>
                         <g id="clkDk-numbersGroup"></g>
 
-                        <text x="200" y="196" text-anchor="middle" font-family="Georgia, 'Times New Roman', serif"
-                              font-size="15" font-weight="700" letter-spacing="3" fill="#f5e6b8">ПОБЕДА</text>
-                        <text x="200" y="392" text-anchor="middle" font-family="Georgia, 'Times New Roman', serif"
-                              font-size="6" font-weight="700" letter-spacing="1.6" fill="#e8cf83" opacity="0.85">СДЕЛАНО В СССР</text>
+                        <text x="200" y="212" text-anchor="middle"
+                              font-family="Georgia, 'Times New Roman', serif"
+                              font-size="13" font-weight="700" letter-spacing="2.6" fill="#f5e6b8">ПОБЕДА</text>
+
+                        <!-- Очень маленькая надпись, вписана между риской "6" и субциферблатом -->
+                        <text x="200" y="386" text-anchor="middle"
+                              font-family="Georgia, 'Times New Roman', serif"
+                              font-size="4.6" font-weight="700" letter-spacing="1" fill="#e8cf83" opacity="0.9">СДЕЛАНО В СССР</text>
 
                         <g id="clkDk-subdial">
                             <circle cx="200" cy="345" r="32" fill="none" stroke="#e8cf83" stroke-width="0.6" opacity="0.85"/>
@@ -1289,9 +1333,9 @@ html.menu-open body {
 
                         <g id="clkDk-hands">
                             <path id="clkDk-hourHand" fill="url(#clkDk-handGrad)"
-                                  d="M 198 258 L 198 200 L 199 168 L 200 158 L 201 168 L 202 200 L 202 258 Z"/>
+                                  d="M 197.5 262 L 197.5 200 L 199 168 L 200 158 L 201 168 L 202.5 200 L 202.5 262 Z"/>
                             <path id="clkDk-minuteHand" fill="url(#clkDk-handGrad)"
-                                  d="M 198.5 258 L 198.5 180 L 199.5 128 L 200 118 L 200.5 128 L 201.5 180 L 201.5 258 Z"/>
+                                  d="M 198.5 262 L 198.5 180 L 199.5 128 L 200 118 L 200.5 128 L 201.5 180 L 201.5 262 Z"/>
                         </g>
                         <circle cx="200" cy="260" r="4" fill="url(#clkDk-bezelGrad)"/>
                         <circle cx="200" cy="260" r="2" fill="#5a4412"/>
@@ -2125,6 +2169,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (wasDrag) {
             clockView.classList.remove('dragging');
             lastDragTime = Date.now();
+            /* Звук ТОЛЬКО при установке стрелок */
             if (!isIOS) speakTime();
         } else if (!wasScroll && !wasOther && point && duration >= TAP_MIN_DURATION && duration < TAP_MAX_DURATION) {
             const ddx = Math.abs(point.x - gesture.startX);
@@ -2154,12 +2199,9 @@ document.addEventListener('DOMContentLoaded', () => {
     window.addEventListener('mousemove', e => { if (!gesture || gesture.source !== 'mouse') return; moveGesture(e, getPoint(e)); });
     window.addEventListener('mouseup', e => { if (!gesture || gesture.source !== 'mouse') return; endGesture(getPoint(e)); });
 
-    clockView.addEventListener('click', e => {
-        if (Date.now() - lastDragTime < 300) return;
-        unlockAudioContext();
-        if (!isIOS) speakTime();
-    });
+    /* Клик по циферблату больше НЕ воспроизводит звук */
 
+    /* Звук ТОЛЬКО по клику на цифровое время */
     if (clockDigitalEl) {
         clockDigitalEl.addEventListener('click', e => {
             e.stopPropagation();
