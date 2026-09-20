@@ -1789,12 +1789,13 @@ function initPoetry() {
 }
 
 /* ---------- 6.6 ART ---------- */
+/* ---------- 6.6 ART ---------- */
 function initArt() {
     once('art', () => {
         const INDEX_URL = 'art/index.json';
         const IMG_DIR   = 'art/';
-        const WHEEL_THRESHOLD = 30;
-        const WHEEL_COOLDOWN  = 420;
+        const WHEEL_THRESHOLD = 4;
+        const WHEEL_COOLDOWN  = 0;
 
         const MQ_NARROW = window.matchMedia('(max-width: 640px)');
         const MQ_COARSE = window.matchMedia('(pointer: coarse)');
@@ -1816,9 +1817,19 @@ function initArt() {
         let order = 'random';
         let current = 0;
         let currentImgEl = null;
-        let lastWheelTime = 0;
-        let closing = false;
+        let prevImgEl    = null;
+        let nextImgEl    = null;
+        let dragging = false;
+        let startX = 0, startY = 0;
+        let lastX = 0, lastY = 0;
+        let axis = null;
+        let t0 = 0;
         let started = false;
+        let closing = false;
+
+        /* Тянем за колесом: накапливаем delta и переключаем когда > ширины */
+        let wheelAccum = 0;
+        let wheelTimer = null;
 
         async function loadIndex() {
             const res = await fetch(INDEX_URL, { cache: 'no-cache' });
@@ -1850,6 +1861,8 @@ function initArt() {
         }
         function clearImage() {
             if (currentImgEl) { currentImgEl.remove(); currentImgEl = null; }
+            if (prevImgEl)    { prevImgEl.remove();    prevImgEl = null; }
+            if (nextImgEl)    { nextImgEl.remove();    nextImgEl = null; }
         }
 
         function buildOrder() {
@@ -1881,57 +1894,85 @@ function initArt() {
             updateNav();
         }
 
-        function showImage(idx, direction) {
-            if (idx < 0 || idx >= items.length) return;
-            const id = items[idx];
-            current = idx;
-
-            const wrap = document.createElement('div');
-            wrap.className = 'art-image-wrap';
-            if (direction === 'down') wrap.classList.add('art-enter-from-down');
-            if (direction === 'up')   wrap.classList.add('art-enter-from-up');
-
+        function makeImg(id) {
             const img = document.createElement('img');
             img.className = 'art-image';
             img.alt = 'Картина ' + id;
             img.draggable = false;
             img.decoding = 'async';
             img.src = IMG_DIR + encodeURIComponent(id) + '.jpg';
-
             img.addEventListener('error', () => {
-                wrap.innerHTML = '';
+                img.replaceWith(document.createTextNode(''));
                 const state = document.createElement('div');
                 state.className = 'art-state is-error';
                 state.textContent = 'Не удалось загрузить картину ' + id;
-                wrap.appendChild(state);
+                img.parentNode && img.parentNode.appendChild(state);
             });
+            return img;
+        }
 
-            wrap.appendChild(img);
-            inner.appendChild(wrap);
+        /* Создаёт wrap с картинкой и позиционирует её по X */
+        function makeWrap(id, offsetX) {
+            const wrap = document.createElement('div');
+            wrap.className = 'art-image-wrap';
+            wrap.style.transform = 'translate3d(' + offsetX + 'px,0,0)';
+            wrap.style.opacity = '1';
+            wrap.appendChild(makeImg(id));
+            return wrap;
+        }
 
-            const oldWrap = currentImgEl;
-            currentImgEl = wrap;
+        /* Главная функция: выставляет три слоя — предыдущий, текущий, следующий */
+        function renderLayers(offsetX) {
+            clearImage();
 
-            requestAnimationFrame(() => {
-                requestAnimationFrame(() => {
-                    wrap.classList.remove('art-enter-from-down', 'art-enter-from-up');
-                    if (oldWrap) {
-                        if (direction === 'down') oldWrap.classList.add('art-exit-up');
-                        if (direction === 'up')   oldWrap.classList.add('art-exit-down');
-                        if (!direction)           oldWrap.classList.add('art-exit-up');
-                        setTimeout(() => { if (oldWrap && oldWrap.parentNode) oldWrap.remove(); }, 550);
-                    }
-                });
-            });
+            const hasPrev = current > 0;
+            const hasNext = current < items.length - 1;
 
+            if (hasPrev) {
+                prevImgEl = makeWrap(items[current - 1], offsetX - inner.clientWidth);
+                inner.appendChild(prevImgEl);
+            }
+            currentImgEl = makeWrap(items[current], offsetX);
+            inner.appendChild(currentImgEl);
+            if (hasNext) {
+                nextImgEl = makeWrap(items[current + 1], offsetX + inner.clientWidth);
+                inner.appendChild(nextImgEl);
+            }
             updateProgress();
+        }
+
+        /* Просто переключение на картинку idx без движения */
+        function showImage(idx, direction) {
+            if (idx < 0 || idx >= items.length) return;
+            current = idx;
+            renderLayers(0);
             preloadAround(idx);
         }
 
+        /* Анимация сдвига в сторону. direction = 1 (вперёд), -1 (назад) */
+        function animateTo(direction, cb) {
+            const W = inner.clientWidth;
+            const targetX = -direction * W;
+
+            if (!currentImgEl) return;
+            const wraps = [prevImgEl, currentImgEl, nextImgEl].filter(Boolean);
+            wraps.forEach((w) => {
+                w.classList.add('art-sliding');
+                w.style.transform = 'translate3d(' + (parseFloat(w.style.transform.replace(/[^\-0-9.]/g, '')) + targetX) + 'px,0,0)';
+            });
+
+            setTimeout(() => {
+                if (direction === 1) current += 1;
+                else                current -= 1;
+                renderLayers(0);
+                preloadAround(current);
+                if (typeof cb === 'function') cb();
+            }, 320);
+        }
+
         function step(dir) {
-            const next = current + dir;
-            if (next < 0 || next >= items.length) return;
-            showImage(next, dir > 0 ? 'down' : 'up');
+            if (dir > 0 && current < items.length - 1) animateTo(1);
+            else if (dir < 0 && current > 0) animateTo(-1);
         }
 
         function openArt() {
@@ -1953,34 +1994,88 @@ function initArt() {
                 showImage(0, null);
             }).catch((err) => showState(err.message || 'Ошибка загрузки', true));
         }
+
+        /* Закрыть галерею И открыть бургер-меню */
         function closeArt() {
             if (!canvas.classList.contains('show')) return;
             closing = true;
             canvas.classList.remove('show');
             document.body.style.overflow = '';
-            setTimeout(() => { closing = false; }, 300);
+            setTimeout(() => {
+                closing = false;
+                if (typeof openMenu === 'function') openMenu();
+            }, 300);
         }
 
         if (prevBtn) prevBtn.addEventListener('click', (e) => { e.preventDefault(); e.stopPropagation(); step(-1); });
         if (nextBtn) nextBtn.addEventListener('click', (e) => { e.preventDefault(); e.stopPropagation(); step(1); });
         if (closeBtn) closeBtn.addEventListener('click', (e) => { e.preventDefault(); e.stopPropagation(); closeArt(); });
 
+        /* Колесо мыши — тянем за колесом */
         function onWheel(e) {
             if (isTouchMode()) return;
             e.preventDefault();
-            const now = Date.now();
-            if (now - lastWheelTime < WHEEL_COOLDOWN) return;
-            if (Math.abs(e.deltaY) < WHEEL_THRESHOLD) return;
-            lastWheelTime = now;
-            step(e.deltaY > 0 ? 1 : -1);
+            if (!currentImgEl) return;
+
+            wheelAccum += e.deltaY;
+
+            /* Сдвигаем текущую картинку пропорционально */
+            const W = inner.clientWidth;
+            const shift = -wheelAccum * 0.6; // чувствительность
+
+            const wraps = [prevImgEl, currentImgEl, nextImgEl].filter(Boolean);
+            const base = current === 0 ? 0 : W;
+            // prevImgEl базовый offset = -W, current = 0, next = +W
+            const baseMap = new Map();
+            if (prevImgEl)    baseMap.set(prevImgEl,    -W);
+            if (currentImgEl) baseMap.set(currentImgEl,  0);
+            if (nextImgEl)    baseMap.set(nextImgEl,     W);
+
+            wraps.forEach((w) => {
+                w.classList.remove('art-sliding');
+                const b = baseMap.get(w) || 0;
+                w.style.transform = 'translate3d(' + (b + shift) + 'px,0,0)';
+            });
+
+            clearTimeout(wheelTimer);
+            wheelTimer = setTimeout(() => {
+                const threshold = W * 0.18;
+                if (wheelAccum > threshold && current < items.length - 1) {
+                    // доехать до следующей
+                    const wraps2 = [prevImgEl, currentImgEl, nextImgEl].filter(Boolean);
+                    wraps2.forEach((w) => {
+                        w.classList.add('art-sliding');
+                        const b = baseMap.get(w) || 0;
+                        w.style.transform = 'translate3d(' + (b - W) + 'px,0,0)';
+                    });
+                    setTimeout(() => { current += 1; renderLayers(0); preloadAround(current); wheelAccum = 0; }, 320);
+                } else if (wheelAccum < -threshold && current > 0) {
+                    const wraps2 = [prevImgEl, currentImgEl, nextImgEl].filter(Boolean);
+                    wraps2.forEach((w) => {
+                        w.classList.add('art-sliding');
+                        const b = baseMap.get(w) || 0;
+                        w.style.transform = 'translate3d(' + (b + W) + 'px,0,0)';
+                    });
+                    setTimeout(() => { current -= 1; renderLayers(0); preloadAround(current); wheelAccum = 0; }, 320);
+                } else {
+                    // вернуть на место
+                    const wraps2 = [prevImgEl, currentImgEl, nextImgEl].filter(Boolean);
+                    wraps2.forEach((w) => {
+                        w.classList.add('art-sliding');
+                        const b = baseMap.get(w) || 0;
+                        w.style.transform = 'translate3d(' + b + 'px,0,0)';
+                    });
+                    wheelAccum = 0;
+                }
+            }, 80);
         }
         canvas.addEventListener('wheel', onWheel, { passive: false });
 
         document.addEventListener('keydown', (e) => {
             if (!canvas.classList.contains('show')) return;
-            if (e.key === 'ArrowDown' || e.key === 'PageDown' || e.key === 'ArrowRight') {
+            if (e.key === 'ArrowRight' || e.key === 'ArrowDown' || e.key === 'PageDown') {
                 e.preventDefault(); step(1);
-            } else if (e.key === 'ArrowUp' || e.key === 'PageUp' || e.key === 'ArrowLeft') {
+            } else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp' || e.key === 'PageUp') {
                 e.preventDefault(); step(-1);
             } else if (e.key === 'Escape') {
                 e.preventDefault(); closeArt();
@@ -1993,52 +2088,111 @@ function initArt() {
             return { x: e.clientX, y: e.clientY };
         }
 
-        let swipe = null;
+        /* СВАЙП: следуем за пальцем */
         catcher.addEventListener('touchstart', (e) => {
             if (closing) return;
             if (e.touches.length !== 1) return;
             const p = getPoint(e);
-            swipe = { startX: p.x, startY: p.y, lastX: p.x, lastY: p.y, t0: Date.now(), axis: null, active: true };
+            dragging = true;
+            axis = null;
+            startX = lastX = p.x;
+            startY = lastY = p.y;
+            t0 = Date.now();
+            /* Снимаем transition на текущих слоях для мгновенного следования */
+            if (currentImgEl) currentImgEl.classList.remove('art-sliding');
+            if (prevImgEl)    prevImgEl.classList.remove('art-sliding');
+            if (nextImgEl)    nextImgEl.classList.remove('art-sliding');
         }, { passive: true });
+
         catcher.addEventListener('touchmove', (e) => {
-            if (!swipe || !swipe.active || closing) return;
-            if (e.touches.length !== 1) { swipe.active = false; return; }
+            if (!dragging || closing) return;
+            if (e.touches.length !== 1) { dragging = false; return; }
             const p = getPoint(e);
-            swipe.lastX = p.x;
-            swipe.lastY = p.y;
-            if (!swipe.axis) {
-                const dx = Math.abs(p.x - swipe.startX);
-                const dy = Math.abs(p.y - swipe.startY);
+            lastX = p.x;
+            lastY = p.y;
+
+            if (!axis) {
+                const dx = Math.abs(p.x - startX);
+                const dy = Math.abs(p.y - startY);
                 if (dx < 6 && dy < 6) return;
-                swipe.axis = dy > dx ? 'v' : 'h';
+                axis = dy > dx ? 'v' : 'h';
             }
-            if (e.cancelable) e.preventDefault();
+
+            const W = inner.clientWidth;
+
+            if (axis === 'h') {
+                if (e.cancelable) e.preventDefault();
+                const dx = p.x - startX;
+                const shift = dx;
+                if (currentImgEl) currentImgEl.style.transform = 'translate3d(' + shift + 'px,0,0)';
+                if (prevImgEl)    prevImgEl.style.transform    = 'translate3d(' + (-W + shift) + 'px,0,0)';
+                if (nextImgEl)    nextImgEl.style.transform    = 'translate3d(' + ( W + shift) + 'px,0,0)';
+            } else {
+                /* Вертикальный — готовим закрытие, но не блокируем скролл */
+                const dy = p.y - startY;
+                if (currentImgEl) {
+                    currentImgEl.style.transform = 'translate3d(0,' + dy + 'px,0)';
+                    currentImgEl.style.opacity = String(Math.max(0.3, 1 - Math.abs(dy) / 400));
+                }
+            }
         }, { passive: false });
 
-        function finishSwipe() {
-            if (!swipe || !swipe.active || closing) { swipe = null; return; }
-            swipe.active = false;
-            const dt = Date.now() - swipe.t0;
-            const dx = swipe.lastX - swipe.startX;
-            const dy = swipe.lastY - swipe.startY;
+        catcher.addEventListener('touchend', () => {
+            if (!dragging) return;
+            dragging = false;
+            const dt = Date.now() - t0;
+            const dx = lastX - startX;
+            const dy = lastY - startY;
             const adx = Math.abs(dx);
             const ady = Math.abs(dy);
-            const v = Math.max(adx, ady) / Math.max(1, dt);
-            if (swipe.axis === 'v') {
-                if ((dt < 300 && ady >= 30) || ady >= 90) closeArt();
-                swipe = null;
-                return;
-            }
-            if (swipe.axis === 'h') {
-                const fast = v > 0.4 && adx > 15;
-                const far = adx > window.innerWidth * 0.22;
-                if (fast || far) step(dx < 0 ? 1 : -1);
-            }
-            swipe = null;
-        }
-        catcher.addEventListener('touchend', finishSwipe, { passive: true });
-        catcher.addEventListener('touchcancel', () => { swipe = null; }, { passive: true });
 
+            if (axis === 'h') {
+                const W = inner.clientWidth;
+                const threshold = Math.min(W * 0.2, 100);
+                const fast = dt < 250 && adx > 40;
+                const far = adx > threshold;
+
+                if ((fast || far) && dx < 0 && current < items.length - 1) {
+                    /* Свайп влево → следующая */
+                    const wraps = [prevImgEl, currentImgEl, nextImgEl].filter(Boolean);
+                    wraps.forEach((w) => {
+                        w.classList.add('art-sliding');
+                        const cur = parseFloat((w.style.transform.match(/translate3d\(([^p]+)px/) || [0,0])[1]) || 0;
+                        w.style.transform = 'translate3d(' + (cur - W) + 'px,0,0)';
+                    });
+                    setTimeout(() => { current += 1; renderLayers(0); preloadAround(current); }, 320);
+                } else if ((fast || far) && dx > 0 && current > 0) {
+                    /* Свайп вправо → предыдущая */
+                    const wraps = [prevImgEl, currentImgEl, nextImgEl].filter(Boolean);
+                    wraps.forEach((w) => {
+                        w.classList.add('art-sliding');
+                        const cur = parseFloat((w.style.transform.match(/translate3d\(([^p]+)px/) || [0,0])[1]) || 0;
+                        w.style.transform = 'translate3d(' + (cur + W) + 'px,0,0)';
+                    });
+                    setTimeout(() => { current -= 1; renderLayers(0); preloadAround(current); }, 320);
+                } else {
+                    /* Возврат */
+                    renderLayers(0);
+                }
+            } else if (axis === 'v') {
+                if (ady > 80) {
+                    closeArt();
+                } else {
+                    renderLayers(0);
+                }
+            } else {
+                renderLayers(0);
+            }
+            axis = null;
+        }, { passive: true });
+
+        catcher.addEventListener('touchcancel', () => {
+            dragging = false;
+            axis = null;
+            renderLayers(0);
+        }, { passive: true });
+
+        /* Смена порядка */
         if (controls) {
             controls.querySelectorAll('.art-order-btn').forEach((btn) => {
                 btn.addEventListener('click', (e) => {
@@ -2051,7 +2205,6 @@ function initArt() {
                     buildOrder();
                     current = 0;
                     clearImage();
-                    inner.querySelectorAll('.art-image-wrap').forEach((el) => el.remove());
                     showImage(0, null);
                 });
             });
