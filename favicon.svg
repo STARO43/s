@@ -1,0 +1,44 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
+    <defs>
+        <clipPath id="avatarClip">
+            <circle cx="32" cy="32" r="28"/>
+        </clipPath>
+        <radialGradient id="ringGrad" cx="0.35" cy="0.3" r="0.85">
+            <stop offset="0"   stop-color="#FF2A4A"/>
+            <stop offset="0.45" stop-color="#D90429"/>
+            <stop offset="1"   stop-color="#8A0119"/>
+        </radialGradient>
+        <radialGradient id="innerShadow" cx="0.5" cy="0.5" r="0.5">
+            <stop offset="0.72" stop-color="#000000" stop-opacity="0"/>
+            <stop offset="1"    stop-color="#000000" stop-opacity="0.28"/>
+        </radialGradient>
+        <linearGradient id="gloss" x1="0" y1="0" x2="0.4" y2="1">
+            <stop offset="0"   stop-color="#FFFFFF" stop-opacity="0.45"/>
+            <stop offset="0.35" stop-color="#FFFFFF" stop-opacity="0.05"/>
+            <stop offset="1"   stop-color="#FFFFFF" stop-opacity="0"/>
+        </linearGradient>
+    </defs>
+
+    <!-- Внешний красный круг -->
+    <circle cx="32" cy="32" r="31" fill="url(#ringGrad)"/>
+
+    <!-- Тонкая белая обводка -->
+    <circle cx="32" cy="32" r="30" fill="none" stroke="#FFFFFF" stroke-width="0.6" opacity="0.9"/>
+
+    <!-- Внутренний чёрный ободок между кольцом и портретом -->
+    <circle cx="32" cy="32" r="29" fill="#0A0A0A"/>
+
+    <!-- Портрет девочки, обрезанный по кругу -->
+    <g clip-path="url(#avatarClip)">
+        <image href="avatar.png"
+               x="2" y="2" width="60" height="60"
+               preserveAspectRatio="xMidYMid slice"/>
+        <!-- Внутренняя тень для объёма -->
+        <circle cx="32" cy="32" r="28" fill="url(#innerShadow)"/>
+        <!-- Глянцевый блик сверху -->
+        <circle cx="32" cy="32" r="28" fill="url(#gloss)"/>
+    </g>
+
+    <!-- Тонкая белая обводка портрета -->
+    <circle cx="32" cy="32" r="28" fill="none" stroke="#FFFFFF" stroke-width="0.8" opacity="0.85"/>
+</svg>
