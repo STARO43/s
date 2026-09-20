@@ -2549,14 +2549,13 @@ function initArticles() {
 
         const list          = document.getElementById('parentsList');
         const reader        = document.getElementById('reader');
+        const readerHead    = document.getElementById('readerHead');
         const readerBody    = document.getElementById('readerBody');
         const readerTitle   = document.getElementById('readerTitle');
         const readerContent = document.getElementById('readerContent');
         const readerTime    = document.getElementById('readerTime');
         const progressFill  = document.getElementById('progressFill');
-        const backBtn       = document.getElementById('backBtn');
         const closeBtn      = document.getElementById('closeBtn');
-        const footBack      = document.getElementById('footBack');
 
         if (!list || !reader) return;
 
@@ -2750,13 +2749,12 @@ function initArticles() {
             list.appendChild(frag);
         }
 
-        /* Считаем минуты чтения */
         function readTime(text) {
             const words = String(text).replace(/<[^>]+>/g, ' ').trim().split(/\s+/).length;
-            return '≈ ' + Math.max(1, Math.round(words / 180)) + ' мин чтения';
+            const mins = Math.max(1, Math.round(words / 180));
+            return 'ПРИМЕРНОЕ ВРЕМЯ ДОКЛАДА: ' + mins + ' МИН';
         }
 
-        /* Открытие читалки */
         async function openBySlug(slug) {
             if (!slug) return;
             if (readingSlug === slug && reader.classList.contains('show')) return;
@@ -2790,7 +2788,6 @@ function initArticles() {
             });
         }
 
-        /* Закрытие */
         function closeReader() {
             if (!reader.classList.contains('show')) return;
             reader.classList.remove('show');
@@ -2819,9 +2816,25 @@ function initArticles() {
 
         window.addEventListener('hashchange', handleHash);
 
-        if (backBtn)  backBtn.addEventListener('click', closeArticle);
-        if (closeBtn) closeBtn.addEventListener('click', closeArticle);
-        if (footBack) footBack.addEventListener('click', closeArticle);
+        // Возврат по клику на всю шапку-линейку
+        if (readerHead) {
+            readerHead.addEventListener('click', (e) => {
+                if (e.target.closest('.reader-close')) return;
+                closeArticle();
+            });
+            readerHead.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    closeArticle();
+                }
+            });
+        }
+        if (closeBtn) {
+            closeBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                closeArticle();
+            });
+        }
 
         document.addEventListener('keydown', (e) => {
             if (reader.classList.contains('show') && e.key === 'Escape') closeArticle();
