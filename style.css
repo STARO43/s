@@ -1267,7 +1267,7 @@ html[data-theme="dark"] .burger-btn .ring { border-color: rgba(221,224,229,.3); 
 }
 
 /* ============================================================
-   READER — книжный лист + печатная машинка
+   READER — лист бумаги с текстом
    ============================================================ */
 .reader {
     position: fixed;
@@ -1308,92 +1308,6 @@ html[data-theme="dark"] .burger-btn .ring { border-color: rgba(221,224,229,.3); 
     transition: width .1s linear;
 }
 
-/* ============================================================
-   ВЕРХНИЙ БАР — «СОВЕТСКАЯ ЛИНЕЙКА»
-   ============================================================ */
-.reader-head {
-    position: sticky;
-    top: 0;
-    z-index: 4;
-    flex-shrink: 0;
-    cursor: pointer;
-    background-color: transparent;
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
-    border-bottom: 1px solid var(--paper-line);
-    transition: background-color .25s ease;
-    -webkit-tap-highlight-color: transparent;
-}
-.reader-head:hover { background-color: rgba(217, 4, 41, 0.04); }
-html[data-theme="dark"] .reader-head:hover { background-color: rgba(255, 59, 92, 0.06); }
-
-.reader-head-inner {
-    max-width: 1100px;
-    margin: 0 auto;
-    padding: 12px 5vw 10px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 16px;
-}
-
-.reader-head::after {
-    content: '';
-    position: absolute;
-    left: 5vw;
-    right: 5vw;
-    bottom: -6px;
-    height: 6px;
-    background-image:
-        repeating-linear-gradient(90deg,
-            var(--muted) 0px,
-            var(--muted) 1px,
-            transparent 1px,
-            transparent 10px),
-        repeating-linear-gradient(90deg,
-            var(--text) 0px,
-            var(--text) 1.5px,
-            transparent 1.5px,
-            transparent 50px);
-    background-size: 10px 4px, 50px 6px;
-    background-repeat: repeat-x, repeat-x;
-    background-position: left bottom, left bottom;
-    opacity: 0.55;
-    pointer-events: none;
-}
-
-.reader-close {
-    background: transparent;
-    border: none;
-    cursor: pointer;
-    color: var(--text);
-    font-size: 1.5rem;
-    letter-spacing: 0;
-    padding: 0 0 4px;
-    font-weight: 300;
-    font-family: var(--font-display);
-    -webkit-tap-highlight-color: transparent;
-    transition: color .2s ease, transform .2s ease;
-}
-.reader-close:hover { color: var(--red); transform: rotate(90deg); }
-
-.reader-label {
-    font-family: var(--font-mono);
-    font-size: 0.58rem;
-    font-weight: 700;
-    letter-spacing: 0.3em;
-    text-transform: uppercase;
-    color: var(--muted);
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    white-space: nowrap;
-}
-.reader-label .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--red); }
-
-/* ============================================================
-   ТЕЛО — текст на «бумажном листе»
-   ============================================================ */
 .reader-body {
     flex: 1;
     min-height: 0;
@@ -1405,7 +1319,7 @@ html[data-theme="dark"] .reader-head:hover { background-color: rgba(255, 59, 92,
 }
 
 .reader-sheet {
-    max-width: 1100px;
+    max-width: 900px;
     margin: 0 auto;
     padding: clamp(40px, 8vh, 80px) 5vw clamp(80px, 12vh, 160px);
     opacity: 0;
@@ -1414,88 +1328,141 @@ html[data-theme="dark"] .reader-head:hover { background-color: rgba(255, 59, 92,
 }
 .reader.show .reader-sheet { opacity: 1; transform: translateY(0); }
 
+/* Заголовок — печатная машинка */
 .reader-title {
-    font-family: var(--font-display);
-    font-weight: 700;
-    font-size: clamp(2rem, 6vw, 4rem);
-    line-height: 1.02;
-    letter-spacing: -0.03em;
+    font-family: 'Special Elite', 'Courier New', monospace;
+    font-weight: 400;
+    font-size: clamp(1.8rem, 5vw, 3.2rem);
+    line-height: 1.15;
+    letter-spacing: 0.01em;
     text-transform: uppercase;
-    color: var(--text);
-    max-width: 22ch;
+    color: #1a1a1a;
+    max-width: 24ch;
     margin: 0 0 18px;
 }
+html[data-theme="dark"] .reader-title { color: #0A0A0A; }
 
+/* Мета: примерное время доклада */
 .reader-meta {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    font-family: var(--font-mono);
-    font-size: 0.72rem;
-    font-weight: 700;
-    letter-spacing: 0.18em;
+    font-family: 'Special Elite', 'Courier New', monospace;
+    font-size: 0.85rem;
+    font-weight: 400;
+    letter-spacing: 0.08em;
     text-transform: uppercase;
-    color: var(--muted);
-    margin-bottom: 40px;
-    padding-bottom: 18px;
-    border-bottom: 1px solid var(--paper-line);
-    position: relative;
-    max-width: 68ch;
+    color: rgba(26, 26, 26, 0.7);
+    margin-bottom: 26px;
 }
-.reader-meta::after {
-    content: '';
-    position: absolute;
-    bottom: -1px; left: 0;
-    right: 0;
-    height: 1px;
-    background-image: repeating-linear-gradient(90deg,
-        var(--muted) 0px, var(--muted) 1px,
-        transparent 1px, transparent 8px);
-    opacity: 0.4;
+html[data-theme="dark"] .reader-meta { color: rgba(10, 10, 10, 0.7); }
+
+/* Кнопка «ВЕРНУТЬ ДОКУМЕНТ» — не кнопка, обычный текст */
+.reader-back {
+    display: inline-block;
+    background: transparent;
+    border: none;
+    padding: 0;
+    margin: 0 0 40px 0;
+    font-family: 'Special Elite', 'Courier New', monospace;
+    font-size: 0.95rem;
+    font-weight: 400;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: #1a1a1a;
+    cursor: default;
+    text-decoration: none;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+    -webkit-user-select: none;
 }
-.reader-meta .dot { display: none; }
+.reader-back::before { content: '←  '; }
+.reader-back-bottom {
+    display: block;
+    margin: 40px 0 0 0;
+}
+html[data-theme="dark"] .reader-back { color: #0A0A0A; }
 
 /* ============================================================
-   КОНТЕНТ — «бумага под текстом»
+   БУМАЖНЫЙ ЛИСТ — под текстом и вокруг него
    ============================================================ */
 .reader-content {
-    max-width: 68ch;
+    max-width: 100%;
     font-family: 'Special Elite', 'Courier New', monospace;
-    font-size: clamp(1.05rem, 1.55vw, 1.18rem);
-    line-height: 1.85;
+    font-size: clamp(1.05rem, 1.5vw, 1.18rem);
+    line-height: 1.9;
     color: #1a1a1a;
     letter-spacing: 0.005em;
     font-weight: 400;
 
     background-color: #F2E9D2;
     background-image:
-        radial-gradient(ellipse 100% 100% at 50% 0%, rgba(255, 251, 236, 0.6), transparent 70%),
+        radial-gradient(ellipse 100% 100% at 50% 0%, rgba(255, 251, 236, 0.65), transparent 70%),
         repeating-linear-gradient(0deg,
-            rgba(120, 90, 50, 0.025) 0px,
-            rgba(120, 90, 50, 0.025) 1px,
+            rgba(120, 90, 50, 0.022) 0px,
+            rgba(120, 90, 50, 0.022) 1px,
             transparent 1px,
-            transparent 28px);
-    padding: 46px 52px 54px;
+            transparent 30px);
+    padding: 56px 60px 64px;
     border: 1px solid rgba(120, 90, 50, 0.22);
     box-shadow:
-        0 1px 0 rgba(255, 255, 255, 0.6) inset,
+        0 1px 0 rgba(255, 255, 255, 0.55) inset,
         0 2px 6px rgba(80, 60, 30, 0.06),
-        0 20px 50px -20px rgba(80, 60, 30, 0.18);
+        0 22px 55px -22px rgba(80, 60, 30, 0.22);
     position: relative;
 }
+/* Тонкая рамка-«оттиск» внутри листа */
 .reader-content::before {
     content: '';
     position: absolute;
-    inset: 6px;
-    border: 1px dashed rgba(120, 90, 50, 0.14);
+    inset: 8px;
+    border: 1px dashed rgba(120, 90, 50, 0.12);
     pointer-events: none;
     z-index: 0;
 }
 .reader-content > * { position: relative; z-index: 1; }
 
+/* Заголовок, мета и верхняя кнопка — тоже на бумаге.
+   Обёртка: их стили уже на бумаге, потому что .reader-sheet содержит .reader-content
+   Но title/meta/back находятся ВЫШЕ content, поэтому заворачиваем бумагу на весь sheet */
+.reader-sheet {
+    background-color: #F2E9D2;
+    background-image:
+        radial-gradient(ellipse 100% 100% at 50% 0%, rgba(255, 251, 236, 0.65), transparent 70%),
+        repeating-linear-gradient(0deg,
+            rgba(120, 90, 50, 0.022) 0px,
+            rgba(120, 90, 50, 0.022) 1px,
+            transparent 1px,
+            transparent 30px);
+    border: 1px solid rgba(120, 90, 50, 0.22);
+    box-shadow:
+        0 1px 0 rgba(255, 255, 255, 0.55) inset,
+        0 2px 6px rgba(80, 60, 30, 0.06),
+        0 22px 55px -22px rgba(80, 60, 30, 0.22);
+    padding: 56px 60px 64px;
+    position: relative;
+}
+.reader-sheet::before {
+    content: '';
+    position: absolute;
+    inset: 8px;
+    border: 1px dashed rgba(120, 90, 50, 0.12);
+    pointer-events: none;
+    z-index: 0;
+}
+.reader-sheet > * { position: relative; z-index: 1; }
+
+/* Внутренний .reader-content на бумаге уже не нуждается — убираем его фон */
+.reader-content {
+    background: transparent;
+    background-image: none;
+    border: none;
+    box-shadow: none;
+    padding: 0;
+}
+.reader-content::before { display: none; }
+
 .reader-content p { margin: 0 0 1.3em; }
 .reader-content p:last-child { margin-bottom: 0; }
 
+/* Первую букву не выделяем вообще */
 .reader-content > p:first-of-type::first-letter {
     float: none;
     font-size: inherit;
@@ -1504,23 +1471,24 @@ html[data-theme="dark"] .reader-head:hover { background-color: rgba(255, 59, 92,
     margin: 0;
     font-family: inherit;
     text-shadow: none;
+    font-weight: inherit;
 }
 
 .reader-content h1,
 .reader-content h2,
 .reader-content h3,
 .reader-content h4 {
-    font-family: var(--font-display);
-    font-weight: 700;
-    line-height: 1.15;
-    letter-spacing: 0.02em;
+    font-family: 'Special Elite', 'Courier New', monospace;
+    font-weight: 400;
+    line-height: 1.2;
+    letter-spacing: 0.04em;
     text-transform: uppercase;
-    color: var(--text);
+    color: #1a1a1a;
     margin: 2em 0 0.6em;
 }
-.reader-content h2 { font-size: 1.6em; }
-.reader-content h3 { font-size: 1.3em; }
-.reader-content h4 { font-size: 1.1em; }
+.reader-content h2 { font-size: 1.4em; }
+.reader-content h3 { font-size: 1.2em; }
+.reader-content h4 { font-size: 1.05em; }
 
 .reader-content strong { font-weight: 700; }
 .reader-content em { font-style: italic; }
@@ -1530,7 +1498,6 @@ html[data-theme="dark"] .reader-head:hover { background-color: rgba(255, 59, 92,
     text-decoration: underline;
     text-decoration-thickness: 1px;
     text-underline-offset: 3px;
-    transition: text-decoration-thickness .2s ease;
 }
 .reader-content a:hover { text-decoration-thickness: 2px; }
 
@@ -1545,7 +1512,6 @@ html[data-theme="dark"] .reader-head:hover { background-color: rgba(255, 59, 92,
     border-left: 3px solid #A50020;
     font-style: italic;
     color: rgba(26, 26, 26, 0.75);
-    font-family: 'Special Elite', monospace;
 }
 
 .reader-content code {
@@ -1577,9 +1543,6 @@ html[data-theme="dark"] .reader-head:hover { background-color: rgba(255, 59, 92,
     width: 100%;
 }
 
-.reader-foot { display: none; }
-.reader-foot-link { display: none; }
-
 /* ============================================================
    ТЁМНАЯ ТЕМА — «копирка»
    ============================================================ */
@@ -1596,36 +1559,21 @@ html[data-theme="dark"] .reader {
         linear-gradient(180deg, #030303 0%, #060606 40%, #020202 100%);
 }
 
-html[data-theme="dark"] .reader-title { color: #E0E0E0; }
-html[data-theme="dark"] .reader-meta { color: rgba(224,224,224,0.5); border-bottom-color: rgba(224,224,224,0.14); }
-html[data-theme="dark"] .reader-head::after {
-    background-image:
-        repeating-linear-gradient(90deg,
-            rgba(224,224,224,0.6) 0px,
-            rgba(224,224,224,0.6) 1px,
-            transparent 1px,
-            transparent 10px),
-        repeating-linear-gradient(90deg,
-            rgba(224,224,224,0.9) 0px,
-            rgba(224,224,224,0.9) 1.5px,
-            transparent 1.5px,
-            transparent 50px);
-}
-
-html[data-theme="dark"] .reader-content {
-    color: #0A0A0A;
+html[data-theme="dark"] .reader-sheet {
     background-color: #E6E3DD;
     background-image:
-        radial-gradient(ellipse 100% 100% at 50% 0%, rgba(255, 255, 255, 0.4), transparent 70%),
+        radial-gradient(ellipse 100% 100% at 50% 0%, rgba(255, 255, 255, 0.35), transparent 70%),
         repeating-linear-gradient(0deg,
             rgba(0, 0, 0, 0.02) 0px,
             rgba(0, 0, 0, 0.02) 1px,
             transparent 1px,
-            transparent 28px);
+            transparent 30px);
     border-color: rgba(0, 0, 0, 0.35);
-    box-shadow: 0 20px 50px -20px rgba(0, 0, 0, 0.7);
+    box-shadow:
+        0 2px 6px rgba(0, 0, 0, 0.4),
+        0 22px 55px -22px rgba(0, 0, 0, 0.75);
 }
-html[data-theme="dark"] .reader-content::before { border-color: rgba(0, 0, 0, 0.15); }
+html[data-theme="dark"] .reader-sheet::before { border-color: rgba(0, 0, 0, 0.15); }
 html[data-theme="dark"] .reader-content a { color: #8A0016; }
 html[data-theme="dark"] .reader-content li::marker { color: #8A0016; }
 html[data-theme="dark"] .reader-content blockquote { border-left-color: #8A0016; color: rgba(10, 10, 10, 0.75); }
@@ -1636,19 +1584,14 @@ html[data-theme="dark"] .reader-content pre { background: rgba(0, 0, 0, 0.06); b
    МОБИЛЬНАЯ
    ============================================================ */
 @media (max-width: 640px) {
-    .reader-head-inner { padding: 10px 5vw 8px; }
-    .reader-close { font-size: 1.35rem; }
-    .reader-label { font-size: 0.52rem; letter-spacing: 0.22em; }
-    .reader-head::after { left: 4vw; right: 4vw; }
-
-    .reader-sheet { padding: 32px 5vw 100px; }
-    .reader-content {
-        padding: 28px 22px 34px;
-        font-size: 1.02rem;
-        line-height: 1.8;
+    .reader-sheet {
+        padding: 32px 22px 40px;
     }
-    .reader-meta { margin-bottom: 28px; padding-bottom: 14px; font-size: 0.64rem; }
-    .reader-title { max-width: none; }
+    .reader-title { font-size: clamp(1.5rem, 7vw, 2.2rem); max-width: none; }
+    .reader-meta { font-size: 0.75rem; margin-bottom: 20px; }
+    .reader-back { font-size: 0.85rem; margin-bottom: 28px; }
+    .reader-back-bottom { margin-top: 28px; }
+    .reader-content { font-size: 1rem; line-height: 1.85; }
 }
 /* READING — слоги */
 .syllable-grid {
