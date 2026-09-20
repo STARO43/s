@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="description" content="Грамотиньо. Живопись.">
+<meta name="theme-color" content="#F4F1EA">
+
+<!-- Open Graph -->
+<meta property="og:type" content="website">
+<meta property="og:title" content="Грамотиньо. Живопись">
+<meta property="og:description" content="Живопись творческого подъёма.">
+<meta property="og:image" content="assets/avatar.png">
+<meta property="og:image:alt" content="Грамотиньо">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Грамотиньо. Живопись">
+<meta name="twitter:description" content="Живопись творческого подъёма.">
+<meta name="twitter:image" content="assets/avatar.png">
+
+<!-- Иконки -->
+<link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
+<link rel="apple-touch-icon" href="assets/avatar.png">
+
+<!-- Шрифты -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Space+Mono:ital,wght@0,400;0,700;1,400&family=PT+Mono&display=swap" rel="stylesheet">
+
+<!-- Стили -->
+<link rel="stylesheet" href="style.css">
+
+<title>Грамотиньо. Живопись</title>
+</head>
+<body>
+
+<!-- ===================== LOADER ===================== -->
+<div class="loader-overlay" id="loader">
+    <div class="shutter shutter-top"></div>
+    <div class="shutter"></div>
+    <div class="shutter"></div>
+    <div class="shutter"></div>
+    <div class="shutter shutter-bot"></div>
+</div>
+
+<!-- ===================== BURGER ===================== -->
+<button class="burger-btn" id="burgerBtn" aria-label="Меню">
+    <span class="ring"></span>
+    <span class="burger-icon">
+        <span></span>
+        <span></span>
+        <span></span>
+        <span></span>
+    </span>
+</button>
+
+<!-- ===================== BURGER MENU ===================== -->
+<div class="burger-menu" id="burgerMenu">
+    <div class="burger-menu-inner">
+        <div class="burger-menu-col burger-menu-col-left">
+            <a href="index.html"    class="burger-link" data-ns="home">ТИТУЛ.</a>
+            <a href="reading.html"  class="burger-link" data-ns="reading">УЧИ СЛОГИ,</a>
+            <a href="tools.html"    class="burger-link" data-ns="tools">УЧИСЬ ЧАСАМ,</a>
+            <a href="heroes.html"   class="burger-link" data-ns="heroes">БЕРИ ПРИМЕР С ВЕЛИКИХ</a>
+            <a href="cinema.html"   class="burger-link" data-ns="cinema">МУЛЬТЫ</a>
+        </div>
+        <div class="burger-menu-col burger-menu-col-right">
+            <a href="art.html"      class="burger-link active" data-ns="art">ЖИВОПИСЬ,</a>
+            <a href="poetry.html"   class="burger-link" data-ns="poetry">ПОЭЗИЯ,</a>
+            <a href="articles.html" class="burger-link" data-ns="articles">ПЕДАГОГИКА.</a>
+        </div>
+    </div>
+    <div class="burger-menu-foot">ГРАМОТИНЬО · ТЕРМИНАЛ КУЛЬТУРЫ · 2026</div>
+</div>
+
+<!-- ===================== ГАЛЕРЕЯ (полный экран) ===================== -->
+<section class="art-section" id="artCanvas">
+    <div class="art-progress"><div class="art-progress-fill" id="artProgressFill"></div></div>
+
+    <div class="art-canvas" id="artCanvasInner">
+        <div class="art-scroll-catcher" id="artScrollCatcher"></div>
+    </div>
+
+    <div class="art-info" id="artInfo">1 / —</div>
+
+    <div class="art-side">
+        <button class="art-nav" id="artPrev" type="button" aria-label="Предыдущая картина">‹</button>
+
+        <div class="art-side-center">
+            <div class="art-order" id="artControls">
+                <button class="art-order-btn" data-order="standard" type="button" aria-label="По порядку" title="По порядку">
+                    <svg viewBox="0 0 24 24">
+                        <line x1="4" y1="6" x2="20" y2="6"/>
+                        <line x1="4" y1="12" x2="16" y2="12"/>
+                        <line x1="4" y1="18" x2="12" y2="18"/>
+                    </svg>
+                </button>
+                <button class="art-order-btn active" data-order="random" type="button" aria-label="Случайно" title="Случайно">
+                    <svg viewBox="0 0 24 24">
+                        <polyline points="16 3 21 3 21 8"/>
+                        <line x1="4" y1="20" x2="21" y2="3"/>
+                        <polyline points="21 16 21 21 16 21"/>
+                        <line x1="15" y1="15" x2="21" y2="21"/>
+                        <line x1="4" y1="4" x2="9" y2="9"/>
+                    </svg>
+                </button>
+            </div>
+
+            <button class="art-close" id="artClose" type="button" aria-label="Закрыть">×</button>
+        </div>
+
+        <button class="art-nav" id="artNext" type="button" aria-label="Следующая картина">›</button>
+    </div>
+</section>
+
+<!-- ===================== GSAP (CDN) ===================== -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+
+<!-- ===================== APP ===================== -->
+<script src="app.js"></script>
+
+</body>
+</html>
