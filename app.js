@@ -2548,11 +2548,17 @@ function initArticles() {
         const ARTICLE_SUFFIX = '.md';
 
         const list          = document.getElementById('parentsList');
-        const readerModal   = document.getElementById('parentsReaderModal');
-        const readerTitle   = document.getElementById('parentsReaderTitle');
-        const readerContent = document.getElementById('parentsReaderContent');
-        const readerClose   = document.getElementById('parentsReaderClose');
-        if (!list || !readerModal) return;
+        const reader        = document.getElementById('reader');
+        const readerBody    = document.getElementById('readerBody');
+        const readerTitle   = document.getElementById('readerTitle');
+        const readerContent = document.getElementById('readerContent');
+        const readerTime    = document.getElementById('readerTime');
+        const progressFill  = document.getElementById('progressFill');
+        const backBtn       = document.getElementById('backBtn');
+        const closeBtn      = document.getElementById('closeBtn');
+        const footBack      = document.getElementById('footBack');
+
+        if (!list || !reader) return;
 
         const indexCache   = { loaded: false, data: [] };
         const articleCache = new Map();
@@ -2709,7 +2715,7 @@ function initArticles() {
                 const dot = document.createElement('span');
                 dot.className = 'dot';
                 const labelText = document.createElement('span');
-                labelText.textContent = 'СТАТЬЯ · ПЕДАГОГИКА';
+                labelText.textContent = 'ЗАМЕТКИ · РАЗМЫШЛЕНИЯ · ТЕОРИЯ';
                 label.appendChild(dot);
                 label.appendChild(labelText);
 
@@ -2744,13 +2750,17 @@ function initArticles() {
             list.appendChild(frag);
         }
 
+        /* Считаем минуты чтения */
+        function readTime(text) {
+            const words = String(text).replace(/<[^>]+>/g, ' ').trim().split(/\s+/).length;
+            return '≈ ' + Math.max(1, Math.round(words / 180)) + ' мин чтения';
+        }
+
+        /* Открытие читалки */
         async function openBySlug(slug) {
             if (!slug) return;
-            if (readingSlug === slug && readerModal.classList.contains('show')) return;
-            if (readerModal.classList.contains('show')) {
-                readerModal.classList.remove('show');
-                readerModal.setAttribute('aria-hidden', 'true');
-            }
+            if (readingSlug === slug && reader.classList.contains('show')) return;
+
             let md;
             try {
                 md = await loadArticle(slug);
@@ -2761,26 +2771,30 @@ function initArticles() {
                 readingSlug = null;
                 return;
             }
+
             const meta  = indexCache.data.find((x) => x && x.slug === slug) || {};
             const title = meta.title || slug;
+            const html  = mdToHtml(stripLeadingH1(md));
 
             readingSlug = slug;
             if (readerTitle) readerTitle.textContent = title;
-            if (readerContent) readerContent.innerHTML = mdToHtml(stripLeadingH1(md));
+            if (readerContent) readerContent.innerHTML = html;
+            if (readerTime) readerTime.textContent = readTime(html);
 
             document.body.style.overflow = 'hidden';
-            readerModal.setAttribute('aria-hidden', 'false');
-            void readerModal.offsetWidth;
-            readerModal.classList.add('show');
-
-            const surf = readerModal.querySelector('.parents-reader-surface');
-            if (surf) surf.scrollTop = 0;
+            reader.setAttribute('aria-hidden', 'false');
+            requestAnimationFrame(() => {
+                reader.classList.add('show');
+                if (readerBody) readerBody.scrollTop = 0;
+                if (progressFill) progressFill.style.width = '0%';
+            });
         }
 
+        /* Закрытие */
         function closeReader() {
-            if (!readerModal.classList.contains('show')) return;
-            readerModal.classList.remove('show');
-            readerModal.setAttribute('aria-hidden', 'true');
+            if (!reader.classList.contains('show')) return;
+            reader.classList.remove('show');
+            reader.setAttribute('aria-hidden', 'true');
             readingSlug = null;
             document.body.style.overflow = '';
         }
@@ -2792,6 +2806,7 @@ function initArticles() {
                 closeReader();
             }
         }
+
         function handleHash() {
             const hash = window.location.hash;
             if (hash.startsWith(HASH_PREFIX)) {
@@ -2804,13 +2819,21 @@ function initArticles() {
 
         window.addEventListener('hashchange', handleHash);
 
-        if (readerClose) readerClose.addEventListener('click', (e) => { e.preventDefault(); closeArticle(); });
-        readerModal.addEventListener('click', (e) => {
-            if (e.target.classList.contains('parents-reader-surface')) closeArticle();
-        });
+        if (backBtn)  backBtn.addEventListener('click', closeArticle);
+        if (closeBtn) closeBtn.addEventListener('click', closeArticle);
+        if (footBack) footBack.addEventListener('click', closeArticle);
+
         document.addEventListener('keydown', (e) => {
-            if (readerModal.classList.contains('show') && e.key === 'Escape') closeArticle();
+            if (reader.classList.contains('show') && e.key === 'Escape') closeArticle();
         });
+
+        if (readerBody) {
+            readerBody.addEventListener('scroll', () => {
+                const max = readerBody.scrollHeight - readerBody.clientHeight;
+                const p = max > 0 ? (readerBody.scrollTop / max) * 100 : 0;
+                if (progressFill) progressFill.style.width = p + '%';
+            }, { passive: true });
+        }
 
         renderLoading();
         loadIndex()
