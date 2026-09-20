@@ -1322,66 +1322,113 @@ html[data-theme="dark"] .burger-btn .ring { border-color: rgba(221,224,229,.3); 
 /* ============================================================
    ЛИСТ — состаренная бумага, всё на нём
    ============================================================ */
+/* ============================================================
+   READER — состаренный лист бумаги
+   ============================================================ */
+.reader {
+    position: fixed;
+    inset: 0;
+    z-index: 400;
+    background-color: var(--bg);
+    background-image:
+        repeating-linear-gradient(135deg,
+            rgba(120, 100, 70, 0.012) 0px,
+            rgba(120, 100, 70, 0.012) 1px,
+            transparent 1px,
+            transparent 4px),
+        radial-gradient(ellipse 130% 80% at 50% -10%, rgba(255, 253, 246, 0.9), transparent 62%),
+        radial-gradient(ellipse 140% 70% at 50% 115%, rgba(214, 202, 180, 0.45), transparent 65%),
+        linear-gradient(180deg, #F6F2EA 0%, #F2EEE5 40%, #EFEADD 100%);
+    background-repeat: no-repeat, no-repeat, no-repeat, no-repeat;
+    background-size: 100% 100%, 100% 100%, 100% 100%, 100% 100%;
+    display: flex;
+    flex-direction: column;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity .45s cubic-bezier(.16,1,.3,1), visibility 0s linear .45s;
+}
+.reader.show { opacity: 1; visibility: visible; transition: opacity .55s cubic-bezier(.16,1,.3,1), visibility 0s linear 0s; }
+
+.reader-progress {
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    background: transparent;
+    z-index: 5;
+    pointer-events: none;
+}
+.reader-progress-fill {
+    height: 100%;
+    width: 0%;
+    background: var(--red);
+    transition: width .1s linear;
+}
+
+.reader-body {
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
+    overflow-x: hidden;
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior: contain;
+    scrollbar-width: thin;
+}
+
+/* ============================================================
+   ЛИСТ — состаренная бумага
+   ============================================================ */
 .reader-sheet {
     max-width: 900px;
     margin: clamp(40px, 8vh, 80px) auto clamp(80px, 12vh, 160px);
     padding: 64px 68px 72px;
     position: relative;
 
-    /* Бумага: пятна, потёртости, вертикальный «залом» */
     background-color: #EFE2BF;
     background-image:
-        /* лёгкая желтизна сверху */
-        radial-gradient(ellipse 120% 60% at 50% 0%, rgba(252, 245, 220, 0.7), transparent 70%),
-        /* пятна от времени — 4 очага */
-        radial-gradient(circle 180px at 12% 18%, rgba(160, 120, 60, 0.10), transparent 65%),
-        radial-gradient(circle 220px at 88% 32%, rgba(150, 105, 55, 0.09), transparent 70%),
-        radial-gradient(circle 160px at 22% 82%, rgba(170, 130, 70, 0.08), transparent 65%),
-        radial-gradient(circle 200px at 78% 92%, rgba(140, 100, 50, 0.10), transparent 70%),
-        /* потёртости в центре — слабые */
-        radial-gradient(circle 90px at 55% 45%, rgba(120, 90, 50, 0.05), transparent 70%),
-        radial-gradient(circle 70px at 40% 65%, rgba(120, 90, 50, 0.04), transparent 70%),
-        /* вермикуле — тонкие полосы «волокон» */
+        /* верхний тёплый свет */
+        radial-gradient(ellipse 130% 55% at 50% 0%, rgba(252, 245, 220, 0.75), transparent 72%),
+        /* нижняя лёгкая тень */
+        radial-gradient(ellipse 130% 55% at 50% 100%, rgba(180, 145, 85, 0.18), transparent 72%),
+        /* пятна времени */
+        radial-gradient(circle 200px at 10% 14%, rgba(160, 118, 55, 0.13), transparent 68%),
+        radial-gradient(circle 240px at 92% 28%, rgba(148, 100, 50, 0.11), transparent 72%),
+        radial-gradient(circle 180px at 18% 78%, rgba(170, 128, 68, 0.10), transparent 68%),
+        radial-gradient(circle 220px at 82% 90%, rgba(140, 98, 48, 0.12), transparent 72%),
+        radial-gradient(circle 140px at 45% 52%, rgba(120, 88, 45, 0.06), transparent 72%),
+        radial-gradient(circle 110px at 68% 18%, rgba(120, 88, 45, 0.05), transparent 70%),
+        radial-gradient(circle 90px at 30% 38%, rgba(120, 88, 45, 0.05), transparent 70%),
+        /* мелкое «зерно» бумаги — тонкая сетка двух направлений */
         repeating-linear-gradient(88deg,
+            rgba(120, 90, 50, 0.022) 0px,
+            rgba(120, 90, 50, 0.022) 1px,
+            transparent 1px,
+            transparent 4px),
+        repeating-linear-gradient(2deg,
             rgba(120, 90, 50, 0.018) 0px,
             rgba(120, 90, 50, 0.018) 1px,
             transparent 1px,
-            transparent 6px),
-        repeating-linear-gradient(0deg,
-            rgba(120, 90, 50, 0.02) 0px,
-            rgba(120, 90, 50, 0.02) 1px,
-            transparent 1px,
-            transparent 32px),
-        /* базовая бумага */
-        linear-gradient(180deg, #F2E7C7 0%, #EDE0BC 60%, #E7D8AE 100%);
+            transparent 5px),
+        /* базовый тон */
+        linear-gradient(180deg, #F3E7C3 0%, #EEDFBC 55%, #E6D4A6 100%);
     background-repeat: no-repeat;
     background-size: 100% 100%;
 
     border: 1px solid rgba(120, 90, 50, 0.28);
     box-shadow:
-        /* внутренняя светлая подсветка от бумаги */
-        0 1px 0 rgba(255, 250, 230, 0.7) inset,
-        0 0 0 1px rgba(180, 150, 100, 0.08) inset,
-        /* мягкая тень от листа */
+        /* внутренняя подсветка бумаги */
+        0 1px 0 rgba(255, 250, 230, 0.8) inset,
+        0 0 0 1px rgba(180, 150, 100, 0.06) inset,
+        /* мягкие тени от листа */
         0 3px 8px rgba(70, 50, 20, 0.08),
-        0 22px 60px -22px rgba(70, 50, 20, 0.28),
-        0 40px 90px -40px rgba(70, 50, 20, 0.35);
+        0 22px 60px -22px rgba(70, 50, 20, 0.30),
+        0 40px 90px -40px rgba(70, 50, 20, 0.38);
     opacity: 0;
     transform: translateY(30px);
     transition: opacity .5s ease .1s, transform .7s cubic-bezier(.16,1,.3,1) .1s;
 }
 .reader.show .reader-sheet { opacity: 1; transform: translateY(0); }
 
-/* Тонкая рамка-«оттиск» внутри листа, как водяной знак печатной формы */
-.reader-sheet::before {
-    content: '';
-    position: absolute;
-    inset: 14px;
-    border: 1px dashed rgba(120, 90, 50, 0.18);
-    pointer-events: none;
-    z-index: 0;
-}
-/* Потёртые уголки — затемнённые «сгибы» */
+/* Уголки-потёртости (без пунктирной рамки) */
 .reader-sheet::after {
     content: '';
     position: absolute;
@@ -1389,16 +1436,16 @@ html[data-theme="dark"] .burger-btn .ring { border-color: rgba(221,224,229,.3); 
     pointer-events: none;
     z-index: 0;
     background:
-        radial-gradient(ellipse 60px 40px at 0% 0%, rgba(120, 90, 50, 0.10), transparent 70%),
-        radial-gradient(ellipse 60px 40px at 100% 0%, rgba(120, 90, 50, 0.10), transparent 70%),
-        radial-gradient(ellipse 60px 40px at 0% 100%, rgba(120, 90, 50, 0.10), transparent 70%),
-        radial-gradient(ellipse 60px 40px at 100% 100%, rgba(120, 90, 50, 0.10), transparent 70%);
+        radial-gradient(ellipse 70px 44px at 0% 0%, rgba(120, 90, 50, 0.14), transparent 72%),
+        radial-gradient(ellipse 70px 44px at 100% 0%, rgba(120, 90, 50, 0.14), transparent 72%),
+        radial-gradient(ellipse 70px 44px at 0% 100%, rgba(120, 90, 50, 0.14), transparent 72%),
+        radial-gradient(ellipse 70px 44px at 100% 100%, rgba(120, 90, 50, 0.14), transparent 72%);
     mix-blend-mode: multiply;
 }
 .reader-sheet > * { position: relative; z-index: 1; }
 
 /* ============================================================
-   ЗАГОЛОВОК, МЕТА, КНОПКИ — тем же машинописным шрифтом
+   ЗАГОЛОВОК, МЕТА, КНОПКИ
    ============================================================ */
 .reader-title {
     font-family: 'Special Elite', 'Courier New', monospace;
@@ -1422,7 +1469,6 @@ html[data-theme="dark"] .burger-btn .ring { border-color: rgba(221,224,229,.3); 
     margin: 0 0 26px 0;
 }
 
-/* «ВЕРНУТЬ ДОКУМЕНТ.» — как рукописная пометка на бумаге */
 .reader-back {
     display: inline-block;
     background: transparent;
@@ -1445,23 +1491,13 @@ html[data-theme="dark"] .burger-btn .ring { border-color: rgba(221,224,229,.3); 
     box-shadow: none;
     outline: none;
 }
-
-/* Убираем «←», которое было через ::before */
 .reader-back::before { content: none; }
 
-/* Внизу статьи — тот же вид, по центру */
 .reader-back-bottom {
     display: block;
     margin: 54px auto 0 auto;
     text-align: center;
     transform-origin: center center;
-}
-
-/* Тёмная тема */
-html[data-theme="dark"] .reader-back {
-    color: #0A0A0A;
-    background: transparent;
-    border: none;
 }
 
 /* ============================================================
@@ -1480,7 +1516,6 @@ html[data-theme="dark"] .reader-back {
 .reader-content p { margin: 0 0 1.3em; }
 .reader-content p:last-child { margin-bottom: 0; }
 
-/* Первая буква — обычная, никаких выделений */
 .reader-content > p:first-of-type::first-letter {
     float: none;
     font-size: inherit;
@@ -1562,7 +1597,9 @@ html[data-theme="dark"] .reader-back {
 }
 
 /* ============================================================
-   ТЁМНАЯ ТЕМА — «копирка»: тот же лист, но холоднее и темнее
+   ТЁМНАЯ ТЕМА — «КОПИРКА»
+   Фон тёмный, лист светлый, строки текста вырезаны
+   светлыми полосами с чёрными буквами.
    ============================================================ */
 html[data-theme="dark"] .reader {
     background-color: #050505;
@@ -1577,59 +1614,110 @@ html[data-theme="dark"] .reader {
         linear-gradient(180deg, #030303 0%, #060606 40%, #020202 100%);
 }
 
+/* Лист в тёмной — светлый, «копировальный» */
 html[data-theme="dark"] .reader-sheet {
-    background-color: #DCD9D2;
+    background-color: #E6E3DD;
     background-image:
-        radial-gradient(ellipse 120% 60% at 50% 0%, rgba(245, 243, 236, 0.6), transparent 70%),
-        radial-gradient(circle 180px at 12% 18%, rgba(80, 75, 65, 0.12), transparent 65%),
-        radial-gradient(circle 220px at 88% 32%, rgba(70, 65, 55, 0.10), transparent 70%),
-        radial-gradient(circle 160px at 22% 82%, rgba(85, 80, 70, 0.10), transparent 65%),
-        radial-gradient(circle 200px at 78% 92%, rgba(75, 70, 60, 0.12), transparent 70%),
+        radial-gradient(ellipse 120% 60% at 50% 0%, rgba(255,255,255,0.5), transparent 72%),
+        radial-gradient(circle 200px at 12% 18%, rgba(70,65,55,0.10), transparent 68%),
+        radial-gradient(circle 220px at 88% 32%, rgba(70,65,55,0.09), transparent 72%),
+        radial-gradient(circle 160px at 22% 82%, rgba(80,75,65,0.09), transparent 68%),
+        radial-gradient(circle 200px at 78% 92%, rgba(75,70,60,0.11), transparent 72%),
         repeating-linear-gradient(88deg,
-            rgba(0, 0, 0, 0.02) 0px,
-            rgba(0, 0, 0, 0.02) 1px,
-            transparent 1px,
-            transparent 6px),
-        repeating-linear-gradient(0deg,
-            rgba(0, 0, 0, 0.025) 0px,
-            rgba(0, 0, 0, 0.025) 1px,
-            transparent 1px,
-            transparent 32px),
-        linear-gradient(180deg, #E2DED4 0%, #D8D4CB 60%, #CFCBC1 100%);
+            rgba(0,0,0,0.02) 0px, rgba(0,0,0,0.02) 1px,
+            transparent 1px, transparent 5px),
+        linear-gradient(180deg, #EBE8E1 0%, #E1DED6 55%, #D6D2C9 100%);
     border-color: rgba(0, 0, 0, 0.4);
     box-shadow:
-        0 1px 0 rgba(255, 255, 255, 0.4) inset,
-        0 0 0 1px rgba(0, 0, 0, 0.08) inset,
-        0 3px 10px rgba(0, 0, 0, 0.5),
-        0 22px 60px -22px rgba(0, 0, 0, 0.8),
-        0 40px 90px -40px rgba(0, 0, 0, 0.9);
+        0 1px 0 rgba(255,255,255,0.5) inset,
+        0 3px 10px rgba(0,0,0,0.5),
+        0 22px 60px -22px rgba(0,0,0,0.85),
+        0 40px 90px -40px rgba(0,0,0,0.9);
 }
-html[data-theme="dark"] .reader-sheet::before { border-color: rgba(0, 0, 0, 0.18); }
 html[data-theme="dark"] .reader-sheet::after {
     background:
-        radial-gradient(ellipse 60px 40px at 0% 0%, rgba(0, 0, 0, 0.18), transparent 70%),
-        radial-gradient(ellipse 60px 40px at 100% 0%, rgba(0, 0, 0, 0.18), transparent 70%),
-        radial-gradient(ellipse 60px 40px at 0% 100%, rgba(0, 0, 0, 0.18), transparent 70%),
-        radial-gradient(ellipse 60px 40px at 100% 100%, rgba(0, 0, 0, 0.18), transparent 70%);
+        radial-gradient(ellipse 70px 44px at 0% 0%, rgba(0,0,0,0.2), transparent 72%),
+        radial-gradient(ellipse 70px 44px at 100% 0%, rgba(0,0,0,0.2), transparent 72%),
+        radial-gradient(ellipse 70px 44px at 0% 100%, rgba(0,0,0,0.2), transparent 72%),
+        radial-gradient(ellipse 70px 44px at 100% 100%, rgba(0,0,0,0.2), transparent 72%);
 }
 
 html[data-theme="dark"] .reader-title { color: #0A0A0A; }
 html[data-theme="dark"] .reader-meta  { color: rgba(10, 10, 10, 0.7); }
-html[data-theme="dark"] .reader-back {
-    background: rgba(255, 255, 255, 0.35);
-    border-color: rgba(0, 0, 0, 0.45);
+html[data-theme="dark"] .reader-back  { color: #0A0A0A; }
+
+/* === КОПИРКА: строки вырезаны светлыми полосами === */
+html[data-theme="dark"] .reader-content {
+    color: #0A0A0A;
+    /* Фон-полосы по высоте строки line-height: 1.92em */
+    background-image: linear-gradient(
+        to bottom,
+        transparent 0,
+        transparent 0.34em,
+        #E6E3DD 0.34em,
+        #E6E3DD calc(1.92em - 0.34em),
+        transparent calc(1.92em - 0.34em),
+        transparent 1.92em
+    );
+    background-size: 100% 1.92em;
+    background-repeat: repeat-y;
+    background-position: 0 0;
+    padding: 0 0.45em;
+    background-clip: content-box;
+    -webkit-background-clip: content-box;
+    box-decoration-break: clone;
+    -webkit-box-decoration-break: clone;
+}
+
+html[data-theme="dark"] .reader-content p,
+html[data-theme="dark"] .reader-content li,
+html[data-theme="dark"] .reader-content blockquote p {
+    background-image: linear-gradient(
+        to bottom,
+        #E6E3DD 0,
+        #E6E3DD 1.58em,
+        transparent 1.58em,
+        transparent 1.92em
+    );
+    background-size: 100% 1.92em;
+    background-repeat: repeat-y;
+    padding: 0 0.55em;
+    margin-left: -0.55em;
+    margin-right: -0.55em;
     color: #0A0A0A;
 }
-html[data-theme="dark"] .reader-content { color: #0A0A0A; }
+
 html[data-theme="dark"] .reader-content h1,
 html[data-theme="dark"] .reader-content h2,
 html[data-theme="dark"] .reader-content h3,
-html[data-theme="dark"] .reader-content h4 { color: #0A0A0A; }
+html[data-theme="dark"] .reader-content h4 {
+    color: #0A0A0A;
+    background: #E6E3DD;
+    display: inline-block;
+    padding: 0.15em 0.5em;
+    margin-left: -0.5em;
+    max-width: calc(100% + 1em);
+}
+
+html[data-theme="dark"] .reader-content blockquote {
+    color: #0A0A0A;
+    border-left-color: #6B1308;
+    background: #E6E3DD;
+    padding: 0.6em 0.9em 0.6em 1.2em;
+    margin-left: -1.2em;
+}
+html[data-theme="dark"] .reader-content blockquote p {
+    background: transparent;
+    margin-left: 0;
+    margin-right: 0;
+    padding: 0;
+}
+
 html[data-theme="dark"] .reader-content a { color: #6B1308; }
 html[data-theme="dark"] .reader-content li::marker { color: #6B1308; }
-html[data-theme="dark"] .reader-content blockquote { border-left-color: #6B1308; color: rgba(10, 10, 10, 0.78); }
-html[data-theme="dark"] .reader-content code { background: rgba(0, 0, 0, 0.09); }
-html[data-theme="dark"] .reader-content pre { background: rgba(0, 0, 0, 0.06); border-color: rgba(0, 0, 0, 0.22); }
+html[data-theme="dark"] .reader-content code { color: #0A0A0A; background: #CFCCC4; }
+html[data-theme="dark"] .reader-content pre  { color: #0A0A0A; background: #E6E3DD; border-color: #CFCCC4; }
+html[data-theme="dark"] .reader-content hr   { background-image: repeating-linear-gradient(90deg, #9A968E 0px, #9A968E 4px, transparent 4px, transparent 10px); }
 
 /* ============================================================
    МОБИЛЬНАЯ
@@ -1641,9 +1729,35 @@ html[data-theme="dark"] .reader-content pre { background: rgba(0, 0, 0, 0.06); b
     }
     .reader-title { font-size: clamp(1.4rem, 6.4vw, 2rem); max-width: none; }
     .reader-meta { font-size: 0.75rem; margin-bottom: 20px; }
-    .reader-back { font-size: 0.72rem; padding: 7px 12px; margin-bottom: 28px; }
+    .reader-back { font-size: 1rem; margin-bottom: 28px; }
     .reader-back-bottom { margin-top: 34px; }
     .reader-content { font-size: 1rem; line-height: 1.85; }
+
+    /* В тёмной теме на мобильном line-height меняется → пересчитываем полосы */
+    html[data-theme="dark"] .reader-content {
+        background-size: 100% 1.85em;
+        background-image: linear-gradient(
+            to bottom,
+            transparent 0,
+            transparent 0.32em,
+            #E6E3DD 0.32em,
+            #E6E3DD calc(1.85em - 0.32em),
+            transparent calc(1.85em - 0.32em),
+            transparent 1.85em
+        );
+    }
+    html[data-theme="dark"] .reader-content p,
+    html[data-theme="dark"] .reader-content li,
+    html[data-theme="dark"] .reader-content blockquote p {
+        background-size: 100% 1.85em;
+        background-image: linear-gradient(
+            to bottom,
+            #E6E3DD 0,
+            #E6E3DD 1.52em,
+            transparent 1.52em,
+            transparent 1.85em
+        );
+    }
 }
 /* READING — слоги */
 .syllable-grid {
