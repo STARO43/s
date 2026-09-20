@@ -952,16 +952,60 @@ body.menu-open::after { display: none; }
     visibility: hidden;
     transition: opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1), visibility 0s linear 0.6s;
 }
-.art-section.show { opacity: 1; visibility: visible; transition: opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1), visibility 0s linear 0s; }
-.art-section::before { content: ''; position: absolute; inset: 0; background: radial-gradient(ellipse 120% 110% at center, transparent 82%, rgba(0, 0, 0, 0.06) 100%); pointer-events: none; z-index: 1; }
-.art-canvas { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; overflow: hidden; z-index: 2; }
-.art-progress { position: absolute; top: 0; left: 0; right: 0; height: 2px; background: transparent; z-index: 15; pointer-events: none; overflow: hidden; }
-.art-progress-fill { height: 100%; width: 0%; background: var(--red); transition: width 0.7s cubic-bezier(0.16, 1, 0.3, 1); opacity: 0.85; }
-.art-image-wrap { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; padding: 0 64px 0 0; will-change: opacity, transform; }
-.art-image-wrap.art-exit-up { opacity: 0; transform: translateY(-40px) scale(0.98); pointer-events: none; transition: opacity 0.45s ease, transform 0.5s cubic-bezier(0.16, 1, 0.3, 1); }
-.art-image-wrap.art-exit-down { opacity: 0; transform: translateY(40px) scale(0.98); pointer-events: none; transition: opacity 0.45s ease, transform 0.5s cubic-bezier(0.16, 1, 0.3, 1); }
-.art-image-wrap.art-enter-from-down { opacity: 0; transform: translateY(50px) scale(0.98); transition: none; }
-.art-image-wrap.art-enter-from-up { opacity: 0; transform: translateY(-50px) scale(0.98); transition: none; }
+.art-section.show {
+    opacity: 1;
+    visibility: visible;
+    transition: opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1), visibility 0s linear 0s;
+}
+.art-section::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse 120% 110% at center, transparent 82%, rgba(0, 0, 0, 0.06) 100%);
+    pointer-events: none;
+    z-index: 1;
+}
+.art-canvas {
+    position: absolute;
+    inset: 0;
+    display: block;
+    overflow: hidden;
+    z-index: 2;
+}
+.art-progress {
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    background: transparent;
+    z-index: 15;
+    pointer-events: none;
+    overflow: hidden;
+}
+.art-progress-fill {
+    height: 100%;
+    width: 0%;
+    background: var(--red);
+    transition: width 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+    opacity: 0.85;
+}
+
+/* Слой с картинкой — позиционируется через transform */
+.art-image-wrap {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 64px 0 0;
+    will-change: transform, opacity;
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+}
+.art-image-wrap.art-sliding {
+    transition: transform 0.32s cubic-bezier(0.22, 1, 0.36, 1),
+                opacity 0.32s ease;
+}
+
 .art-image {
     max-width: 100%;
     max-height: 100%;
@@ -974,9 +1018,30 @@ body.menu-open::after { display: none; }
     -webkit-tap-highlight-color: transparent;
     box-shadow: 0 6px 14px rgba(0, 0, 0, 0.08), 0 20px 50px rgba(0, 0, 0, 0.14), 0 60px 120px -30px rgba(0, 0, 0, 0.3);
 }
-.art-state { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; text-align: center; padding: 40px 20px; font-family: var(--font-mono); font-size: 0.72rem; font-weight: 600; letter-spacing: 0.28em; text-transform: uppercase; color: rgba(10, 10, 10, 0.5); line-height: 1.9; }
+.art-state {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 40px 20px;
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    font-weight: 600;
+    letter-spacing: 0.28em;
+    text-transform: uppercase;
+    color: rgba(10, 10, 10, 0.5);
+    line-height: 1.9;
+}
 .art-state.is-error { color: var(--red); letter-spacing: 0.16em; }
-.art-scroll-catcher { position: absolute; inset: 0; z-index: 5; cursor: pointer; touch-action: none; }
+.art-scroll-catcher {
+    position: absolute;
+    inset: 0;
+    z-index: 5;
+    cursor: pointer;
+    touch-action: none;
+}
 .art-info {
     position: absolute;
     top: 20px;
@@ -998,7 +1063,20 @@ body.menu-open::after { display: none; }
 }
 .art-info::before { content: '◆ '; color: var(--red); font-size: 0.8em; letter-spacing: 0; }
 .art-section.show .art-info { opacity: 1; transform: translateX(0); }
-.art-side { position: absolute; top: 0; right: 0; bottom: 0; width: 64px; z-index: 20; display: flex; flex-direction: column; align-items: center; justify-content: space-between; padding: 20px 0; pointer-events: none; }
+.art-side {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    width: 64px;
+    z-index: 20;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+    padding: 20px 0;
+    pointer-events: none;
+}
 .art-side > * { pointer-events: auto; }
 .art-nav {
     width: 40px; height: 40px;
@@ -1059,6 +1137,7 @@ body.menu-open::after { display: none; }
     .art-order-btn svg { width: 16px; height: 16px; }
     .art-info { top: 14px; left: 14px; font-size: 0.6rem; letter-spacing: 0.22em; }
 }
+@media (pointer: coarse) { .art-nav { display: none !important; } }
 @media (pointer: coarse) { .art-nav { display: none !important; } }
 
 /* ARTICLES */
