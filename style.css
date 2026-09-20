@@ -22,11 +22,11 @@ html { scroll-behavior: smooth; }
 }
 
 html[data-theme="dark"] {
-    --bg: #0A0A0B;
-    --text: #E8E6E1;
+    --bg: #070912;
+    --text: #DDE4F0;
     --red: #FF3B5C;
---paper-line: rgba(232, 230, 225, 0.14);
-    --muted: rgba(232, 230, 225, 0.5);
+    --paper-line: rgba(221, 228, 240, 0.14);
+    --muted: rgba(221, 228, 240, 0.5);
 }
 
 body {
@@ -49,24 +49,24 @@ body {
 }
 
 html[data-theme="dark"] body {
-    background-color: #0A0A0B;
+    background-color: #070912;
     background-image:
         /* тонкая диагональная штриховка — «дорогая» текстура без картинок */
         repeating-linear-gradient(135deg,
-            rgba(255, 255, 255, 0.01) 0px,
-            rgba(255, 255, 255, 0.01) 1px,
+            rgba(255, 255, 255, 0.012) 0px,
+            rgba(255, 255, 255, 0.012) 1px,
             transparent 1px,
             transparent 3px),
-        /* верхний тёплый отсвет */
-        radial-gradient(ellipse 120% 80% at 50% -10%, rgba(60, 55, 70, 0.5), transparent 60%),
-        /* нижний глубокий подсвет */
-        radial-gradient(ellipse 140% 70% at 50% 115%, rgba(30, 28, 38, 0.7), transparent 65%),
-        /* мягкое свечение справа сверху */
-        radial-gradient(circle 600px at 88% 12%, rgba(80, 70, 100, 0.28), transparent 70%),
+        /* верхнее ночное свечение — как млечный путь */
+        radial-gradient(ellipse 130% 80% at 50% -10%, rgba(40, 60, 120, 0.55), transparent 62%),
+        /* нижний глубокий подсвет — горизонт */
+        radial-gradient(ellipse 140% 70% at 50% 115%, rgba(20, 30, 70, 0.7), transparent 65%),
+        /* мягкое голубое свечение справа сверху */
+        radial-gradient(circle 600px at 88% 12%, rgba(70, 110, 180, 0.32), transparent 70%),
         /* холодный блик слева */
-        radial-gradient(circle 500px at 8% 60%, rgba(50, 50, 65, 0.35), transparent 70%),
-        /* базовая глубина */
-        linear-gradient(180deg, #08080A 0%, #0B0B0E 40%, #050506 100%);
+        radial-gradient(circle 500px at 8% 60%, rgba(40, 60, 110, 0.38), transparent 70%),
+        /* базовая глубина ночного неба */
+        linear-gradient(180deg, #05070F 0%, #080B1A 40%, #04050C 100%);
     background-repeat: no-repeat, no-repeat, no-repeat, no-repeat, no-repeat, no-repeat;
     background-size: 100% 100%, 100% 100%, 100% 100%, 100% 100%, 100% 100%, 100% 100%;
 }
@@ -85,8 +85,8 @@ body::before {
 }
 html[data-theme="dark"] body::before {
     background-image:
-        radial-gradient(circle 800px at 15% 20%, rgba(120, 100, 140, 0.06), transparent 60%),
-        radial-gradient(circle 700px at 85% 80%, rgba(90, 80, 110, 0.05), transparent 60%);
+        radial-gradient(circle 800px at 15% 20%, rgba(90, 130, 200, 0.08), transparent 60%),
+        radial-gradient(circle 700px at 85% 80%, rgba(60, 90, 160, 0.06), transparent 60%);
 }
 
 /* Виньетка по краям (только тёмная тема) */
@@ -114,10 +114,10 @@ body.menu-open::after { display: none; }
             radial-gradient(ellipse 130% 70% at 50% 0%, #FFFDF8 0%, rgba(255,253,248,0) 62%),
             radial-gradient(ellipse 110% 60% at 50% 100%, #EDE7D9 0%, rgba(237,231,217,0) 72%);
     }
-   html[data-theme="dark"] body {
+html[data-theme="dark"] body {
     background-image:
-        radial-gradient(ellipse 130% 70% at 50% 0%, #141420 0%, rgba(20,20,32,0) 62%),
-        radial-gradient(ellipse 110% 60% at 50% 100%, #060608 0%, rgba(6,6,8,0) 72%);
+        radial-gradient(ellipse 130% 70% at 50% 0%, #0E1730 0%, rgba(14,23,48,0) 62%),
+        radial-gradient(ellipse 110% 60% at 50% 100%, #04060E 0%, rgba(4,6,14,0) 72%);
 }
 }
 
