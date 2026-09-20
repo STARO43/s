@@ -35,21 +35,15 @@ html[data-theme="dark"] {
 body {
     background-color: var(--bg);
     background-image:
-        /* тонкая диагональная штриховка «бумага» */
         repeating-linear-gradient(135deg,
             rgba(120, 100, 70, 0.012) 0px,
             rgba(120, 100, 70, 0.012) 1px,
             transparent 1px,
             transparent 4px),
-        /* верхний тёплый свет */
         radial-gradient(ellipse 130% 80% at 50% -10%, rgba(255, 253, 246, 0.9), transparent 62%),
-        /* нижняя тёплая тень */
         radial-gradient(ellipse 140% 70% at 50% 115%, rgba(214, 202, 180, 0.45), transparent 65%),
-        /* мягкий блик справа */
         radial-gradient(circle 600px at 88% 12%, rgba(248, 244, 235, 0.5), transparent 70%),
-        /* холодный блик слева */
         radial-gradient(circle 500px at 8% 60%, rgba(230, 224, 210, 0.4), transparent 70%),
-        /* базовый пергамент */
         linear-gradient(180deg, #F6F2EA 0%, #F2EEE5 40%, #EFEADD 100%);
     background-repeat: no-repeat, no-repeat, no-repeat, no-repeat, no-repeat, no-repeat;
     background-size: 100% 100%, 100% 100%, 100% 100%, 100% 100%, 100% 100%, 100% 100%;
@@ -64,7 +58,7 @@ body {
 }
 
 /* ============================================================
-   ТЁМНАЯ ТЕМА — почти чёрный с холодным синим отливом
+   ТЁМНАЯ ТЕМА — почти чёрный
    ============================================================ */
 html[data-theme="dark"] body {
     background-color: #050505;
@@ -83,7 +77,6 @@ html[data-theme="dark"] body {
     background-size: 100% 100%, 100% 100%, 100% 100%, 100% 100%, 100% 100%, 100% 100%;
 }
 
-/* Мягкие блики поверх фона (без текстур, без склеек) */
 body::before {
     content: '';
     position: fixed;
@@ -101,7 +94,6 @@ html[data-theme="dark"] body::before {
         radial-gradient(circle 700px at 85% 80%, rgba(60, 60, 70, 0.03), transparent 60%);
 }
 
-/* Виньетка по краям (только тёмная тема) */
 body::after {
     content: '';
     position: fixed;
@@ -126,11 +118,11 @@ body.menu-open::after { display: none; }
             radial-gradient(ellipse 130% 70% at 50% 0%, #F8F4EC 0%, rgba(248,244,236,0) 62%),
             radial-gradient(ellipse 110% 60% at 50% 100%, #ECE6D8 0%, rgba(236,230,216,0) 72%);
     }
-html[data-theme="dark"] body {
-    background-image:
-        radial-gradient(ellipse 130% 70% at 50% 0%, #0a0a0a 0%, rgba(10,10,10,0) 62%),
-        radial-gradient(ellipse 110% 60% at 50% 100%, #020202 0%, rgba(2,2,2,0) 72%);
-}
+    html[data-theme="dark"] body {
+        background-image:
+            radial-gradient(ellipse 130% 70% at 50% 0%, #0a0a0a 0%, rgba(10,10,10,0) 62%),
+            radial-gradient(ellipse 110% 60% at 50% 100%, #020202 0%, rgba(2,2,2,0) 72%);
+    }
 }
 
 /* LOADER */
@@ -316,7 +308,6 @@ html[data-theme="dark"] .burger-btn .ring { border-color: rgba(221,224,229,.3); 
 .burger-btn.open:hover .ring { transform: rotate(585deg); }
 .burger-btn.open:hover .burger-icon { transform: rotate(0deg) scale(1.12); }
 
-/* Мобильные размеры: burger / theme / clock-switch */
 @media (max-width: 768px) {
     .burger-btn { top: 8px; right: 8px; width: 44px; height: 44px; }
     .burger-btn .ring { inset: 4px; }
@@ -468,14 +459,12 @@ html[data-theme="dark"] .burger-btn .ring { border-color: rgba(221,224,229,.3); 
     .burger-link { font-size: clamp(1.6rem, 4.4vw, 2.8rem); }
 }
 
-/* ТИТУЛ. чуть больше на десктопе */
 @media (min-width: 769px) {
     .burger-menu-col-left .burger-link:nth-child(1) {
         font-size: clamp(2.1rem, 4.2vw, 4.4rem);
     }
 }
 
-/* МОБИЛЬНОЕ МЕНЮ */
 @media (max-width: 768px) {
     .burger-menu {
         contain: none;
@@ -1637,7 +1626,7 @@ html[data-theme="dark"] .burger-btn .ring { border-color: rgba(221,224,229,.3); 
     .term-overlay::after { display: none; }
 }
 
-/* ===== QUIZ/DICT — новый дизайн-оверлей ===== */
+/* ===== QUIZ/DICT ===== */
 .qd-overlay{
   position:fixed;inset:0;z-index:9000;
   background:var(--bg);
@@ -1980,7 +1969,7 @@ html[data-theme="dark"] .clock-switch .switch-ring { border-color: rgba(221,224,
 .heroes-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 22px; margin-bottom: 26px; }
 .hero-item {
     border: none;
-    background: var(--bg);
+    background: transparent;
     cursor: pointer;
     display: flex;
     flex-direction: column;
@@ -1988,12 +1977,35 @@ html[data-theme="dark"] .clock-switch .switch-ring { border-color: rgba(221,224,
     -webkit-tap-highlight-color: transparent;
 }
 .hero-item:hover { transform: translate(-4px, -4px); }
-.hero-photo { position: relative; aspect-ratio: 1 / 1; border-bottom: none; overflow: hidden; background: var(--bg); }
+.hero-photo { position: relative; aspect-ratio: 1 / 1; border-bottom: none; overflow: hidden; background: transparent; }
 .hero-photo img { width: 100%; height: 100%; object-fit: cover; display: block; filter: grayscale(1) contrast(1.15); transition: filter 0.35s ease; }
 .hero-item:hover .hero-photo img { filter: grayscale(0) contrast(1.15); }
-.hero-info { padding: 16px 14px 18px; display: flex; flex-direction: column; gap: 6px; background: transparent; }
-.hero-name { font-family: var(--font-display); font-size: 1.15rem; font-weight: 600; line-height: 1.05; letter-spacing: 0.03em; text-transform: uppercase; color: var(--text); padding: 0 4px }
-.hero-years { font-family: var(--font-mono); font-size: 0.7rem; font-weight: 600; letter-spacing: 0.05em; color: var(--muted); display: flex; align-items: baseline; gap: 8px;  padding: 0 4px; }
+.hero-info {
+    padding: 6px 2px 6px 2px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    background: transparent;
+}
+.hero-name {
+    font-family: var(--font-display);
+    font-size: 1.15rem;
+    font-weight: 600;
+    line-height: 1.05;
+    letter-spacing: 0.03em;
+    text-transform: uppercase;
+    color: var(--text);
+}
+.hero-years {
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    color: var(--muted);
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+}
 .hero-age { color: var(--red); font-weight: 700; }
 
 .hero-modal {
@@ -2156,8 +2168,8 @@ html[data-theme="dark"] .clock-switch .switch-ring { border-color: rgba(221,224,
 @media (max-width: 768px) {
     .heroes-timeline { padding: 2rem 4vw 5rem; }
     .heroes-grid { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 14px; }
-    .hero-name { font-size: 1rem; padding: 0 2px; }
-    .hero-years { font-size: 0.64rem; padding: 0 2px; }
+    .hero-name { font-size: 1rem; }
+    .hero-years { font-size: 0.64rem; }
     .century-header { padding: 0 0 10px; margin-bottom: 22px; }
     .century-header:not(:first-child) { margin-top: 52px; }
     .soviet-band { padding: 12px 18px; font-size: 0.92rem; letter-spacing: 0.18em; }
