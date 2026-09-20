@@ -1597,9 +1597,7 @@ html[data-theme="dark"] .burger-btn .ring { border-color: rgba(221,224,229,.3); 
 }
 
 /* ============================================================
-   ТЁМНАЯ ТЕМА — «КОПИРКА»
-   Фон тёмный, лист светлый, строки текста вырезаны
-   светлыми полосами с чёрными буквами.
+   ТЁМНАЯ ТЕМА — тот же лист, но под приглушённой лампой
    ============================================================ */
 html[data-theme="dark"] .reader {
     background-color: #050505;
@@ -1614,111 +1612,100 @@ html[data-theme="dark"] .reader {
         linear-gradient(180deg, #030303 0%, #060606 40%, #020202 100%);
 }
 
-/* Лист в тёмной — светлый, «копировальный» */
+/* Лист — та же бумага, только притушенная и с тёплым смещением */
 html[data-theme="dark"] .reader-sheet {
-    background-color: #E6E3DD;
+    background-color: #C9B98E;
     background-image:
-        radial-gradient(ellipse 120% 60% at 50% 0%, rgba(255,255,255,0.5), transparent 72%),
-        radial-gradient(circle 200px at 12% 18%, rgba(70,65,55,0.10), transparent 68%),
-        radial-gradient(circle 220px at 88% 32%, rgba(70,65,55,0.09), transparent 72%),
-        radial-gradient(circle 160px at 22% 82%, rgba(80,75,65,0.09), transparent 68%),
-        radial-gradient(circle 200px at 78% 92%, rgba(75,70,60,0.11), transparent 72%),
+        /* сверху — как будто блик от лампы, но слабый */
+        radial-gradient(ellipse 130% 55% at 50% 0%, rgba(214, 197, 155, 0.55), transparent 72%),
+        /* нижняя тень — как будто свет не достаёт */
+        radial-gradient(ellipse 130% 60% at 50% 100%, rgba(80, 60, 30, 0.35), transparent 72%),
+        /* пятна времени — те же, что и в светлой, но темнее */
+        radial-gradient(circle 200px at 10% 14%, rgba(90, 62, 25, 0.18), transparent 68%),
+        radial-gradient(circle 240px at 92% 28%, rgba(80, 55, 20, 0.16), transparent 72%),
+        radial-gradient(circle 180px at 18% 78%, rgba(95, 68, 30, 0.15), transparent 68%),
+        radial-gradient(circle 220px at 82% 90%, rgba(70, 48, 18, 0.18), transparent 72%),
+        radial-gradient(circle 140px at 45% 52%, rgba(70, 50, 25, 0.10), transparent 72%),
+        radial-gradient(circle 110px at 68% 18%, rgba(70, 50, 25, 0.09), transparent 70%),
+        radial-gradient(circle 90px at 30% 38%, rgba(70, 50, 25, 0.09), transparent 70%),
+        /* зерно бумаги — та же сетка, слабее */
         repeating-linear-gradient(88deg,
-            rgba(0,0,0,0.02) 0px, rgba(0,0,0,0.02) 1px,
-            transparent 1px, transparent 5px),
-        linear-gradient(180deg, #EBE8E1 0%, #E1DED6 55%, #D6D2C9 100%);
-    border-color: rgba(0, 0, 0, 0.4);
+            rgba(60, 40, 15, 0.03) 0px,
+            rgba(60, 40, 15, 0.03) 1px,
+            transparent 1px,
+            transparent 4px),
+        repeating-linear-gradient(2deg,
+            rgba(60, 40, 15, 0.025) 0px,
+            rgba(60, 40, 15, 0.025) 1px,
+            transparent 1px,
+            transparent 5px),
+        /* базовая бумага — притушенная тёплая */
+        linear-gradient(180deg, #D4C397 0%, #C9B98E 55%, #B8A578 100%);
+    background-repeat: no-repeat;
+    background-size: 100% 100%;
+
+    border: 1px solid rgba(60, 40, 15, 0.45);
     box-shadow:
-        0 1px 0 rgba(255,255,255,0.5) inset,
-        0 3px 10px rgba(0,0,0,0.5),
-        0 22px 60px -22px rgba(0,0,0,0.85),
-        0 40px 90px -40px rgba(0,0,0,0.9);
+        /* внутренняя подсветка, слабее чем в светлой */
+        0 1px 0 rgba(240, 225, 190, 0.35) inset,
+        0 0 0 1px rgba(0, 0, 0, 0.15) inset,
+        /* мягкая тень от листа на тёмном фоне */
+        0 3px 10px rgba(0, 0, 0, 0.55),
+        0 22px 60px -22px rgba(0, 0, 0, 0.85),
+        0 40px 90px -40px rgba(0, 0, 0, 0.95);
 }
+
+/* Уголки-потёртости — темнее, но в том же ключе */
 html[data-theme="dark"] .reader-sheet::after {
     background:
-        radial-gradient(ellipse 70px 44px at 0% 0%, rgba(0,0,0,0.2), transparent 72%),
-        radial-gradient(ellipse 70px 44px at 100% 0%, rgba(0,0,0,0.2), transparent 72%),
-        radial-gradient(ellipse 70px 44px at 0% 100%, rgba(0,0,0,0.2), transparent 72%),
-        radial-gradient(ellipse 70px 44px at 100% 100%, rgba(0,0,0,0.2), transparent 72%);
+        radial-gradient(ellipse 70px 44px at 0% 0%, rgba(50, 32, 12, 0.28), transparent 72%),
+        radial-gradient(ellipse 70px 44px at 100% 0%, rgba(50, 32, 12, 0.28), transparent 72%),
+        radial-gradient(ellipse 70px 44px at 0% 100%, rgba(50, 32, 12, 0.28), transparent 72%),
+        radial-gradient(ellipse 70px 44px at 100% 100%, rgba(50, 32, 12, 0.28), transparent 72%);
+    mix-blend-mode: multiply;
 }
 
-html[data-theme="dark"] .reader-title { color: #0A0A0A; }
-html[data-theme="dark"] .reader-meta  { color: rgba(10, 10, 10, 0.7); }
-html[data-theme="dark"] .reader-back  { color: #0A0A0A; }
-
-/* === КОПИРКА: строки вырезаны светлыми полосами === */
-html[data-theme="dark"] .reader-content {
-    color: #0A0A0A;
-    /* Фон-полосы по высоте строки line-height: 1.92em */
-    background-image: linear-gradient(
-        to bottom,
-        transparent 0,
-        transparent 0.34em,
-        #E6E3DD 0.34em,
-        #E6E3DD calc(1.92em - 0.34em),
-        transparent calc(1.92em - 0.34em),
-        transparent 1.92em
-    );
-    background-size: 100% 1.92em;
-    background-repeat: repeat-y;
-    background-position: 0 0;
-    padding: 0 0.45em;
-    background-clip: content-box;
-    -webkit-background-clip: content-box;
-    box-decoration-break: clone;
-    -webkit-box-decoration-break: clone;
-}
-
-html[data-theme="dark"] .reader-content p,
-html[data-theme="dark"] .reader-content li,
-html[data-theme="dark"] .reader-content blockquote p {
-    background-image: linear-gradient(
-        to bottom,
-        #E6E3DD 0,
-        #E6E3DD 1.58em,
-        transparent 1.58em,
-        transparent 1.92em
-    );
-    background-size: 100% 1.92em;
-    background-repeat: repeat-y;
-    padding: 0 0.55em;
-    margin-left: -0.55em;
-    margin-right: -0.55em;
-    color: #0A0A0A;
-}
-
+/* Текст — тот же тёмно-коричневый «чернильный», но чуть приглушённый */
+html[data-theme="dark"] .reader-title { color: #2A1F0F; }
+html[data-theme="dark"] .reader-meta  { color: rgba(42, 31, 15, 0.72); }
+html[data-theme="dark"] .reader-back  { color: #2A1F0F; }
+html[data-theme="dark"] .reader-content { color: #2A1F0F; }
 html[data-theme="dark"] .reader-content h1,
 html[data-theme="dark"] .reader-content h2,
 html[data-theme="dark"] .reader-content h3,
-html[data-theme="dark"] .reader-content h4 {
-    color: #0A0A0A;
-    background: #E6E3DD;
-    display: inline-block;
-    padding: 0.15em 0.5em;
-    margin-left: -0.5em;
-    max-width: calc(100% + 1em);
+html[data-theme="dark"] .reader-content h4 { color: #2A1F0F; }
+html[data-theme="dark"] .reader-content a { color: #7A1B10; }
+html[data-theme="dark"] .reader-content li::marker { color: #7A1B10; }
+html[data-theme="dark"] .reader-content blockquote {
+    border-left-color: #7A1B10;
+    color: rgba(42, 31, 15, 0.82);
+}
+html[data-theme="dark"] .reader-content code {
+    background: rgba(60, 40, 15, 0.16);
+    color: #2A1F0F;
+}
+html[data-theme="dark"] .reader-content pre {
+    background: rgba(60, 40, 15, 0.10);
+    border-color: rgba(60, 40, 15, 0.32);
+    color: #2A1F0F;
+}
+html[data-theme="dark"] .reader-content hr {
+    background-image: repeating-linear-gradient(90deg,
+        rgba(60, 40, 15, 0.55) 0px, rgba(60, 40, 15, 0.55) 4px,
+        transparent 4px, transparent 10px);
 }
 
-html[data-theme="dark"] .reader-content blockquote {
-    color: #0A0A0A;
-    border-left-color: #6B1308;
-    background: #E6E3DD;
-    padding: 0.6em 0.9em 0.6em 1.2em;
-    margin-left: -1.2em;
-}
+/* Полосы «копирки» отключаем — ничего не вырезаем */
+html[data-theme="dark"] .reader-content,
+html[data-theme="dark"] .reader-content p,
+html[data-theme="dark"] .reader-content li,
 html[data-theme="dark"] .reader-content blockquote p {
-    background: transparent;
+    background-image: none;
+    background-size: auto;
+    padding: inherit;
     margin-left: 0;
     margin-right: 0;
-    padding: 0;
 }
-
-html[data-theme="dark"] .reader-content a { color: #6B1308; }
-html[data-theme="dark"] .reader-content li::marker { color: #6B1308; }
-html[data-theme="dark"] .reader-content code { color: #0A0A0A; background: #CFCCC4; }
-html[data-theme="dark"] .reader-content pre  { color: #0A0A0A; background: #E6E3DD; border-color: #CFCCC4; }
-html[data-theme="dark"] .reader-content hr   { background-image: repeating-linear-gradient(90deg, #9A968E 0px, #9A968E 4px, transparent 4px, transparent 10px); }
-
 /* ============================================================
    МОБИЛЬНАЯ
    ============================================================ */
