@@ -2549,13 +2549,13 @@ function initArticles() {
 
         const list          = document.getElementById('parentsList');
         const reader        = document.getElementById('reader');
-        const readerHead    = document.getElementById('readerHead');
         const readerBody    = document.getElementById('readerBody');
         const readerTitle   = document.getElementById('readerTitle');
         const readerContent = document.getElementById('readerContent');
         const readerTime    = document.getElementById('readerTime');
         const progressFill  = document.getElementById('progressFill');
-        const closeBtn      = document.getElementById('closeBtn');
+        const backBtnTop    = document.getElementById('backBtnTop');
+        const backBtnBottom = document.getElementById('backBtnBottom');
 
         if (!list || !reader) return;
 
@@ -2816,25 +2816,8 @@ function initArticles() {
 
         window.addEventListener('hashchange', handleHash);
 
-        // Возврат по клику на всю шапку-линейку
-        if (readerHead) {
-            readerHead.addEventListener('click', (e) => {
-                if (e.target.closest('.reader-close')) return;
-                closeArticle();
-            });
-            readerHead.addEventListener('keydown', (e) => {
-                if (e.key === 'Enter' || e.key === ' ') {
-                    e.preventDefault();
-                    closeArticle();
-                }
-            });
-        }
-        if (closeBtn) {
-            closeBtn.addEventListener('click', (e) => {
-                e.stopPropagation();
-                closeArticle();
-            });
-        }
+        if (backBtnTop)    backBtnTop.addEventListener('click', closeArticle);
+        if (backBtnBottom) backBtnBottom.addEventListener('click', closeArticle);
 
         document.addEventListener('keydown', (e) => {
             if (reader.classList.contains('show') && e.key === 'Escape') closeArticle();
