@@ -22,11 +22,11 @@ html { scroll-behavior: smooth; }
 }
 
 html[data-theme="dark"] {
-    --bg: #060907;
-    --text: #C7E0C7;
+    --bg: #0A0A0B;
+    --text: #E8E6E1;
     --red: #FF3B5C;
-    --paper-line: rgba(199, 224, 199, 0.16);
-    --muted: rgba(199, 224, 199, 0.5);
+--paper-line: rgba(232, 230, 225, 0.14);
+    --muted: rgba(232, 230, 225, 0.5);
 }
 
 body {
