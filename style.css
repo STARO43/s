@@ -1268,8 +1268,6 @@ html[data-theme="dark"] .burger-btn .ring { border-color: rgba(221,224,229,.3); 
 
 /* ============================================================
    READER — книжный лист + печатная машинка
-   Светлая тема: пергамент. Тёмная тема: «копирка» — строки
-   вырезаны светлыми прямоугольниками с чёрным текстом.
    ============================================================ */
 .reader {
     position: fixed;
@@ -1295,7 +1293,6 @@ html[data-theme="dark"] .burger-btn .ring { border-color: rgba(221,224,229,.3); 
 }
 .reader.show { opacity: 1; visibility: visible; transition: opacity .55s cubic-bezier(.16,1,.3,1), visibility 0s linear 0s; }
 
-/* Прогресс чтения */
 .reader-progress {
     position: absolute;
     top: 0; left: 0; right: 0;
@@ -1311,54 +1308,92 @@ html[data-theme="dark"] .burger-btn .ring { border-color: rgba(221,224,229,.3); 
     transition: width .1s linear;
 }
 
-/* Шапка */
+/* ============================================================
+   ВЕРХНИЙ БАР — «СОВЕТСКАЯ ЛИНЕЙКА»
+   ============================================================ */
 .reader-head {
     position: sticky;
     top: 0;
     z-index: 4;
     flex-shrink: 0;
+    cursor: pointer;
     background-color: transparent;
     backdrop-filter: blur(10px);
     -webkit-backdrop-filter: blur(10px);
     border-bottom: 1px solid var(--paper-line);
+    transition: background-color .25s ease;
+    -webkit-tap-highlight-color: transparent;
 }
+.reader-head:hover { background-color: rgba(217, 4, 41, 0.04); }
+html[data-theme="dark"] .reader-head:hover { background-color: rgba(255, 59, 92, 0.06); }
+
 .reader-head-inner {
     max-width: 1100px;
     margin: 0 auto;
-    padding: 14px 5vw;
-    display: grid;
-    grid-template-columns: 1fr auto 1fr;
+    padding: 12px 5vw 10px;
+    display: flex;
     align-items: center;
+    justify-content: space-between;
     gap: 16px;
 }
-.reader-back,
-.reader-close {
-    background: transparent; border: none; cursor: pointer;
-    padding: 8px 0;
-    font-family: var(--font-mono);
-    font-size: 0.65rem; font-weight: 700;
-    letter-spacing: 0.24em; text-transform: uppercase;
-    color: var(--text);
-    display: inline-flex; align-items: center; gap: 10px;
-    -webkit-tap-highlight-color: transparent;
-    transition: color .2s ease;
-    text-decoration: none;
+
+.reader-head::after {
+    content: '';
+    position: absolute;
+    left: 5vw;
+    right: 5vw;
+    bottom: -6px;
+    height: 6px;
+    background-image:
+        repeating-linear-gradient(90deg,
+            var(--muted) 0px,
+            var(--muted) 1px,
+            transparent 1px,
+            transparent 10px),
+        repeating-linear-gradient(90deg,
+            var(--text) 0px,
+            var(--text) 1.5px,
+            transparent 1.5px,
+            transparent 50px);
+    background-size: 10px 4px, 50px 6px;
+    background-repeat: repeat-x, repeat-x;
+    background-position: left bottom, left bottom;
+    opacity: 0.55;
+    pointer-events: none;
 }
-.reader-back { justify-self: start; }
-.reader-close { justify-self: end; font-size: 1.5rem; letter-spacing: 0; padding: 0 0 4px; font-weight: 300; font-family: var(--font-display); }
-.reader-back:hover, .reader-close:hover { color: var(--red); }
+
+.reader-close {
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    color: var(--text);
+    font-size: 1.5rem;
+    letter-spacing: 0;
+    padding: 0 0 4px;
+    font-weight: 300;
+    font-family: var(--font-display);
+    -webkit-tap-highlight-color: transparent;
+    transition: color .2s ease, transform .2s ease;
+}
+.reader-close:hover { color: var(--red); transform: rotate(90deg); }
+
 .reader-label {
-    justify-self: center;
     font-family: var(--font-mono);
-    font-size: 0.58rem; font-weight: 700;
-    letter-spacing: 0.3em; text-transform: uppercase;
+    font-size: 0.58rem;
+    font-weight: 700;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
     color: var(--muted);
-    display: flex; align-items: center; gap: 10px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
     white-space: nowrap;
 }
 .reader-label .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--red); }
 
-/* Тело читалки */
+/* ============================================================
+   ТЕЛО — текст на «бумажном листе»
+   ============================================================ */
 .reader-body {
     flex: 1;
     min-height: 0;
@@ -1368,6 +1403,7 @@ html[data-theme="dark"] .burger-btn .ring { border-color: rgba(221,224,229,.3); 
     overscroll-behavior: contain;
     scrollbar-width: thin;
 }
+
 .reader-sheet {
     max-width: 1100px;
     margin: 0 auto;
@@ -1378,7 +1414,6 @@ html[data-theme="dark"] .burger-btn .ring { border-color: rgba(221,224,229,.3); 
 }
 .reader.show .reader-sheet { opacity: 1; transform: translateY(0); }
 
-/* Заголовок */
 .reader-title {
     font-family: var(--font-display);
     font-weight: 700;
@@ -1390,14 +1425,19 @@ html[data-theme="dark"] .burger-btn .ring { border-color: rgba(221,224,229,.3); 
     max-width: 22ch;
     margin: 0 0 18px;
 }
+
 .reader-meta {
-    display: flex; align-items: center; gap: 14px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
     font-family: var(--font-mono);
-    font-size: 0.62rem; font-weight: 700;
-    letter-spacing: 0.24em; text-transform: uppercase;
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
     color: var(--muted);
     margin-bottom: 40px;
-    padding-bottom: 22px;
+    padding-bottom: 18px;
     border-bottom: 1px solid var(--paper-line);
     position: relative;
     max-width: 68ch;
@@ -1406,35 +1446,64 @@ html[data-theme="dark"] .burger-btn .ring { border-color: rgba(221,224,229,.3); 
     content: '';
     position: absolute;
     bottom: -1px; left: 0;
-    width: 80px; height: 2px;
-    background: var(--red);
+    right: 0;
+    height: 1px;
+    background-image: repeating-linear-gradient(90deg,
+        var(--muted) 0px, var(--muted) 1px,
+        transparent 1px, transparent 8px);
+    opacity: 0.4;
 }
-.reader-meta .dot { width: 5px; height: 5px; border-radius: 50%; background: var(--red); }
+.reader-meta .dot { display: none; }
 
 /* ============================================================
-   КОНТЕНТ — «печатная машинка на книжном листе»
+   КОНТЕНТ — «бумага под текстом»
    ============================================================ */
 .reader-content {
     max-width: 68ch;
     font-family: 'Special Elite', 'Courier New', monospace;
     font-size: clamp(1.05rem, 1.55vw, 1.18rem);
     line-height: 1.85;
-    color: var(--text);
+    color: #1a1a1a;
     letter-spacing: 0.005em;
     font-weight: 400;
+
+    background-color: #F2E9D2;
+    background-image:
+        radial-gradient(ellipse 100% 100% at 50% 0%, rgba(255, 251, 236, 0.6), transparent 70%),
+        repeating-linear-gradient(0deg,
+            rgba(120, 90, 50, 0.025) 0px,
+            rgba(120, 90, 50, 0.025) 1px,
+            transparent 1px,
+            transparent 28px);
+    padding: 46px 52px 54px;
+    border: 1px solid rgba(120, 90, 50, 0.22);
+    box-shadow:
+        0 1px 0 rgba(255, 255, 255, 0.6) inset,
+        0 2px 6px rgba(80, 60, 30, 0.06),
+        0 20px 50px -20px rgba(80, 60, 30, 0.18);
+    position: relative;
 }
+.reader-content::before {
+    content: '';
+    position: absolute;
+    inset: 6px;
+    border: 1px dashed rgba(120, 90, 50, 0.14);
+    pointer-events: none;
+    z-index: 0;
+}
+.reader-content > * { position: relative; z-index: 1; }
+
 .reader-content p { margin: 0 0 1.3em; }
 .reader-content p:last-child { margin-bottom: 0; }
 
 .reader-content > p:first-of-type::first-letter {
-    font-family: 'Special Elite', 'Courier New', monospace;
-    font-weight: 700;
-    float: left;
-    font-size: 3.4em;
-    line-height: 0.9;
-    margin: 0.1em 0.14em 0.02em 0;
-    color: var(--red);
-    text-shadow: 1px 1px 0 rgba(0,0,0,0.12);
+    float: none;
+    font-size: inherit;
+    line-height: inherit;
+    color: inherit;
+    margin: 0;
+    font-family: inherit;
+    text-shadow: none;
 }
 
 .reader-content h1,
@@ -1444,7 +1513,7 @@ html[data-theme="dark"] .burger-btn .ring { border-color: rgba(221,224,229,.3); 
     font-family: var(--font-display);
     font-weight: 700;
     line-height: 1.15;
-    letter-spacing: -0.01em;
+    letter-spacing: 0.02em;
     text-transform: uppercase;
     color: var(--text);
     margin: 2em 0 0.6em;
@@ -1457,7 +1526,7 @@ html[data-theme="dark"] .burger-btn .ring { border-color: rgba(221,224,229,.3); 
 .reader-content em { font-style: italic; }
 
 .reader-content a {
-    color: var(--red);
+    color: #A50020;
     text-decoration: underline;
     text-decoration-thickness: 1px;
     text-underline-offset: 3px;
@@ -1468,21 +1537,21 @@ html[data-theme="dark"] .burger-btn .ring { border-color: rgba(221,224,229,.3); 
 .reader-content ul,
 .reader-content ol { padding-left: 1.4em; margin: 0 0 1.3em; }
 .reader-content li { margin: 0.4em 0; }
-.reader-content li::marker { color: var(--red); }
+.reader-content li::marker { color: #A50020; }
 
 .reader-content blockquote {
     margin: 1.8em 0;
     padding: 0.3em 0 0.3em 1.5em;
-    border-left: 3px solid var(--red);
+    border-left: 3px solid #A50020;
     font-style: italic;
-    color: rgba(10,10,10,0.72);
+    color: rgba(26, 26, 26, 0.75);
     font-family: 'Special Elite', monospace;
 }
 
 .reader-content code {
     font-family: var(--font-mono);
     font-size: 0.85em;
-    background: rgba(127,127,127,0.12);
+    background: rgba(120, 90, 50, 0.12);
     padding: 0.12em 0.42em;
     border-radius: 3px;
 }
@@ -1490,9 +1559,9 @@ html[data-theme="dark"] .burger-btn .ring { border-color: rgba(221,224,229,.3); 
     font-family: var(--font-mono);
     font-size: 0.82em;
     line-height: 1.55;
-    background: rgba(127,127,127,0.1);
-    border: 1px solid var(--paper-line);
-    border-radius: 6px;
+    background: rgba(120, 90, 50, 0.08);
+    border: 1px solid rgba(120, 90, 50, 0.22);
+    border-radius: 4px;
     padding: 1.15em 1.35em;
     overflow-x: auto;
     margin: 1.6em 0;
@@ -1501,45 +1570,18 @@ html[data-theme="dark"] .burger-btn .ring { border-color: rgba(221,224,229,.3); 
 .reader-content hr {
     border: none;
     height: 1px;
-    background: var(--paper-line);
-    margin: 2.6em 0;
-    width: 40%;
+    background-image: repeating-linear-gradient(90deg,
+        rgba(120, 90, 50, 0.4) 0px, rgba(120, 90, 50, 0.4) 4px,
+        transparent 4px, transparent 10px);
+    margin: 2.4em 0;
+    width: 100%;
 }
 
-/* Подвал */
-.reader-foot {
-    max-width: 68ch;
-    margin-top: 60px;
-    padding-top: 32px;
-    border-top: 1px solid var(--paper-line);
-    position: relative;
-}
-.reader-foot::after {
-    content: '';
-    position: absolute;
-    top: -1px; left: 0;
-    width: 80px; height: 2px;
-    background: var(--red);
-}
-.reader-foot-link {
-    display: inline-flex; align-items: center; gap: 14px;
-    font-family: var(--font-mono);
-    font-size: 0.68rem; font-weight: 700;
-    letter-spacing: 0.26em; text-transform: uppercase;
-    color: var(--text); text-decoration: none;
-    cursor: pointer; background: transparent; border: none;
-    padding: 6px 0;
-    transition: color .2s ease, transform .35s cubic-bezier(.16,1,.3,1);
-    -webkit-tap-highlight-color: transparent;
-}
-.reader-foot-link:hover { color: var(--red); transform: translateX(-6px); }
-.reader-foot-link .arr { display: inline-block; transition: transform .35s cubic-bezier(.16,1,.3,1); }
-.reader-foot-link:hover .arr { transform: translateX(-4px); }
+.reader-foot { display: none; }
+.reader-foot-link { display: none; }
 
 /* ============================================================
    ТЁМНАЯ ТЕМА — «копирка»
-   Страница тёмная, строки текста вырезаны светлыми полосами,
-   буквы — чёрные. Как на копировальной бумаге.
    ============================================================ */
 html[data-theme="dark"] .reader {
     background-color: #050505;
@@ -1554,173 +1596,60 @@ html[data-theme="dark"] .reader {
         linear-gradient(180deg, #030303 0%, #060606 40%, #020202 100%);
 }
 
-/* Заголовок остаётся светлым */
 html[data-theme="dark"] .reader-title { color: #E0E0E0; }
 html[data-theme="dark"] .reader-meta { color: rgba(224,224,224,0.5); border-bottom-color: rgba(224,224,224,0.14); }
+html[data-theme="dark"] .reader-head::after {
+    background-image:
+        repeating-linear-gradient(90deg,
+            rgba(224,224,224,0.6) 0px,
+            rgba(224,224,224,0.6) 1px,
+            transparent 1px,
+            transparent 10px),
+        repeating-linear-gradient(90deg,
+            rgba(224,224,224,0.9) 0px,
+            rgba(224,224,224,0.9) 1.5px,
+            transparent 1.5px,
+            transparent 50px);
+}
 
-/* Основной текст — чёрные буквы на светлых полосах */
 html[data-theme="dark"] .reader-content {
     color: #0A0A0A;
-    background-image: linear-gradient(
-        to bottom,
-        transparent 0,
-        transparent 0.35em,
-        #E6E3DD 0.35em,
-        #E6E3DD calc(1.85em - 0.35em),
-        transparent calc(1.85em - 0.35em),
-        transparent 1.85em
-    );
-    background-size: 100% 1.85em;
-    background-repeat: repeat-y;
-    background-position: 0 0;
-    padding: 0 0.4em;
-    border-radius: 0;
-    /* Обрезаем полосы до границ текста, чтобы не вылезали за пределы абзацев */
-    background-clip: content-box;
-    -webkit-background-clip: content-box;
-    /* Компенсируем: фон должен идти поверх padding */
-    box-decoration-break: clone;
-    -webkit-box-decoration-break: clone;
+    background-color: #E6E3DD;
+    background-image:
+        radial-gradient(ellipse 100% 100% at 50% 0%, rgba(255, 255, 255, 0.4), transparent 70%),
+        repeating-linear-gradient(0deg,
+            rgba(0, 0, 0, 0.02) 0px,
+            rgba(0, 0, 0, 0.02) 1px,
+            transparent 1px,
+            transparent 28px);
+    border-color: rgba(0, 0, 0, 0.35);
+    box-shadow: 0 20px 50px -20px rgba(0, 0, 0, 0.7);
 }
-
-/* Для абзацев и списков — те же полосы */
-html[data-theme="dark"] .reader-content p,
-html[data-theme="dark"] .reader-content li,
-html[data-theme="dark"] .reader-content blockquote p {
-    background-image: linear-gradient(
-        to bottom,
-        #E6E3DD 0,
-        #E6E3DD 1.5em,
-        transparent 1.5em,
-        transparent 1.85em
-    );
-    background-size: 100% 1.85em;
-    background-repeat: repeat-y;
-    padding: 0 0.5em;
-    margin-left: -0.5em;
-    margin-right: -0.5em;
-    color: #0A0A0A;
-}
-
-/* Буквица в тёмной теме — тёмная на светлом */
-html[data-theme="dark"] .reader-content > p:first-of-type::first-letter {
-    color: #B0001F;
-    text-shadow: none;
-}
-
-/* Заголовки h2/h3 внутри тёмной темы — тоже на светлых полосах */
-html[data-theme="dark"] .reader-content h2,
-html[data-theme="dark"] .reader-content h3,
-html[data-theme="dark"] .reader-content h4 {
-    color: #0A0A0A;
-    background: #E6E3DD;
-    display: inline-block;
-    padding: 0.15em 0.5em;
-    margin-left: -0.5em;
-    max-width: calc(100% + 1em);
-}
-
-/* Цитаты в тёмной теме */
-html[data-theme="dark"] .reader-content blockquote {
-    color: #0A0A0A;
-    border-left-color: #B0001F;
-    background: #E6E3DD;
-    padding: 0.6em 0.9em 0.6em 1.2em;
-    margin-left: -1.2em;
-}
-html[data-theme="dark"] .reader-content blockquote p {
-    background: transparent;
-    margin-left: 0;
-    margin-right: 0;
-    padding: 0;
-}
-
-/* Ссылки, strong, em — тёмные на светлом */
+html[data-theme="dark"] .reader-content::before { border-color: rgba(0, 0, 0, 0.15); }
 html[data-theme="dark"] .reader-content a { color: #8A0016; }
-html[data-theme="dark"] .reader-content code {
-    color: #0A0A0A;
-    background: #CFCCC4;
-}
-html[data-theme="dark"] .reader-content pre {
-    color: #0A0A0A;
-    background: #E6E3DD;
-    border-color: #CFCCC4;
-}
-html[data-theme="dark"] .reader-content hr {
-    background: #E6E3DD;
-}
+html[data-theme="dark"] .reader-content li::marker { color: #8A0016; }
+html[data-theme="dark"] .reader-content blockquote { border-left-color: #8A0016; color: rgba(10, 10, 10, 0.75); }
+html[data-theme="dark"] .reader-content code { background: rgba(0, 0, 0, 0.08); }
+html[data-theme="dark"] .reader-content pre { background: rgba(0, 0, 0, 0.06); border-color: rgba(0, 0, 0, 0.2); }
 
-/* Мобильная */
+/* ============================================================
+   МОБИЛЬНАЯ
+   ============================================================ */
 @media (max-width: 640px) {
-    .reader-head-inner { padding: 12px 5vw; gap: 8px; }
-    .reader-back { font-size: 0.58rem; letter-spacing: 0.18em; gap: 8px; }
+    .reader-head-inner { padding: 10px 5vw 8px; }
     .reader-close { font-size: 1.35rem; }
-    .reader-label { display: none; }
-    .reader-head-inner { grid-template-columns: 1fr auto; }
-    .reader-back { justify-self: start; }
-    .reader-close { justify-self: end; }
-    .reader-title { max-width: none; }
-    .reader-content { font-size: 1.02rem; line-height: 1.8; }
-    .reader-content > p:first-of-type::first-letter { font-size: 2.6em; }
+    .reader-label { font-size: 0.52rem; letter-spacing: 0.22em; }
+    .reader-head::after { left: 4vw; right: 4vw; }
+
     .reader-sheet { padding: 32px 5vw 100px; }
-    .reader-meta { margin-bottom: 28px; padding-bottom: 18px; }
+    .reader-content {
+        padding: 28px 22px 34px;
+        font-size: 1.02rem;
+        line-height: 1.8;
+    }
+    .reader-meta { margin-bottom: 28px; padding-bottom: 14px; font-size: 0.64rem; }
+    .reader-title { max-width: none; }
 }
-
-/* READING — кнопки */
-.controls {
-    position: relative;
-    z-index: 10;
-    max-width: 1300px;
-    margin: 0 auto;
-    padding: 2.4rem 12vw 1.6rem 5vw;
-    display: flex;
-    justify-content: flex-end;
-    align-items: flex-start;
-    flex-wrap: wrap;
-    gap: 1.6rem 2rem;
-}
-@media (max-width: 900px) { .controls { padding: 1.6rem 8vw 1rem 5vw; gap: 1rem 1.2rem; } }
-@media (max-width: 640px) { .controls { padding: 1.2rem 6vw 0.8rem 5vw; gap: 0.8rem 1rem; } }
-.ibtn-wrap { display: flex; flex-direction: column; align-items: center; gap: 0.7rem; will-change: transform, opacity; }
-.ibtn {
-    position: relative;
-    background: transparent;
-    border: none;
-    padding: 0;
-    cursor: pointer;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    color: var(--text);
-    transition: color 0.25s ease, transform 0.35s cubic-bezier(0.34, 1.4, 0.64, 1);
-    -webkit-tap-highlight-color: transparent;
-    line-height: 1;
-    width: 72px;
-    height: 72px;
-}
-.ibtn svg { width: 100%; height: 100%; display: block; fill: none; stroke: currentColor; stroke-width: 1.3; stroke-linecap: round; stroke-linejoin: round; transition: stroke 0.25s ease, stroke-width 0.25s ease; overflow: visible; }
-.ibtn:hover { color: var(--red); transform: scale(1.08); }
-.ibtn.active { color: var(--red); }
-.ibtn.active svg { stroke-width: 1.9; }
-.ibtn:active { transform: scale(0.94); }
-.ibtn.underline::after {
-    content: '';
-    position: absolute;
-    left: 14%; right: 14%;
-    bottom: -8px;
-    height: 2px;
-    background: var(--red);
-    transform: scaleX(0);
-    transform-origin: center;
-    transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
-}
-.ibtn.underline.active::after { transform: scaleX(1); }
-.ibtn-caption { font-family: var(--font-mono); font-size: 0.58rem; font-weight: 700; letter-spacing: 0.22em; text-transform: uppercase; color: var(--muted); transition: color 0.25s ease; text-align: center; }
-.ibtn-wrap:hover .ibtn-caption, .ibtn-wrap.active .ibtn-caption { color: var(--red); }
-.ctrl-sep { width: 1px; height: 60px; background: var(--paper-line); align-self: center; margin: 0 0.2rem; }
-@media (max-width: 900px) { .ibtn { width: 60px; height: 60px; } .ibtn-caption { font-size: 0.52rem; letter-spacing: 0.18em; } }
-@media (max-width: 640px) { .ibtn { width: 48px; height: 48px; } .ibtn svg { stroke-width: 1.6; } .ibtn-caption { font-size: 0.48rem; letter-spacing: 0.14em; } .ctrl-sep { height: 40px; } }
-
 /* READING — слоги */
 .syllable-grid {
     position: relative;
