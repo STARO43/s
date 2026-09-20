@@ -93,15 +93,12 @@
     </div>
 </section>
 
-<!-- ===================== ЧИТАЛКА (inline-разворот) ===================== -->
+<!-- ===================== ЧИТАЛКА ===================== -->
 <div class="reader" id="reader" aria-hidden="true">
     <div class="reader-progress"><div class="reader-progress-fill" id="progressFill"></div></div>
 
-    <div class="reader-head">
+    <div class="reader-head" id="readerHead" title="Вернуться к списку статей" role="button" tabindex="0">
         <div class="reader-head-inner">
-            <button class="reader-back" id="backBtn">
-                <span>←</span><span>НАЗАД</span>
-            </button>
             <span class="reader-label"><span class="dot"></span><span>ЗАМЕТКИ · РАЗМЫШЛЕНИЯ · ТЕОРИЯ</span></span>
             <button class="reader-close" id="closeBtn" aria-label="Закрыть">×</button>
         </div>
@@ -111,15 +108,9 @@
         <div class="reader-sheet">
             <h1 class="reader-title" id="readerTitle"></h1>
             <div class="reader-meta">
-                <span class="dot"></span>
-                <span id="readerTime">4 МИН ЧТЕНИЯ</span>
+                <span id="readerTime">ПРИМЕРНОЕ ВРЕМЯ ДОКЛАДА: 4 МИН</span>
             </div>
             <div class="reader-content" id="readerContent"></div>
-            <div class="reader-foot">
-                <button class="reader-foot-link" id="footBack">
-                    <span class="arr">←</span><span>ВСЕ СТАТЬИ</span>
-                </button>
-            </div>
         </div>
     </div>
 </div>
