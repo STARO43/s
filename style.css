@@ -1695,16 +1695,31 @@ html[data-theme="dark"] .reader-content hr {
         transparent 4px, transparent 10px);
 }
 
-/* Полосы «копирки» отключаем — ничего не вырезаем */
-html[data-theme="dark"] .reader-content,
+/* Полосы «копирки» полностью отключаем — возвращаем нормальные абзацы */
+html[data-theme="dark"] .reader-content {
+    background-image: none !important;
+    background-size: auto !important;
+    background-clip: border-box !important;
+    -webkit-background-clip: border-box !important;
+    box-decoration-break: slice !important;
+    -webkit-box-decoration-break: slice !important;
+    padding: 0 !important;
+    margin: 0 !important;
+}
 html[data-theme="dark"] .reader-content p,
 html[data-theme="dark"] .reader-content li,
 html[data-theme="dark"] .reader-content blockquote p {
-    background-image: none;
-    background-size: auto;
-    padding: inherit;
-    margin-left: 0;
-    margin-right: 0;
+    background-image: none !important;
+    background-size: auto !important;
+    padding: 0 !important;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+}
+html[data-theme="dark"] .reader-content p {
+    margin: 0 0 1.3em 0 !important;
+}
+html[data-theme="dark"] .reader-content p:last-child {
+    margin-bottom: 0 !important;
 }
 /* ============================================================
    МОБИЛЬНАЯ
