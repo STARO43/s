@@ -6,7 +6,6 @@
 <meta name="description" content="Грамотиньо. Великие личности Родины.">
 <meta name="theme-color" content="#F4F1EA">
 
-<!-- Open Graph -->
 <meta property="og:type" content="website">
 <meta property="og:title" content="Грамотиньо. Великие">
 <meta property="og:description" content="Великие личности Родины.">
@@ -17,23 +16,19 @@
 <meta name="twitter:description" content="Великие личности Родины.">
 <meta name="twitter:image" content="assets/avatar.png">
 
-<!-- Иконки -->
 <link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
 <link rel="apple-touch-icon" href="assets/avatar.png">
 
-<!-- Шрифты -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Space+Mono:ital,wght@0,400;0,700;1,400&family=PT+Mono&display=swap" rel="stylesheet">
 
-<!-- Стили -->
 <link rel="stylesheet" href="style.css">
 
 <title>Грамотиньо. Великие</title>
 </head>
 <body>
 
-<!-- ===================== LOADER ===================== -->
 <div class="loader-overlay" id="loader">
     <div class="shutter shutter-top"></div>
     <div class="shutter"></div>
@@ -42,7 +37,6 @@
     <div class="shutter shutter-bot"></div>
 </div>
 
-<!-- ===================== BURGER ===================== -->
 <button class="burger-btn" id="burgerBtn" aria-label="Меню">
     <span class="ring"></span>
     <span class="burger-icon">
@@ -53,26 +47,32 @@
     </span>
 </button>
 
-<!-- ===================== BURGER MENU ===================== -->
+<button class="theme-toggle" id="themeToggle" aria-label="Сменить тему">
+    <span class="ring"></span>
+    <span class="ico">
+        <svg class="sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4.2"/><line x1="12" y1="1.5" x2="12" y2="4"/><line x1="12" y1="20" x2="12" y2="22.5"/><line x1="1.5" y1="12" x2="4" y2="12"/><line x1="20" y1="12" x2="22.5" y2="12"/><line x1="4.6" y1="4.6" x2="6.4" y2="6.4"/><line x1="17.6" y1="17.6" x2="19.4" y2="19.4"/><line x1="4.6" y1="19.4" x2="6.4" y2="17.6"/><line x1="17.6" y1="6.4" x2="19.4" y2="4.6"/></svg>
+        <svg class="moon" viewBox="0 0 24 24"><path d="M20 14.5A8.2 8.2 0 0 1 9.5 4 8.5 8.5 0 1 0 20 14.5z"/></svg>
+    </span>
+</button>
+
 <div class="burger-menu" id="burgerMenu">
     <div class="burger-menu-inner">
         <div class="burger-menu-col burger-menu-col-left">
             <a href="index.html"    class="burger-link" data-ns="home">ТИТУЛ.</a>
             <a href="reading.html"  class="burger-link" data-ns="reading">УЧИ СЛОГИ,</a>
             <a href="tools.html"    class="burger-link" data-ns="tools">УЧИСЬ ЧАСАМ,</a>
-            <a href="heroes.html"   class="burger-link active" data-ns="heroes">БЕРИ ПРИМЕР С ВЕЛИКИХ</a>
-            <a href="cinema.html"   class="burger-link" data-ns="cinema">МУЛЬТЫ</a>
+            <a href="cinema.html"   class="burger-link" data-ns="cinema">МУЛЬТЫ.</a>
         </div>
         <div class="burger-menu-col burger-menu-col-right">
+            <a href="heroes.html"   class="burger-link active" data-ns="heroes">ВЕЛИКИЕ ЛИЧНОСТИ,</a>
+            <a href="articles.html" class="burger-link" data-ns="articles">ПЕДАГОГИКА,</a>
             <a href="art.html"      class="burger-link" data-ns="art">ЖИВОПИСЬ,</a>
-            <a href="poetry.html"   class="burger-link" data-ns="poetry">ПОЭЗИЯ,</a>
-            <a href="articles.html" class="burger-link" data-ns="articles">ПЕДАГОГИКА.</a>
+            <a href="poetry.html"   class="burger-link" data-ns="poetry">ПОЭЗИЯ.</a>
         </div>
     </div>
     <div class="burger-menu-foot">ГРАМОТИНЬО · ТЕРМИНАЛ КУЛЬТУРЫ · 2026</div>
 </div>
 
-<!-- ===================== HEADER ===================== -->
 <header class="page-header">
     <div class="page-logo">
         <span class="l1">ВЕЛИКИЕ.</span>
@@ -80,14 +80,9 @@
     </div>
 </header>
 
-<!-- ===================== ТАЙМЛАЙН ===================== -->
 <section class="heroes-timeline" id="heroesTimeline"></section>
 
-<!-- ===================== GSAP (CDN) ===================== -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
-
-<!-- ===================== APP ===================== -->
 <script src="app.js"></script>
-
 </body>
 </html>
