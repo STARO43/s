@@ -22,11 +22,11 @@ html { scroll-behavior: smooth; }
 }
 
 html[data-theme="dark"] {
-    --bg: #08090A;
-    --text: #DDE0E5;
+    --bg: #050505;
+    --text: #E0E0E0;
     --red: #FF3B5C;
-    --paper-line: rgba(221, 224, 229, 0.14);
-    --muted: rgba(221, 224, 229, 0.5);
+    --paper-line: rgba(224, 224, 224, 0.14);
+    --muted: rgba(224, 224, 224, 0.5);
 }
 
 /* ============================================================
@@ -67,24 +67,18 @@ body {
    ТЁМНАЯ ТЕМА — почти чёрный с холодным синим отливом
    ============================================================ */
 html[data-theme="dark"] body {
-    background-color: #050608;
+    background-color: #050505;
     background-image:
-        /* тонкая диагональная штриховка */
         repeating-linear-gradient(135deg,
-            rgba(255, 255, 255, 0.008) 0px,
-            rgba(255, 255, 255, 0.008) 1px,
+            rgba(255, 255, 255, 0.006) 0px,
+            rgba(255, 255, 255, 0.006) 1px,
             transparent 1px,
             transparent 4px),
-        /* верхний холодный отсвет */
-        radial-gradient(ellipse 130% 80% at 50% -10%, rgba(30, 40, 70, 0.55), transparent 62%),
-        /* нижняя глубокая тень */
-        radial-gradient(ellipse 140% 70% at 50% 115%, rgba(15, 20, 40, 0.75), transparent 65%),
-        /* мягкое свечение справа */
-        radial-gradient(circle 600px at 88% 12%, rgba(45, 65, 110, 0.28), transparent 70%),
-        /* холодный блик слева */
-        radial-gradient(circle 500px at 8% 60%, rgba(30, 40, 70, 0.35), transparent 70%),
-        /* базовая тьма */
-        linear-gradient(180deg, #040507 0%, #070A12 40%, #030405 100%);
+        radial-gradient(ellipse 130% 80% at 50% -10%, rgba(30, 30, 32, 0.5), transparent 62%),
+        radial-gradient(ellipse 140% 70% at 50% 115%, rgba(15, 15, 16, 0.75), transparent 65%),
+        radial-gradient(circle 600px at 88% 12%, rgba(35, 35, 38, 0.25), transparent 70%),
+        radial-gradient(circle 500px at 8% 60%, rgba(25, 25, 28, 0.3), transparent 70%),
+        linear-gradient(180deg, #030303 0%, #060606 40%, #020202 100%);
     background-repeat: no-repeat, no-repeat, no-repeat, no-repeat, no-repeat, no-repeat;
     background-size: 100% 100%, 100% 100%, 100% 100%, 100% 100%, 100% 100%, 100% 100%;
 }
@@ -103,8 +97,8 @@ body::before {
 }
 html[data-theme="dark"] body::before {
     background-image:
-        radial-gradient(circle 800px at 15% 20%, rgba(60, 90, 150, 0.05), transparent 60%),
-        radial-gradient(circle 700px at 85% 80%, rgba(40, 60, 110, 0.04), transparent 60%);
+        radial-gradient(circle 800px at 15% 20%, rgba(80, 80, 90, 0.04), transparent 60%),
+        radial-gradient(circle 700px at 85% 80%, rgba(60, 60, 70, 0.03), transparent 60%);
 }
 
 /* Виньетка по краям (только тёмная тема) */
@@ -132,11 +126,11 @@ body.menu-open::after { display: none; }
             radial-gradient(ellipse 130% 70% at 50% 0%, #F8F4EC 0%, rgba(248,244,236,0) 62%),
             radial-gradient(ellipse 110% 60% at 50% 100%, #ECE6D8 0%, rgba(236,230,216,0) 72%);
     }
-    html[data-theme="dark"] body {
-        background-image:
-            radial-gradient(ellipse 130% 70% at 50% 0%, #0A1024 0%, rgba(10,16,36,0) 62%),
-            radial-gradient(ellipse 110% 60% at 50% 100%, #030405 0%, rgba(3,4,5,0) 72%);
-    }
+html[data-theme="dark"] body {
+    background-image:
+        radial-gradient(ellipse 130% 70% at 50% 0%, #0a0a0a 0%, rgba(10,10,10,0) 62%),
+        radial-gradient(ellipse 110% 60% at 50% 100%, #020202 0%, rgba(2,2,2,0) 72%);
+}
 }
 
 /* LOADER */
@@ -1997,9 +1991,9 @@ html[data-theme="dark"] .clock-switch .switch-ring { border-color: rgba(221,224,
 .hero-photo { position: relative; aspect-ratio: 1 / 1; border-bottom: none; overflow: hidden; background: var(--bg); }
 .hero-photo img { width: 100%; height: 100%; object-fit: cover; display: block; filter: grayscale(1) contrast(1.15); transition: filter 0.35s ease; }
 .hero-item:hover .hero-photo img { filter: grayscale(0) contrast(1.15); }
-.hero-info { padding: 14px 0 16px; display: flex; flex-direction: column; gap: 6px; }
-.hero-name { font-family: var(--font-display); font-size: 1.15rem; font-weight: 600; line-height: 1.05; letter-spacing: 0.03em; text-transform: uppercase; color: var(--text); }
-.hero-years { font-family: var(--font-mono); font-size: 0.7rem; font-weight: 600; letter-spacing: 0.05em; color: var(--muted); display: flex; align-items: baseline; gap: 8px; }
+.hero-info { padding: 16px 14px 18px; display: flex; flex-direction: column; gap: 6px; background: transparent; }
+.hero-name { font-family: var(--font-display); font-size: 1.15rem; font-weight: 600; line-height: 1.05; letter-spacing: 0.03em; text-transform: uppercase; color: var(--text); padding: 0 4px }
+.hero-years { font-family: var(--font-mono); font-size: 0.7rem; font-weight: 600; letter-spacing: 0.05em; color: var(--muted); display: flex; align-items: baseline; gap: 8px;  padding: 0 4px; }
 .hero-age { color: var(--red); font-weight: 700; }
 
 .hero-modal {
@@ -2162,8 +2156,8 @@ html[data-theme="dark"] .clock-switch .switch-ring { border-color: rgba(221,224,
 @media (max-width: 768px) {
     .heroes-timeline { padding: 2rem 4vw 5rem; }
     .heroes-grid { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 14px; }
-    .hero-name { font-size: 1rem; }
-    .hero-years { font-size: 0.64rem; }
+    .hero-name { font-size: 1rem; padding: 0 2px; }
+    .hero-years { font-size: 0.64rem; padding: 0 2px; }
     .century-header { padding: 0 0 10px; margin-bottom: 22px; }
     .century-header:not(:first-child) { margin-top: 52px; }
     .soviet-band { padding: 12px 18px; font-size: 0.92rem; letter-spacing: 0.18em; }
