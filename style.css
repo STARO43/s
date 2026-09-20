@@ -1422,17 +1422,17 @@ html[data-theme="dark"] .burger-btn .ring { border-color: rgba(221,224,229,.3); 
     margin: 0 0 26px 0;
 }
 
-/* Кнопка «ВЕРНУТЬ ДОКУМЕНТ» — текст в квадратике */
+/* «ВЕРНУТЬ ДОКУМЕНТ.» — как рукописная пометка на бумаге */
 .reader-back {
     display: inline-block;
-    background: rgba(255, 250, 230, 0.35);
-    border: 1px solid rgba(120, 90, 50, 0.45);
-    padding: 8px 14px;
-    margin: 0 0 40px 0;
+    background: transparent;
+    border: none;
+    padding: 6px 0;
+    margin: 0 0 42px 0;
     font-family: 'Special Elite', 'Courier New', monospace;
-    font-size: 0.82rem;
+    font-size: 1.15rem;
     font-weight: 400;
-    letter-spacing: 0.14em;
+    letter-spacing: 0.06em;
     text-transform: uppercase;
     color: #1a1611;
     cursor: default;
@@ -1440,18 +1440,28 @@ html[data-theme="dark"] .burger-btn .ring { border-color: rgba(221,224,229,.3); 
     user-select: none;
     -webkit-tap-highlight-color: transparent;
     -webkit-user-select: none;
-    box-shadow:
-        0 1px 0 rgba(255, 250, 230, 0.7) inset,
-        0 0 0 1px rgba(180, 150, 100, 0.08) inset;
-    transition: none;
+    transform: rotate(-1.5deg);
+    transform-origin: left center;
+    box-shadow: none;
+    outline: none;
 }
-.reader-back::before { content: '←  '; }
 
-/* Внизу статьи — тот же вид, но по центру и с большим отступом */
+/* Убираем «←», которое было через ::before */
+.reader-back::before { content: none; }
+
+/* Внизу статьи — тот же вид, по центру */
 .reader-back-bottom {
     display: block;
-    margin: 48px auto 0 auto;
+    margin: 54px auto 0 auto;
     text-align: center;
+    transform-origin: center center;
+}
+
+/* Тёмная тема */
+html[data-theme="dark"] .reader-back {
+    color: #0A0A0A;
+    background: transparent;
+    border: none;
 }
 
 /* ============================================================
