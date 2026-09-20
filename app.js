@@ -1,7 +1,5 @@
 /* ============================================================
    ГРАМОТИНЬО — app.js
-   Общая логика + инициализация страниц.
-   Анимации — ровно как в исходных inline-скриптах.
    ============================================================ */
 'use strict';
 
@@ -15,7 +13,23 @@ const $  = (sel, root = document) => root.querySelector(sel);
 const $$ = (sel, root = document) => Array.from(root.querySelectorAll(sel));
 
 /* ============================================================
-   1. СТАРТОВАЯ АНИМАЦИЯ (как в исходных страницах)
+   0.1 ТЕМА
+   ============================================================ */
+function initTheme(){
+    const saved = localStorage.getItem('theme') || 'light';
+    document.documentElement.setAttribute('data-theme', saved);
+    const btn = document.getElementById('themeToggle');
+    if (!btn) return;
+    btn.style.opacity = '1';
+    btn.addEventListener('click', () => {
+        const cur = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+        document.documentElement.setAttribute('data-theme', cur);
+        localStorage.setItem('theme', cur);
+    });
+}
+
+/* ============================================================
+   1. СТАРТОВАЯ АНИМАЦИЯ
    ============================================================ */
 function playEntryAnimation(onDone) {
     const loader = document.getElementById('loader');
@@ -42,7 +56,6 @@ function playEntryAnimation(onDone) {
         onComplete: () => { if (typeof onDone === 'function') onDone(); }
     });
 
-    /* Шторки уезжают — как в исходнике */
     tl.to('.shutter', {
         duration: 0.8,
         scaleY: 0,
@@ -67,7 +80,7 @@ function playEntryAnimation(onDone) {
           .to('.hero-sub', {
               opacity: 1, x: 0, duration: 0.8, ease: 'power3.out'
           }, '-=0.6')
-          .to('.burger-btn', {
+          .to('.burger-btn, .theme-toggle', {
               opacity: 1, duration: 0.6, ease: 'power2.out'
           }, '-=0.5');
     } else {
@@ -79,7 +92,7 @@ function playEntryAnimation(onDone) {
               { opacity: 0, y: 24 },
               { opacity: 1, y: 0, duration: 0.85, ease: 'power3.out' },
               '-=0.65')
-          .fromTo('.burger-btn',
+          .fromTo('.burger-btn, .theme-toggle',
               { opacity: 0, scale: 0.6, rotate: -90 },
               { opacity: 1, scale: 1, rotate: 0, duration: 0.65, ease: 'back.out(1.8)' },
               '-=0.55');
@@ -100,7 +113,7 @@ function playEntryAnimation(onDone) {
 }
 
 /* ============================================================
-   2. БУРГЕР-МЕНЮ (как в исходниках — без preventDefault)
+   2. БУРГЕР-МЕНЮ
    ============================================================ */
 let _menuBound = false;
 
@@ -139,12 +152,11 @@ function initBurger() {
         else openMenu();
     });
 
-    /* Как в исходниках: просто закрываем меню, браузер сам уходит по ссылке */
     $$('.burger-link').forEach((link) => {
-    link.addEventListener('click', () => {
-        window.location.href = link.href;
+        link.addEventListener('click', () => {
+            window.location.href = link.href;
+        });
     });
-});
 
     document.addEventListener('keydown', (e) => {
         if (e.key === 'Escape' && menu.classList.contains('open')) closeMenu();
@@ -173,7 +185,7 @@ function closeAllModals() {
 }
 
 /* ============================================================
-   4. КИБЕР-МЕРЦАНИЕ (как в исходнике)
+   4. КИБЕР-МЕРЦАНИЕ
    ============================================================ */
 function triggerCyberFlicker(el, durationMs = 1700) {
     if (!el) return;
@@ -322,7 +334,6 @@ function initHome() {
             evmBody.innerHTML = '';
         }
 
-        /* Как в исходнике: navigateWithEffect */
         function navigateWithEffect(href) {
             closeTerminal();
             window.location.href = href;
@@ -710,6 +721,367 @@ function initReading() {
             });
         }
 
+        /* ====================================================
+           НОВЫЙ QUIZ / DICT — дизайн-оверлеи
+           + двойной клик по кнопкам = пасхалка на терминал
+           ==================================================== */
+        const qdOverlay = document.getElementById('qdOverlay');
+        const qdClose   = document.getElementById('qdClose');
+        const qdBody    = document.getElementById('qdBody');
+        const qdLabel   = document.getElementById('qdLabel');
+        const qdTitle   = document.getElementById('qdTitle');
+        const qdFill    = document.getElementById('qdProgressFill');
+        const qdCounter = document.getElementById('qdCounter');
+
+        let qdMode = null; // 'quiz' | 'dict'
+        let qdLocked = false;
+
+        function openQD(mode){
+            if (!qdOverlay) return;
+            qdMode = mode;
+            qdLocked = false;
+            qdOverlay.classList.add('show');
+            qdOverlay.setAttribute('aria-hidden','false');
+            document.body.style.overflow = 'hidden';
+            if (mode === 'quiz'){
+                if (qdLabel) qdLabel.innerHTML = '<span class="dot"></span><span>ВИКТОРИНА · РАСПОЗНАВАНИЕ</span>';
+                if (qdTitle) qdTitle.textContent = 'ЧТО ЗВУЧАЛО?';
+                startQuizQD();
+            } else {
+                if (qdLabel) qdLabel.innerHTML = '<span class="dot"></span><span>ДИКТАНТ · СБОРКА СЛОГА</span>';
+                if (qdTitle) qdTitle.textContent = 'СОСТАВЬ СЛОГ';
+                startDictQD();
+            }
+        }
+        function closeQD(){
+            if (!qdOverlay) return;
+            qdOverlay.classList.remove('show');
+            qdOverlay.setAttribute('aria-hidden','true');
+            document.body.style.overflow = '';
+            qdMode = null;
+            if (currentAudio) { try { currentAudio.pause(); } catch(e){} }
+            if (dictationAudio) { try { dictationAudio.pause(); } catch(e){} }
+        }
+        if (qdClose) qdClose.addEventListener('click', closeQD);
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && qdOverlay && qdOverlay.classList.contains('show')) closeQD();
+        });
+
+        function qdSetProgress(cur, total){
+            if (qdFill) qdFill.style.width = total ? (cur/total*100) + '%' : '0%';
+            if (qdCounter) qdCounter.innerHTML = `ВОПРОС <b>${Math.min(cur+1,total)}</b> ИЗ <b>${total}</b>`;
+        }
+
+        /* ---------- QUIZ ---------- */
+        function startQuizQD(){
+            examQuestions = syllables.slice().sort(() => Math.random() - 0.5).slice(0, 10);
+            examIndex = 0;
+            examScore = 0;
+            showQuizQD();
+        }
+
+        function showQuizQD(){
+            if (!qdBody) return;
+            qdBody.innerHTML = '';
+            if (examIndex >= examQuestions.length){
+                showQDResult(examScore, 10);
+                return;
+            }
+            qdSetProgress(examIndex, examQuestions.length);
+            const correct = examQuestions[examIndex];
+            currentExamCorrect = correct;
+
+            const inner = document.createElement('div');
+            inner.className = 'qd-inner';
+
+            const audioBtn = document.createElement('button');
+            audioBtn.type = 'button';
+            audioBtn.className = 'qd-audio';
+            audioBtn.innerHTML = '<span class="ico"><svg viewBox="0 0 24 24"><path d="M4 9v6h4l5 4V5L8 9H4z"/><path d="M16 8.5a4.5 4.5 0 0 1 0 7"/><path d="M18.5 6a8 8 0 0 1 0 12"/></svg></span><span>ПРОСЛУШАТЬ</span>';
+            audioBtn.addEventListener('click', () => playAudio(correct));
+            inner.appendChild(audioBtn);
+
+            const variants = new Set([correct]);
+            const fl = correct.charAt(0).toUpperCase();
+            const slp = syllables.filter((i) => i !== correct && i.charAt(0).toUpperCase() === fl);
+            slp.sort(() => Math.random() - 0.5).slice(0, 5).forEach((i) => variants.add(i));
+            const fp = syllables.filter((i) => !variants.has(i));
+            while (variants.size < 6 && fp.length > 0) {
+                const ri = fp[Math.floor(Math.random() * fp.length)];
+                variants.add(ri);
+                fp.splice(fp.indexOf(ri), 1);
+            }
+            const va = [...variants].sort(() => Math.random() - 0.5);
+
+            const opts = document.createElement('div');
+            opts.className = 'qd-options';
+            va.forEach((v) => {
+                const b = document.createElement('button');
+                b.className = 'qd-opt';
+                b.type = 'button';
+                b.textContent = v.toUpperCase();
+                b.addEventListener('click', () => handleQuizAnswer(b, v, correct, opts));
+                opts.appendChild(b);
+            });
+            inner.appendChild(opts);
+            qdBody.appendChild(inner);
+            playAudio(correct);
+        }
+
+        function handleQuizAnswer(btn, sel, correct, opts){
+            if (qdLocked) return;
+            qdLocked = true;
+            opts.querySelectorAll('.qd-opt').forEach((o) => o.disabled = true);
+            if (sel === correct){
+                btn.classList.add('correct');
+                examScore++;
+            } else {
+                btn.classList.add('wrong');
+                opts.querySelectorAll('.qd-opt').forEach((o) => {
+                    if (o.textContent === correct.toUpperCase()) o.classList.add('reveal');
+                });
+                playAudio('Не-то', 0.35);
+            }
+            showNextButton(() => {
+                qdLocked = false;
+                examIndex++;
+                showQuizQD();
+            });
+        }
+
+        /* ---------- DICT ---------- */
+        const ALPHA_LAYOUT = ['А','Б','В','Г','Д','Е','Ё','Ж','З','И','Й','К','Л','М','Н','О','П','Р','С','Т','У','Ф','Х','Ц','Ч','Ш','Щ','Ъ','Ы','Ь','Э','Ю','Я'];
+        const QWERTY_ROW1 = ['Й','Ц','У','К','Е','Н','Г','Ш','Щ','З','Х','Ъ'];
+        const QWERTY_ROW2 = ['Ф','Ы','В','А','П','Р','О','Л','Д','Ж','Э'];
+        const QWERTY_ROW3 = ['Я','Ч','С','М','И','Т','Ь','Б','Ю'];
+
+        function startDictQD(){
+            const pool = syllables.filter((s) => /^[А-Яа-яЁё]{2,4}$/.test(s));
+            dictationQuestions = pool.slice().sort(() => Math.random() - 0.5).slice(0, 10);
+            dictationIndex = 0;
+            dictationScore = 0;
+            dictationLayout = 'alpha';
+            showDictQD();
+        }
+
+        function showDictQD(){
+            if (!qdBody) return;
+            qdBody.innerHTML = '';
+            qdLocked = false;
+            if (dictationIndex >= dictationQuestions.length){
+                showQDResult(dictationScore, 10);
+                return;
+            }
+            qdSetProgress(dictationIndex, dictationQuestions.length);
+            dictationCurrent = dictationQuestions[dictationIndex];
+            dictationInput = [];
+
+            const inner = document.createElement('div');
+            inner.className = 'qd-inner';
+
+            const audioBtn = document.createElement('button');
+            audioBtn.type = 'button';
+            audioBtn.className = 'qd-audio';
+            audioBtn.innerHTML = '<span class="ico"><svg viewBox="0 0 24 24"><path d="M4 9v6h4l5 4V5L8 9H4z"/><path d="M16 8.5a4.5 4.5 0 0 1 0 7"/><path d="M18.5 6a8 8 0 0 1 0 12"/></svg></span><span>ПРОСЛУШАТЬ</span>';
+            audioBtn.addEventListener('click', () => playDictAudio());
+            inner.appendChild(audioBtn);
+
+            const slotLine = document.createElement('div');
+            slotLine.className = 'qd-slot-line';
+            inner.appendChild(slotLine);
+
+            const kb = document.createElement('div');
+            kb.className = 'qd-keyboard';
+            inner.appendChild(kb);
+
+            qdBody.appendChild(inner);
+
+            renderDictSlotsQD();
+            renderDictKeyboardQD();
+
+            setTimeout(() => playDictAudio(), 250);
+        }
+
+        function renderDictSlotsQD(){
+            const line = qdBody.querySelector('.qd-slot-line');
+            if (!line) return;
+            line.innerHTML = '';
+            const total = dictationCurrent.length;
+            for (let i = 0; i < total; i++){
+                const s = document.createElement('span');
+                s.className = 'qd-slot' + (dictationInput[i] ? ' filled' : '');
+                s.textContent = dictationInput[i] || '\u00A0';
+                line.appendChild(s);
+            }
+        }
+
+        function renderDictKeyboardQD(){
+            const kb = qdBody.querySelector('.qd-keyboard');
+            if (!kb) return;
+            kb.innerHTML = '';
+            const rows = dictationLayout === 'alpha'
+                ? [ALPHA_LAYOUT.slice()]
+                : [QWERTY_ROW1.slice(), QWERTY_ROW2.slice(), QWERTY_ROW3.slice()];
+            rows.forEach((row) => {
+                const r = document.createElement('div');
+                r.className = 'qd-kb-row';
+                row.forEach((letter) => {
+                    const k = document.createElement('button');
+                    k.type = 'button';
+                    k.className = 'qd-key';
+                    k.textContent = letter;
+                    k.addEventListener('click', () => pressDictKeyQD(letter));
+                    r.appendChild(k);
+                });
+                kb.appendChild(r);
+            });
+            const util = document.createElement('div');
+            util.className = 'qd-kb-row';
+            const bs = document.createElement('button');
+            bs.type = 'button';
+            bs.className = 'qd-key util';
+            bs.textContent = '⌫ СТЕРЕТЬ';
+            bs.addEventListener('click', pressBackspaceQD);
+            util.appendChild(bs);
+            const sw = document.createElement('button');
+            sw.type = 'button';
+            sw.className = 'qd-key util';
+            sw.textContent = 'РАСКЛАДКА';
+            sw.addEventListener('click', () => {
+                dictationLayout = dictationLayout === 'alpha' ? 'qwerty' : 'alpha';
+                renderDictKeyboardQD();
+            });
+            util.appendChild(sw);
+            kb.appendChild(util);
+        }
+
+        function pressDictKeyQD(letter){
+            if (qdLocked || dictationInput.length >= dictationCurrent.length) return;
+            dictationInput.push(letter);
+            renderDictSlotsQD();
+            if (dictationInput.length === dictationCurrent.length){
+                setTimeout(checkDictQD, 220);
+            }
+        }
+        function pressBackspaceQD(){
+            if (qdLocked || !dictationInput.length) return;
+            dictationInput.pop();
+            renderDictSlotsQD();
+        }
+
+        function checkDictQD(){
+            if (qdLocked) return;
+            qdLocked = true;
+            const typed = dictationInput.join('').toUpperCase();
+            const correct = dictationCurrent.toUpperCase();
+            const slots = qdBody.querySelectorAll('.qd-slot');
+            if (typed === correct){
+                dictationScore++;
+                slots.forEach((s) => s.classList.add('correct'));
+            } else {
+                slots.forEach((s, i) => {
+                    s.classList.add('wrong');
+                    s.textContent = correct[i] || '\u00A0';
+                });
+                playAudio('Не-то', 0.35);
+            }
+            const kb = qdBody.querySelector('.qd-keyboard');
+            if (kb) kb.style.display = 'none';
+            showNextButton(() => {
+                dictationIndex++;
+                showDictQD();
+            });
+        }
+
+        function playDictAudio(){
+            if (!dictationCurrent) return;
+            if (dictationAudio) { try { dictationAudio.pause(); } catch (e) {} }
+            let a = audioCache[dictationCurrent];
+            if (!a) {
+                a = new Audio('audio/' + dictationCurrent + '.mp3');
+                a.preload = 'auto';
+                audioCache[dictationCurrent] = a;
+            }
+            try { a.currentTime = 0; } catch (e) {}
+            dictationAudio = a;
+            a.play().catch(() => {});
+        }
+
+        /* ---------- Общая кнопка «ДАЛЕЕ» ---------- */
+        function showNextButton(onClick){
+            const inner = qdBody.querySelector('.qd-inner');
+            if (!inner) return;
+            const wrap = document.createElement('div');
+            wrap.className = 'qd-next-wrap';
+            const btn = document.createElement('button');
+            btn.type = 'button';
+            btn.className = 'qd-next';
+            btn.innerHTML = '<span>ДАЛЕЕ</span><span class="arrow"><svg viewBox="0 0 24 24"><line x1="4" y1="12" x2="19" y2="12"/><polyline points="13 6 19 12 13 18"/></svg></span>';
+            btn.addEventListener('click', () => {
+                if (btn.classList.contains('fly')) return;
+                btn.classList.add('fly');
+                btn.disabled = true;
+                setTimeout(onClick, 420);
+            });
+            wrap.appendChild(btn);
+            inner.appendChild(wrap);
+            setTimeout(() => btn.scrollIntoView({ behavior:'smooth', block:'nearest' }), 40);
+        }
+
+        /* ---------- Результат ---------- */
+        function showQDResult(score, total){
+            if (!qdBody) return;
+            qdBody.innerHTML = '';
+            qdSetProgress(total, total);
+            const inner = document.createElement('div');
+            inner.className = 'qd-inner';
+            const res = document.createElement('div');
+            res.className = 'qd-result';
+            res.innerHTML = `РЕЗУЛЬТАТ: <b>${score}</b> ИЗ <b>${total}</b>`;
+            inner.appendChild(res);
+            const sub = document.createElement('div');
+            sub.className = 'qd-result-sub';
+            if (score === total) sub.textContent = 'ОТЛИЧНО. МОЛОДЕЦ.';
+            else if (score >= total*0.7) sub.textContent = 'ХОРОШО. ПРОДОЛЖАЙ ТРЕНИРОВКИ.';
+            else sub.textContent = 'ПОПРОБУЙ ЕЩЁ РАЗ.';
+            inner.appendChild(sub);
+            qdBody.appendChild(inner);
+        }
+
+        /* ---------- Пасхалка: двойной клик по кнопкам -> терминал ---------- */
+        function bindDblClickEasterEgg(btn, mode){
+            if (!btn) return;
+            let lastTap = 0;
+            btn.addEventListener('click', (e) => {
+                const now = Date.now();
+                if (now - lastTap < 350){
+                    e.preventDefault();
+                    e.stopPropagation();
+                    lastTap = 0;
+                    openTerminalQD(mode);
+                } else {
+                    lastTap = now;
+                }
+            });
+            btn.addEventListener('dblclick', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                openTerminalQD(mode);
+            });
+        }
+
+        if (examBtn) {
+            examBtn.addEventListener('click', () => openQD('quiz'));
+            bindDblClickEasterEgg(examBtn, 'exam');
+        }
+        if (dictationBtn) {
+            dictationBtn.addEventListener('click', () => openQD('dict'));
+            bindDblClickEasterEgg(dictationBtn, 'dict');
+        }
+
+        /* ====================================================
+           СТАРЫЙ ТЕРМИНАЛ — только как пасхалка (двойной клик)
+           ==================================================== */
         function openTerm() {
             if (!termOverlay) return;
             termOverlay.classList.add('show');
@@ -750,9 +1122,18 @@ function initReading() {
         }
         function clearTerm() { if (termBody) termBody.innerHTML = ''; }
 
-        async function startExam() {
+        async function openTerminalQD(mode){
             openTerm();
-            termMode = 'exam';
+            if (mode === 'exam') {
+                termMode = 'exam';
+                await startExamTerm();
+            } else {
+                termMode = 'dict';
+                await startDictTerm();
+            }
+        }
+
+        async function startExamTerm() {
             clearTerm();
             examQuestions = syllables.slice().sort(() => Math.random() - 0.5).slice(0, 10);
             examIndex = 0;
@@ -845,16 +1226,7 @@ function initReading() {
             termScroll();
         }
 
-        if (examBtn) examBtn.addEventListener('click', startExam);
-
-        const ALPHA_LAYOUT = ['А','Б','В','Г','Д','Е','Ё','Ж','З','И','Й','К','Л','М','Н','О','П','Р','С','Т','У','Ф','Х','Ц','Ч','Ш','Щ','Ъ','Ы','Ь','Э','Ю','Я'];
-        const QWERTY_ROW1 = ['Й','Ц','У','К','Е','Н','Г','Ш','Щ','З','Х','Ъ'];
-        const QWERTY_ROW2 = ['Ф','Ы','В','А','П','Р','О','Л','Д','Ж','Э'];
-        const QWERTY_ROW3 = ['Я','Ч','С','М','И','Т','Ь','Б','Ю'];
-
-        async function startDictation() {
-            openTerm();
-            termMode = 'dict';
+        async function startDictTerm() {
             clearTerm();
             dictationLayout = 'alpha';
             const pool = syllables.filter((s) => /^[А-Яа-яЁё]{2,4}$/.test(s));
@@ -897,12 +1269,11 @@ function initReading() {
             await typeTerm(`ЗАДАНИЕ ${dictationIndex + 1}: СОСТАВЬ СЛОГ.`, 10);
             await sleep(100);
             const cmdLine = await printTerm('$ ПРОИГРЫШЬ', 'cmd-underline');
-            cmdLine.addEventListener('click', (e) => playDictAudio(e.currentTarget));
+            cmdLine.addEventListener('click', () => playDictAudio());
             renderDictAnswer();
             renderDictKeyboard();
             setTimeout(() => {
-                const cmd = termBody.querySelector('.cmd-underline');
-                if (cmd && dictationCurrent) playDictAudio(cmd);
+                if (dictationCurrent) playDictAudio();
             }, 250);
         }
 
@@ -995,20 +1366,6 @@ function initReading() {
             await renderDictKeyboard(true);
         }
 
-        function playDictAudio() {
-            if (!dictationCurrent) return;
-            if (dictationAudio) { try { dictationAudio.pause(); } catch (e) {} }
-            let a = audioCache[dictationCurrent];
-            if (!a) {
-                a = new Audio('audio/' + dictationCurrent + '.mp3');
-                a.preload = 'auto';
-                audioCache[dictationCurrent] = a;
-            }
-            try { a.currentTime = 0; } catch (e) {}
-            dictationAudio = a;
-            a.play().catch(() => {});
-        }
-
         function pressDictationKey(letter) {
             if (dictationLocked || dictationInput.length >= dictationCurrent.length) return;
             dictationInput.push(letter);
@@ -1052,8 +1409,6 @@ function initReading() {
             termBody.appendChild(actions);
             termScroll();
         }
-
-        if (dictationBtn) dictationBtn.addEventListener('click', startDictation);
 
         function createExitLine() {
             const wrap = document.createElement('div');
@@ -1495,9 +1850,9 @@ function initHeroes() {
             if (!timeline) return;
 
             const centuries = [
-                { name: "XVIII век", filter: (h) => h.overrideCentury === 18 || (!h.overrideCentury && h.deathYear < 1801) },
-                { name: "XIX век",   filter: (h) => h.overrideCentury === 19 || (!h.overrideCentury && h.deathYear >= 1801 && h.deathYear <= 1921) },
-                { name: "XX век",    filter: (h) => h.overrideCentury === 20 || (!h.overrideCentury && h.deathYear > 1921) }
+                { name: "XVIII ВЕК", filter: (h) => h.overrideCentury === 18 || (!h.overrideCentury && h.deathYear < 1801) },
+                { name: "XIX ВЕК",   filter: (h) => h.overrideCentury === 19 || (!h.overrideCentury && h.deathYear >= 1801 && h.deathYear <= 1921) },
+                { name: "XX ВЕК",    filter: (h) => h.overrideCentury === 20 || (!h.overrideCentury && h.deathYear > 1921) }
             ];
 
             let html = '';
@@ -1508,7 +1863,7 @@ function initHeroes() {
                 let sovietBandInserted = false;
                 heroes.forEach((hero) => {
                     if (!sovietBandInserted && hero.name === "Ленин") {
-                        html += `</div><div class="soviet-band"><span>★</span> СОВЕТСКИЙ ПЕРИОД <span>★</span></div><div class="heroes-grid">`;
+                        html += `</div><div class="soviet-band">СОВЕТСКИЙ ПЕРИОД</div><div class="heroes-grid">`;
                         sovietBandInserted = true;
                     }
                     const imgPath = encodePath('Great Rus/' + hero.images[0]);
@@ -1789,17 +2144,15 @@ function initPoetry() {
 }
 
 /* ---------- 6.6 ART ---------- */
-/* ---------- 6.6 ART ---------- */
 function initArt() {
     once('art', () => {
         const INDEX_URL = 'art/index.json';
         const IMG_DIR   = 'art/';
-        const WHEEL_THRESHOLD = 4;
-        const WHEEL_COOLDOWN  = 0;
 
         const MQ_NARROW = window.matchMedia('(max-width: 640px)');
         const MQ_COARSE = window.matchMedia('(pointer: coarse)');
         const isTouchMode = () => MQ_NARROW.matches || MQ_COARSE.matches;
+        const IS_MOBILE_ART = window.matchMedia('(max-width: 768px)').matches;
 
         const canvas   = document.getElementById('artCanvas');
         const inner    = document.getElementById('artCanvasInner');
@@ -1827,9 +2180,9 @@ function initArt() {
         let started = false;
         let closing = false;
 
-        /* Тянем за колесом: накапливаем delta и переключаем когда > ширины */
         let wheelAccum = 0;
         let wheelTimer = null;
+        let animating = false;
 
         async function loadIndex() {
             const res = await fetch(INDEX_URL, { cache: 'no-cache' });
@@ -1902,16 +2255,14 @@ function initArt() {
             img.decoding = 'async';
             img.src = IMG_DIR + encodeURIComponent(id) + '.jpg';
             img.addEventListener('error', () => {
-                img.replaceWith(document.createTextNode(''));
                 const state = document.createElement('div');
                 state.className = 'art-state is-error';
                 state.textContent = 'Не удалось загрузить картину ' + id;
-                img.parentNode && img.parentNode.appendChild(state);
+                img.replaceWith(state);
             });
             return img;
         }
 
-        /* Создаёт wrap с картинкой и позиционирует её по X */
         function makeWrap(id, offsetX) {
             const wrap = document.createElement('div');
             wrap.className = 'art-image-wrap';
@@ -1921,10 +2272,8 @@ function initArt() {
             return wrap;
         }
 
-        /* Главная функция: выставляет три слоя — предыдущий, текущий, следующий */
         function renderLayers(offsetX) {
             clearImage();
-
             const hasPrev = current > 0;
             const hasNext = current < items.length - 1;
 
@@ -1941,36 +2290,59 @@ function initArt() {
             updateProgress();
         }
 
-        /* Просто переключение на картинку idx без движения */
-        function showImage(idx, direction) {
+        function showImage(idx) {
             if (idx < 0 || idx >= items.length) return;
             current = idx;
             renderLayers(0);
             preloadAround(idx);
         }
 
-        /* Анимация сдвига в сторону. direction = 1 (вперёд), -1 (назад) */
+        /* ---------- Анимация перелистывания ---------- */
         function animateTo(direction, cb) {
+            if (animating) return;
             const W = inner.clientWidth;
             const targetX = -direction * W;
 
-            if (!currentImgEl) return;
+            if (IS_MOBILE_ART) {
+                /* Лёгкая мобильная: мгновенная смена с fade-out/in */
+                animating = true;
+                const wraps = [prevImgEl, currentImgEl, nextImgEl].filter(Boolean);
+                wraps.forEach((w) => {
+                    w.classList.add('art-sliding');
+                    w.style.transform = 'translate3d(' + targetX + 'px,0,0)';
+                });
+                setTimeout(() => {
+                    if (direction === 1) current += 1;
+                    else                current -= 1;
+                    renderLayers(0);
+                    preloadAround(current);
+                    animating = false;
+                    if (typeof cb === 'function') cb();
+                }, 200);
+                return;
+            }
+
+            /* Десктоп: плавный слайд */
+            animating = true;
+            if (!currentImgEl) { animating = false; return; }
             const wraps = [prevImgEl, currentImgEl, nextImgEl].filter(Boolean);
             wraps.forEach((w) => {
                 w.classList.add('art-sliding');
-                w.style.transform = 'translate3d(' + (parseFloat(w.style.transform.replace(/[^\-0-9.]/g, '')) + targetX) + 'px,0,0)';
+                const cur = parseFloat((w.style.transform.match(/translate3d\(([^p]+)px/) || [0,0])[1]) || 0;
+                w.style.transform = 'translate3d(' + (cur + targetX) + 'px,0,0)';
             });
-
             setTimeout(() => {
                 if (direction === 1) current += 1;
                 else                current -= 1;
                 renderLayers(0);
                 preloadAround(current);
+                animating = false;
                 if (typeof cb === 'function') cb();
-            }, 320);
+            }, 560);
         }
 
         function step(dir) {
+            if (animating) return;
             if (dir > 0 && current < items.length - 1) animateTo(1);
             else if (dir < 0 && current > 0) animateTo(-1);
         }
@@ -1991,11 +2363,10 @@ function initArt() {
                 clearState();
                 buildOrder();
                 current = 0;
-                showImage(0, null);
+                showImage(0);
             }).catch((err) => showState(err.message || 'Ошибка загрузки', true));
         }
 
-        /* Закрыть галерею И открыть бургер-меню */
         function closeArt() {
             if (!canvas.classList.contains('show')) return;
             closing = true;
@@ -2011,63 +2382,25 @@ function initArt() {
         if (nextBtn) nextBtn.addEventListener('click', (e) => { e.preventDefault(); e.stopPropagation(); step(1); });
         if (closeBtn) closeBtn.addEventListener('click', (e) => { e.preventDefault(); e.stopPropagation(); closeArt(); });
 
-        /* Колесо мыши — тянем за колесом */
+        /* Колесо мыши (десктоп) — плавное накопление */
         function onWheel(e) {
-            if (isTouchMode()) return;
+            if (isTouchMode() || IS_MOBILE_ART) return;
             e.preventDefault();
-            if (!currentImgEl) return;
+            if (!currentImgEl || animating) return;
 
             wheelAccum += e.deltaY;
-
-            /* Сдвигаем текущую картинку пропорционально */
             const W = inner.clientWidth;
-            const shift = -wheelAccum * 0.6; // чувствительность
-
-            const wraps = [prevImgEl, currentImgEl, nextImgEl].filter(Boolean);
-            const base = current === 0 ? 0 : W;
-            // prevImgEl базовый offset = -W, current = 0, next = +W
-            const baseMap = new Map();
-            if (prevImgEl)    baseMap.set(prevImgEl,    -W);
-            if (currentImgEl) baseMap.set(currentImgEl,  0);
-            if (nextImgEl)    baseMap.set(nextImgEl,     W);
-
-            wraps.forEach((w) => {
-                w.classList.remove('art-sliding');
-                const b = baseMap.get(w) || 0;
-                w.style.transform = 'translate3d(' + (b + shift) + 'px,0,0)';
-            });
 
             clearTimeout(wheelTimer);
             wheelTimer = setTimeout(() => {
-                const threshold = W * 0.18;
+                const threshold = W * 0.14;
                 if (wheelAccum > threshold && current < items.length - 1) {
-                    // доехать до следующей
-                    const wraps2 = [prevImgEl, currentImgEl, nextImgEl].filter(Boolean);
-                    wraps2.forEach((w) => {
-                        w.classList.add('art-sliding');
-                        const b = baseMap.get(w) || 0;
-                        w.style.transform = 'translate3d(' + (b - W) + 'px,0,0)';
-                    });
-                    setTimeout(() => { current += 1; renderLayers(0); preloadAround(current); wheelAccum = 0; }, 320);
+                    step(1);
                 } else if (wheelAccum < -threshold && current > 0) {
-                    const wraps2 = [prevImgEl, currentImgEl, nextImgEl].filter(Boolean);
-                    wraps2.forEach((w) => {
-                        w.classList.add('art-sliding');
-                        const b = baseMap.get(w) || 0;
-                        w.style.transform = 'translate3d(' + (b + W) + 'px,0,0)';
-                    });
-                    setTimeout(() => { current -= 1; renderLayers(0); preloadAround(current); wheelAccum = 0; }, 320);
-                } else {
-                    // вернуть на место
-                    const wraps2 = [prevImgEl, currentImgEl, nextImgEl].filter(Boolean);
-                    wraps2.forEach((w) => {
-                        w.classList.add('art-sliding');
-                        const b = baseMap.get(w) || 0;
-                        w.style.transform = 'translate3d(' + b + 'px,0,0)';
-                    });
-                    wheelAccum = 0;
+                    step(-1);
                 }
-            }, 80);
+                wheelAccum = 0;
+            }, 90);
         }
         canvas.addEventListener('wheel', onWheel, { passive: false });
 
@@ -2088,9 +2421,9 @@ function initArt() {
             return { x: e.clientX, y: e.clientY };
         }
 
-        /* СВАЙП: следуем за пальцем */
+        /* Свайпы */
         catcher.addEventListener('touchstart', (e) => {
-            if (closing) return;
+            if (closing || animating) return;
             if (e.touches.length !== 1) return;
             const p = getPoint(e);
             dragging = true;
@@ -2098,14 +2431,13 @@ function initArt() {
             startX = lastX = p.x;
             startY = lastY = p.y;
             t0 = Date.now();
-            /* Снимаем transition на текущих слоях для мгновенного следования */
             if (currentImgEl) currentImgEl.classList.remove('art-sliding');
             if (prevImgEl)    prevImgEl.classList.remove('art-sliding');
             if (nextImgEl)    nextImgEl.classList.remove('art-sliding');
         }, { passive: true });
 
         catcher.addEventListener('touchmove', (e) => {
-            if (!dragging || closing) return;
+            if (!dragging || closing || animating) return;
             if (e.touches.length !== 1) { dragging = false; return; }
             const p = getPoint(e);
             lastX = p.x;
@@ -2122,13 +2454,14 @@ function initArt() {
 
             if (axis === 'h') {
                 if (e.cancelable) e.preventDefault();
+                /* На мобильном не двигаем слои — только жест */
+                if (IS_MOBILE_ART) return;
                 const dx = p.x - startX;
-                const shift = dx;
-                if (currentImgEl) currentImgEl.style.transform = 'translate3d(' + shift + 'px,0,0)';
-                if (prevImgEl)    prevImgEl.style.transform    = 'translate3d(' + (-W + shift) + 'px,0,0)';
-                if (nextImgEl)    nextImgEl.style.transform    = 'translate3d(' + ( W + shift) + 'px,0,0)';
+                if (currentImgEl) currentImgEl.style.transform = 'translate3d(' + dx + 'px,0,0)';
+                if (prevImgEl)    prevImgEl.style.transform    = 'translate3d(' + (-W + dx) + 'px,0,0)';
+                if (nextImgEl)    nextImgEl.style.transform    = 'translate3d(' + ( W + dx) + 'px,0,0)';
             } else {
-                /* Вертикальный — готовим закрытие, но не блокируем скролл */
+                if (IS_MOBILE_ART) return;
                 const dy = p.y - startY;
                 if (currentImgEl) {
                     currentImgEl.style.transform = 'translate3d(0,' + dy + 'px,0)';
@@ -2148,30 +2481,15 @@ function initArt() {
 
             if (axis === 'h') {
                 const W = inner.clientWidth;
-                const threshold = Math.min(W * 0.2, 100);
-                const fast = dt < 250 && adx > 40;
+                const threshold = Math.min(W * 0.18, 90);
+                const fast = dt < 260 && adx > 40;
                 const far = adx > threshold;
 
                 if ((fast || far) && dx < 0 && current < items.length - 1) {
-                    /* Свайп влево → следующая */
-                    const wraps = [prevImgEl, currentImgEl, nextImgEl].filter(Boolean);
-                    wraps.forEach((w) => {
-                        w.classList.add('art-sliding');
-                        const cur = parseFloat((w.style.transform.match(/translate3d\(([^p]+)px/) || [0,0])[1]) || 0;
-                        w.style.transform = 'translate3d(' + (cur - W) + 'px,0,0)';
-                    });
-                    setTimeout(() => { current += 1; renderLayers(0); preloadAround(current); }, 320);
+                    step(1);
                 } else if ((fast || far) && dx > 0 && current > 0) {
-                    /* Свайп вправо → предыдущая */
-                    const wraps = [prevImgEl, currentImgEl, nextImgEl].filter(Boolean);
-                    wraps.forEach((w) => {
-                        w.classList.add('art-sliding');
-                        const cur = parseFloat((w.style.transform.match(/translate3d\(([^p]+)px/) || [0,0])[1]) || 0;
-                        w.style.transform = 'translate3d(' + (cur + W) + 'px,0,0)';
-                    });
-                    setTimeout(() => { current -= 1; renderLayers(0); preloadAround(current); }, 320);
+                    step(-1);
                 } else {
-                    /* Возврат */
                     renderLayers(0);
                 }
             } else if (axis === 'v') {
@@ -2205,7 +2523,7 @@ function initArt() {
                     buildOrder();
                     current = 0;
                     clearImage();
-                    showImage(0, null);
+                    showImage(0);
                 });
             });
         }
@@ -2533,6 +2851,7 @@ function initPageSpecific(page) {
 }
 
 function bootstrap() {
+    initTheme();
     initBurger();
     initPageSpecific(detectPage());
 
