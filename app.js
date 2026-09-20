@@ -745,11 +745,11 @@ function initReading() {
             document.body.style.overflow = 'hidden';
             if (mode === 'quiz'){
                 if (qdLabel) qdLabel.innerHTML = '<span class="dot"></span><span>ВИКТОРИНА · РАСПОЗНАВАНИЕ</span>';
-                if (qdTitle) qdTitle.textContent = 'ЧТО ЗВУЧАЛО?';
+                if (qdTitle) qdTitle.textContent = 'ЧТО?';
                 startQuizQD();
             } else {
-                if (qdLabel) qdLabel.innerHTML = '<span class="dot"></span><span>ДИКТАНТ · СБОРКА СЛОГА</span>';
-                if (qdTitle) qdTitle.textContent = 'СОСТАВЬ СЛОГ';
+                if (qdLabel) qdLabel.innerHTML = '<span class="dot"></span><span>ДИКТАНТ</span>';
+                if (qdTitle) qdTitle.textContent = 'ЧТО?';
                 startDictQD();
             }
         }
