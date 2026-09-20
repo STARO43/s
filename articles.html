@@ -30,7 +30,6 @@
 </head>
 <body>
 
-<!-- ===================== LOADER ===================== -->
 <div class="loader-overlay" id="loader">
     <div class="shutter shutter-top"></div>
     <div class="shutter"></div>
@@ -39,7 +38,6 @@
     <div class="shutter shutter-bot"></div>
 </div>
 
-<!-- ===================== BURGER ===================== -->
 <button class="burger-btn" id="burgerBtn" aria-label="Меню">
     <span class="ring"></span>
     <span class="burger-icon">
@@ -50,7 +48,6 @@
     </span>
 </button>
 
-<!-- ===================== THEME ===================== -->
 <button class="theme-toggle" id="themeToggle" aria-label="Сменить тему">
     <span class="ring"></span>
     <span class="ico">
@@ -59,7 +56,6 @@
     </span>
 </button>
 
-<!-- ===================== BURGER MENU ===================== -->
 <div class="burger-menu" id="burgerMenu">
     <div class="burger-menu-inner">
         <div class="burger-menu-col burger-menu-col-left">
@@ -78,7 +74,6 @@
     <div class="burger-menu-foot">ГРАМОТИНЬО · ТЕРМИНАЛ КУЛЬТУРЫ · 2026</div>
 </div>
 
-<!-- ===================== HEADER ===================== -->
 <header class="page-header">
     <div class="page-logo">
         <span class="l1">ПЕДАГОГИКА.</span>
@@ -86,36 +81,28 @@
     </div>
 </header>
 
-<!-- ===================== СПИСОК СТАТЕЙ ===================== -->
 <section class="parents-wrapper">
     <div class="parents-list" id="parentsList">
         <div class="parents-state">Загрузка…</div>
     </div>
 </section>
 
-<!-- ===================== ЧИТАЛКА ===================== -->
 <div class="reader" id="reader" aria-hidden="true">
     <div class="reader-progress"><div class="reader-progress-fill" id="progressFill"></div></div>
-
-    <div class="reader-head" id="readerHead" title="Вернуться к списку статей" role="button" tabindex="0">
-        <div class="reader-head-inner">
-            <span class="reader-label"><span class="dot"></span><span>ЗАМЕТКИ · РАЗМЫШЛЕНИЯ · ТЕОРИЯ</span></span>
-            <button class="reader-close" id="closeBtn" aria-label="Закрыть">×</button>
-        </div>
-    </div>
 
     <div class="reader-body" id="readerBody">
         <div class="reader-sheet">
             <h1 class="reader-title" id="readerTitle"></h1>
-            <div class="reader-meta">
-                <span id="readerTime">ПРИМЕРНОЕ ВРЕМЯ ДОКЛАДА: 4 МИН</span>
-            </div>
+            <div class="reader-meta" id="readerTime">ПРИМЕРНОЕ ВРЕМЯ ДОКЛАДА: 4 МИН</div>
+            <button class="reader-back" id="backBtnTop" type="button">ВЕРНУТЬ ДОКУМЕНТ</button>
+
             <div class="reader-content" id="readerContent"></div>
+
+            <button class="reader-back reader-back-bottom" id="backBtnBottom" type="button">ВЕРНУТЬ ДОКУМЕНТ</button>
         </div>
     </div>
 </div>
 
-<!-- ===================== GSAP ===================== -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
 <script src="app.js"></script>
 </body>
