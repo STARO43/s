@@ -2752,7 +2752,7 @@ function initArticles() {
         function readTime(text) {
             const words = String(text).replace(/<[^>]+>/g, ' ').trim().split(/\s+/).length;
             const mins = Math.max(1, Math.round(words / 180));
-            return 'ПРИМЕРНОЕ ВРЕМЯ ДОКЛАДА: ' + mins + ' МИН';
+            return 'ПРИМЕРНОЕ ВРЕМЯ ДОКЛАДА: ' + mins + ' МИН.';
         }
 
         async function openBySlug(slug) {
