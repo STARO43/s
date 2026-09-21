@@ -1402,7 +1402,7 @@ html[data-theme="dark"] .reader {
     padding-bottom: 22px;
     border-bottom: 1px solid var(--paper-line);
     position: relative;
-    max-width: 68ch;
+    max-width: 100%;
     width: 100%;
 }
 .reader-meta::after {
