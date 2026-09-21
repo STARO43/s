@@ -1,44 +1,116 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
     <defs>
+        <!-- Красное кольцо -->
+        <radialGradient id="ringGrad" cx="0.35" cy="0.3" r="0.85">
+            <stop offset="0"    stop-color="#FF2A4A"/>
+            <stop offset="0.45" stop-color="#D90429"/>
+            <stop offset="1"    stop-color="#8A0119"/>
+        </radialGradient>
+
+        <!-- Тёмный фон внутри медальона -->
+        <radialGradient id="portraitBg" cx="0.5" cy="0.35" r="0.75">
+            <stop offset="0"   stop-color="#1A1A1A"/>
+            <stop offset="1"   stop-color="#050505"/>
+        </radialGradient>
+
+        <!-- Градиент волос: от светлой пряди к тенистой -->
+        <linearGradient id="hairGrad" x1="0" y1="0" x2="0.2" y2="1">
+            <stop offset="0"   stop-color="#E8C79A"/>
+            <stop offset="0.5" stop-color="#C9A472"/>
+            <stop offset="1"   stop-color="#8B6A42"/>
+        </linearGradient>
+
+        <!-- Пряди-блики -->
+        <linearGradient id="hairShine" x1="0" y1="0" x2="0.5" y2="1">
+            <stop offset="0"   stop-color="#F5DFB8" stop-opacity="0.9"/>
+            <stop offset="0.6" stop-color="#F5DFB8" stop-opacity="0"/>
+        </linearGradient>
+
+        <!-- Кожа -->
+        <linearGradient id="skinGrad" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0"   stop-color="#F4D8BB"/>
+            <stop offset="1"   stop-color="#DFB68E"/>
+        </linearGradient>
+
+        <!-- Внутренняя тень для объёма -->
+        <radialGradient id="innerShadow" cx="0.5" cy="0.5" r="0.5">
+            <stop offset="0.7" stop-color="#000000" stop-opacity="0"/>
+            <stop offset="1"   stop-color="#000000" stop-opacity="0.32"/>
+        </radialGradient>
+
+        <!-- Глянцевый блик -->
+        <linearGradient id="gloss" x1="0" y1="0" x2="0.4" y2="1">
+            <stop offset="0"    stop-color="#FFFFFF" stop-opacity="0.42"/>
+            <stop offset="0.35" stop-color="#FFFFFF" stop-opacity="0.05"/>
+            <stop offset="1"    stop-color="#FFFFFF" stop-opacity="0"/>
+        </linearGradient>
+
+        <!-- Маска-круг для портрета -->
         <clipPath id="avatarClip">
             <circle cx="32" cy="32" r="28"/>
         </clipPath>
-        <radialGradient id="ringGrad" cx="0.35" cy="0.3" r="0.85">
-            <stop offset="0"   stop-color="#FF2A4A"/>
-            <stop offset="0.45" stop-color="#D90429"/>
-            <stop offset="1"   stop-color="#8A0119"/>
-        </radialGradient>
-        <radialGradient id="innerShadow" cx="0.5" cy="0.5" r="0.5">
-            <stop offset="0.72" stop-color="#000000" stop-opacity="0"/>
-            <stop offset="1"    stop-color="#000000" stop-opacity="0.28"/>
-        </radialGradient>
-        <linearGradient id="gloss" x1="0" y1="0" x2="0.4" y2="1">
-            <stop offset="0"   stop-color="#FFFFFF" stop-opacity="0.45"/>
-            <stop offset="0.35" stop-color="#FFFFFF" stop-opacity="0.05"/>
-            <stop offset="1"   stop-color="#FFFFFF" stop-opacity="0"/>
-        </linearGradient>
     </defs>
 
     <!-- Внешний красный круг -->
     <circle cx="32" cy="32" r="31" fill="url(#ringGrad)"/>
-
-    <!-- Тонкая белая обводка -->
     <circle cx="32" cy="32" r="30" fill="none" stroke="#FFFFFF" stroke-width="0.6" opacity="0.9"/>
 
-    <!-- Внутренний чёрный ободок между кольцом и портретом -->
+    <!-- Чёрный ободок между кольцом и портретом -->
     <circle cx="32" cy="32" r="29" fill="#0A0A0A"/>
 
-    <!-- Портрет девочки, обрезанный по кругу -->
+    <!-- Портрет -->
     <g clip-path="url(#avatarClip)">
-        <image href="avatar.png"
-               x="2" y="2" width="60" height="60"
-               preserveAspectRatio="xMidYMid slice"/>
-        <!-- Внутренняя тень для объёма -->
+        <!-- Фон -->
+        <circle cx="32" cy="32" r="28" fill="url(#portraitBg)"/>
+
+        <!-- Плечи/торс -->
+        <path d="M 8 60 Q 14 44 32 42 Q 50 44 56 60 Z"
+              fill="#1B1B1B"/>
+        <path d="M 12 60 Q 16 47 32 45 Q 48 47 52 60 Z"
+              fill="#2A2A2A" opacity="0.7"/>
+
+        <!-- Волосы: основной объём -->
+        <path d="M 12 34
+                 Q 10 16 22 12
+                 Q 30 8  38 12
+                 Q 50 16 52 30
+                 Q 54 44 48 52
+                 Q 44 42 42 34
+                 Q 40 26 32 24
+                 Q 24 24 22 34
+                 Q 20 44 16 52
+                 Q 10 44 12 34 Z"
+              fill="url(#hairGrad)"/>
+
+        <!-- Пряди-светлые полосы по волосам -->
+        <path d="M 20 16 Q 26 12 34 14 Q 42 18 46 26
+                 Q 44 20 36 18 Q 28 16 22 20 Z"
+              fill="url(#hairShine)"/>
+
+        <!-- Лицо (овал) -->
+        <ellipse cx="32" cy="32" rx="9" ry="11"
+                 fill="url(#skinGrad)"/>
+
+        <!-- Чёлка, спадающая на лоб -->
+        <path d="M 24 26
+                 Q 26 22 32 22
+                 Q 38 22 40 26
+                 Q 38 24 32 24
+                 Q 26 24 24 26 Z"
+              fill="#C9A472" opacity="0.85"/>
+
+        <!-- Глаза (две точки) -->
+        <circle cx="29" cy="32" r="0.9" fill="#2A1B0E"/>
+        <circle cx="35" cy="32" r="0.9" fill="#2A1B0E"/>
+
+        <!-- Тень по краю портрета -->
         <circle cx="32" cy="32" r="28" fill="url(#innerShadow)"/>
-        <!-- Глянцевый блик сверху -->
-        <circle cx="32" cy="32" r="28" fill="url(#gloss)"/>
     </g>
 
     <!-- Тонкая белая обводка портрета -->
-    <circle cx="32" cy="32" r="28" fill="none" stroke="#FFFFFF" stroke-width="0.8" opacity="0.85"/>
+    <circle cx="32" cy="32" r="28" fill="none"
+            stroke="#FFFFFF" stroke-width="0.8" opacity="0.85"/>
+
+    <!-- Глянцевый блик сверху -->
+    <circle cx="32" cy="32" r="28" fill="url(#gloss)" pointer-events="none"/>
 </svg>
