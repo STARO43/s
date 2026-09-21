@@ -1771,6 +1771,16 @@ function initTools() {
         if (typeof window.initToolsClock === 'function') {
             window.initToolsClock();
         }
+
+        /* ============================================================
+           SPACE-SWITCH — кнопка «Орбиты», открывает spacewatch.html
+           ============================================================ */
+        const spaceSwitch = document.getElementById('spaceSwitch');
+        if (spaceSwitch) {
+            spaceSwitch.addEventListener('click', () => {
+                window.open('spacewatch.html', '_blank');
+            });
+        }
     });
 }
 
