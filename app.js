@@ -723,7 +723,6 @@ function initReading() {
 
         /* ====================================================
            НОВЫЙ QUIZ / DICT — дизайн-оверлеи
-           + двойной клик по кнопкам = пасхалка на терминал
            ==================================================== */
         const qdOverlay = document.getElementById('qdOverlay');
         const qdClose   = document.getElementById('qdClose');
@@ -1046,37 +1045,6 @@ function initReading() {
             else sub.textContent = 'ПОПРОБУЙ ЕЩЁ РАЗ.';
             inner.appendChild(sub);
             qdBody.appendChild(inner);
-        }
-
-        /* ---------- Пасхалка: двойной клик по кнопкам -> терминал ---------- */
-        function bindDblClickEasterEgg(btn, mode){
-            if (!btn) return;
-            let lastTap = 0;
-            btn.addEventListener('click', (e) => {
-                const now = Date.now();
-                if (now - lastTap < 350){
-                    e.preventDefault();
-                    e.stopPropagation();
-                    lastTap = 0;
-                    openTerminalQD(mode);
-                } else {
-                    lastTap = now;
-                }
-            });
-            btn.addEventListener('dblclick', (e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                openTerminalQD(mode);
-            });
-        }
-
-        if (examBtn) {
-            examBtn.addEventListener('click', () => openQD('quiz'));
-            bindDblClickEasterEgg(examBtn, 'exam');
-        }
-        if (dictationBtn) {
-            dictationBtn.addEventListener('click', () => openQD('dict'));
-            bindDblClickEasterEgg(dictationBtn, 'dict');
         }
 
         /* ====================================================
@@ -1420,6 +1388,50 @@ function initReading() {
             termBody.appendChild(wrap);
             termScroll();
         }
+
+        /* ====================================================
+           ПАСХАЛКА: двойной клик по ПОДПИСЯМ "ВИКТОРИНА" и "ДИКТАНТ"
+           (.ibtn-caption ПОД иконками-кнопками) -> открывает терминал-ЭВМ.
+           Одиночный клик по самой иконке -> открывает дизайн-оверлей qdOverlay.
+           ==================================================== */
+
+        /* Обычный одиночный клик по кнопке-иконке — открывает дизайн-оверлей */
+        if (examBtn)      examBtn.addEventListener('click', () => openQD('quiz'));
+        if (dictationBtn) dictationBtn.addEventListener('click', () => openQD('dict'));
+
+        /* Двойной клик по ПОДПИСИ под кнопкой — открывает терминал */
+        function bindCaptionDoubleTap(captionEl, mode){
+            if (!captionEl) return;
+            let lastTap = 0;
+            let tapTimer = null;
+            captionEl.addEventListener('click', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                const now = Date.now();
+                if (now - lastTap < 400){
+                    clearTimeout(tapTimer);
+                    lastTap = 0;
+                    openTerminalQD(mode);
+                } else {
+                    lastTap = now;
+                    clearTimeout(tapTimer);
+                    tapTimer = setTimeout(() => { lastTap = 0; }, 420);
+                }
+            });
+            captionEl.addEventListener('dblclick', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                clearTimeout(tapTimer);
+                lastTap = 0;
+                openTerminalQD(mode);
+            });
+        }
+
+        const examCaption      = examBtn      ? examBtn.closest('.ibtn-wrap')?.querySelector('.ibtn-caption')      : null;
+        const dictationCaption = dictationBtn ? dictationBtn.closest('.ibtn-wrap')?.querySelector('.ibtn-caption') : null;
+
+        bindCaptionDoubleTap(examCaption, 'exam');
+        bindCaptionDoubleTap(dictationCaption, 'dict');
 
         renderGrid();
     });
@@ -2454,7 +2466,6 @@ function initArt() {
 
             if (axis === 'h') {
                 if (e.cancelable) e.preventDefault();
-                /* На мобильном не двигаем слои — только жест */
                 if (IS_MOBILE_ART) return;
                 const dx = p.x - startX;
                 if (currentImgEl) currentImgEl.style.transform = 'translate3d(' + dx + 'px,0,0)';
@@ -2789,7 +2800,7 @@ function initArticles() {
             });
         }
 
-               function closeReader() {
+        function closeReader() {
             if (!reader.classList.contains('show')) return;
             reader.classList.remove('show');
             reader.classList.remove('reader-alt');
@@ -2818,7 +2829,7 @@ function initArticles() {
 
         window.addEventListener('hashchange', handleHash);
 
-          const backBtnTop    = document.getElementById('backBtnTop');
+        const backBtnTop    = document.getElementById('backBtnTop');
         const backBtnBottom = document.getElementById('backBtnBottom');
         if (backBtnTop)    backBtnTop.addEventListener('click', closeArticle);
         if (backBtnBottom) backBtnBottom.addEventListener('click', closeArticle);
