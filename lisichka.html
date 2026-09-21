@@ -18,6 +18,7 @@
     display:block;
     width:100vw;
     height:100vh;
+    height:100dvh;
     cursor:grab;
     touch-action:none;
     -webkit-tap-highlight-color:transparent;
@@ -172,7 +173,11 @@ function resize(){
   ctx.setTransform(DPR,0,0,DPR,0,0);
 }
 window.addEventListener('resize',resize);
-
+window.addEventListener('orientationchange',function(){ setTimeout(resize,60); });
+if (window.visualViewport){
+  window.visualViewport.addEventListener('resize',resize);
+  window.visualViewport.addEventListener('scroll',resize);
+}
 const rnd=(a,b)=>a+Math.random()*(b-a);
 const pick=a=>a[Math.floor(Math.random()*a.length)];
 const clamp=(v,a,b)=>v<a?a:v>b?b:v;
@@ -1978,7 +1983,10 @@ function roundRect(x,y,w,h,r){
 /* SLOTS */
 function slotLayout(){
   const n=5;
-  const size=Math.min(W*0.135,H*0.135,118);
+  // На узких экранах слоты меньше, чтобы влезли по ширине
+  const sizeW = W / (n + 1.2);          /* запас по ширине */
+  const sizeH = H * 0.16;               /* ограничение по высоте */
+  const size = Math.min(sizeW, sizeH, 118, 72);
   const gap=size*0.16;
   const totalW=n*size+(n-1)*gap;
   const startX=(W-totalW)/2;
