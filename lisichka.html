@@ -236,9 +236,16 @@ const USEFUL=[
   {kind:'useful',sub:'broom',label:'Уборка'},
 ];
 
-/* ---------- время просветления ---------- */
-const CALM_SILENCE_TIME = 300;   /* 5 минут = 300 сек — перестаёт орать */
-const CALM_ENLIGHTEN_TIME = 420; /* 7 минут = 420 сек — полезное поднимает настроение */
+/* ====== НОВЫЕ ПОЛЕЗНЫЕ ====== */
+const USEFUL_EXTRA=[
+  {kind:'useful',sub:'subbotnik',label:'Субботник'},
+  {kind:'useful',sub:'grandma',label:'Помощь бабушке'},
+  {kind:'useful',sub:'gifts',label:'Дарить подарки'},
+];
+
+/* ---------- время режимов ---------- */
+const CALM_SILENCE_TIME = 120;    /* 2 минуты = 120 сек — перестаёт орать */
+const CALM_ENLIGHTEN_TIME = 240;  /* ещё 2 минуты = 240 сек — просветление */
 
 const G={
   t:0, phase:'calm', phaseT:0,
@@ -247,11 +254,14 @@ const G={
   fat:0, ugly:0,
   monsterStage:0,
 
-  /* ==== НОВОЕ: таймер «не-монстра» ==== */
-  calmTimer:0,        /* сек, сколько девочка НЕ монстр */
-  silenceMode:false,  /* true — перестала орать (300 сек) */
-  enlightenMode:false,/* true — полезное поднимает настроение (420 сек) */
-  enlightenPrev:false,/* для отслеживания момента входа в режим */
+  /* таймер «не-монстра» */
+  calmTimer:0,
+  silenceMode:false,
+  enlightenMode:false,
+
+  /* ==== НОВОЕ: счётчики применений полезных ===== */
+  usefulCount:{book:0,apron:0,broom:0},
+  extraUnlocked:false,
 
   headAngle:0, headTarget:0, headTimer:0,
   eyeBlink:0, blinkTimer:2,
@@ -263,20 +273,35 @@ const G={
   slotFlash:[0,0,0,0,0],
 };
 
-function makeSlots(){
-  G.slots=[pick(TOYS),pick(FOODS),pick(CLOTHES),pick(USEFUL),
-    pick([...TOYS,...FOODS,...CLOTHES])];
+/* Пул полезных — базовый или расширенный */
+function getUsefulPool(){
+  return G.extraUnlocked ? USEFUL.concat(USEFUL_EXTRA) : USEFUL.slice();
 }
-function shuffleSlots(){
-  /* Собираем 5 предметов: 1 полезный + 4 случайных из игрушек/еды/одежды */
+
+function makeSlots(){
+  /* Стартовые слоты: по одному из категорий + 1 полезный */
   var arr = [
-    pick(USEFUL),
+    pick(TOYS),
+    pick(FOODS),
+    pick(CLOTHES),
+    pick(getUsefulPool()),
+    pick([...TOYS,...FOODS,...CLOTHES])
+  ];
+  for(var i=arr.length-1;i>0;i--){
+    var j=Math.floor(Math.random()*(i+1));
+    var t=arr[i];arr[i]=arr[j];arr[j]=t;
+  }
+  G.slots=arr;
+}
+
+function shuffleSlots(){
+  var arr = [
+    pick(getUsefulPool()),
     pick(TOYS),
     pick(FOODS),
     pick(CLOTHES),
     pick([...TOYS,...FOODS,...CLOTHES])
   ];
-  /* Перемешиваем — полезный может оказаться в любом слоте */
   for(var i=arr.length-1;i>0;i--){
     var j=Math.floor(Math.random()*(i+1));
     var t=arr[i];arr[i]=arr[j];arr[j]=t;
@@ -293,13 +318,19 @@ const YELL_PHRASES=['ХОЧУ ИГРУШКУ!','ХОЧУ ВКУСНЯШКУ!','�
 const RAGE_PHRASES=['АААААА!','НЕНАВИЖУ!','ДАЙ СЕЙЧАС ЖЕ!','ХОЧУ!!!','Я ТЕБЯ НЕ ЛЮБЛЮ!!!', 'РРРРРРР!!!'];
 const USEFUL_PHRASES=['Фу!','Убери!','Не хочу!','Ненавижу!','Не буду!'];
 
-/* ==== НОВЫЕ ФРАЗЫ ПРОСВЕТЛЕНИЯ ==== */
 const ENLIGHTEN_PHRASES=[
   'Да, я же умница!',
   'Давай сюда, всё сделаю!',
   'Самостоятельность — это свобода',
   'Характер как алмаз, чем твёрже, тем лучше'
 ];
+
+/* Фразы для новых полезных предметов */
+const EXTRA_PHRASES={
+  subbotnik:['Субботник!','Всё подмету!','Убираю двор!'],
+  grandma:['Бабушке помогу!','Сумки донесу!','Помогу бабушке!'],
+  gifts:['Подарю подарки!','Всем сюрпризы!','Дарю!']
+};
 
 function addBubble(text,x,y,opts={}){
   if(G.bubbles.length>3)G.bubbles.shift();
@@ -310,9 +341,8 @@ function addBubble(text,x,y,opts={}){
 function setPhase(p){
   if(G.phase===p)return;
 
-  /* ==== В РЕЖИМЕ ТИШИНЫ ЗАПРЕЩАЕМ yell и rage ==== */
   if(G.silenceMode && (p==='yell'||p==='rage')) {
-    p = 'sad';   /* вместо крика — тихая грусть */
+    p = 'sad';
   }
 
   G.phase=p;G.phaseT=0;
@@ -325,11 +355,9 @@ function setPhase(p){
 function updatePhase(dt){
   G.phaseT+=dt;
 
-  /* ==== РЕЖИМ ТИШИНЫ: не даём уйти в крик, если настроение низкое ==== */
   if(G.silenceMode){
     if(G.mood>15){ if(G.phase!=='calm')setPhase('calm'); return; }
     if(G.phase==='calm'&&G.phaseT>3)setPhase('sad');
-    /* в режиме тишины фазы дальше sad не идут */
     return;
   }
 
@@ -339,7 +367,6 @@ function updatePhase(dt){
   else if(G.phase==='yell'&&G.phaseT>1.5)setPhase('rage');
 }
 function shoutLoop(dt){
-  /* ==== В РЕЖИМЕ ПРОСВЕТЛЕНИЯ вместо криков — хорошие фразы ==== */
   if(G.enlightenMode){
     const interval=2.6;
     if(G.t-G.lastYell>interval){
@@ -350,7 +377,6 @@ function shoutLoop(dt){
     return;
   }
 
-  /* ==== В РЕЖИМЕ ТИШИНЫ — только тихие фразы, без крика ==== */
   if(G.silenceMode){
     const interval=2.4;
     if(G.t-G.lastYell>interval){
@@ -362,7 +388,6 @@ function shoutLoop(dt){
     return;
   }
 
-  /* ==== Обычный режим ==== */
   const interval={calm:1.9,sad:2.4,yell:1.3,rage:0.9}[G.phase];
   if(G.t-G.lastYell>interval){
     G.lastYell=G.t;
@@ -384,7 +409,7 @@ function applyItem(item){
   const cx=W/2, cy=H*0.30;
 
   /* =====================================================
-     БАЛОВСТВО (игрушки, сладости, наряды)
+     БАЛОВСТВО
      ===================================================== */
   if(item.kind!=='useful'){
     G.mood=clamp(G.mood+36,-100,100);
@@ -401,43 +426,75 @@ function applyItem(item){
   }
   /* =====================================================
      ПОЛЕЗНОЕ
-     - Чтение:  ugly -0.04 (за 25 применений)
-     - Готовка: ugly -0.05 (за 20 применений)
-     - Уборка:  fat  -0.0334 (за 30 применений)
-     - В РЕЖИМЕ ПРОСВЕТЛЕНИЯ: + настроение вместо наказания
      ===================================================== */
   else {
     G.happyStreak=0;
 
     let isPositive = false;
+    let bubbleText = null;
+
+    /* Учёт применений для разблокировки новых полезных */
+    if(item.sub==='book' || item.sub==='apron' || item.sub==='broom'){
+      if(G.usefulCount[item.sub] === undefined) G.usefulCount[item.sub] = 0;
+      G.usefulCount[item.sub]++;
+    }
 
     if(item.sub==='book'){
       G.ugly = clamp(G.ugly - 0.04, 0, 1);
-      if(G.enlightenMode){ isPositive=true; addBubble('Читаю с удовольствием!',cx+rnd(-30,30),cy-40,{color:'happy',life:2.0,size:22}); }
-      else { addBubble('Читаю!',cx+rnd(-30,30),cy-40,{color:'normal',life:1.8,size:22}); }
+      bubbleText = G.enlightenMode ? 'Читаю с удовольствием!' : 'Читаю!';
     } else if(item.sub==='apron'){
       G.ugly = clamp(G.ugly - 0.05, 0, 1);
-      if(G.enlightenMode){ isPositive=true; addBubble('Давай сюда, всё сделаю!',cx+rnd(-30,30),cy-40,{color:'happy',life:2.0,size:22}); }
-      else { addBubble('Готовлю!',cx+rnd(-30,30),cy-40,{color:'normal',life:1.8,size:22}); }
+      bubbleText = G.enlightenMode ? 'Давай сюда, всё сделаю!' : 'Готовлю!';
     } else if(item.sub==='broom'){
       G.fat = clamp(G.fat - 0.0334, 0, 1);
-      if(G.enlightenMode){ isPositive=true; addBubble('Самостоятельность — это свобода',cx+rnd(-30,30),cy-40,{color:'happy',life:2.2,size:20}); }
-      else { sndClean(); addBubble('Подметаю...',cx+rnd(-30,30),cy-40,{color:'normal',life:1.8,size:22}); }
+      bubbleText = G.enlightenMode ? 'Самостоятельность — это свобода' : 'Подметаю...';
+      if(!G.enlightenMode) sndClean();
+    } else if(item.sub==='subbotnik'){
+      G.fat = clamp(G.fat - 0.0334, 0, 1);
+      G.ugly = clamp(G.ugly - 0.04, 0, 1);
+      bubbleText = 'Субботник!';
+    } else if(item.sub==='grandma'){
+      G.ugly = clamp(G.ugly - 0.05, 0, 1);
+      bubbleText = 'Помогу бабушке!';
+    } else if(item.sub==='gifts'){
+      G.ugly = clamp(G.ugly - 0.05, 0, 1);
+      bubbleText = 'Дарю подарки!';
+    }
+
+    if(G.enlightenMode){
+      isPositive = true;
+      /* Подменяем тексты на позитивные для новых предметов */
+      if(item.sub==='subbotnik') bubbleText='Субботник — здорово!';
+      if(item.sub==='grandma') bubbleText='Бабушке помогу!';
+      if(item.sub==='gifts') bubbleText='Подарки — это радость!';
+      addBubble(bubbleText, cx+rnd(-30,30), cy-40, {color:'happy',life:2.0,size:22});
+    } else {
+      addBubble(bubbleText, cx+rnd(-30,30), cy-40, {color:'normal',life:1.8,size:22});
     }
 
     if(isPositive){
-      /* В просветлении полезное РАДУЕТ, а не расстраивает */
       G.mood=clamp(G.mood+15,-100,100);
       G.reaction='happy';G.reactionT=1.3;
       sndGood();
       spawnParticles('heart',cx,cy+60);
     } else {
-      /* Обычное поведение: полезное слегка расстраивает */
       G.reaction='cry';G.reactionT=1.5;
       sndBad();
       G.mood=clamp(G.mood-25,-100,100);
       spawnParticles('tear',cx,cy+60);
       if(G.phase==='calm'&&!G.silenceMode)setPhase('sad');
+    }
+
+    /* ==== Проверяем разблокировку новых полезных ==== */
+    if(!G.extraUnlocked){
+      var ok = G.usefulCount.book>=10 && G.usefulCount.apron>=10 && G.usefulCount.broom>=10;
+      if(ok){
+        G.extraUnlocked = true;
+        sndEnlighten();
+        setTimeout(function(){
+          addBubble('Новые дела открылись!', W/2, H*0.30, {color:'happy',life:3.2,size:22});
+        }, 400);
+      }
     }
   }
   updateMonster();
@@ -470,27 +527,27 @@ function update(dt){
   G.t+=dt;
 
   /* =====================================================
-     НОВАЯ МЕХАНИКА: таймер «не-монстра»
+     ТАЙМЕР «НЕ-МОНСТРА»
      ===================================================== */
   if(G.monsterStage===0){
     G.calmTimer += dt;
   } else {
     /* Стала монстром — сбрасываем весь прогресс тишины */
-    if(G.calmTimer>0){
+    if(G.calmTimer>0 || G.silenceMode || G.enlightenMode){
       G.calmTimer=0;
       G.silenceMode=false;
       G.enlightenMode=false;
     }
   }
 
-  /* Включаем режим тишины через 5 минут */
+  /* Тишина через 2 минуты */
   if(!G.silenceMode && G.calmTimer >= CALM_SILENCE_TIME){
     G.silenceMode = true;
     sndEnlighten();
     addBubble('Хм... ладно.', W/2, H*0.28, {color:'happy',life:2.6,size:22});
   }
 
-  /* Включаем просветление через 7 минут */
+  /* Просветление — ещё через 2 минуты */
   if(!G.enlightenMode && G.calmTimer >= CALM_ENLIGHTEN_TIME){
     G.enlightenMode = true;
     sndEnlighten();
@@ -1815,6 +1872,95 @@ function drawItem(sub,size){
       }
       break;
     }
+    case 'subbotnik':{
+      /* Субботник: грабли и мешок для мусора */
+      ctx.strokeStyle='#a06030';ctx.lineWidth=8;ctx.lineCap='round';
+      ctx.beginPath();ctx.moveTo(-55,-85);ctx.lineTo(40,55);ctx.stroke();
+      ctx.strokeStyle='#d09050';ctx.lineWidth=2;
+      ctx.beginPath();ctx.moveTo(-53,-82);ctx.lineTo(38,52);ctx.stroke();
+      ctx.strokeStyle='#8a5a2a';ctx.lineWidth=6;
+      ctx.beginPath();ctx.moveTo(30,45);ctx.lineTo(65,45);ctx.stroke();
+      for(let i=0;i<6;i++){
+        ctx.beginPath();
+        ctx.moveTo(34+i*6,45);ctx.lineTo(34+i*6,68);
+        ctx.stroke();
+      }
+      ctx.fillStyle='#3a5a9a';
+      ctx.beginPath();
+      ctx.ellipse(-30,50,42,50,0,0,6.28);ctx.fill();
+      ctx.fillStyle='#5a7aba';
+      ctx.beginPath();
+      ctx.ellipse(-38,40,16,22,-0.3,0,6.28);ctx.fill();
+      ctx.strokeStyle='#2a4a7a';ctx.lineWidth=3;
+      ctx.beginPath();ctx.moveTo(-30,0);ctx.lineTo(-30,18);ctx.stroke();
+      ctx.beginPath();ctx.moveTo(-42,0);ctx.lineTo(-42,18);ctx.stroke();
+      break;
+    }
+    case 'grandma':{
+      /* Помощь бабушке: бабушка с платком */
+      ctx.fillStyle='#e8b898';
+      ctx.beginPath();ctx.arc(0,10,50,0,6.28);ctx.fill();
+      ctx.fillStyle='#c89070';
+      ctx.beginPath();ctx.arc(0,10,50,0,Math.PI);ctx.fill();
+      ctx.fillStyle='#fff';
+      ctx.beginPath();
+      ctx.arc(-18,0,5,0,6.28);ctx.fill();
+      ctx.beginPath();
+      ctx.arc(18,0,5,0,6.28);ctx.fill();
+      ctx.fillStyle='#333';
+      ctx.beginPath();ctx.arc(-18,2,3,0,6.28);ctx.fill();
+      ctx.beginPath();ctx.arc(18,2,3,0,6.28);ctx.fill();
+      ctx.strokeStyle='#8a5a4a';ctx.lineWidth=3;ctx.lineCap='round';
+      ctx.beginPath();ctx.arc(0,25,12,0.2,Math.PI-0.2);ctx.stroke();
+      /* Платок */
+      ctx.fillStyle='#d04060';
+      ctx.beginPath();
+      ctx.moveTo(-52,-10);
+      ctx.quadraticCurveTo(0,-70,52,-10);
+      ctx.quadraticCurveTo(0,-40,-52,-10);
+      ctx.closePath();ctx.fill();
+      ctx.fillStyle='#e06080';
+      ctx.beginPath();
+      ctx.arc(-30,-28,5,0,6.28);ctx.fill();
+      ctx.beginPath();
+      ctx.arc(30,-28,5,0,6.28);ctx.fill();
+      ctx.beginPath();
+      ctx.arc(0,-48,6,0,6.28);ctx.fill();
+      /* Пирожок/сумка */
+      ctx.fillStyle='#c08040';
+      ctx.beginPath();
+      ctx.ellipse(50,45,18,22,0,0,6.28);ctx.fill();
+      ctx.fillStyle='#8a5a2a';
+      ctx.beginPath();ctx.arc(50,30,10,Math.PI,0);ctx.fill();
+      break;
+    }
+    case 'gifts':{
+      /* Дарить подарки: подарочная коробка */
+      ctx.fillStyle='#e0284a';
+      roundRect(-55,-20,110,85,8);ctx.fill();
+      ctx.fillStyle='#b01838';
+      roundRect(-55,25,110,40,8);ctx.fill();
+      ctx.fillStyle='#ffd000';
+      ctx.fillRect(-8,-20,16,85);
+      ctx.fillRect(-55,10,110,16);
+      ctx.fillStyle='#e8284a';
+      ctx.beginPath();
+      ctx.moveTo(0,-20);
+      ctx.quadraticCurveTo(-45,-55,-25,-65);
+      ctx.quadraticCurveTo(0,-70,0,-20);
+      ctx.fill();
+      ctx.beginPath();
+      ctx.moveTo(0,-20);
+      ctx.quadraticCurveTo(45,-55,25,-65);
+      ctx.quadraticCurveTo(0,-70,0,-20);
+      ctx.fill();
+      ctx.fillStyle='#ffd000';
+      ctx.beginPath();ctx.arc(0,-20,7,0,6.28);ctx.fill();
+      ctx.fillStyle='#ff9090';
+      ctx.beginPath();ctx.arc(-25,-65,5,0,6.28);ctx.fill();
+      ctx.beginPath();ctx.arc(25,-65,5,0,6.28);ctx.fill();
+      break;
+    }
   }
   ctx.restore();
 }
@@ -1844,7 +1990,8 @@ function slotLayout(){
     arr.push({x,y,w:size,h:size,labelH,
       cx:x+size/2,cy:y+size/2,
       label:G.slots[i]?G.slots[i].label:'',
-      isUseful: !!(G.slots[i] && G.slots[i].kind==='useful')});  }
+      isUseful: !!(G.slots[i] && G.slots[i].kind==='useful')});
+  }
   return arr;
 }
 function drawSlots(){
@@ -1872,9 +2019,9 @@ function drawSlots(){
     roundRect(s.x+4,s.y+5,s.w,s.h,18);ctx.fill();
     ctx.restore();
 
-  const g=ctx.createLinearGradient(s.x,s.y,s.x,s.y+s.h);
-g.addColorStop(0,'#4a3568');g.addColorStop(1,'#251838');
-ctx.fillStyle=g;
+    const g=ctx.createLinearGradient(s.x,s.y,s.x,s.y+s.h);
+    g.addColorStop(0,'#4a3568');g.addColorStop(1,'#251838');
+    ctx.fillStyle=g;
     roundRect(s.x,s.y,s.w,s.h,18);ctx.fill();
 
     ctx.fillStyle='rgba(255,255,255,0.08)';
@@ -1885,10 +2032,10 @@ ctx.fillStyle=g;
       roundRect(s.x,s.y,s.w,s.h,18);ctx.fill();
     }
 
-   let br='#7a5aaa';
-if(G.dragging&&G.dragging.slot===i)br='#ffd000';
-if(flash>0.3)br='#fff5a0';
-ctx.strokeStyle=br;
+    let br='#7a5aaa';
+    if(G.dragging&&G.dragging.slot===i)br='#ffd000';
+    if(flash>0.3)br='#fff5a0';
+    ctx.strokeStyle=br;
     ctx.lineWidth=(G.dragging&&G.dragging.slot===i)?4:3;
     roundRect(s.x,s.y,s.w,s.h,18);ctx.stroke();
 
@@ -1909,11 +2056,11 @@ ctx.strokeStyle=br;
     const padX=s.labelH*0.35, padY=s.labelH*0.14;
     ctx.fillStyle='rgba(0,0,0,0.55)';
     roundRect(lx-tw/2-padX,ly-s.labelH*0.5-padY+2,tw+padX*2,s.labelH+padY*2,8);ctx.fill();
-  ctx.strokeStyle='#7a5aaa';
-ctx.lineWidth=2;
-roundRect(lx-tw/2-padX,ly-s.labelH*0.5-padY+2,tw+padX*2,s.labelH+padY*2,8);ctx.stroke();
-ctx.fillStyle='#e8d8ff';
-ctx.fillText(label,lx,ly+1);
+    ctx.strokeStyle='#7a5aaa';
+    ctx.lineWidth=2;
+    roundRect(lx-tw/2-padX,ly-s.labelH*0.5-padY+2,tw+padX*2,s.labelH+padY*2,8);ctx.stroke();
+    ctx.fillStyle='#e8d8ff';
+    ctx.fillText(label,lx,ly+1);
   }
 }
 
@@ -1936,7 +2083,7 @@ function drawHUD(){
   ctx.font='bold 20px "Segoe UI",sans-serif';
   ctx.fillStyle=col;
   ctx.shadowColor=col;ctx.shadowBlur=12;
-  ctx.fillText(ph,W-pad,pad);
+  ctx.fillText(ph,W/2,pad);
   ctx.shadowBlur=0;
 
   if(G.monsterStage>=3){
@@ -1944,11 +2091,10 @@ function drawHUD(){
     ctx.fillStyle=`rgba(255,60,60,${0.6+0.4*Math.sin(G.t*6)})`;
     ctx.textAlign='center';
     ctx.shadowColor='#ff0000';ctx.shadowBlur=20;
-    ctx.fillText('МОНСТРИЧКА',W/2,pad+2);
+    ctx.fillText('МОНСТРИЧКА',W/2,pad+30);
     ctx.shadowBlur=0;
   }
 }
-
 function drawBar(x,y,w,h,fg,val){
   ctx.fillStyle='rgba(0,0,0,0.55)';
   roundRect(x-2,y-2,w+4,h+4,8);ctx.fill();
@@ -1966,7 +2112,6 @@ function drawBar(x,y,w,h,fg,val){
   ctx.strokeStyle='rgba(255,255,255,0.2)';ctx.lineWidth=1;
   roundRect(x,y,w,h,6);ctx.stroke();
 }
-
 function shade(hex,amt){
   const n=parseInt(hex.slice(1),16);
   let r=(n>>16)+amt,g=((n>>8)&255)+amt,b=(n&255)+amt;
