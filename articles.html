@@ -90,15 +90,40 @@
 <div class="reader" id="reader" aria-hidden="true">
     <div class="reader-progress"><div class="reader-progress-fill" id="progressFill"></div></div>
 
+    <div class="reader-head">
+        <div class="reader-head-inner">
+            <button class="reader-back" id="backBtn" aria-label="Назад">
+                <span>←</span><span>НАЗАД</span>
+            </button>
+            <span class="reader-label"><span class="dot"></span><span>ЗАМЕТКИ · РАЗМЫШЛЕНИЯ · ТЕОРИЯ</span></span>
+            <button class="reader-close" id="closeBtn" aria-label="Закрыть">×</button>
+        </div>
+    </div>
+
     <div class="reader-body" id="readerBody">
         <div class="reader-sheet">
             <h1 class="reader-title" id="readerTitle"></h1>
-            <div class="reader-meta" id="readerTime">ПРИМЕРНОЕ ВРЕМЯ ДОКЛАДА: 4 МИН.</div>
-            <button class="reader-back" id="backBtnTop" type="button">← ВЕРНУТЬ ДОКУМЕНТ.</button>
+
+            <div class="reader-meta">
+                <span id="readerTime">ВРЕМЯ ЧТЕНИЯ: 4 МИН</span>
+                <button class="reader-typewriter" id="typewriterToggle" type="button" aria-label="Двойной клик — сменить вид" title="Двойной клик — сменить вид">
+                    <svg viewBox="0 0 32 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                        <path d="M4 6h24v10H4z" fill="none" stroke="currentColor" stroke-width="1.4"/>
+                        <path d="M8 16h16v4H8z" fill="none" stroke="currentColor" stroke-width="1.4"/>
+                        <path d="M11 6V3h10v3" fill="none" stroke="currentColor" stroke-width="1.4"/>
+                        <g stroke="currentColor" stroke-width="1" opacity="0.75">
+                            <line x1="8" y1="9" x2="8" y2="13"/>
+                            <line x1="11" y1="9" x2="11" y2="13"/>
+                            <line x1="14" y1="9" x2="14" y2="13"/>
+                            <line x1="17" y1="9" x2="17" y2="13"/>
+                            <line x1="20" y1="9" x2="20" y2="13"/>
+                            <line x1="23" y1="9" x2="23" y2="13"/>
+                        </g>
+                    </svg>
+                </button>
+            </div>
 
             <div class="reader-content" id="readerContent"></div>
-
-            <button class="reader-back reader-back-bottom" id="backBtnBottom" type="button">← ВЕРНУТЬ ДОКУМЕНТ.</button>
         </div>
     </div>
 </div>
