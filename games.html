@@ -2,7 +2,7 @@
 <html lang="ru">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <title>Игровой раздел</title>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
@@ -12,7 +12,7 @@
   html, body {
     height: 100%;
     overflow: hidden;
-    background: #1a120a;
+    background: #0a0604;
     -webkit-user-select: none;
     user-select: none;
     -webkit-tap-highlight-color: transparent;
@@ -29,15 +29,15 @@
 
   .room {
     position: relative;
-    width: 100vw;
-    height: 100vh;
-    max-width: 1000px;
-    max-height: 700px;
-    overflow: visible;
+    width: 1000px;
+    height: 700px;
+    overflow: hidden;
     background: #1a120a;
+    transform-origin: center center;
+    flex-shrink: 0;
   }
 
-  /* ===== ЗАДНЯЯ СТЕНА — ОБОИ С ЦВЕТОЧКАМИ ===== */
+  /* ===== ЗАДНЯЯ СТЕНА ===== */
   .wall {
     position: absolute;
     left: 0; right: 0; top: 0; bottom: 35%;
@@ -91,7 +91,6 @@
     box-shadow: 0 6px 12px rgba(0,0,0,0.8);
   }
 
-  /* ===== ПОЛ ===== */
   .floor {
     position: absolute;
     left: 0; right: 0; bottom: 0;
@@ -143,7 +142,6 @@
     z-index: 6;
   }
 
-  /* ===== ОКНО ===== */
   .window-frame {
     position: absolute;
     top: 10%;
@@ -208,7 +206,6 @@
     border-radius: 50%;
   }
 
-  /* ===== ДОЖДЬ ===== */
   .rain {
     position: absolute;
     inset: 0;
@@ -275,7 +272,6 @@
     box-shadow: 0 2px 0 rgba(0,0,0,0.6);
   }
 
-  /* ===== СВЕТ ОТ ТЕЛЕВИЗОРА ===== */
   .tv-glow {
     position: absolute;
     left: 50%;
@@ -292,7 +288,6 @@
     z-index: 10;
   }
 
-  /* ===== КОВЁР ===== */
   .carpet {
     position: absolute;
     left: 50%;
@@ -322,7 +317,6 @@
     clip-path: polygon(8% 0, 92% 0, 100% 100%, 0 100%);
   }
 
-  /* ===== КОТ ===== */
   .cat {
     position: absolute;
     left: 50%;
@@ -488,7 +482,6 @@
     transform: rotate(8deg);
   }
 
-  /* ===== ЧАСЫ ===== */
   .clock {
     position: absolute;
     top: 12%;
@@ -521,7 +514,6 @@
     transform-origin: bottom center;
   }
 
-  /* ===== ТУМБА ===== */
   .cabinet {
     position: absolute;
     left: 50%;
@@ -596,7 +588,6 @@
   .cabinet-door.left::after { right: 9px; }
   .cabinet-door.right::after { left: 9px; }
 
-  /* ===== ТЕЛЕВИЗОР ===== */
   .tv {
     position: absolute;
     left: 50%;
@@ -934,7 +925,8 @@
     pointer-events: none;
     z-index: 40;
   }
-    /* ============================================================
+
+  /* ============================================================
      EXIT OVERLAY — «ВЫЙТИ В МЕНЮ?»
      ============================================================ */
   .exit-overlay {
@@ -1016,7 +1008,6 @@
       border-color: #7dff8a;
   }
 </style>
-  <link rel="stylesheet" href="style.css">
 </head>
 <body>
 <div class="room">
@@ -1110,6 +1101,21 @@
   var screenEl  = document.getElementById('tvScreen');
   var rainEl    = document.getElementById('rain');
 
+  /* ====== АДАПТАЦИЯ ПОД ЭКРАН ====== */
+  function fitRoom() {
+    var room = document.querySelector('.room');
+    if (!room) return;
+    var W = window.innerWidth;
+    var H = window.innerHeight;
+    var scale = Math.min(W / 1000, H / 700);
+    room.style.transform = 'scale(' + scale + ')';
+  }
+  window.addEventListener('resize', fitRoom);
+  window.addEventListener('orientationchange', function() {
+    setTimeout(fitRoom, 50);
+  });
+  fitRoom();
+
   function createRain() {
     rainEl.innerHTML = '';
     var dropCount = 22;
@@ -1189,7 +1195,52 @@
 })();
 </script>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
-<script src="app.js"></script>
+<!-- Esc → «ВЫЙТИ В МЕНЮ?» -->
+<script>
+(function() {
+  'use strict';
+
+  var overlay = document.createElement('div');
+  overlay.className = 'exit-overlay';
+  overlay.setAttribute('aria-hidden', 'true');
+  overlay.innerHTML =
+    '<div class="exit-dialog">' +
+      '<div class="exit-dialog-title">ВЫЙТИ В МЕНЮ?</div>' +
+      '<div class="exit-dialog-buttons">' +
+        '<button type="button" class="exit-btn exit-btn-yes">ДА</button>' +
+        '<button type="button" class="exit-btn exit-btn-no">НЕТ</button>' +
+      '</div>' +
+    '</div>';
+  document.body.appendChild(overlay);
+
+  var btnYes = overlay.querySelector('.exit-btn-yes');
+  var btnNo  = overlay.querySelector('.exit-btn-no');
+
+  function show() {
+    overlay.classList.add('show');
+    overlay.setAttribute('aria-hidden', 'false');
+  }
+  function hide() {
+    overlay.classList.remove('show');
+    overlay.setAttribute('aria-hidden', 'true');
+  }
+
+  btnYes.addEventListener('click', function() {
+    window.location.href = 'index.html';
+  });
+  btnNo.addEventListener('click', hide);
+
+  overlay.addEventListener('click', function(e) {
+    if (e.target === overlay) hide();
+  });
+
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+      if (overlay.classList.contains('show')) hide();
+      else show();
+    }
+  });
+})();
+</script>
 </body>
 </html>
