@@ -406,6 +406,7 @@ html[data-theme="dark"] .burger-btn .ring { border-color: rgba(221,224,229,.3); 
 .burger-menu.open .burger-menu-col-left .burger-link:nth-child(2) { transition-delay: 0.11s; }
 .burger-menu.open .burger-menu-col-left .burger-link:nth-child(3) { transition-delay: 0.16s; }
 .burger-menu.open .burger-menu-col-left .burger-link:nth-child(4) { transition-delay: 0.21s; }
+.burger-menu.open .burger-menu-col-left .burger-link:nth-child(5) { transition-delay: 0.26s; }
 .burger-menu.open .burger-menu-col-right .burger-link:nth-child(1) { transition-delay: 0.14s; }
 .burger-menu.open .burger-menu-col-right .burger-link:nth-child(2) { transition-delay: 0.19s; }
 .burger-menu.open .burger-menu-col-right .burger-link:nth-child(3) { transition-delay: 0.24s; }
@@ -1340,9 +1341,6 @@ html[data-theme="dark"] .reader {
 }
 .reader.show .reader-sheet { opacity: 1; transform: translateY(0); }
 
-/* ============================================================
-   СТРЕЛКА НАЗАД — просто «←», без подписи
-   ============================================================ */
 .reader-back-arrow {
     display: inline-flex;
     align-items: center;
@@ -1367,9 +1365,6 @@ html[data-theme="dark"] .reader {
     margin: 48px 0 0 0;
 }
 
-/* ============================================================
-   ЗАГОЛОВОК
-   ============================================================ */
 .reader-title {
     font-family: var(--font-display);
     font-weight: 700;
@@ -1382,11 +1377,6 @@ html[data-theme="dark"] .reader {
     margin: 0 0 22px;
 }
 
-/* ============================================================
-   МЕТА: время чтения + машинка. Машинка стоит справа,
-   но контейнер растянут до конца колонки текста,
-   чтобы иконка была примерно там, где текст кончается
-   ============================================================ */
 .reader-meta {
     display: flex;
     align-items: center;
@@ -1432,9 +1422,6 @@ html[data-theme="dark"] .reader-meta::after { background: var(--red); }
 html[data-theme="dark"] .reader-typewriter { color: rgba(224,224,224,0.55); }
 html[data-theme="dark"] .reader-typewriter:hover { color: #E0E0E0; }
 
-/* ============================================================
-   ТЕКСТ СТАТЬИ
-   ============================================================ */
 .reader-content {
     max-width: 68ch;
     font-family: Georgia, 'Times New Roman', serif;
@@ -1447,7 +1434,6 @@ html[data-theme="dark"] .reader-typewriter:hover { color: #E0E0E0; }
 .reader-content p { margin: 0 0 1.4em; }
 .reader-content p:last-child { margin-bottom: 0; }
 
-/* Буквицу убираем полностью */
 .reader-content > p:first-of-type::first-letter {
     float: none;
     font-size: inherit;
@@ -1642,7 +1628,6 @@ html[data-theme="dark"] .reader-content blockquote { color: rgba(224,224,224,0.7
 .reader.reader-alt .reader-content code { background: rgba(120, 90, 50, 0.14); }
 .reader.reader-alt .reader-content pre  { background: rgba(120, 90, 50, 0.10); border-color: rgba(120, 90, 50, 0.25); }
 
-/* Тёмная тема для альтернативного вида — «приглушённая лампа» */
 html[data-theme="dark"] .reader.reader-alt .reader-sheet {
     background-color: #C9B98E;
     background-image:
@@ -1683,9 +1668,6 @@ html[data-theme="dark"] .reader.reader-alt .reader-content h2,
 html[data-theme="dark"] .reader.reader-alt .reader-content h3,
 html[data-theme="dark"] .reader.reader-alt .reader-content h4 { color: #2A1F0F; }
 
-/* ============================================================
-   МОБИЛЬНАЯ
-   ============================================================ */
 @media (max-width: 640px) {
     .reader-sheet { padding: 32px 5vw 100px; }
     .reader-back-arrow { font-size: 1.6rem; margin-bottom: 20px; }
@@ -2505,4 +2487,86 @@ html[data-theme="dark"] .clock-switch .switch-ring { border-color: rgba(221,224,
     .hero-item:active { transform: scale(0.97); }
     .hero-item:hover .hero-photo img { filter: grayscale(1) contrast(1.15); }
     .hero-item:active .hero-photo img { filter: grayscale(0) contrast(1.15); }
+}
+
+/* ============================================================
+   EXIT OVERLAY — «ВЫЙТИ В МЕНЮ?» (для games.html)
+   ============================================================ */
+.exit-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    background: rgba(5, 5, 10, 0.82);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s ease, visibility 0s linear 0.3s;
+    padding: 20px;
+}
+.exit-overlay.show {
+    opacity: 1;
+    visibility: visible;
+    transition: opacity 0.3s ease, visibility 0s linear 0s;
+}
+.exit-dialog {
+    background: #0a0a12;
+    border: 2px solid #7dff8a;
+    border-radius: 12px;
+    padding: 40px 50px;
+    text-align: center;
+    box-shadow:
+        0 0 0 1px rgba(125,255,138,0.2),
+        0 0 30px rgba(125,255,138,0.25),
+        0 20px 60px rgba(0,0,0,0.9);
+    font-family: 'Press Start 2P', 'Courier New', monospace;
+    transform: translateY(16px) scale(0.96);
+    transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.exit-overlay.show .exit-dialog {
+    transform: translateY(0) scale(1);
+}
+.exit-dialog-title {
+    color: #7dff8a;
+    font-size: clamp(12px, 2vw, 16px);
+    letter-spacing: 4px;
+    margin-bottom: 32px;
+    text-shadow: 0 0 8px rgba(125,255,138,0.7);
+}
+.exit-dialog-buttons {
+    display: flex;
+    gap: 24px;
+    justify-content: center;
+}
+.exit-btn {
+    font-family: inherit;
+    font-size: clamp(11px, 1.6vw, 13px);
+    letter-spacing: 3px;
+    padding: 14px 32px;
+    background: transparent;
+    color: #7dff8a;
+    border: 2px solid #7dff8a;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: color 0.2s ease, background 0.2s ease, transform 0.15s ease;
+    -webkit-tap-highlight-color: transparent;
+}
+.exit-btn:hover {
+    background: #7dff8a;
+    color: #0a0a12;
+    box-shadow: 0 0 20px rgba(125,255,138,0.6);
+}
+.exit-btn:active {
+    transform: scale(0.96);
+}
+.exit-btn-yes:hover {
+    background: #ff5a8a;
+    border-color: #ff5a8a;
+    color: #0a0a12;
+    box-shadow: 0 0 20px rgba(255,90,138,0.6);
+}
+.exit-btn-no:hover {
+    background: #7dff8a;
+    border-color: #7dff8a;
 }
