@@ -268,8 +268,20 @@ function makeSlots(){
     pick([...TOYS,...FOODS,...CLOTHES])];
 }
 function shuffleSlots(){
-  G.slots=[pick(TOYS),pick(FOODS),pick(CLOTHES),pick(USEFUL),
-    pick([...TOYS,...FOODS,...CLOTHES])];
+  /* Собираем 5 предметов: 1 полезный + 4 случайных из игрушек/еды/одежды */
+  var arr = [
+    pick(USEFUL),
+    pick(TOYS),
+    pick(FOODS),
+    pick(CLOTHES),
+    pick([...TOYS,...FOODS,...CLOTHES])
+  ];
+  /* Перемешиваем — полезный может оказаться в любом слоте */
+  for(var i=arr.length-1;i>0;i--){
+    var j=Math.floor(Math.random()*(i+1));
+    var t=arr[i];arr[i]=arr[j];arr[j]=t;
+  }
+  G.slots=arr;
   G.slotAnim=G.slotAnimMax;
   G.slotFlash=[1,1,1,1,1];
   sndJump();
@@ -1832,8 +1844,7 @@ function slotLayout(){
     arr.push({x,y,w:size,h:size,labelH,
       cx:x+size/2,cy:y+size/2,
       label:G.slots[i]?G.slots[i].label:'',
-      isUseful:(i===3)});
-  }
+      isUseful: !!(G.slots[i] && G.slots[i].kind==='useful')});  }
   return arr;
 }
 function drawSlots(){
@@ -1861,10 +1872,9 @@ function drawSlots(){
     roundRect(s.x+4,s.y+5,s.w,s.h,18);ctx.fill();
     ctx.restore();
 
-    const g=ctx.createLinearGradient(s.x,s.y,s.x,s.y+s.h);
-    if(s.isUseful){g.addColorStop(0,'#2a5a3a');g.addColorStop(1,'#14301e');}
-    else {g.addColorStop(0,'#4a3568');g.addColorStop(1,'#251838');}
-    ctx.fillStyle=g;
+  const g=ctx.createLinearGradient(s.x,s.y,s.x,s.y+s.h);
+g.addColorStop(0,'#4a3568');g.addColorStop(1,'#251838');
+ctx.fillStyle=g;
     roundRect(s.x,s.y,s.w,s.h,18);ctx.fill();
 
     ctx.fillStyle='rgba(255,255,255,0.08)';
@@ -1875,12 +1885,10 @@ function drawSlots(){
       roundRect(s.x,s.y,s.w,s.h,18);ctx.fill();
     }
 
-    let br='#7a5aaa';
-    if(s.isUseful)br='#5ac080';
-    if(G.dragging&&G.dragging.slot===i)br='#ffd000';
-    if(flash>0.3)br='#fff5a0';
-    if(G.enlightenMode&&s.isUseful)br='#ffd000';
-    ctx.strokeStyle=br;
+   let br='#7a5aaa';
+if(G.dragging&&G.dragging.slot===i)br='#ffd000';
+if(flash>0.3)br='#fff5a0';
+ctx.strokeStyle=br;
     ctx.lineWidth=(G.dragging&&G.dragging.slot===i)?4:3;
     roundRect(s.x,s.y,s.w,s.h,18);ctx.stroke();
 
@@ -1901,11 +1909,11 @@ function drawSlots(){
     const padX=s.labelH*0.35, padY=s.labelH*0.14;
     ctx.fillStyle='rgba(0,0,0,0.55)';
     roundRect(lx-tw/2-padX,ly-s.labelH*0.5-padY+2,tw+padX*2,s.labelH+padY*2,8);ctx.fill();
-    ctx.strokeStyle=s.isUseful?'#5ac080':'#7a5aaa';
-    ctx.lineWidth=2;
-    roundRect(lx-tw/2-padX,ly-s.labelH*0.5-padY+2,tw+padX*2,s.labelH+padY*2,8);ctx.stroke();
-    ctx.fillStyle=s.isUseful?'#b0ffd0':'#e8d8ff';
-    ctx.fillText(label,lx,ly+1);
+  ctx.strokeStyle='#7a5aaa';
+ctx.lineWidth=2;
+roundRect(lx-tw/2-padX,ly-s.labelH*0.5-padY+2,tw+padX*2,s.labelH+padY*2,8);ctx.stroke();
+ctx.fillStyle='#e8d8ff';
+ctx.fillText(label,lx,ly+1);
   }
 }
 
