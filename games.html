@@ -1,0 +1,1116 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Игровой раздел</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html, body {
+    height: 100%;
+    overflow: hidden;
+    background: #000;
+  }
+
+  body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-family: 'Press Start 2P', 'Courier New', monospace;
+    image-rendering: pixelated;
+    -webkit-font-smoothing: none;
+  }
+
+  .room {
+    position: relative;
+    width: 100vw;
+    height: 100vh;
+    max-width: 1000px;
+    max-height: 700px;
+    overflow: visible;
+    border: 4px solid #0a0604;
+    box-shadow: inset 0 0 0 2px #1a120a;
+    background: #1a120a;
+  }
+
+  /* ===== ЗАДНЯЯ СТЕНА — ОБОИ С ЦВЕТОЧКАМИ ===== */
+  .wall {
+    position: absolute;
+    left: 0; right: 0; top: 0; bottom: 35%;
+    background-color: #4a4a3a;
+    background-image:
+      radial-gradient(circle at 50% 20%, #6a6a50 1.2px, transparent 1.6px),
+      radial-gradient(circle at 78% 38%, #6a6a50 1.2px, transparent 1.6px),
+      radial-gradient(circle at 65% 75%, #6a6a50 1.2px, transparent 1.6px),
+      radial-gradient(circle at 35% 75%, #6a6a50 1.2px, transparent 1.6px),
+      radial-gradient(circle at 22% 38%, #6a6a50 1.2px, transparent 1.6px),
+      radial-gradient(circle at 50% 50%, #8a8a60 1.8px, transparent 2.2px);
+    background-size: 40px 40px, 40px 40px, 40px 40px, 40px 40px, 40px 40px, 40px 40px;
+    z-index: 1;
+  }
+  .wall::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background-image:
+      radial-gradient(circle at 50% 20%, #5a5a42 1.2px, transparent 1.6px),
+      radial-gradient(circle at 78% 38%, #5a5a42 1.2px, transparent 1.6px),
+      radial-gradient(circle at 65% 75%, #5a5a42 1.2px, transparent 1.6px),
+      radial-gradient(circle at 35% 75%, #5a5a42 1.2px, transparent 1.6px),
+      radial-gradient(circle at 22% 38%, #5a5a42 1.2px, transparent 1.6px),
+      radial-gradient(circle at 50% 50%, #7a7a52 1.8px, transparent 2.2px);
+    background-size: 40px 40px, 40px 40px, 40px 40px, 40px 40px, 40px 40px, 40px 40px;
+    background-position: 20px 20px;
+  }
+  .wall::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: 
+      radial-gradient(ellipse at 55% 65%,
+        rgba(60, 90, 60, 0.15) 0%,
+        transparent 50%),
+      linear-gradient(180deg,
+        rgba(0,0,0,0.55) 0%,
+        rgba(0,0,0,0.35) 40%,
+        rgba(0,0,0,0.65) 100%);
+    z-index: 2;
+  }
+
+  .ceiling {
+    position: absolute;
+    left: 0; right: 0;
+    top: 0;
+    height: 6%;
+    background: #1a1a10;
+    z-index: 4;
+    box-shadow: 0 6px 12px rgba(0,0,0,0.8);
+  }
+
+  /* ===== ПОЛ ===== */
+  .floor {
+    position: absolute;
+    left: 0; right: 0; bottom: 0;
+    height: 44%;
+    background-color: #3a2a18;
+    background-image:
+      repeating-linear-gradient(90deg,
+        #3a2a18 0px, #3a2a18 40px,
+        #33241a 40px, #33241a 80px,
+        #42301c 80px, #42301c 120px);
+    z-index: 5;
+  }
+  .floor::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background-image:
+      linear-gradient(180deg,
+        transparent 0%, transparent 14%,
+        rgba(20,15,10,0.7) 14%, rgba(20,15,10,0.7) 15%,
+        transparent 15%, transparent 30%,
+        rgba(20,15,10,0.7) 30%, rgba(20,15,10,0.7) 31%,
+        transparent 31%, transparent 47%,
+        rgba(20,15,10,0.7) 47%, rgba(20,15,10,0.7) 48%,
+        transparent 48%, transparent 65%,
+        rgba(20,15,10,0.7) 65%, rgba(20,15,10,0.7) 66%,
+        transparent 66%, transparent 84%,
+        rgba(20,15,10,0.7) 84%, rgba(20,15,10,0.7) 85%,
+        transparent 85%, transparent 100%);
+  }
+  .floor::before {
+    content: "";
+    position: absolute;
+    left: 0; right: 0; top: 0;
+    height: 40%;
+    background: linear-gradient(180deg,
+      rgba(0,0,0,0.55) 0%,
+      transparent 100%);
+    pointer-events: none;
+  }
+
+  .skirting {
+    position: absolute;
+    left: 0; right: 0;
+    top: 61%;
+    height: 14px;
+    background: #1a1208;
+    box-shadow: inset 0 2px 0 #2a2014, inset 0 -3px 0 #0a0604;
+    z-index: 6;
+  }
+
+  /* ===== ОКНО ===== */
+  .window-frame {
+    position: absolute;
+    top: 10%;
+    left: 20%;
+    width: 170px;
+    height: 160px;
+    z-index: 7;
+  }
+  .window-glass {
+    position: absolute;
+    inset: 0;
+    background: #0a1525;
+    background-image:
+      radial-gradient(1px 1px at 15% 25%, #ddddcc, transparent),
+      radial-gradient(1px 1px at 55% 15%, #ddddcc, transparent),
+      radial-gradient(1px 1px at 80% 40%, #ddddcc, transparent),
+      radial-gradient(1px 1px at 30% 60%, #ddddcc, transparent),
+      radial-gradient(1px 1px at 65% 75%, #ddddcc, transparent),
+      linear-gradient(180deg, #050a15 0%, #0a1525 60%, #152540 100%);
+    border: 5px solid #6a6a5a;
+    box-shadow:
+      inset 0 0 0 2px #4a4a3a,
+      0 0 0 3px #0a0604,
+      0 0 30px rgba(120,140,180,0.15);
+    overflow: hidden;
+  }
+  .window-glass::before {
+    content: "";
+    position: absolute;
+    top: 50%; left: 0; right: 0;
+    height: 5px;
+    background: #6a6a5a;
+    transform: translateY(-50%);
+    z-index: 3;
+  }
+  .window-glass::after {
+    content: "";
+    position: absolute;
+    left: 50%; top: 0; bottom: 0;
+    width: 5px;
+    background: #6a6a5a;
+    transform: translateX(-50%);
+    z-index: 3;
+  }
+  .moon {
+    position: absolute;
+    top: 20px;
+    right: 28px;
+    width: 20px;
+    height: 20px;
+    background: #d8d8b8;
+    border-radius: 50%;
+    box-shadow: 0 0 14px rgba(200,200,150,0.5);
+    z-index: 1;
+  }
+  .moon::after {
+    content: "";
+    position: absolute;
+    top: 5px; left: 6px;
+    width: 5px; height: 5px;
+    background: #b0b090;
+    border-radius: 50%;
+  }
+
+  /* ===== ДОЖДЬ ===== */
+  .rain {
+    position: absolute;
+    inset: 0;
+    z-index: 2;
+    overflow: hidden;
+    pointer-events: none;
+  }
+  .rain-drop {
+    position: absolute;
+    top: -20px;
+    width: 1px;
+    height: 12px;
+    background: linear-gradient(180deg,
+      transparent 0%,
+      rgba(180, 200, 220, 0.7) 100%);
+    animation: rainFall linear infinite;
+  }
+  @keyframes rainFall {
+    0%   { transform: translateY(-20px); opacity: 0; }
+    10%  { opacity: 0.9; }
+    90%  { opacity: 0.9; }
+    100% { transform: translateY(180px); opacity: 0; }
+  }
+
+  .curtain-left,
+  .curtain-right {
+    position: absolute;
+    top: -12px;
+    width: 40px;
+    height: calc(100% + 12px);
+    z-index: 8;
+    background: #3a2030;
+    background-image:
+      repeating-linear-gradient(90deg,
+        #3a2030 0px, #3a2030 5px,
+        #452838 5px, #452838 10px,
+        #2f1a28 10px, #2f1a28 15px);
+    border: 2px solid #1a0a14;
+    box-shadow: inset 0 0 0 2px #4a2a3a;
+  }
+  .curtain-left {
+    left: -8px;
+    clip-path: polygon(
+      0 0, 100% 0, 100% 92%,
+      85% 100%, 70% 92%, 55% 100%, 40% 92%, 25% 100%, 10% 92%, 0 100%
+    );
+  }
+  .curtain-right {
+    right: -8px;
+    clip-path: polygon(
+      0 0, 100% 0, 100% 100%,
+      90% 92%, 75% 100%, 60% 92%, 45% 100%, 30% 92%, 15% 100%, 0 92%
+    );
+  }
+  .curtain-rod {
+    position: absolute;
+    top: -16px;
+    left: -20px;
+    right: -20px;
+    height: 9px;
+    background: #3a2a18;
+    border: 2px solid #1a1208;
+    z-index: 9;
+    box-shadow: 0 2px 0 rgba(0,0,0,0.6);
+  }
+
+  /* ===== СВЕТ ОТ ТЕЛЕВИЗОРА ===== */
+  .tv-glow {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    top: 15%;
+    width: 800px;
+    height: 600px;
+    background: radial-gradient(ellipse at 50% 40%,
+      rgba(80, 220, 80, 0.18) 0%,
+      rgba(60, 180, 60, 0.10) 25%,
+      rgba(40, 120, 40, 0.05) 50%,
+      transparent 75%);
+    pointer-events: none;
+    z-index: 10;
+  }
+
+  /* ===== КОВЁР ===== */
+  .carpet {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    bottom: 3%;
+    width: 78%;
+    height: 28%;
+    z-index: 11;
+    background: #5a1a1a;
+    background-image:
+      repeating-linear-gradient(45deg,
+        #5a1a1a 0px, #5a1a1a 8px,
+        #6a2424 8px, #6a2424 16px),
+      repeating-linear-gradient(-45deg,
+        transparent 0px, transparent 8px,
+        #461414 8px, #461414 16px);
+    border: 3px solid #3a0e0e;
+    box-shadow: inset 0 0 0 4px #7a3030;
+    clip-path: polygon(8% 0, 92% 0, 100% 100%, 0 100%);
+  }
+  .carpet::after {
+    content: "";
+    position: absolute;
+    inset: 12px;
+    border: 2px dashed #8a3a3a;
+    opacity: 0.6;
+    clip-path: polygon(8% 0, 92% 0, 100% 100%, 0 100%);
+  }
+
+  /* ===== КОТ — ПОВЕРХ ВСЕГО, НА ПЕРЕДНЕМ ПЛАНЕ КОВРА ===== */
+  /* Кот должен быть НА ковре, ПЕРЕД тумбой, и НЕ перекрыт ею.
+     z-index выше, чем у тумбы (15), и выше, чем у ТВ (20) — чтобы точно был виден.
+     Позиция: bottom 6% — самый низ ковра, ближе к зрителю. */
+  .cat {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    bottom: 5%;
+    width: 130px;
+    height: 70px;
+    z-index: 25;
+    filter: brightness(0.8);
+  }
+  .cat-tail {
+    position: absolute;
+    left: -18px;
+    bottom: 18px;
+    width: 42px;
+    height: 12px;
+    background: #3a3a3a;
+    background-image: repeating-linear-gradient(90deg,
+      #3a3a3a 0px, #3a3a3a 6px,
+      #252525 6px, #252525 12px);
+    border: 2px solid #0a0604;
+    border-radius: 8px;
+    transform: rotate(-22deg);
+    transform-origin: right center;
+    animation: tailWave 3.5s ease-in-out infinite;
+  }
+  @keyframes tailWave {
+    0%   { transform: rotate(-22deg); }
+    25%  { transform: rotate(-14deg); }
+    50%  { transform: rotate(-26deg); }
+    75%  { transform: rotate(-18deg); }
+    100% { transform: rotate(-22deg); }
+  }
+  .cat-body {
+    position: absolute;
+    left: 10px;
+    bottom: 14px;
+    width: 92px;
+    height: 38px;
+    background: #3a3a3a;
+    background-image:
+      repeating-linear-gradient(90deg,
+        transparent 0px, transparent 11px,
+        #252525 11px, #252525 17px);
+    border: 2px solid #0a0604;
+    border-radius: 18px 26px 11px 11px;
+    box-shadow: inset 0 4px 0 #505050;
+  }
+  .cat-paw {
+    position: absolute;
+    bottom: 5px;
+    width: 20px;
+    height: 14px;
+    background: #3a3a3a;
+    border: 2px solid #0a0604;
+    border-radius: 8px;
+    box-shadow: inset 0 2px 0 #505050;
+  }
+  .cat-paw.p1 { left: 30px; }
+  .cat-paw.p2 { left: 60px; }
+  .cat-head {
+    position: absolute;
+    left: 82px;
+    bottom: 20px;
+    width: 46px;
+    height: 42px;
+    background: #3a3a3a;
+    border: 2px solid #0a0604;
+    border-radius: 16px 16px 12px 12px;
+    box-shadow: inset 0 4px 0 #505050;
+    z-index: 2;
+  }
+  .cat-ear {
+    position: absolute;
+    top: -13px;
+    width: 0;
+    height: 0;
+    border-left: 9px solid transparent;
+    border-right: 9px solid transparent;
+    border-bottom: 16px solid #3a3a3a;
+    z-index: 3;
+  }
+  .cat-ear::after {
+    content: "";
+    position: absolute;
+    top: 4px;
+    left: -5px;
+    width: 0;
+    height: 0;
+    border-left: 4px solid transparent;
+    border-right: 4px solid transparent;
+    border-bottom: 9px solid #8a4a4a;
+  }
+  .cat-ear.l { left: 0px; transform: rotate(-12deg); }
+  .cat-ear.r { right: 0px; transform: rotate(12deg); }
+
+  .cat-eye {
+    position: absolute;
+    top: 14px;
+    width: 8px;
+    height: 8px;
+    background: #a8d040;
+    border: 1px solid #0a0604;
+    border-radius: 50%;
+    z-index: 4;
+    animation: blink 4s infinite;
+  }
+  .cat-eye.l { left: 7px; }
+  .cat-eye.r { right: 7px; }
+  .cat-eye::before {
+    content: "";
+    position: absolute;
+    top: 50%; left: 50%;
+    width: 2px;
+    height: 6px;
+    background: #0a0604;
+    border-radius: 1px;
+    transform: translate(-50%, -50%);
+  }
+  @keyframes blink {
+    0%, 88%, 100% { transform: scaleY(1); }
+    92%           { transform: scaleY(0.05); }
+    96%           { transform: scaleY(0.05); }
+  }
+
+  .cat-nose {
+    position: absolute;
+    top: 25px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 5px;
+    height: 4px;
+    background: #8a4a4a;
+    border-radius: 50%;
+    z-index: 4;
+  }
+  .cat-whiskers {
+    position: absolute;
+    top: 27px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 44px;
+    height: 9px;
+    z-index: 4;
+  }
+  .cat-whiskers::before,
+  .cat-whiskers::after {
+    content: "";
+    position: absolute;
+    width: 18px;
+    height: 1px;
+    background: #8a8a8a;
+    top: 2px;
+  }
+  .cat-whiskers::before {
+    left: -9px;
+    box-shadow: 0 4px 0 #8a8a8a;
+    transform: rotate(-8deg);
+  }
+  .cat-whiskers::after {
+    right: -9px;
+    box-shadow: 0 4px 0 #8a8a8a;
+    transform: rotate(8deg);
+  }
+
+  /* ===== ЧАСЫ ===== */
+  .clock {
+    position: absolute;
+    top: 12%;
+    right: 22%;
+    width: 48px;
+    height: 48px;
+    z-index: 7;
+    background: #8a8070;
+    border: 4px solid #3a2a18;
+    border-radius: 50%;
+    box-shadow: 0 0 0 2px #0a0604, 3px 3px 0 rgba(0,0,0,0.6);
+    filter: brightness(0.7);
+  }
+  .clock::before {
+    content: "";
+    position: absolute;
+    top: 50%; left: 50%;
+    width: 3px; height: 15px;
+    background: #1a1208;
+    transform: translate(-50%, -100%) rotate(40deg);
+    transform-origin: bottom center;
+  }
+  .clock::after {
+    content: "";
+    position: absolute;
+    top: 50%; left: 50%;
+    width: 3px; height: 10px;
+    background: #1a1208;
+    transform: translate(-50%, -100%) rotate(160deg);
+    transform-origin: bottom center;
+  }
+
+  /* ===== ТУМБА ===== */
+  .cabinet {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    bottom: 12%;
+    width: 480px;
+    height: 200px;
+    z-index: 15;
+  }
+  .cabinet-body {
+    position: absolute;
+    inset: 0;
+    background: #3a2818;
+    background-image:
+      repeating-linear-gradient(90deg,
+        #3a2818 0px, #3a2818 4px,
+        #453020 4px, #453020 8px),
+      repeating-linear-gradient(0deg,
+        transparent 0px, transparent 44px,
+        #2f1e10 44px, #2f1e10 48px);
+    border: 4px solid #1a1008;
+    clip-path: polygon(2% 0, 98% 0, 100% 100%, 0 100%);
+    box-shadow:
+      inset 0 4px 0 #504028,
+      inset 0 -4px 0 #2a1e12,
+      inset 4px 0 0 #453020,
+      inset -4px 0 0 #2f1e10,
+      10px 12px 0 rgba(0,0,0,0.6);
+  }
+  .cabinet-top {
+    position: absolute;
+    top: -13px;
+    left: 2%;
+    right: 2%;
+    height: 15px;
+    background: #504028;
+    background-image:
+      repeating-linear-gradient(90deg,
+        #504028 0px, #504028 4px,
+        #5a4830 4px, #5a4830 8px);
+    border: 2px solid #1a1008;
+    clip-path: polygon(0 0, 100% 0, 99% 100%, 1% 100%);
+    z-index: 2;
+    box-shadow: inset 0 2px 0 #6a5840;
+  }
+  .cabinet-door {
+    position: absolute;
+    top: 20px;
+    bottom: 20px;
+    width: 46%;
+    background: #2f1e10;
+    background-image:
+      repeating-linear-gradient(45deg,
+        #2f1e10 0px, #2f1e10 4px,
+        #3a2818 4px, #3a2818 8px);
+    border: 3px solid #1a1008;
+    box-shadow: inset 0 0 0 2px #453020;
+  }
+  .cabinet-door.left { left: 12px; }
+  .cabinet-door.right { right: 12px; }
+  .cabinet-door::after {
+    content: "";
+    position: absolute;
+    top: 50%;
+    width: 7px;
+    height: 7px;
+    background: #8a7038;
+    border: 2px solid #4a3a18;
+    border-radius: 50%;
+    transform: translateY(-50%);
+  }
+  .cabinet-door.left::after { right: 9px; }
+  .cabinet-door.right::after { left: 9px; }
+
+  /* ===== ТЕЛЕВИЗОР ===== */
+  .tv {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    bottom: calc(12% + 200px + 13px);
+    width: 380px;
+    height: 260px;
+    z-index: 20;
+  }
+
+  .tv-body {
+    position: absolute;
+    inset: 0;
+    background: #1a140e;
+    background-image:
+      repeating-linear-gradient(90deg,
+        #1a140e 0px, #1a140e 3px,
+        #241a12 3px, #241a12 6px),
+      repeating-linear-gradient(0deg,
+        transparent 0px, transparent 30px,
+        rgba(10, 6, 4, 0.4) 30px, rgba(10, 6, 4, 0.4) 32px);
+    border: 4px solid #050302;
+    border-radius: 6px 6px 5px 5px;
+    box-shadow:
+      inset 0 3px 0 #3a2e22,
+      inset 0 -3px 0 #0a0604,
+      inset 3px 0 0 #2a2018,
+      inset -3px 0 0 #0a0604,
+      8px 10px 0 rgba(0,0,0,0.5);
+    overflow: hidden;
+  }
+
+  .tv-brand {
+    position: absolute;
+    bottom: 10px;
+    left: 18px;
+    font-family: 'Press Start 2P', monospace;
+    font-size: 9px;
+    color: #4a3a2a;
+    text-shadow: 
+      0 1px 0 #6a5a4a,
+      0 -1px 0 #2a1e14,
+      1px 0 0 #3a2e1e,
+      -1px 0 0 #3a2e1e;
+    letter-spacing: 3px;
+    z-index: 21;
+    opacity: 0.85;
+  }
+
+  .tv-screen-frame {
+    position: absolute;
+    top: 14px;
+    left: 14px;
+    width: 250px;
+    height: 210px;
+    background: #050302;
+    border-radius: 26px / 18px;
+    border: 4px solid #0a0604;
+    box-shadow:
+      inset 0 0 0 3px #1a140e,
+      0 0 0 2px #000000;
+    padding: 8px;
+  }
+  .tv-screen {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    background: #0a1a0a;
+    border-radius: 18px / 12px;
+    overflow: hidden;
+    box-shadow:
+      inset 0 0 40px #000,
+      0 0 28px rgba(80, 220, 80, 0.4);
+  }
+  .tv-screen::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: repeating-linear-gradient(0deg,
+      rgba(0, 255, 0, 0.05) 0px,
+      rgba(0, 0, 0, 0.16) 1px,
+      transparent 2px,
+      transparent 3px);
+    pointer-events: none;
+    z-index: 5;
+    border-radius: 18px / 12px;
+  }
+  .tv-screen::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse at 50% 40%,
+      rgba(80, 255, 80, 0.20) 0%,
+      transparent 72%);
+    pointer-events: none;
+    z-index: 4;
+    border-radius: 18px / 12px;
+  }
+
+  .tv-menu {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 3;
+    padding: 14px 10px;
+  }
+  .game-item {
+    font-family: 'Press Start 2P', monospace;
+    font-size: 11px;
+    line-height: 1.6;
+    text-align: center;
+    color: #40ff40;
+    text-shadow:
+      0 0 4px #20a020,
+      0 0 8px #106010,
+      0 0 2px #80ff80;
+    padding: 8px 10px;
+    letter-spacing: 1px;
+    word-break: break-word;
+    max-width: 100%;
+    cursor: default;
+  }
+
+  .tv-side {
+    position: absolute;
+    top: 14px;
+    right: 10px;
+    width: 84px;
+    bottom: 14px;
+    background: #0f0a06;
+    background-image:
+      repeating-linear-gradient(0deg,
+        #0f0a06 0px, #0f0a06 3px,
+        #1a140e 3px, #1a140e 6px);
+    border: 2px solid #000000;
+    border-radius: 4px;
+    box-shadow:
+      inset 0 0 0 2px #241a12,
+      inset 0 2px 0 #3a2e22;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    padding: 9px 5px;
+    gap: 8px;
+    z-index: 22;
+  }
+  .tv-knob-deco {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: #1a1208;
+    border: 2px solid #000000;
+    box-shadow:
+      inset 0 2px 3px #000,
+      inset 0 -2px 3px #3a2e22,
+      0 1px 0 #0a0604;
+    position: relative;
+    flex-shrink: 0;
+  }
+  .tv-knob-deco::after {
+    content: "";
+    position: absolute;
+    top: 4px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 3px;
+    height: 9px;
+    background: #6a5a3a;
+    border-radius: 1px;
+  }
+  .tv-speaker-grill {
+    width: 60px;
+    height: 48px;
+    background-color: #0a0604;
+    background-image:
+      radial-gradient(circle, #241a12 1.2px, transparent 1.8px);
+    background-size: 5px 5px;
+    border: 2px solid #000000;
+    border-radius: 3px;
+    box-shadow: inset 0 0 4px #000;
+    flex-shrink: 0;
+  }
+  .round-switch {
+    width: 48px;
+    height: 48px;
+    position: relative;
+    cursor: pointer;
+    z-index: 30;
+    user-select: none;
+    -webkit-user-select: none;
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+  .round-switch-base {
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    background: #1a1208;
+    border: 3px solid #000000;
+    box-shadow:
+      inset 0 2px 4px #000,
+      inset 0 -2px 4px #3a2e22,
+      0 2px 0 #0a0604;
+  }
+  .round-switch-base::before {
+    content: "";
+    position: absolute;
+    inset: 4px;
+    border-radius: 50%;
+    background:
+      conic-gradient(
+        #3a2e22 0deg 5deg, transparent 5deg 55deg,
+        #3a2e22 55deg 60deg, transparent 60deg 115deg,
+        #3a2e22 115deg 120deg, transparent 120deg 175deg,
+        #3a2e22 175deg 180deg, transparent 180deg 235deg,
+        #3a2e22 235deg 240deg, transparent 240deg 295deg,
+        #3a2e22 295deg 300deg, transparent 300deg 355deg,
+        #3a2e22 355deg 360deg
+      );
+    -webkit-mask: radial-gradient(circle, transparent 64%, #000 65%);
+    mask: radial-gradient(circle, transparent 64%, #000 65%);
+  }
+  .round-switch-marker {
+    position: absolute;
+    top: 1px;
+    left: 50%;
+    width: 4px;
+    height: 8px;
+    background: #ffaa40;
+    transform: translateX(-50%);
+    border-radius: 1px;
+    box-shadow: 0 0 6px #ffaa40;
+    z-index: 2;
+  }
+  .round-switch-handle {
+    position: absolute;
+    inset: 8px;
+    border-radius: 50%;
+    background: #8a7048;
+    background-image:
+      repeating-linear-gradient(90deg,
+        #8a7048 0px, #8a7048 3px,
+        #6a5030 3px, #6a5030 6px);
+    border: 2px solid #4a3018;
+    box-shadow:
+      inset 0 2px 0 #a08858,
+      inset 0 -2px 0 #5a4020,
+      0 2px 4px rgba(0,0,0,0.8);
+    transition: transform 0.35s cubic-bezier(0.34, 1.4, 0.64, 1);
+    z-index: 3;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .round-switch-handle::before {
+    content: "";
+    width: 3px;
+    height: 12px;
+    background: #1a1208;
+    border-radius: 2px;
+    box-shadow: 0 0 0 1px #5a4020;
+    transform: translateY(-3px);
+  }
+  .round-switch-handle::after {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 4px;
+    height: 4px;
+    background: #1a1208;
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    box-shadow: inset 0 1px 1px #000;
+  }
+  .tv-side-label {
+    font-family: 'Press Start 2P', monospace;
+    font-size: 5px;
+    color: #5a4a2a;
+    text-shadow: 1px 1px 0 #000;
+    letter-spacing: 1px;
+    text-align: center;
+    line-height: 1.6;
+  }
+
+  .tv-screen.changing {
+    animation: glitch 0.55s steps(9);
+  }
+  @keyframes glitch {
+    0%   { filter: brightness(3.5) contrast(0.3); transform: translateY(0); }
+    11%  { filter: brightness(0.15) contrast(3); transform: translateY(-4px); }
+    22%  { filter: brightness(4.5) contrast(0.4); transform: translateY(3px); }
+    33%  { filter: brightness(0.4) contrast(2.5); transform: translateY(-3px); }
+    44%  { filter: brightness(3.2) contrast(0.35); transform: translateY(4px); }
+    55%  { filter: brightness(0.25) contrast(3.2); transform: translateY(-2px); }
+    66%  { filter: brightness(2.4) contrast(0.6); transform: translateY(2px); }
+    77%  { filter: brightness(1.6) contrast(1.6); transform: translateY(-3px); }
+    88%  { filter: brightness(2.2) contrast(0.8); transform: translateY(2px); }
+    100% { filter: brightness(1) contrast(1); transform: translateY(0); }
+  }
+  .tv-screen.changing .scan-bar {
+    display: block;
+    animation: scanBar 0.55s linear;
+  }
+  .scan-bar {
+    display: none;
+    position: absolute;
+    left: 0; right: 0;
+    height: 22px;
+    background: linear-gradient(180deg,
+      transparent 0%,
+      rgba(255,255,255,0.75) 50%,
+      transparent 100%);
+    z-index: 10;
+    pointer-events: none;
+  }
+  @keyframes scanBar {
+    0%   { top: -36px; }
+    100% { top: 100%; }
+  }
+
+  .vignette {
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse at 50% 50%,
+      transparent 30%,
+      rgba(0,0,0,0.4) 70%,
+      rgba(0,0,0,0.75) 100%);
+    pointer-events: none;
+    z-index: 40;
+  }
+
+  @media (max-width: 950px) { .room { transform: scale(0.85); } }
+  @media (max-width: 760px) { .room { transform: scale(0.7); } }
+  @media (max-width: 600px) { .room { transform: scale(0.55); } }
+</style>
+</head>
+<body>
+<div class="room">
+  <div class="wall"></div>
+  <div class="ceiling"></div>
+  <div class="floor"></div>
+  <div class="skirting"></div>
+
+  <div class="window-frame">
+    <div class="window-glass">
+      <div class="moon"></div>
+      <div class="rain" id="rain"></div>
+    </div>
+    <div class="curtain-left"></div>
+    <div class="curtain-right"></div>
+    <div class="curtain-rod"></div>
+  </div>
+
+  <div class="clock"></div>
+
+  <div class="carpet"></div>
+
+  <div class="tv-glow"></div>
+
+  <div class="cabinet">
+    <div class="cabinet-body">
+      <div class="cabinet-door left"></div>
+      <div class="cabinet-door right"></div>
+    </div>
+    <div class="cabinet-top"></div>
+  </div>
+
+  <!-- Телевизор -->
+  <div class="tv">
+    <div class="tv-body">
+      <div class="tv-screen-frame">
+        <div class="tv-screen" id="tvScreen">
+          <div class="scan-bar"></div>
+          <div class="tv-menu" id="gameMenu"></div>
+        </div>
+      </div>
+
+      <div class="tv-brand">ГОРИЗОНТ</div>
+
+      <div class="tv-side">
+        <div class="tv-knob-deco"></div>
+        <div class="tv-speaker-grill"></div>
+        <div class="tv-side-label">ГРОМК.</div>
+        <div class="round-switch" id="roundSwitch">
+          <div class="round-switch-base"></div>
+          <div class="round-switch-marker"></div>
+          <div class="round-switch-handle" id="roundHandle"></div>
+        </div>
+        <div class="tv-side-label">КАНАЛ</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- КОТ — ПОСЛЕДНИМ в разметке + z-index 25, чтобы гарантированно был поверх тумбы -->
+  <div class="cat">
+    <div class="cat-tail"></div>
+    <div class="cat-body"></div>
+    <div class="cat-paw p1"></div>
+    <div class="cat-paw p2"></div>
+    <div class="cat-head">
+      <div class="cat-ear l"></div>
+      <div class="cat-ear r"></div>
+      <div class="cat-eye l"></div>
+      <div class="cat-eye r"></div>
+      <div class="cat-nose"></div>
+      <div class="cat-whiskers"></div>
+    </div>
+  </div>
+
+  <div class="vignette"></div>
+</div>
+
+<script>
+(function() {
+  'use strict';
+
+  var games = [
+    { id: 'road', title: 'Переходим дорогу' },
+    { id: 'fox',  title: 'Лисичка-истеричка' }
+  ];
+
+  var currentIndex = 0;
+  var rotation = 0;
+
+  var menuEl    = document.getElementById('gameMenu');
+  var switchEl  = document.getElementById('roundSwitch');
+  var handleEl  = document.getElementById('roundHandle');
+  var screenEl  = document.getElementById('tvScreen');
+  var rainEl    = document.getElementById('rain');
+
+  function createRain() {
+    rainEl.innerHTML = '';
+    var dropCount = 22;
+    for (var i = 0; i < dropCount; i++) {
+      var drop = document.createElement('div');
+      drop.className = 'rain-drop';
+      drop.style.left = (Math.random() * 100) + '%';
+      drop.style.animationDelay = (Math.random() * 2) + 's';
+      drop.style.animationDuration = (0.5 + Math.random() * 0.5) + 's';
+      drop.style.height = (8 + Math.random() * 10) + 'px';
+      drop.style.opacity = 0.4 + Math.random() * 0.5;
+      rainEl.appendChild(drop);
+    }
+  }
+
+  function renderMenu() {
+    menuEl.innerHTML = '';
+    var game = games[currentIndex];
+    var el = document.createElement('div');
+    el.className = 'game-item';
+    el.textContent = game.title;
+    el.dataset.id = game.id;
+
+    el.addEventListener('click', function(e) {
+      e.stopPropagation();
+      enterGame(game);
+    });
+
+    menuEl.appendChild(el);
+  }
+
+  function enterGame(game) {
+    menuEl.innerHTML = '';
+    var loading = document.createElement('div');
+    loading.className = 'game-item';
+    loading.style.fontSize = '9px';
+    loading.style.color = '#ffff80';
+    loading.textContent = 'ЗАГРУЗКА';
+    menuEl.appendChild(loading);
+
+    var dots = 0;
+    var blinkInterval = setInterval(function() {
+      dots = (dots + 1) % 4;
+      loading.textContent = 'ЗАГРУЗКА' + '.'.repeat(dots);
+      menuEl.style.opacity = (dots % 2 === 0) ? '0.6' : '1';
+    }, 220);
+
+    setTimeout(function() {
+      clearInterval(blinkInterval);
+      menuEl.style.opacity = '1';
+      alert('🎮 Игра: "' + game.title + '"\n\nЗдесь откроется страница игры.');
+      renderMenu();
+    }, 1500);
+  }
+
+  function rotateSwitch() {
+    rotation += 180;
+    handleEl.style.transform = 'rotate(' + rotation + 'deg)';
+
+    screenEl.classList.add('changing');
+
+    setTimeout(function() {
+      currentIndex = currentIndex === 0 ? 1 : 0;
+      renderMenu();
+    }, 270);
+
+    setTimeout(function() {
+      screenEl.classList.remove('changing');
+    }, 580);
+  }
+
+  createRain();
+  renderMenu();
+  handleEl.style.transform = 'rotate(0deg)';
+
+  switchEl.addEventListener('click', rotateSwitch);
+  switchEl.addEventListener('mousedown', function(e) { e.preventDefault(); });
+})();
+</script>
+</body>
+</html>
