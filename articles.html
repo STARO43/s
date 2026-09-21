@@ -90,18 +90,13 @@
 <div class="reader" id="reader" aria-hidden="true">
     <div class="reader-progress"><div class="reader-progress-fill" id="progressFill"></div></div>
 
-    <div class="reader-head">
-        <div class="reader-head-inner">
-            <button class="reader-back" id="backBtn" aria-label="Назад">
-                <span>←</span><span>НАЗАД</span>
-            </button>
-            <span class="reader-label"><span class="dot"></span><span>ЗАМЕТКИ · РАЗМЫШЛЕНИЯ · ТЕОРИЯ</span></span>
-            <button class="reader-close" id="closeBtn" aria-label="Закрыть">×</button>
-        </div>
-    </div>
-
     <div class="reader-body" id="readerBody">
         <div class="reader-sheet">
+
+            <button class="reader-back-arrow" id="backBtnTop" aria-label="Назад">
+                <span>←</span>
+            </button>
+
             <h1 class="reader-title" id="readerTitle"></h1>
 
             <div class="reader-meta">
@@ -124,6 +119,11 @@
             </div>
 
             <div class="reader-content" id="readerContent"></div>
+
+            <button class="reader-back-arrow reader-back-arrow-bottom" id="backBtnBottom" aria-label="Назад">
+                <span>←</span>
+            </button>
+
         </div>
     </div>
 </div>
