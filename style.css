@@ -1562,7 +1562,175 @@ html[data-theme="dark"] .reader-content blockquote { color: rgba(224,224,224,0.7
         0 1px 0 rgba(255, 250, 230, 0.8) inset,
         0 0 0 1px rgba(180, 150, 100, 0.06) inset,
         0 3px 8px rgba(70, 50, 20, 0.08),
-        0 22px 60px -22px rgba(70, 50, 20, 0.
+        0 22px 60px -22px rgba(70, 50, 20, 0.30),
+        0 40px 90px -40px rgba(70, 50, 20, 0.38);
+}
+.reader.reader-alt .reader-sheet::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    z-index: 0;
+    background:
+        radial-gradient(ellipse 70px 44px at 0% 0%, rgba(120, 90, 50, 0.14), transparent 72%),
+        radial-gradient(ellipse 70px 44px at 100% 0%, rgba(120, 90, 50, 0.14), transparent 72%),
+        radial-gradient(ellipse 70px 44px at 0% 100%, rgba(120, 90, 50, 0.14), transparent 72%),
+        radial-gradient(ellipse 70px 44px at 100% 100%, rgba(120, 90, 50, 0.14), transparent 72%);
+    mix-blend-mode: multiply;
+}
+.reader.reader-alt .reader-sheet > * { position: relative; z-index: 1; }
+
+.reader.reader-alt .reader-title {
+    font-family: 'Special Elite', 'Courier New', monospace;
+    font-weight: 400;
+    font-size: clamp(1.7rem, 4.6vw, 2.8rem);
+    line-height: 1.2;
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+    color: #1a1611;
+    max-width: 26ch;
+    margin: 0 0 22px;
+}
+
+.reader.reader-alt .reader-meta {
+    font-family: 'Special Elite', 'Courier New', monospace;
+    font-size: 0.85rem;
+    font-weight: 400;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: rgba(26, 22, 17, 0.7);
+    margin: 0 0 26px 0;
+    padding: 0;
+    border: none;
+    display: block;
+    justify-content: flex-start;
+}
+.reader.reader-alt .reader-meta::after { display: none; }
+
+/* «← ВЕРНУТЬ ДОКУМЕНТ.» — как рукописная пометка */
+.reader.reader-alt .reader-back {
+    display: inline-block;
+    background: transparent;
+    border: none;
+    padding: 6px 0;
+    margin: 0 0 42px 0;
+    font-family: 'Special Elite', 'Courier New', monospace;
+    font-size: 1.15rem;
+    font-weight: 400;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: #1a1611;
+    cursor: default;
+    text-decoration: none;
+    user-select: none;
+    -webkit-user-select: none;
+    transform: rotate(-1.5deg);
+    transform-origin: left center;
+    justify-self: start;
+}
+
+/* Иконку-машинку в альтернативном виде скрываем */
+.reader.reader-alt .reader-typewriter { display: none; }
+
+.reader.reader-alt .reader-content {
+    max-width: 100%;
+    font-family: 'Special Elite', 'Courier New', monospace;
+    font-size: clamp(1.02rem, 1.45vw, 1.15rem);
+    line-height: 1.92;
+    color: #1a1611;
+    letter-spacing: 0.005em;
+    font-weight: 400;
+}
+.reader.reader-alt .reader-content p { margin: 0 0 1.3em; }
+.reader.reader-alt .reader-content p:last-child { margin-bottom: 0; }
+.reader.reader-alt .reader-content > p:first-of-type::first-letter {
+    float: none;
+    font-size: inherit;
+    line-height: inherit;
+    color: inherit;
+    margin: 0;
+    font-family: inherit;
+    text-shadow: none;
+    font-weight: inherit;
+}
+.reader.reader-alt .reader-content h1,
+.reader.reader-alt .reader-content h2,
+.reader.reader-alt .reader-content h3,
+.reader.reader-alt .reader-content h4 {
+    font-family: 'Special Elite', 'Courier New', monospace;
+    font-weight: 400;
+    letter-spacing: 0.04em;
+    color: #1a1611;
+}
+.reader.reader-alt .reader-content a { color: #7A1B10; }
+.reader.reader-alt .reader-content li::marker { color: #7A1B10; }
+.reader.reader-alt .reader-content blockquote { border-left-color: #7A1B10; color: rgba(26, 22, 17, 0.78); }
+.reader.reader-alt .reader-content code { background: rgba(120, 90, 50, 0.14); }
+.reader.reader-alt .reader-content pre  { background: rgba(120, 90, 50, 0.10); border-color: rgba(120, 90, 50, 0.25); }
+
+/* Тёмная тема — «приглушённая лампа», тот же лист, чуть темнее */
+html[data-theme="dark"] .reader.reader-alt .reader-sheet {
+    background-color: #C9B98E;
+    background-image:
+        radial-gradient(ellipse 130% 55% at 50% 0%, rgba(214, 197, 155, 0.55), transparent 72%),
+        radial-gradient(ellipse 130% 60% at 50% 100%, rgba(80, 60, 30, 0.35), transparent 72%),
+        radial-gradient(circle 200px at 10% 14%, rgba(90, 62, 25, 0.18), transparent 68%),
+        radial-gradient(circle 240px at 92% 28%, rgba(80, 55, 20, 0.16), transparent 72%),
+        radial-gradient(circle 180px at 18% 78%, rgba(95, 68, 30, 0.15), transparent 68%),
+        radial-gradient(circle 220px at 82% 90%, rgba(70, 48, 18, 0.18), transparent 72%),
+        repeating-linear-gradient(88deg,
+            rgba(60, 40, 15, 0.03) 0px, rgba(60, 40, 15, 0.03) 1px,
+            transparent 1px, transparent 4px),
+        repeating-linear-gradient(2deg,
+            rgba(60, 40, 15, 0.025) 0px, rgba(60, 40, 15, 0.025) 1px,
+            transparent 1px, transparent 5px),
+        linear-gradient(180deg, #D4C397 0%, #C9B98E 55%, #B8A578 100%);
+    border-color: rgba(60, 40, 15, 0.45);
+    box-shadow:
+        0 1px 0 rgba(240, 225, 190, 0.35) inset,
+        0 0 0 1px rgba(0, 0, 0, 0.15) inset,
+        0 3px 10px rgba(0, 0, 0, 0.55),
+        0 22px 60px -22px rgba(0, 0, 0, 0.85),
+        0 40px 90px -40px rgba(0, 0, 0, 0.95);
+}
+html[data-theme="dark"] .reader.reader-alt .reader-sheet::after {
+    background:
+        radial-gradient(ellipse 70px 44px at 0% 0%, rgba(50, 32, 12, 0.28), transparent 72%),
+        radial-gradient(ellipse 70px 44px at 100% 0%, rgba(50, 32, 12, 0.28), transparent 72%),
+        radial-gradient(ellipse 70px 44px at 0% 100%, rgba(50, 32, 12, 0.28), transparent 72%),
+        radial-gradient(ellipse 70px 44px at 100% 100%, rgba(50, 32, 12, 0.28), transparent 72%);
+}
+html[data-theme="dark"] .reader.reader-alt .reader-title { color: #2A1F0F; }
+html[data-theme="dark"] .reader.reader-alt .reader-meta  { color: rgba(42, 31, 15, 0.72); }
+html[data-theme="dark"] .reader.reader-alt .reader-back  { color: #2A1F0F; }
+html[data-theme="dark"] .reader.reader-alt .reader-content { color: #2A1F0F; }
+html[data-theme="dark"] .reader.reader-alt .reader-content h1,
+html[data-theme="dark"] .reader.reader-alt .reader-content h2,
+html[data-theme="dark"] .reader.reader-alt .reader-content h3,
+html[data-theme="dark"] .reader.reader-alt .reader-content h4 { color: #2A1F0F; }
+
+/* ============================================================
+   МОБИЛЬНАЯ
+   ============================================================ */
+@media (max-width: 640px) {
+    .reader-head-inner { padding: 12px 5vw; gap: 8px; }
+    .reader-back { font-size: 0.58rem; letter-spacing: 0.18em; gap: 8px; }
+    .reader-close { font-size: 1.35rem; }
+    .reader-label { display: none; }
+    .reader-head-inner { grid-template-columns: 1fr auto; }
+    .reader-back { justify-self: start; }
+    .reader-close { justify-self: end; }
+    .reader-title { max-width: none; }
+    .reader-content { font-size: 1.02rem; }
+    .reader-content > p:first-of-type::first-letter { font-size: 2.8em; }
+    .reader-sheet { padding: 32px 5vw 100px; }
+    .reader-meta { margin-bottom: 28px; padding-bottom: 18px; }
+
+    .reader.reader-alt .reader-sheet { margin: 24px 4vw 60px; padding: 40px 26px 48px; }
+    .reader.reader-alt .reader-title { font-size: clamp(1.4rem, 6.4vw, 2rem); max-width: none; }
+    .reader.reader-alt .reader-back { font-size: 1rem; margin-bottom: 28px; }
+    .reader.reader-alt .reader-content { font-size: 1rem; line-height: 1.85; }
+}
 /* READING — слоги */
 .syllable-grid {
     position: relative;
