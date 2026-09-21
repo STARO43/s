@@ -48,6 +48,7 @@
   }
   .start:hover { transform:translate(-2px,-2px); box-shadow:8px 8px 0 #000; }
   .start:active { transform:translate(4px,4px); box-shadow:2px 2px 0 #000; }
+
   /* ==== Выход в меню ==== */
   .exit-btn-pdd {
     position: fixed;
@@ -99,7 +100,7 @@
     margin-bottom: 26px;
     letter-spacing: 3px;
   }
-  .exit-confirm-btns { display: flex; gap: 16px; justify-content: center; }
+  .exit-confirm-btns { display: flex; flex-wrap: wrap; gap: 16px; justify-content: center; }
   .exit-confirm-btn {
     font-family: inherit;
     font-size: 11px;
@@ -113,7 +114,9 @@
     -webkit-tap-highlight-color: transparent;
   }
   .exit-confirm-btn:hover { background: #ffd93d; color: #0d0d12; }
-  .exit-confirm-btn.yes:hover { background: #ff5a8a; border-color: #ff5a8a; color: #0d0d12; } 
+  .exit-confirm-btn.restart { color: #4ad0ff; border-color: #4ad0ff; }
+  .exit-confirm-btn.restart:hover { background: #4ad0ff; border-color: #4ad0ff; color: #0d0d12; }
+  .exit-confirm-btn.yes:hover { background: #ff5a8a; border-color: #ff5a8a; color: #0d0d12; }
 </style>
 </head>
 <body>
@@ -121,14 +124,16 @@
 <div id="scene">
   <canvas id="game" width="900" height="640"></canvas>
 </div>
-  <button class="exit-btn-pdd" id="exitBtnPdd" type="button">← МЕНЮ</button>
+
+<button class="exit-btn-pdd" id="exitBtnPdd" type="button">← МЕНЮ</button>
 
 <div class="exit-confirm" id="exitConfirm">
   <div class="exit-confirm-inner">
     <div class="exit-confirm-title">ВЫЙТИ В МЕНЮ?</div>
     <div class="exit-confirm-btns">
-      <button class="exit-confirm-btn yes" id="exitYes" type="button">ДА</button>
-      <button class="exit-confirm-btn no"  id="exitNo"  type="button">НЕТ</button>
+      <button class="exit-confirm-btn restart" id="restartYes" type="button">ЗАНОВО</button>
+      <button class="exit-confirm-btn yes"     id="exitYes"    type="button">ДА</button>
+      <button class="exit-confirm-btn no"      id="exitNo"     type="button">НЕТ</button>
     </div>
   </div>
 </div>
@@ -239,7 +244,7 @@ let crossings = 0;
 let time = 0;
 
 /* Концовка */
-let ending = null;         // null | 'wrong' | 'right'
+let ending = null;         // null | 'wrong' | 'right' | 'nochild'
 let endingShown = false;   // экран показан и ждёт клика
 
 /* Таймер «3 секунды после захода на дорогу» */
@@ -288,19 +293,6 @@ let vehicles = [];
 let parkedCars = [];
 let spawnTimer = 0;
 
-function isSomeoneOnCrossing() {
-  const people = [];
-  if (adult) people.push({ x: adult.x, y: adult.y, w: adult.w, h: adult.h });
-  if (child && child.attached) people.push({ x: child.x, y: child.y, w: child.w, h: child.h });
-  const crossBox = { x: CROSS_X - 8, y: H_ROAD_Y - 8, w: CROSS_W + 16, h: H_ROAD_H + 16 };
-  for (const p of people) {
-    if (rectsOverlap(p, crossBox)) return true;
-  }
-  return false;
-}
-
-const CAR_COLORS = [C.car1, C.car2, C.car3, C.car4, C.car5, C.car6, C.car7, C.car8];
-
 /* ============================================================
    УТИЛИТЫ
    ============================================================ */
@@ -316,14 +308,37 @@ function overlapsObstacle(x, y, w, h) {
   return false;
 }
 
-/* Проверка: находится ли взрослый на проезжей части ГОРИЗОНТАЛЬНОЙ дороги */
+/* ============================================================
+   ПРОВЕРКИ ПЕРЕХОДА
+   ============================================================ */
+
+/* Кто-то рядом с зеброй (на дороге или на подходе к ней) */
+function isSomeoneOnCrossing() {
+  const people = [];
+  if (adult) people.push({ x: adult.x, y: adult.y, w: adult.w, h: adult.h });
+  if (child && child.attached) people.push({ x: child.x, y: child.y, w: child.w, h: child.h });
+
+  // Расширенный бокс: захватываем людей за 40px до зебры и после
+  const crossBox = {
+    x: CROSS_X - 20,
+    y: H_ROAD_Y - 40,
+    w: CROSS_W + 40,
+    h: H_ROAD_H + 80,
+  };
+  for (const p of people) {
+    if (rectsOverlap(p, crossBox)) return true;
+  }
+  return false;
+}
+
+/* Взрослый на проезжей части горизонтальной дороги */
 function isAdultOnHorizontalRoad() {
   const cx = adult.x + adult.w/2;
   const cy = adult.y + adult.h/2;
   return cy > H_ROAD_Y && cy < H_ROAD_B && cx > VT_ROAD_R;
 }
 
-/* Проверка: находится ли взрослый в зоне зебры */
+/* Взрослый в зоне зебры */
 function isAdultOnCrossing() {
   const cx = adult.x + adult.w/2;
   const cy = adult.y + adult.h/2;
@@ -360,12 +375,10 @@ window.addEventListener('keydown', e => {
 });
 
 canvas.addEventListener('pointerdown', e => {
-  // Экран концовки: клик → новая игра
+  // Экран концовки: клик → закрываем оверлей и разрешаем свободно ходить
   if (ending && endingShown) {
-    ending = null;
     endingShown = false;
-    onRoadSince = -1;
-    resetScene(false);
+    ending = null;
     return;
   }
 
@@ -377,7 +390,6 @@ canvas.addEventListener('pointerdown', e => {
   const dAdult = Math.hypot(mx - (adult.x + adult.w/2), my - (adult.y + adult.h/2));
   const dChild = Math.hypot(mx - (child.x + child.w/2), my - (child.y + child.h/2));
 
-  // Спешивание (самокат) — только если у перехода
   if (mode === 'scooter' && child.attached && child.onScooter) {
     if (dChild < 40 || dAdult < 40) {
       if (nearCrossing()) {
@@ -415,15 +427,12 @@ function handleChildClick() {
   stage = 'walk';
 }
 
-/* Взрослый теперь может идти куда угодно, включая дорогу вне зебры */
 function moveAdultTo(mx, my) {
   const tx = clamp(mx - adult.w/2, 10, W - adult.w - 10);
   const ty = clamp(my - adult.h/2, 10, H - adult.h - 10);
   if (overlapsObstacle(tx, ty, adult.w, adult.h)) return;
   adult.targetX = tx; adult.targetY = ty;
 }
-
-function canCrossNow() { return true; } /* больше не блокируем */
 
 function nearCrossing() {
   const cx = adult.x + adult.w/2;
@@ -602,23 +611,55 @@ function updateChildAI() {
 }
 
 /* ============================================================
-   ОСТАНОВКА МАШИН ТОЛЬКО ПЕРЕД ПЕРЕХОДОМ
+   ОСТАНОВКА МАШИН ПЕРЕД ЗЕБРОЙ
    ============================================================ */
 function shouldStop(v, i) {
   if (!isSomeoneOnCrossing()) return false;
-  if (v.turned) return false;
 
-  const target = { x: CROSS_X, w: CROSS_W };
-
-  if (v.route === 'E2N') {
-    if (v.x > target.x + target.w) return true;
+  if (v.turned) {
+    // Уже повернувшие
+    if (v.dir === 'E') {
+      // Едет вправо (N2E после поворота) — стоп, пока правый край ЛЕВЕЕ зебры
+      if (v.x + v.w < CROSS_X - 10) return true;
+    } else if (v.dir === 'N') {
+      // Едет вверх (E2N после поворота) — стоп, пока верхний край НИЖЕ зебры
+      if (v.y > H_ROAD_B + 10) return true;
+    }
     return false;
   }
-  if (v.route === 'N2E' && v.turned) {
-    if (v.x + v.w < target.x) return true;
+
+  if (v.route === 'E2N') {
+    // Едет справа налево — стоп, пока не доехал до правого края зебры
+    if (v.x > CROSS_X + CROSS_W + 10) return true;
+    return false;
+  }
+  if (v.route === 'N2E') {
+    // Едет сверху вниз — до поворота она НЕ пересекает зебру, не тормозим
+    return false;
+  }
+  if (v.route === 'N2S') {
+    // По узкой дороге снизу вверх — зебру не пересекает
     return false;
   }
   return false;
+}
+
+/* ============================================================
+   ОЦЕНКА КОНЦОВКИ
+   ============================================================ */
+function evaluateEnding() {
+  if (savedOnCrossing && !savedOnScooter) {
+    // Успешный переход, но если ребёнок не привязан — «А ГДЕ РЕБЁНОК?»
+    if (!child.attached) {
+      ending = 'nochild';
+    } else {
+      ending = 'right';
+    }
+  } else {
+    ending = 'wrong';
+  }
+  endingShown = true;
+  onRoadSince = -1;
 }
 
 /* ============================================================
@@ -672,7 +713,9 @@ function update() {
   }
 
   /* ============================================================
-     ЛОГИКА РЕЗУЛЬТАТА — 3 СЕКУНДЫ ПОСЛЕ ЗАХОДА НА ДОРОГУ
+     ЛОГИКА РЕЗУЛЬТАТА
+     - 3 секунды на дороге → оценка
+     - сошёл с дороги → оценка сразу
      ============================================================ */
   const onRoadNow = isAdultOnHorizontalRoad();
 
@@ -683,22 +726,18 @@ function update() {
     savedOnScooter = (mode === 'scooter' && child.attached && child.onScooter);
   }
 
-  if (!onRoadNow) {
-    // Сошёл с дороги — сбрасываем таймер (если результат ещё не показан)
+  if (!onRoadNow && onRoadSince > 0 && !ending) {
+    // Только что сошёл с дороги — оцениваем сразу
+    evaluateEnding();
+  } else if (!onRoadNow) {
     onRoadSince = -1;
   }
 
   if (onRoadSince > 0 && !ending) {
     const elapsed = time - onRoadSince;
     if (elapsed >= 180) {
-      // Прошло 3 секунды после захода на дорогу — оцениваем
-      if (savedOnCrossing && !savedOnScooter) {
-        ending = 'right';
-      } else {
-        ending = 'wrong';
-      }
-      endingShown = true;
-      onRoadSince = -1;
+      // 3 секунды на дороге — оцениваем
+      evaluateEnding();
     }
   }
 
@@ -750,7 +789,7 @@ function update() {
       }
     }
 
-    // Столкновение с машиной — сразу «провал», минуя 3 секунды
+    // Столкновение с машиной — сразу «провал»
     if (rectsOverlap(adult, v)) {
       ending = 'wrong';
       endingShown = true;
@@ -958,16 +997,18 @@ function drawRoads() {
   drawPath(LH_X + LH_W + 4, PLAY_BOT_Y + 60, PLAY_BOT_W, 30);
   drawPath(PLAY_BOT_X - 28, PLAY_BOT_Y, 28, PLAY_BOT_H);
 
-  // Надпись "Бульвар Эйнштейна" серым
-  const labelX = Math.max(CROSS_X + CROSS_W + 220, (CROSS_X + CROSS_W + W) / 2);
-  const labelY = H_ROAD_Y + H_ROAD_H/2 + 2;
-  ctx.font = 'bold 20px "VT323", monospace';
-  ctx.textAlign = 'center';
+  /* Надпись «Бульвар Эйнштейна» — слева от зебры со стрелкой вправо */
+  const labelX = VT_ROAD_R + 8;
+  const labelY = H_ROAD_Y + H_ROAD_H / 2 + 2;
+  ctx.font = 'bold 18px "VT323", monospace';
+  ctx.textAlign = 'left';
   ctx.textBaseline = 'middle';
-  ctx.fillStyle = 'rgba(0,0,0,0.35)';
-  ctx.fillText('Бульвар Эйнштейна', labelX + 1, labelY + 1);
-  ctx.fillStyle = 'rgba(180,180,190,0.9)';
-  ctx.fillText('Бульвар Эйнштейна', labelX, labelY);
+
+  ctx.fillStyle = 'rgba(0,0,0,0.5)';
+  ctx.fillText('→ Бульвар Эйнштейна', labelX + 1, labelY + 1);
+  ctx.fillStyle = 'rgba(230,230,240,0.95)';
+  ctx.fillText('→ Бульвар Эйнштейна', labelX, labelY);
+
   ctx.textBaseline = 'alphabetic';
   ctx.textAlign = 'left';
 }
@@ -1276,7 +1317,8 @@ function drawMoto(v) {
 
 function drawVehicle(v) {
   if (v.kind === 'moto') drawMoto(v); else drawCar(v);
-  if (v.waitTime > 180 && v.honkTimer < 60 && !isSomeoneOnCrossing()) {
+  // Бибикает, когда машина стоит и кто-то на зебре / на подходе к ней
+  if (v.waitTime > 180 && v.honkTimer < 60 && isSomeoneOnCrossing()) {
     const px = v.x + v.w/2;
     const py = v.y - 14;
     ctx.fillStyle = 'rgba(255,255,255,0.95)';
@@ -1641,7 +1683,7 @@ const ROSHAL_ASCII = String.raw`
 -------------------:.................................:::-------::......              ...:----==+++++++++++++++++=======---============+++**+-:::::
 ---------------------::................................:::----::.............  ........::-------=++++++++++++====-----=---==========:::-=+**+-::::
 -------------------------:.............................:::::--:......................:::---------==+++++++++===-...:::-:--=========-::..-+*#*+::--
-----------------------------:..........................::::---......................:::--====----==++==========-:....:::--=========-::::+*##**=::-
+----------------------------:..........................::::---......................:::--====----==++==========-:....:::--=========-::::+*##**=::-:
 ----------------------------=-.........................::----:......::............::::--======---==-----:::-=====-::::::--=========-::-=+**##**-::
 ----------------====------====:........................::---:.....:..............:::::---====-----:::::-===========--::::-========--::=++**##*#+-:
 -----------------=---==-------. .......................::---:......:..............::::::.:::-::::::-==+++++==========------====-==-::-+++**##***-::
@@ -1778,6 +1820,29 @@ function drawRightEnding() {
   ctx.textAlign = 'left';
 }
 
+function drawNoChildEnding() {
+  ctx.fillStyle = '#27ae60';
+  ctx.fillRect(0, 0, W, H);
+  for (let i = 0; i < 3000; i++) {
+    const x = (i * 173) % W;
+    const y = (i * 311) % H;
+    ctx.fillStyle = (i % 3 === 0) ? '#2ecc71' : '#1a7a40';
+    ctx.fillRect(x, y, 2, 2);
+  }
+
+  ctx.fillStyle = '#ffffff';
+  ctx.font = 'bold 64px "Press Start 2P", monospace';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillText('НОРМ.', W / 2, H / 2 - 55);
+
+  ctx.font = 'bold 34px "Press Start 2P", monospace';
+  ctx.fillText('А ГДЕ РЕБЁНОК?', W / 2, H / 2 + 35);
+
+  ctx.textBaseline = 'alphabetic';
+  ctx.textAlign = 'left';
+}
+
 function drawOverlay() {
   if (state === 'idle') {
     ctx.fillStyle = 'rgba(13,13,18,0.5)';
@@ -1812,8 +1877,9 @@ function draw() {
   drawOverlay();
 
   if (ending && endingShown) {
-    if (ending === 'wrong') drawWrongEnding();
-    else if (ending === 'right') drawRightEnding();
+    if (ending === 'wrong')        drawWrongEnding();
+    else if (ending === 'right')   drawRightEnding();
+    else if (ending === 'nochild') drawNoChildEnding();
   }
 }
 
@@ -1830,12 +1896,14 @@ function loop() {
 /* ============================================================
    СТАРТ
    ============================================================ */
-document.getElementById('startBtn').addEventListener('click', () => {
+function startNewGame() {
   mode = Math.random() < 0.5 ? 'hand' : 'scooter';
   document.getElementById('intro').classList.add('hidden');
   state = 'playing';
   resetScene(false);
-});
+}
+
+document.getElementById('startBtn').addEventListener('click', startNewGame);
 
 /* ============================================================
    ИНИЦИАЛИЗАЦИЯ
@@ -1844,12 +1912,14 @@ initParkedCars();
 resetScene(false);
 state = 'idle';
 loop();
-  /* ==== Выход в меню ==== */
+
+/* ==== Выход в меню ==== */
 (function() {
-  var btn     = document.getElementById('exitBtnPdd');
-  var overlay = document.getElementById('exitConfirm');
-  var yes     = document.getElementById('exitYes');
-  var no      = document.getElementById('exitNo');
+  var btn       = document.getElementById('exitBtnPdd');
+  var overlay   = document.getElementById('exitConfirm');
+  var yes       = document.getElementById('exitYes');
+  var no        = document.getElementById('exitNo');
+  var restart   = document.getElementById('restartYes');
 
   function show() { overlay.classList.add('show'); }
   function hide() { overlay.classList.remove('show'); }
@@ -1860,6 +1930,19 @@ loop();
   if (overlay) overlay.addEventListener('click', function(e) {
     if (e.target === overlay) hide();
   });
+
+  if (restart) restart.addEventListener('click', function() {
+    hide();
+    // Полный сброс
+    ending = null;
+    endingShown = false;
+    onRoadSince = -1;
+    resetScene(false);
+    // Показываем интро заново
+    document.getElementById('intro').classList.remove('hidden');
+    state = 'idle';
+  });
+
   document.addEventListener('keydown', function(e) {
     if (e.key === 'Escape') {
       if (overlay.classList.contains('show')) hide();
