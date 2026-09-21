@@ -349,7 +349,9 @@ function isAdultOnCrossing() {
 /* ============================================================
    ПРИПАРКОВАННЫЕ
    ============================================================ */
-function initParkedCars() {
+const CAR_COLORS = [C.car1, C.car2, C.car3, C.car4, C.car5, C.car6, C.car7, C.car8];
+
+  function initParkedCars() {
   parkedCars = [];
   parkedCars.push({
     x: PARK_X + 12, y: PARK_Y + 20,
