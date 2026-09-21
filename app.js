@@ -2817,8 +2817,10 @@ function initArticles() {
 
         window.addEventListener('hashchange', handleHash);
 
-        if (backBtn)  backBtn.addEventListener('click', closeArticle);
-        if (closeBtn) closeBtn.addEventListener('click', closeArticle);
+          const backBtnTop    = document.getElementById('backBtnTop');
+        const backBtnBottom = document.getElementById('backBtnBottom');
+        if (backBtnTop)    backBtnTop.addEventListener('click', closeArticle);
+        if (backBtnBottom) backBtnBottom.addEventListener('click', closeArticle);
 
         /* ====================================================
            ПАСХАЛКА: двойной клик по машинке — альтернативный вид
