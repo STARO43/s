@@ -2789,9 +2789,10 @@ function initArticles() {
             });
         }
 
-        function closeReader() {
+               function closeReader() {
             if (!reader.classList.contains('show')) return;
             reader.classList.remove('show');
+            reader.classList.remove('reader-alt');
             reader.setAttribute('aria-hidden', 'true');
             readingSlug = null;
             document.body.style.overflow = '';
