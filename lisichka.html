@@ -1939,7 +1939,40 @@ function drawHUD(){
   ctx.fillText(ph,W-pad,pad);
   ctx.shadowBlur=0;
 
+  if(G.monsterStage>=3){
+    ctx.font='bold 28px "Segoe UI",sans-serif';
+    ctx.fillStyle=`rgba(255,60,60,${0.6+0.4*Math.sin(G.t*6)})`;
+    ctx.textAlign='center';
+    ctx.shadowColor='#ff0000';ctx.shadowBlur=20;
+    ctx.fillText('МОНСТРИЧКА',W/2,pad+2);
+    ctx.shadowBlur=0;
+  }
+}
 
+function drawBar(x,y,w,h,fg,val){
+  ctx.fillStyle='rgba(0,0,0,0.55)';
+  roundRect(x-2,y-2,w+4,h+4,8);ctx.fill();
+  ctx.fillStyle='rgba(255,255,255,0.08)';
+  roundRect(x,y,w,h,6);ctx.fill();
+  const v=clamp(val,0,1);
+  if(v>0){
+    const g=ctx.createLinearGradient(x,y,x,y+h);
+    g.addColorStop(0,fg);g.addColorStop(1,shade(fg,-40));
+    ctx.fillStyle=g;
+    roundRect(x,y,w*v,h,6);ctx.fill();
+    ctx.fillStyle='rgba(255,255,255,0.3)';
+    roundRect(x+2,y+2,Math.max(0,w*v-4),h*0.35,4);ctx.fill();
+  }
+  ctx.strokeStyle='rgba(255,255,255,0.2)';ctx.lineWidth=1;
+  roundRect(x,y,w,h,6);ctx.stroke();
+}
+
+function shade(hex,amt){
+  const n=parseInt(hex.slice(1),16);
+  let r=(n>>16)+amt,g=((n>>8)&255)+amt,b=(n&255)+amt;
+  r=clamp(r,0,255);g=clamp(g,0,255);b=clamp(b,0,255);
+  return `rgb(${r|0},${g|0},${b|0})`;
+}
 
 /* BUBBLES */
 function drawBubbles(){
