@@ -999,11 +999,11 @@ function drawRoads() {
   drawPath(LH_X + LH_W + 4, PLAY_BOT_Y + 60, PLAY_BOT_W, 30);
   drawPath(PLAY_BOT_X - 28, PLAY_BOT_Y, 28, PLAY_BOT_H);
 
-  /* Надпись «Бульвар Эйнштейна» — слева от зебры со стрелкой вправо */
-  const labelX = VT_ROAD_R + 8;
-  const labelY = H_ROAD_Y + H_ROAD_H / 2 + 2;
+   /* Надпись «Бульвар Эйнштейна» — в правом краю, чуть выше дороги */
+  const labelX = W - 16;
+  const labelY = H_ROAD_Y - 14;
   ctx.font = 'bold 18px "VT323", monospace';
-  ctx.textAlign = 'left';
+  ctx.textAlign = 'right';
   ctx.textBaseline = 'middle';
 
   ctx.fillStyle = 'rgba(0,0,0,0.5)';
