@@ -2,13 +2,30 @@
 <html lang="ru">
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <title>Лисичка-истеричка</title>
 <style>
-  html,body{margin:0;padding:0;height:100%;background:#120a18;overflow:hidden;
-    font-family:'Segoe UI',system-ui,sans-serif;user-select:none;}
-  #game{display:block;width:100vw;height:100vh;cursor:grab;touch-action:none;}
+  html,body{
+    margin:0;padding:0;height:100%;
+    background:#120a18;overflow:hidden;
+    font-family:'Segoe UI',system-ui,sans-serif;
+    user-select:none;
+    -webkit-user-select:none;
+    -webkit-tap-highlight-color:transparent;
+    -webkit-touch-callout:none;
+  }
+  #game{
+    display:block;
+    width:100vw;
+    height:100vh;
+    cursor:grab;
+    touch-action:none;
+    -webkit-tap-highlight-color:transparent;
+    outline:none;
+  }
   #game.grabbing{cursor:grabbing;}
-    /* ==== Выход в меню ==== */
+
+  /* ==== Выход в меню ==== */
   .exit-btn-fox {
     position: fixed;
     top: 14px;
@@ -80,11 +97,34 @@
   }
   .exit-confirm-fox-btn:hover { background: #ff5a8a; color: #1c1430; }
   .exit-confirm-fox-btn:active { transform: scale(0.95); }
+
+  @media (max-width: 480px) {
+    .exit-btn-fox {
+      top: 10px; right: 10px;
+      font-size: 12px;
+      padding: 8px 14px;
+    }
+    .exit-confirm-fox-inner {
+      padding: 24px 22px;
+      border-radius: 14px;
+    }
+    .exit-confirm-fox-title {
+      font-size: 15px;
+      margin-bottom: 18px;
+    }
+    .exit-confirm-fox-btn {
+      font-size: 13px;
+      padding: 10px 18px;
+      letter-spacing: 1px;
+    }
+    .exit-confirm-fox-btns { gap: 10px; }
+  }
 </style>
 </head>
 <body>
 <canvas id="game"></canvas>
-  <button class="exit-btn-fox" id="exitBtnFox" type="button">← МЕНЮ</button>
+
+<button class="exit-btn-fox" id="exitBtnFox" type="button">← МЕНЮ</button>
 
 <div class="exit-confirm-fox" id="exitConfirmFox">
   <div class="exit-confirm-fox-inner">
@@ -95,10 +135,12 @@
     </div>
   </div>
 </div>
+
 <script>
 (()=>{
 'use strict';
-  /* ==== Выход в меню ==== */
+
+/* ==== Выход в меню ==== */
 (function() {
   var btn     = document.getElementById('exitBtnFox');
   var overlay = document.getElementById('exitConfirmFox');
@@ -121,6 +163,7 @@
     }
   });
 })();
+
 const cv=document.getElementById('game'),ctx=cv.getContext('2d');
 let W=0,H=0,DPR=1;
 function resize(){
@@ -158,6 +201,7 @@ const sndBad=()=>beep(200,.35,'sawtooth',.06,-120);
 const sndScream=()=>{beep(750,.5,'sawtooth',.05,-550)};
 const sndMonster=()=>{beep(90,.8,'sawtooth',.08,-50)};
 const sndJump=()=>{beep(500,.08,'square',.05,400)};
+const sndClean=()=>{beep(600,.15,'sine',.05,200);setTimeout(()=>beep(800,.18,'sine',.05,200),120)};
 
 /* ---------- catalog ---------- */
 const TOYS=[
@@ -174,7 +218,7 @@ const FOODS=[
   {kind:'food',sub:'fries',label:'Картошечка'},
   {kind:'food',sub:'cake',label:'Тортик'},
   {kind:'food',sub:'lolli',label:'Леденец'},
-  {kind:'food',sub:'bun',label:'Булочка'},
+  {kind:'food',sub:'bun',label:'Печенька'},
 ];
 const CLOTHES=[
   {kind:'cloth',sub:'shoes',label:'Туфельки'},
@@ -183,9 +227,9 @@ const CLOTHES=[
   {kind:'cloth',sub:'lipstick',label:'Помадка'},
 ];
 const USEFUL=[
-  {kind:'useful',sub:'book',label:'Книга наук'},
-  {kind:'useful',sub:'apron',label:'Фартучек'},
-  {kind:'useful',sub:'broom',label:'Метёлочка'},
+  {kind:'useful',sub:'book',label:'Чтение'},
+  {kind:'useful',sub:'apron',label:'Готовка'},
+  {kind:'useful',sub:'broom',label:'Уборка'},
 ];
 
 const G={
@@ -216,10 +260,10 @@ function shuffleSlots(){
   sndJump();
 }
 
-const HAPPY_PHRASES=['Ура!','Хихи!','Моё!','Класс!','Ещё!','Дай!','Хочу-хочу!'];
+const HAPPY_PHRASES=['Ура!','Хихи!','Моё!','Класс!','Ещё!','Дай!','Хочу-хочу!', 'Я тебя лю!' ];
 const SAD_PHRASES=['Скучно...','Грустно...','Хочу игрушку...','Дай вкусняшку...'];
 const YELL_PHRASES=['ХОЧУ ИГРУШКУ!','ХОЧУ ВКУСНЯШКУ!','ХОЧУ ИГРАТЬ!','ХОЧУ БЕСИТЬСЯ!','ДАЙ-ДАЙ-ДАЙ!'];
-const RAGE_PHRASES=['АААААА!','НЕНАВИЖУ!','ДАЙ СЕЙЧАС ЖЕ!','ХОЧУ!!!','УАААА!'];
+const RAGE_PHRASES=['АААААА!','НЕНАВИЖУ!','ДАЙ СЕЙЧАС ЖЕ!','ХОЧУ!!!','Я ТЕБЯ НЕ ЛЮБЛЮ!!!', 'РРРРРРР!!!'];
 const USEFUL_PHRASES=['Фу!','Убери!','Не хочу!','Ненавижу!','Не буду!'];
 
 function addBubble(text,x,y,opts={}){
@@ -251,7 +295,7 @@ function shoutLoop(dt){
     const cx=W/2+rnd(-80,80), cy=H*0.26+rnd(-20,20);
     if(G.phase==='calm'){
       if(G.mood>30)addBubble(pick(HAPPY_PHRASES),cx,cy,{color:'happy',life:1.8});
-      else addBubble(pick(['Скучно!','Хочу игрушку!','Хочу вкусняшку!','Хочу играть!','Хочу беситься!']),cx,cy,{life:2.2});
+      else addBubble(pick(['Скучно!','Хочу игрушку!','Хочу вкусняшку!','Хочу играть!','Хочу всего и побольше!']),cx,cy,{life:2.2});
     } else if(G.phase==='sad'){
       addBubble(pick(SAD_PHRASES),cx,cy,{color:'sad',life:2.2});
     } else if(G.phase==='yell'){
@@ -264,8 +308,11 @@ function shoutLoop(dt){
 
 function applyItem(item){
   const cx=W/2, cy=H*0.30;
-  const bad = item.kind!=='useful';
-  if(bad){
+
+  /* =====================================================
+     БАЛОВСТВО (игрушки, сладости, наряды)
+     ===================================================== */
+  if(item.kind!=='useful'){
     G.mood=clamp(G.mood+36,-100,100);
     G.happyStreak++;
     G.lastBadT=G.t;
@@ -277,26 +324,57 @@ function applyItem(item){
     G.reactionT=1.3;
     spawnParticles('heart',cx,cy+60);
     addBubble(pick(HAPPY_PHRASES),cx+rnd(-40,40),cy-40,{color:'happy',life:1.6,size:22});
-  } else {
-    G.mood=clamp(G.mood-55,-100,100);
+  }
+  /* =====================================================
+     ПОЛЕЗНОЕ (чтение / готовка / уборка)
+     - book и apron снижают монструозность (fat и ugly)
+     - broom сгоняет жир очень медленно
+     ===================================================== */
+  else {
     G.happyStreak=0;
     G.reaction='cry';G.reactionT=1.5;
     sndBad();
+
+    if(item.sub==='book'){
+      // Книга — уменьшает монструозность (жир и уродство)
+      G.fat  = clamp(G.fat  - 0.10, 0, 1);
+      G.ugly = clamp(G.ugly - 0.10, 0, 1);
+      addBubble('Читаю!',cx+rnd(-30,30),cy-40,{color:'normal',life:1.8,size:22});
+    } else if(item.sub==='apron'){
+      // Фартук — готовка, тоже уменьшает монструозность
+      G.fat  = clamp(G.fat  - 0.08, 0, 1);
+      G.ugly = clamp(G.ugly - 0.08, 0, 1);
+      addBubble('Готовлю!',cx+rnd(-30,30),cy-40,{color:'normal',life:1.8,size:22});
+    } else if(item.sub==='broom'){
+      // Метла — сгоняет жир ОЧЕНЬ медленно
+      G.fat  = clamp(G.fat  - 0.04, 0, 1);
+      G.ugly = clamp(G.ugly - 0.02, 0, 1);
+      sndClean();
+      addBubble('Подметаю...',cx+rnd(-30,30),cy-40,{color:'normal',life:1.8,size:22});
+    }
+
+    // Полезные слегка портят настроение — чтобы был вызов
+    G.mood=clamp(G.mood-25,-100,100);
     spawnParticles('tear',cx,cy+60);
-    addBubble(pick(USEFUL_PHRASES),cx+rnd(-30,30),cy-40,{color:'rage',life:1.8,size:22});
     if(G.phase==='calm')setPhase('sad');
   }
   updateMonster();
 }
 function updateMonster(){
+  // Монстр теперь «отрастает» и «спадает» по мере изменения fat и ugly
   const s=G.fat*0.55+G.ugly*0.6;
   let st=0;
-  if(s>0.3)st=1;
+  if(s>0.30)st=1;
   if(s>0.62)st=2;
   if(s>0.95)st=3;
+
+  // Снижаемся мягко, повышаемся с эффектом
   if(st>G.monsterStage){
     G.monsterStage=st;
     if(st>=1){sndMonster();addBubble('Ой-ой...',W/2,H*0.28,{color:'mon',life:1.6,size:24});}
+  } else if(st<G.monsterStage){
+    // Плавный регресс: только когда жир и уродство уже существенно снизились
+    G.monsterStage=st;
   }
 }
 function spawnParticles(type,x,y){
@@ -379,13 +457,12 @@ function drawBG(){
 }
 
 /* =========================================================
-   ДЕВОЧКА — v4
-   Добавлена ШЕЯ между головой и телом.
+   ДЕВОЧКА
    ========================================================= */
 function drawGirl(){
   const cx=W/2;
   const R=Math.min(W,H)*0.26;
-  const cy=H*0.42;   // подняли голову, чтобы влезла шея
+  const cy=H*0.42;
   const fat=G.fat, stage=G.monsterStage;
   const mood=G.mood;
 
@@ -396,16 +473,14 @@ function drawGirl(){
   ctx.save();
   ctx.translate(cx+sx,cy+sy);
 
-  /* палитра */
   const skin      = stage>=2?'#8fbf6a':(stage>=1?'#f5d5b0':'#ffe4cc');
   const skinShade = stage>=2?'#6a9a4a':(stage>=1?'#e0bb90':'#f0c0a0');
   const skinDeep  = stage>=2?'#4a7a2a':(stage>=1?'#c09868':'#d89468');
   const hair      = stage>=2?'#3a1810':(stage>=1?'#ff9a4a':'#ffa055');
   const hairDark  = stage>=2?'#20080a':(stage>=1?'#d86a20':'#e07a30');
 
-  /* ---------- ТЕЛО ---------- */
   const bodyR=R*(1.15+fat*0.9);
-  const bodyY=R*1.20;    // тело опущено ниже из-за шеи
+  const bodyY=R*1.20;
 
   const shG=ctx.createRadialGradient(0,bodyY+R*0.95,0,0,bodyY+R*0.95,bodyR*1.4);
   shG.addColorStop(0,'rgba(0,0,0,0.35)');shG.addColorStop(1,'rgba(0,0,0,0)');
@@ -434,16 +509,10 @@ function drawGirl(){
     ctx.stroke();
   }
 
-  /* ==========================================================
-     ШЕЯ — рисуем ДО воротника и ДО лица, чтобы она была "позади"
-     Шея тянется от подбородка (низа лица) вниз к воротнику.
-     Верх шеи чуть шире подбородка — образует тень под челюстью.
-     ========================================================== */
-  const neckTopY = -R*0.05;                 // верх шеи (уходит за подбородок)
-  const neckBotY = bodyY-R*0.15;            // низ шеи (в воротник)
-  const neckHalfW = R*0.34;                 // половина ширины шеи
+  const neckTopY = -R*0.05;
+  const neckBotY = bodyY-R*0.15;
+  const neckHalfW = R*0.34;
 
-  // основной объём шеи
   const neckG=ctx.createLinearGradient(-neckHalfW,0,neckHalfW,0);
   neckG.addColorStop(0,skinDeep);
   neckG.addColorStop(0.35,skin);
@@ -458,7 +527,6 @@ function drawGirl(){
   ctx.closePath();
   ctx.fill();
 
-  // тень под подбородком (мягкая, прямо на шее сверху)
   const chinShadow=ctx.createRadialGradient(0,neckTopY+R*0.02,R*0.02,0,neckTopY+R*0.10,R*0.40);
   chinShadow.addColorStop(0,'rgba(60,20,10,0.45)');
   chinShadow.addColorStop(1,'rgba(60,20,10,0)');
@@ -467,7 +535,6 @@ function drawGirl(){
   ctx.ellipse(0,neckTopY+R*0.10,neckHalfW*1.05,R*0.22,0,0,6.28);
   ctx.fill();
 
-  // боковые тени на шее (объём)
   ctx.fillStyle='rgba(0,0,0,0.12)';
   ctx.beginPath();
   ctx.ellipse(-neckHalfW*0.75,(neckTopY+neckBotY)/2,R*0.10,R*0.30,0,0,6.28);
@@ -476,15 +543,11 @@ function drawGirl(){
   ctx.ellipse(neckHalfW*0.75,(neckTopY+neckBotY)/2,R*0.10,R*0.30,0,0,6.28);
   ctx.fill();
 
-  // ямочка-ключица намёком
   ctx.fillStyle='rgba(0,0,0,0.10)';
   ctx.beginPath();
   ctx.ellipse(0,neckBotY-R*0.02,R*0.08,R*0.03,0,0,6.28);
   ctx.fill();
 
-  /* ==========================================================
-     ВОРОТНИЧОК (поверх низа шеи)
-     ========================================================== */
   ctx.fillStyle=stage>=2?'#c0a0d0':'#ffffff';
   ctx.beginPath();
   ctx.ellipse(0,bodyY-R*0.18,bodyR*0.40,R*0.16,0,0,6.28);
@@ -499,16 +562,13 @@ function drawGirl(){
   }
   ctx.fill();
 
-  /* ---------- ГОЛОВА с поворотом ---------- */
   const ha=G.headAngle;
   ctx.save();
   ctx.translate(Math.sin(ha)*R*0.20, -Math.abs(ha)*R*0.05);
   ctx.rotate(ha*0.10);
 
-  /* ---------- ВОЛОСЫ — замкнутый контур с дыркой ---------- */
   ctx.save();
   ctx.beginPath();
-  // внешний контур
   ctx.moveTo(-R*1.05,-R*0.10);
   ctx.bezierCurveTo(-R*1.10,-R*0.85,-R*0.55,-R*1.15,0,-R*1.15);
   ctx.bezierCurveTo(R*0.55,-R*1.15,R*1.10,-R*0.85,R*1.05,-R*0.10);
@@ -517,7 +577,6 @@ function drawGirl(){
   ctx.bezierCurveTo(-R*0.75,R*1.15,-R*0.95,R*0.95,-R*1.05,R*0.55);
   ctx.bezierCurveTo(-R*1.10,R*0.20,-R*1.05,-R*0.05,-R*1.05,-R*0.10);
   ctx.closePath();
-  // внутренний контур (лицо) — вырезаем
   ctx.moveTo(-R*0.86,R*0.02);
   ctx.bezierCurveTo(-R*0.86,-R*0.72,-R*0.42,-R*0.98,0,-R*0.98);
   ctx.bezierCurveTo(R*0.42,-R*0.98,R*0.86,-R*0.72,R*0.86,R*0.02);
@@ -533,11 +592,9 @@ function drawGirl(){
   ctx.fill('evenodd');
   ctx.restore();
 
-  /* ---------- УШИ ЛИСИЧКИ ---------- */
   drawEar(-R*0.70,-R*0.78,-0.35,R,hair,hairDark,stage);
   drawEar( R*0.70,-R*0.78, 0.35,R,hair,hairDark,stage);
 
-  /* ---------- ЛИЦО ---------- */
   const fg=ctx.createRadialGradient(-R*0.20,-R*0.30,R*0.15,0,R*0.10,R*1.05);
   fg.addColorStop(0,stage>=2?'#a8d080':(stage>=1?'#ffe0c0':'#fff5ea'));
   fg.addColorStop(0.55,skin);
@@ -555,7 +612,6 @@ function drawGirl(){
   ctx.beginPath();
   ctx.ellipse(0,R*0.76,R*0.40,R*0.12,0,0,6.28);ctx.fill();
 
-  /* румянец */
   const blushA=0.42+Math.max(0,mood/180);
   const blushColor=stage>=2?'255,90,120':(stage>=1?'255,120,140':'255,140,160');
   const b1=ctx.createRadialGradient(-R*0.52,R*0.28,0,-R*0.52,R*0.28,R*0.26);
@@ -569,7 +625,6 @@ function drawGirl(){
   ctx.fillStyle=b2;
   ctx.beginPath();ctx.arc(R*0.52,R*0.28,R*0.26,0,6.28);ctx.fill();
 
-  /* веснушки */
   if(stage<2){
     ctx.fillStyle='rgba(210,150,110,0.55)';
     const freckles=[[-R*0.42,R*0.24],[-R*0.52,R*0.28],[-R*0.47,R*0.36],
@@ -579,20 +634,15 @@ function drawGirl(){
     }
   }
 
-  /* монстрячьи пятна */
   if(stage>=1){
     ctx.fillStyle=stage>=2?'rgba(90,140,60,0.5)':'rgba(200,150,100,0.38)';
     ctx.beginPath();ctx.ellipse(-R*0.50,-R*0.42,R*0.12,R*0.085,0.3,0,6.28);ctx.fill();
     ctx.beginPath();ctx.ellipse(R*0.55,R*0.08,R*0.09,R*0.065,-0.4,0,6.28);ctx.fill();
   }
 
-  /* ГЛАЗА */
   drawEyes(R,mood,stage);
-
-  /* РОТ */
   drawMouth(R,mood,stage);
 
-  /* БОКОВЫЕ ПРЯДИ */
   ctx.fillStyle=hair;
   ctx.beginPath();
   ctx.moveTo(-R*0.86,-R*0.05);
@@ -607,7 +657,6 @@ function drawGirl(){
   ctx.bezierCurveTo(R*0.82,-R*0.02,R*0.85,-R*0.06,R*0.86,-R*0.05);
   ctx.closePath();ctx.fill();
 
-  /* рожки монстра */
   if(stage>=2){
     const rk=stage>=3?'#5a1010':'#3a1010';
     ctx.fillStyle=rk;
@@ -625,7 +674,6 @@ function drawGirl(){
 
   ctx.restore();
 
-  /* бантик */
   drawBow(0,-R*1.28,R,stage);
 
   ctx.restore();
@@ -633,7 +681,6 @@ function drawGirl(){
   drawParticles();
 }
 
-/* ---------- ухо ---------- */
 function drawEar(x,y,rot,R,hair,hairD,stage){
   ctx.save();
   ctx.translate(x,y);ctx.rotate(rot);
@@ -662,7 +709,6 @@ function drawEar(x,y,rot,R,hair,hairD,stage){
   ctx.restore();
 }
 
-/* ---------- бантик ---------- */
 function drawBow(x,y,R,stage){
   const c1=stage>=2?'#8a2ab0':'#ff3d7f';
   const c2=stage>=2?'#5a1a80':'#c02060';
@@ -691,7 +737,6 @@ function drawBow(x,y,R,stage){
   ctx.beginPath();ctx.ellipse(x-R*0.035,y-R*0.035,R*0.030,R*0.018,-0.4,0,6.28);ctx.fill();
 }
 
-/* ---------- глаза ---------- */
 function drawEyes(R,mood,stage){
   const eyeY=-R*0.05;
   const eyeX=R*0.40;
@@ -837,7 +882,6 @@ function drawEyes(R,mood,stage){
   }
 }
 
-/* ---------- рот ---------- */
 function drawMouth(R,mood,stage){
   const y=R*0.50;
   ctx.save();
@@ -934,7 +978,6 @@ function drawMouth(R,mood,stage){
   ctx.restore();
 }
 
-/* ---------- частицы ---------- */
 function drawParticles(){
   for(const p of G.particles){
     const a=clamp(p.life/p.max,0,1);
@@ -1328,66 +1371,121 @@ function drawItem(sub,size){
       break;
     }
     case 'bun':{
-      ctx.fillStyle='#e0e0f0';
-      ctx.beginPath();ctx.ellipse(0,65,68,14,0,0,6.28);ctx.fill();
-      ctx.fillStyle='#c08040';
-      ctx.beginPath();ctx.ellipse(0,30,58,32,0,0,6.28);ctx.fill();
-      const g=ctx.createRadialGradient(-15,-10,10,0,0,60);
-      g.addColorStop(0,'#f0c080');g.addColorStop(1,'#c08040');
+      /* ПЕЧЕНЬКА — круглое шоколадное печенье с шоколадными крошками */
+      ctx.fillStyle='rgba(0,0,0,0.25)';
+      ctx.beginPath();ctx.ellipse(0,68,60,10,0,0,6.28);ctx.fill();
+      const g=ctx.createRadialGradient(-18,-18,8,0,0,68);
+      g.addColorStop(0,'#e8a860');
+      g.addColorStop(0.55,'#c07a30');
+      g.addColorStop(1,'#8a5218');
       ctx.fillStyle=g;
-      ctx.beginPath();ctx.ellipse(0,-10,56,40,0,0,6.28);ctx.fill();
-      ctx.fillStyle='#fff5d0';
-      const seeds=[[-30,-22],[-10,-30],[15,-28],[30,-15],[-20,-8],[5,-12],[25,0]];
-      for(const [x,y] of seeds){
-        ctx.save();ctx.translate(x,y);ctx.rotate(0.3);
-        ctx.beginPath();ctx.ellipse(0,0,6,3,0,0,6.28);ctx.fill();
-        ctx.restore();
+      ctx.beginPath();ctx.arc(0,0,62,0,6.28);ctx.fill();
+      ctx.fillStyle='#a86428';
+      ctx.beginPath();ctx.arc(0,0,58,0,6.28);ctx.fill();
+      ctx.fillStyle='rgba(255,255,255,0.15)';
+      ctx.beginPath();ctx.ellipse(-22,-26,26,14,-0.5,0,6.28);ctx.fill();
+      /* шоколадные крошки */
+      const chips=[
+        [-30,-18,9],[-8,-30,10],[18,-22,8],[34,-4,9],[-40,10,8],
+        [-14,10,10],[10,20,9],[30,28,8],[-24,32,8],[0,42,7],
+        [40,-30,7],[-44,-8,7],[22,-44,7],[-6,50,6],[44,20,7]
+      ];
+      for(const [x,y,r] of chips){
+        const cg=ctx.createRadialGradient(x-r*0.3,y-r*0.3,r*0.2,x,y,r);
+        cg.addColorStop(0,'#5a2a10');
+        cg.addColorStop(1,'#2a1004');
+        ctx.fillStyle=cg;
+        ctx.beginPath();ctx.arc(x,y,r,0,6.28);ctx.fill();
+        ctx.fillStyle='rgba(255,220,180,0.35)';
+        ctx.beginPath();ctx.arc(x-r*0.35,y-r*0.35,r*0.22,0,6.28);ctx.fill();
       }
-      ctx.fillStyle='#3a1a10';
-      ctx.beginPath();ctx.arc(-18,-5,4,0,6.28);ctx.fill();
-      ctx.beginPath();ctx.arc(18,-5,4,0,6.28);ctx.fill();
-      ctx.strokeStyle='#3a1a10';ctx.lineWidth=3;ctx.lineCap='round';
-      ctx.beginPath();ctx.arc(0,8,8,0.2,Math.PI-0.2);ctx.stroke();
       break;
     }
     case 'shoes':{
-      drawShoe(-15,10,-0.15,'#a01040');
-      drawShoe(15,-5,0.1,'#e02060');
-      function drawShoe(x,y,rot,c){
-        ctx.save();ctx.translate(x,y);ctx.rotate(rot);
-        ctx.fillStyle='#2a2a2a';
+      /* ТУФЕЛЬКИ — пара аккуратных туфелек с бантиками */
+      drawShoe(-32,20,-0.15,'#c81048','#7a0028');
+      drawShoe( 32,-2,0.10,'#e8286a','#8a1040');
+      function drawShoe(x,y,rot,c,cd){
+        ctx.save();
+        ctx.translate(x,y);
+        ctx.rotate(rot);
+
+        /* подошва */
+        ctx.fillStyle='#1a1a22';
         ctx.beginPath();
-        ctx.moveTo(-55,35);ctx.lineTo(55,35);
-        ctx.quadraticCurveTo(62,35,62,28);ctx.lineTo(60,18);
-        ctx.quadraticCurveTo(20,10,-10,18);
-        ctx.quadraticCurveTo(-45,25,-55,35);
-        ctx.closePath();ctx.fill();
-        ctx.fillStyle=c;
+        ctx.ellipse(0,36,44,9,0,0,6.28);
+        ctx.fill();
+        ctx.fillStyle='#3a3a48';
         ctx.beginPath();
-        ctx.moveTo(-55,32);
-        ctx.quadraticCurveTo(-45,-10,-10,4);
-        ctx.quadraticCurveTo(30,15,58,20);
-        ctx.lineTo(60,18);
-        ctx.quadraticCurveTo(20,8,-10,16);
-        ctx.quadraticCurveTo(-45,22,-55,32);
-        ctx.closePath();ctx.fill();
-        ctx.fillStyle='#7a0828';
+        ctx.ellipse(0,34,42,7,0,0,6.28);
+        ctx.fill();
+
+        /* корпус туфельки */
+        const tg=ctx.createLinearGradient(-30,-40,30,30);
+        tg.addColorStop(0,c);
+        tg.addColorStop(0.55,c);
+        tg.addColorStop(1,cd);
+        ctx.fillStyle=tg;
         ctx.beginPath();
-        ctx.moveTo(52,30);ctx.lineTo(58,30);ctx.lineTo(58,58);ctx.lineTo(54,58);
-        ctx.closePath();ctx.fill();
-        ctx.fillStyle='rgba(255,255,255,0.3)';
+        ctx.moveTo(-42,32);
+        ctx.bezierCurveTo(-44,4,-30,-32,-8,-38);
+        ctx.bezierCurveTo(10,-42,26,-30,32,-14);
+        ctx.bezierCurveTo(38,0,44,18,44,32);
+        ctx.lineTo(-42,32);
+        ctx.closePath();
+        ctx.fill();
+
+        /* блик */
+        ctx.fillStyle='rgba(255,255,255,0.35)';
         ctx.beginPath();
-        ctx.moveTo(-40,25);ctx.quadraticCurveTo(-25,-5,-5,4);
-        ctx.lineTo(-10,10);ctx.quadraticCurveTo(-30,4,-38,28);
-        ctx.closePath();ctx.fill();
+        ctx.ellipse(-16,-12,14,7,-0.5,0,6.28);
+        ctx.fill();
+
+        /* каблучок */
+        ctx.fillStyle=cd;
+        ctx.beginPath();
+        ctx.moveTo(30,30);
+        ctx.lineTo(42,30);
+        ctx.lineTo(42,52);
+        ctx.lineTo(36,52);
+        ctx.closePath();
+        ctx.fill();
+
+        /* вырез (декольте) */
+        ctx.fillStyle='#1a0a14';
+        ctx.beginPath();
+        ctx.ellipse(0,-14,20,9,0,0,6.28);
+        ctx.fill();
+        ctx.fillStyle='rgba(255,255,255,0.18)';
+        ctx.beginPath();
+        ctx.ellipse(-4,-16,14,5,0,0,6.28);
+        ctx.fill();
+
+        /* бантик */
         ctx.fillStyle='#ffd000';
-        ctx.beginPath();ctx.moveTo(-32,5);
-        ctx.quadraticCurveTo(-42,-5,-48,5);
-        ctx.quadraticCurveTo(-40,10,-32,5);ctx.fill();
-        ctx.beginPath();ctx.moveTo(-30,5);
-        ctx.quadraticCurveTo(-22,-5,-18,5);
-        ctx.quadraticCurveTo(-24,10,-30,5);ctx.fill();
-        ctx.beginPath();ctx.arc(-31,5,3,0,6.28);ctx.fill();
+        ctx.beginPath();
+        ctx.moveTo(0,-24);
+        ctx.quadraticCurveTo(-16,-36,-16,-22);
+        ctx.quadraticCurveTo(-16,-12,0,-22);
+        ctx.closePath();
+        ctx.fill();
+        ctx.beginPath();
+        ctx.moveTo(0,-24);
+        ctx.quadraticCurveTo(16,-36,16,-22);
+        ctx.quadraticCurveTo(16,-12,0,-22);
+        ctx.closePath();
+        ctx.fill();
+        ctx.fillStyle='#ffe040';
+        ctx.beginPath();
+        ctx.arc(0,-23,4,0,6.28);
+        ctx.fill();
+
+        /* носочек — стразы */
+        ctx.fillStyle='rgba(255,255,255,0.85)';
+        ctx.beginPath();ctx.arc(-24,-4,2,0,6.28);ctx.fill();
+        ctx.beginPath();ctx.arc(-20,4,1.6,0,6.28);ctx.fill();
+        ctx.beginPath();ctx.arc(-30,4,1.6,0,6.28);ctx.fill();
+
         ctx.restore();
       }
       break;
@@ -1496,16 +1594,19 @@ function drawItem(sub,size){
       break;
     }
     case 'book':{
+      /* КНИГА — «ЧТЕНИЕ» */
       ctx.fillStyle='#1a3a80';
       roundRect(-50,-68,100,136,8);ctx.fill();
       ctx.fillStyle='#fff5e0';
       roundRect(-44,-62,88,124,4);ctx.fill();
+      /* строчки текста */
       ctx.fillStyle='#aaa';
       for(let i=0;i<12;i++){
         const y=-52+i*11;
         const w=50+((i*7)%20);
         ctx.fillRect(-38,y,w,3);
       }
+      /* корешок-обложка */
       ctx.fillStyle='#3a6ad0';
       ctx.beginPath();
       ctx.moveTo(-50,-68);ctx.lineTo(45,-68);
@@ -1513,15 +1614,29 @@ function drawItem(sub,size){
       ctx.lineTo(55,62);
       ctx.quadraticCurveTo(55,72,45,72);
       ctx.lineTo(-50,72);ctx.closePath();ctx.fill();
+      /* надпись «ЧТЕНИЕ» */
       ctx.fillStyle='#ffd000';
-      ctx.font='bold 20px sans-serif';
+      ctx.font='bold 17px sans-serif';
       ctx.textAlign='center';ctx.textBaseline='middle';
-      ctx.fillText('НАУКИ',3,-30);
+      ctx.fillText('ЧТЕНИЕ',3,-34);
+      /* маленькая звёздочка-декор */
       ctx.fillStyle='#ffd070';
-      ctx.beginPath();ctx.arc(3,20,22,0,6.28);ctx.fill();
-      ctx.fillStyle='#ff8a3a';
-      ctx.beginPath();ctx.arc(-4,14,10,0,6.28);ctx.fill();
-      ctx.beginPath();ctx.arc(11,14,10,0,6.28);ctx.fill();
+      const starX=3, starY=20, starR=20;
+      ctx.beginPath();
+      for(let i=0;i<5;i++){
+        const a=i*Math.PI*2/5 - Math.PI/2;
+        const ax=starX+Math.cos(a)*starR;
+        const ay=starY+Math.sin(a)*starR;
+        if(i===0)ctx.moveTo(ax,ay);
+        else ctx.lineTo(ax,ay);
+        const a2=a+Math.PI/5;
+        const ax2=starX+Math.cos(a2)*starR*0.45;
+        const ay2=starY+Math.sin(a2)*starR*0.45;
+        ctx.lineTo(ax2,ay2);
+      }
+      ctx.closePath();
+      ctx.fill();
+      /* закладка */
       ctx.fillStyle='#ff3a6a';
       ctx.beginPath();
       ctx.moveTo(-8,72);ctx.lineTo(-8,30);ctx.lineTo(3,42);ctx.lineTo(14,30);ctx.lineTo(14,72);
@@ -1529,6 +1644,7 @@ function drawItem(sub,size){
       break;
     }
     case 'apron':{
+      /* ФАРТУК — «ГОТОВКА» */
       ctx.strokeStyle='#5ab080';ctx.lineWidth=6;ctx.lineCap='round';
       ctx.beginPath();ctx.moveTo(-35,-58);ctx.lineTo(-58,-78);ctx.stroke();
       ctx.beginPath();ctx.moveTo(35,-58);ctx.lineTo(58,-78);ctx.stroke();
@@ -1546,23 +1662,21 @@ function drawItem(sub,size){
       ctx.moveTo(-28,5);ctx.lineTo(28,5);
       ctx.lineTo(24,45);ctx.lineTo(-24,45);
       ctx.closePath();ctx.fill();
-      ctx.strokeStyle='#3a8060';ctx.lineWidth=2;
-      ctx.setLineDash([4,4]);
-      ctx.beginPath();
-      ctx.moveTo(-26,7);ctx.lineTo(26,7);
-      ctx.moveTo(-22,43);ctx.lineTo(22,43);
-      ctx.stroke();
-      ctx.setLineDash([]);
-      ctx.fillStyle='#ff5a8a';
-      for(let i=0;i<5;i++){
-        const a=i*Math.PI*2/5;
-        ctx.beginPath();ctx.arc(-6+Math.cos(a)*7,25+Math.sin(a)*7,5,0,6.28);ctx.fill();
-      }
-      ctx.fillStyle='#ffd000';
-      ctx.beginPath();ctx.arc(-6,25,4,0,6.28);ctx.fill();
+      /* поварёшка-декор вместо цветка */
+      ctx.save();
+      ctx.translate(-4,25);
+      ctx.rotate(-0.4);
+      ctx.strokeStyle='#8a5a2a';ctx.lineWidth=4;ctx.lineCap='round';
+      ctx.beginPath();ctx.moveTo(0,-14);ctx.lineTo(0,10);ctx.stroke();
+      ctx.fillStyle='#c0c8d0';
+      ctx.beginPath();ctx.arc(0,-18,9,0,6.28);ctx.fill();
+      ctx.fillStyle='#8a9098';
+      ctx.beginPath();ctx.arc(0,-18,9,0.3,Math.PI);ctx.fill();
+      ctx.restore();
       break;
     }
     case 'broom':{
+      /* МЕТЛА — «УБОРКА» */
       ctx.strokeStyle='#a06030';ctx.lineWidth=9;ctx.lineCap='round';
       ctx.beginPath();ctx.moveTo(45,-88);ctx.lineTo(-10,20);ctx.stroke();
       ctx.strokeStyle='#d09050';ctx.lineWidth=2;
@@ -1811,7 +1925,7 @@ cv.addEventListener('pointerdown',e=>{
     if(p.x>=s.x&&p.x<=s.x+s.w&&p.y>=s.y&&p.y<=s.y+s.h){
       G.dragging={slot:i,item:G.slots[i],x:p.x,y:p.y};
       cv.classList.add('grabbing');
-      cv.setPointerCapture(e.pointerId);
+      try{cv.setPointerCapture(e.pointerId);}catch(err){}
       break;
     }
   }
