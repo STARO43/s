@@ -2547,15 +2547,16 @@ function initArticles() {
         const HASH_PREFIX    = '#article/';
         const ARTICLE_SUFFIX = '.md';
 
-        const list          = document.getElementById('parentsList');
-        const reader        = document.getElementById('reader');
-        const readerBody    = document.getElementById('readerBody');
-        const readerTitle   = document.getElementById('readerTitle');
-        const readerContent = document.getElementById('readerContent');
-        const readerTime    = document.getElementById('readerTime');
-        const progressFill  = document.getElementById('progressFill');
-        const backBtnTop    = document.getElementById('backBtnTop');
-        const backBtnBottom = document.getElementById('backBtnBottom');
+        const list           = document.getElementById('parentsList');
+        const reader         = document.getElementById('reader');
+        const readerBody     = document.getElementById('readerBody');
+        const readerTitle    = document.getElementById('readerTitle');
+        const readerContent  = document.getElementById('readerContent');
+        const readerTime     = document.getElementById('readerTime');
+        const progressFill   = document.getElementById('progressFill');
+        const backBtn        = document.getElementById('backBtn');
+        const closeBtn       = document.getElementById('closeBtn');
+        const typewriterBtn  = document.getElementById('typewriterToggle');
 
         if (!list || !reader) return;
 
@@ -2752,7 +2753,7 @@ function initArticles() {
         function readTime(text) {
             const words = String(text).replace(/<[^>]+>/g, ' ').trim().split(/\s+/).length;
             const mins = Math.max(1, Math.round(words / 180));
-            return 'ПРИМЕРНОЕ ВРЕМЯ ДОКЛАДА: ' + mins + ' МИН.';
+            return 'ВРЕМЯ ЧТЕНИЯ: ' + mins + ' МИН';
         }
 
         async function openBySlug(slug) {
@@ -2816,8 +2817,29 @@ function initArticles() {
 
         window.addEventListener('hashchange', handleHash);
 
-        if (backBtnTop)    backBtnTop.addEventListener('click', closeArticle);
-        if (backBtnBottom) backBtnBottom.addEventListener('click', closeArticle);
+        if (backBtn)  backBtn.addEventListener('click', closeArticle);
+        if (closeBtn) closeBtn.addEventListener('click', closeArticle);
+
+        /* ====================================================
+           ПАСХАЛКА: двойной клик по машинке — альтернативный вид
+           ==================================================== */
+        if (typewriterBtn) {
+            let lastTap = 0;
+            const toggleAlt = (e) => {
+                if (e) { e.preventDefault(); e.stopPropagation(); }
+                reader.classList.toggle('reader-alt');
+            };
+            typewriterBtn.addEventListener('click', (e) => {
+                const now = Date.now();
+                if (now - lastTap < 350) {
+                    lastTap = 0;
+                    toggleAlt(e);
+                } else {
+                    lastTap = now;
+                }
+            });
+            typewriterBtn.addEventListener('dblclick', toggleAlt);
+        }
 
         document.addEventListener('keydown', (e) => {
             if (reader.classList.contains('show') && e.key === 'Escape') closeArticle();
