@@ -552,7 +552,7 @@ html[data-theme="dark"] .burger-btn .ring { border-color: rgba(221,224,229,.3); 
 .line-2 { color: var(--text); }
 
 .hero-title .terminal-word {
-    cursor: pointer;
+    cursor: default;
     user-select: none;
     -webkit-tap-highlight-color: transparent;
     position: relative;
