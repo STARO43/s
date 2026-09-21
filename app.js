@@ -1914,65 +1914,68 @@ function initHeroes() {
         let currentImages = [];
 
         function openHeroModal(name, images, audioSrc, birthYear, deathYear) {
-            if (heroModal) heroModal.remove();
-            currentImages = images;
-            currentImageIndex = 0;
-            const navHTML = images.length > 1
-                ? `<button class="hero-nav prev" type="button" aria-label="Предыдущий">‹</button><button class="hero-nav next" type="button" aria-label="Следующий">›</button>`
-                : '';
-            const initials = name.split(/\s+/).map((w) => w.charAt(0)).join('').slice(0, 2).toUpperCase();
+    if (heroModal) heroModal.remove();
+    currentImages = images;
+    currentImageIndex = 0;
+    const navHTML = images.length > 1
+        ? `<button class="hero-nav prev" type="button" aria-label="Предыдущий">‹</button><button class="hero-nav next" type="button" aria-label="Следующий">›</button>`
+        : '';
+    const initials = name.split(/\s+/).map((w) => w.charAt(0)).join('').slice(0, 2).toUpperCase();
 
-            heroModal = document.createElement('div');
-            heroModal.className = 'hero-modal';
-            heroModal.innerHTML = `
-                <button class="hero-modal-repeat" type="button" aria-label="Повторить звук">♪</button>
-                <button class="hero-modal-close" type="button" aria-label="Закрыть">×</button>
-                <div class="hero-modal-portrait-wrap">
-                    ${navHTML}
-                    <img class="hero-modal-portrait" src="${images[0]}" alt="${name}" decoding="async">
-                </div>
-                <div class="hero-modal-info">
-                    <h3>${name}</h3>
-                    <div class="hero-modal-years">${birthYear} — ${deathYear}</div>
-                </div>
-                <div class="hero-modal-timeline">${buildTimelineHTML(birthYear, deathYear)}</div>
-            `;
+    /* На мобиле линию времени не рисуем вообще */
+    const IS_MOBILE_HEROES = window.matchMedia('(max-width: 768px)').matches;
 
-            const imgEl = heroModal.querySelector('.hero-modal-portrait');
-            imgEl.addEventListener('error', () => {
-                const placeholder = document.createElement('div');
-                placeholder.className = 'hero-portrait-placeholder';
-                placeholder.textContent = initials;
-                imgEl.replaceWith(placeholder);
-            });
+    heroModal = document.createElement('div');
+    heroModal.className = 'hero-modal';
+    heroModal.innerHTML = `
+        <button class="hero-modal-repeat" type="button" aria-label="Повторить звук">♪</button>
+        <button class="hero-modal-close" type="button" aria-label="Закрыть">×</button>
+        <div class="hero-modal-portrait-wrap">
+            ${navHTML}
+            <img class="hero-modal-portrait" src="${images[0]}" alt="${name}" decoding="async">
+        </div>
+        <div class="hero-modal-info">
+            <h3>${name}</h3>
+            <div class="hero-modal-years">${birthYear} — ${deathYear}</div>
+        </div>
+        ${IS_MOBILE_HEROES ? '' : `<div class="hero-modal-timeline">${buildTimelineHTML(birthYear, deathYear)}</div>`}
+    `;
 
-            document.body.appendChild(heroModal);
-            playHeroAudio(audioSrc);
+    const imgEl = heroModal.querySelector('.hero-modal-portrait');
+    imgEl.addEventListener('error', () => {
+        const placeholder = document.createElement('div');
+        placeholder.className = 'hero-portrait-placeholder';
+        placeholder.textContent = initials;
+        imgEl.replaceWith(placeholder);
+    });
 
-            heroModal.querySelector('.hero-modal-close').addEventListener('click', () => {
-                heroModal.remove();
-                heroAudio.pause();
-                heroAudio.currentTime = 0;
-            });
-            heroModal.querySelector('.hero-modal-repeat').addEventListener('click', () => playHeroAudio(audioSrc));
+    document.body.appendChild(heroModal);
+    playHeroAudio(audioSrc);
 
-            const prevBtn = heroModal.querySelector('.hero-nav.prev');
-            const nextBtn = heroModal.querySelector('.hero-nav.next');
-            if (prevBtn) {
-                prevBtn.addEventListener('click', () => {
-                    currentImageIndex = (currentImageIndex - 1 + currentImages.length) % currentImages.length;
-                    const im = heroModal.querySelector('.hero-modal-portrait');
-                    if (im) im.src = currentImages[currentImageIndex];
-                });
-            }
-            if (nextBtn) {
-                nextBtn.addEventListener('click', () => {
-                    currentImageIndex = (currentImageIndex + 1) % currentImages.length;
-                    const im = heroModal.querySelector('.hero-modal-portrait');
-                    if (im) im.src = currentImages[currentImageIndex];
-                });
-            }
-        }
+    heroModal.querySelector('.hero-modal-close').addEventListener('click', () => {
+        heroModal.remove();
+        heroAudio.pause();
+        heroAudio.currentTime = 0;
+    });
+    heroModal.querySelector('.hero-modal-repeat').addEventListener('click', () => playHeroAudio(audioSrc));
+
+    const prevBtn = heroModal.querySelector('.hero-nav.prev');
+    const nextBtn = heroModal.querySelector('.hero-nav.next');
+    if (prevBtn) {
+        prevBtn.addEventListener('click', () => {
+            currentImageIndex = (currentImageIndex - 1 + currentImages.length) % currentImages.length;
+            const im = heroModal.querySelector('.hero-modal-portrait');
+            if (im) im.src = currentImages[currentImageIndex];
+        });
+    }
+    if (nextBtn) {
+        nextBtn.addEventListener('click', () => {
+            currentImageIndex = (currentImageIndex + 1) % currentImages.length;
+            const im = heroModal.querySelector('.hero-modal-portrait');
+            if (im) im.src = currentImages[currentImageIndex];
+        });
+    }
+}
 
         function playHeroAudio(src) {
             heroAudio.pause();
