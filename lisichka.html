@@ -25,7 +25,6 @@
   }
   #game.grabbing{cursor:grabbing;}
 
-  /* ==== Выход в меню ==== */
   .exit-btn-fox {
     position: fixed;
     top: 14px;
@@ -202,6 +201,11 @@ const sndScream=()=>{beep(750,.5,'sawtooth',.05,-550)};
 const sndMonster=()=>{beep(90,.8,'sawtooth',.08,-50)};
 const sndJump=()=>{beep(500,.08,'square',.05,400)};
 const sndClean=()=>{beep(600,.15,'sine',.05,200);setTimeout(()=>beep(800,.18,'sine',.05,200),120)};
+const sndEnlighten=()=>{
+  beep(700,.2,'sine',.05,200);
+  setTimeout(()=>beep(880,.2,'sine',.05,200),150);
+  setTimeout(()=>beep(1100,.35,'sine',.06,300),320);
+};
 
 /* ---------- catalog ---------- */
 const TOYS=[
@@ -232,12 +236,23 @@ const USEFUL=[
   {kind:'useful',sub:'broom',label:'Уборка'},
 ];
 
+/* ---------- время просветления ---------- */
+const CALM_SILENCE_TIME = 300;   /* 5 минут = 300 сек — перестаёт орать */
+const CALM_ENLIGHTEN_TIME = 420; /* 7 минут = 420 сек — полезное поднимает настроение */
+
 const G={
   t:0, phase:'calm', phaseT:0,
   mood:0,
   happyStreak:0, lastBadT:0,
   fat:0, ugly:0,
   monsterStage:0,
+
+  /* ==== НОВОЕ: таймер «не-монстра» ==== */
+  calmTimer:0,        /* сек, сколько девочка НЕ монстр */
+  silenceMode:false,  /* true — перестала орать (300 сек) */
+  enlightenMode:false,/* true — полезное поднимает настроение (420 сек) */
+  enlightenPrev:false,/* для отслеживания момента входа в режим */
+
   headAngle:0, headTarget:0, headTimer:0,
   eyeBlink:0, blinkTimer:2,
   slots:[], particles:[], bubbles:[],
@@ -266,6 +281,14 @@ const YELL_PHRASES=['ХОЧУ ИГРУШКУ!','ХОЧУ ВКУСНЯШКУ!','�
 const RAGE_PHRASES=['АААААА!','НЕНАВИЖУ!','ДАЙ СЕЙЧАС ЖЕ!','ХОЧУ!!!','Я ТЕБЯ НЕ ЛЮБЛЮ!!!', 'РРРРРРР!!!'];
 const USEFUL_PHRASES=['Фу!','Убери!','Не хочу!','Ненавижу!','Не буду!'];
 
+/* ==== НОВЫЕ ФРАЗЫ ПРОСВЕТЛЕНИЯ ==== */
+const ENLIGHTEN_PHRASES=[
+  'Да, я же умница!',
+  'Давай сюда, всё сделаю!',
+  'Самостоятельность — это свобода',
+  'Характер как алмаз, чем твёрже, тем лучше'
+];
+
 function addBubble(text,x,y,opts={}){
   if(G.bubbles.length>3)G.bubbles.shift();
   G.bubbles.push({text,x,y,life:opts.life||2.2,max:opts.life||2.2,
@@ -274,6 +297,12 @@ function addBubble(text,x,y,opts={}){
 
 function setPhase(p){
   if(G.phase===p)return;
+
+  /* ==== В РЕЖИМЕ ТИШИНЫ ЗАПРЕЩАЕМ yell и rage ==== */
+  if(G.silenceMode && (p==='yell'||p==='rage')) {
+    p = 'sad';   /* вместо крика — тихая грусть */
+  }
+
   G.phase=p;G.phaseT=0;
   const cx=W/2, cy=H*0.30;
   if(p==='sad'){sndBad();addBubble(pick(SAD_PHRASES),cx,cy,{color:'sad',life:2.4});}
@@ -283,12 +312,45 @@ function setPhase(p){
 }
 function updatePhase(dt){
   G.phaseT+=dt;
+
+  /* ==== РЕЖИМ ТИШИНЫ: не даём уйти в крик, если настроение низкое ==== */
+  if(G.silenceMode){
+    if(G.mood>15){ if(G.phase!=='calm')setPhase('calm'); return; }
+    if(G.phase==='calm'&&G.phaseT>3)setPhase('sad');
+    /* в режиме тишины фазы дальше sad не идут */
+    return;
+  }
+
   if(G.mood>15){ if(G.phase!=='calm')setPhase('calm'); return; }
   if(G.phase==='calm'&&G.phaseT>3)setPhase('sad');
   else if(G.phase==='sad'&&G.phaseT>2)setPhase('yell');
   else if(G.phase==='yell'&&G.phaseT>1.5)setPhase('rage');
 }
 function shoutLoop(dt){
+  /* ==== В РЕЖИМЕ ПРОСВЕТЛЕНИЯ вместо криков — хорошие фразы ==== */
+  if(G.enlightenMode){
+    const interval=2.6;
+    if(G.t-G.lastYell>interval){
+      G.lastYell=G.t;
+      const cx=W/2+rnd(-80,80), cy=H*0.26+rnd(-20,20);
+      addBubble(pick(ENLIGHTEN_PHRASES),cx,cy,{color:'happy',life:2.6,size:20});
+    }
+    return;
+  }
+
+  /* ==== В РЕЖИМЕ ТИШИНЫ — только тихие фразы, без крика ==== */
+  if(G.silenceMode){
+    const interval=2.4;
+    if(G.t-G.lastYell>interval){
+      G.lastYell=G.t;
+      const cx=W/2+rnd(-80,80), cy=H*0.26+rnd(-20,20);
+      if(G.mood>30)addBubble(pick(HAPPY_PHRASES),cx,cy,{color:'happy',life:1.8});
+      else addBubble(pick(SAD_PHRASES),cx,cy,{color:'sad',life:2.2});
+    }
+    return;
+  }
+
+  /* ==== Обычный режим ==== */
   const interval={calm:1.9,sad:2.4,yell:1.3,rage:0.9}[G.phase];
   if(G.t-G.lastYell>interval){
     G.lastYell=G.t;
@@ -326,57 +388,64 @@ function applyItem(item){
     addBubble(pick(HAPPY_PHRASES),cx+rnd(-40,40),cy-40,{color:'happy',life:1.6,size:22});
   }
   /* =====================================================
-     ПОЛЕЗНОЕ (чтение / готовка / уборка)
-     - book и apron снижают монструозность (fat и ugly)
-     - broom сгоняет жир очень медленно
+     ПОЛЕЗНОЕ
+     - Чтение:  ugly -0.04 (за 25 применений)
+     - Готовка: ugly -0.05 (за 20 применений)
+     - Уборка:  fat  -0.0334 (за 30 применений)
+     - В РЕЖИМЕ ПРОСВЕТЛЕНИЯ: + настроение вместо наказания
      ===================================================== */
   else {
     G.happyStreak=0;
-    G.reaction='cry';G.reactionT=1.5;
-    sndBad();
+
+    let isPositive = false;
 
     if(item.sub==='book'){
-      // Книга — уменьшает монструозность (жир и уродство)
-      G.fat  = clamp(G.fat  - 0.10, 0, 1);
-      G.ugly = clamp(G.ugly - 0.10, 0, 1);
-      addBubble('Читаю!',cx+rnd(-30,30),cy-40,{color:'normal',life:1.8,size:22});
+      G.ugly = clamp(G.ugly - 0.04, 0, 1);
+      if(G.enlightenMode){ isPositive=true; addBubble('Читаю с удовольствием!',cx+rnd(-30,30),cy-40,{color:'happy',life:2.0,size:22}); }
+      else { addBubble('Читаю!',cx+rnd(-30,30),cy-40,{color:'normal',life:1.8,size:22}); }
     } else if(item.sub==='apron'){
-      // Фартук — готовка, тоже уменьшает монструозность
-      G.fat  = clamp(G.fat  - 0.08, 0, 1);
-      G.ugly = clamp(G.ugly - 0.08, 0, 1);
-      addBubble('Готовлю!',cx+rnd(-30,30),cy-40,{color:'normal',life:1.8,size:22});
+      G.ugly = clamp(G.ugly - 0.05, 0, 1);
+      if(G.enlightenMode){ isPositive=true; addBubble('Давай сюда, всё сделаю!',cx+rnd(-30,30),cy-40,{color:'happy',life:2.0,size:22}); }
+      else { addBubble('Готовлю!',cx+rnd(-30,30),cy-40,{color:'normal',life:1.8,size:22}); }
     } else if(item.sub==='broom'){
-      // Метла — сгоняет жир ОЧЕНЬ медленно
-      G.fat  = clamp(G.fat  - 0.04, 0, 1);
-      G.ugly = clamp(G.ugly - 0.02, 0, 1);
-      sndClean();
-      addBubble('Подметаю...',cx+rnd(-30,30),cy-40,{color:'normal',life:1.8,size:22});
+      G.fat = clamp(G.fat - 0.0334, 0, 1);
+      if(G.enlightenMode){ isPositive=true; addBubble('Самостоятельность — это свобода',cx+rnd(-30,30),cy-40,{color:'happy',life:2.2,size:20}); }
+      else { sndClean(); addBubble('Подметаю...',cx+rnd(-30,30),cy-40,{color:'normal',life:1.8,size:22}); }
     }
 
-    // Полезные слегка портят настроение — чтобы был вызов
-    G.mood=clamp(G.mood-25,-100,100);
-    spawnParticles('tear',cx,cy+60);
-    if(G.phase==='calm')setPhase('sad');
+    if(isPositive){
+      /* В просветлении полезное РАДУЕТ, а не расстраивает */
+      G.mood=clamp(G.mood+15,-100,100);
+      G.reaction='happy';G.reactionT=1.3;
+      sndGood();
+      spawnParticles('heart',cx,cy+60);
+    } else {
+      /* Обычное поведение: полезное слегка расстраивает */
+      G.reaction='cry';G.reactionT=1.5;
+      sndBad();
+      G.mood=clamp(G.mood-25,-100,100);
+      spawnParticles('tear',cx,cy+60);
+      if(G.phase==='calm'&&!G.silenceMode)setPhase('sad');
+    }
   }
   updateMonster();
 }
+
 function updateMonster(){
-  // Монстр теперь «отрастает» и «спадает» по мере изменения fat и ugly
   const s=G.fat*0.55+G.ugly*0.6;
   let st=0;
   if(s>0.30)st=1;
   if(s>0.62)st=2;
   if(s>0.95)st=3;
 
-  // Снижаемся мягко, повышаемся с эффектом
   if(st>G.monsterStage){
     G.monsterStage=st;
     if(st>=1){sndMonster();addBubble('Ой-ой...',W/2,H*0.28,{color:'mon',life:1.6,size:24});}
   } else if(st<G.monsterStage){
-    // Плавный регресс: только когда жир и уродство уже существенно снизились
     G.monsterStage=st;
   }
 }
+
 function spawnParticles(type,x,y){
   const n=type==='heart'?14:12;
   for(let i=0;i<n;i++)G.particles.push({
@@ -387,13 +456,45 @@ function spawnParticles(type,x,y){
 
 function update(dt){
   G.t+=dt;
+
+  /* =====================================================
+     НОВАЯ МЕХАНИКА: таймер «не-монстра»
+     ===================================================== */
+  if(G.monsterStage===0){
+    G.calmTimer += dt;
+  } else {
+    /* Стала монстром — сбрасываем весь прогресс тишины */
+    if(G.calmTimer>0){
+      G.calmTimer=0;
+      G.silenceMode=false;
+      G.enlightenMode=false;
+    }
+  }
+
+  /* Включаем режим тишины через 5 минут */
+  if(!G.silenceMode && G.calmTimer >= CALM_SILENCE_TIME){
+    G.silenceMode = true;
+    sndEnlighten();
+    addBubble('Хм... ладно.', W/2, H*0.28, {color:'happy',life:2.6,size:22});
+  }
+
+  /* Включаем просветление через 7 минут */
+  if(!G.enlightenMode && G.calmTimer >= CALM_ENLIGHTEN_TIME){
+    G.enlightenMode = true;
+    sndEnlighten();
+    addBubble('Да, я же умница!', W/2, H*0.28, {color:'happy',life:3.0,size:22});
+  }
+
   updatePhase(dt);
   shoutLoop(dt);
 
   G.headTimer-=dt;
   if(G.headTimer<=0){
     G.headTimer=rnd(0.8,2.2);
-    const range=G.phase==='rage'?0.35:G.phase==='yell'?0.4:0.55;
+    let range;
+    if(G.enlightenMode) range=0.35;
+    else if(G.silenceMode) range=0.45;
+    else range=G.phase==='rage'?0.35:G.phase==='yell'?0.4:0.55;
     G.headTarget=rnd(-range,range);
   }
   G.headAngle=lerp(G.headAngle,G.headTarget,dt*6);
@@ -428,10 +529,19 @@ function update(dt){
    ========================================================= */
 function drawBG(){
   const g=ctx.createLinearGradient(0,0,0,H);
-  if(G.monsterStage>=2){g.addColorStop(0,'#3a0a1a');g.addColorStop(1,'#0a0308');}
-  else if(G.phase==='rage'){g.addColorStop(0,'#5a1220');g.addColorStop(1,'#1a060c');}
-  else if(G.phase==='yell'){g.addColorStop(0,'#4a1a3a');g.addColorStop(1,'#1c0a1e');}
-  else {g.addColorStop(0,'#4a3568');g.addColorStop(1,'#1c1430');}
+  if(G.enlightenMode){
+    g.addColorStop(0,'#5a4a88');g.addColorStop(1,'#241a44');
+  } else if(G.silenceMode){
+    g.addColorStop(0,'#4e3a72');g.addColorStop(1,'#1f1638');
+  } else if(G.monsterStage>=2){
+    g.addColorStop(0,'#3a0a1a');g.addColorStop(1,'#0a0308');
+  } else if(G.phase==='rage'){
+    g.addColorStop(0,'#5a1220');g.addColorStop(1,'#1a060c');
+  } else if(G.phase==='yell'){
+    g.addColorStop(0,'#4a1a3a');g.addColorStop(1,'#1c0a1e');
+  } else {
+    g.addColorStop(0,'#4a3568');g.addColorStop(1,'#1c1430');
+  }
   ctx.fillStyle=g;ctx.fillRect(0,0,W,H);
 
   const rg=ctx.createRadialGradient(W/2,H*0.4,0,W/2,H*0.4,Math.max(W,H)*0.7);
@@ -445,7 +555,7 @@ function drawBG(){
     ctx.fillStyle=`rgba(255,235,210,${a})`;
     ctx.beginPath();ctx.arc(x,y,1.3,0,6.28);ctx.fill();
   }
-  if(G.phase==='yell'||G.phase==='rage'){
+  if(!G.silenceMode && (G.phase==='yell'||G.phase==='rage')){
     const v=ctx.createRadialGradient(W/2,H*0.45,H*0.25,W/2,H*0.45,H*0.95);
     v.addColorStop(0,'rgba(0,0,0,0)');
     v.addColorStop(1,G.phase==='rage'?'rgba(150,0,20,0.6)':'rgba(90,0,40,0.4)');
@@ -467,8 +577,10 @@ function drawGirl(){
   const mood=G.mood;
 
   let sx=0,sy=0;
-  if(G.phase==='rage'){sx=rnd(-4,4);sy=rnd(-4,4);}
-  else if(G.phase==='yell'){sx=rnd(-2,2);sy=rnd(-2,2);}
+  if(!G.silenceMode){
+    if(G.phase==='rage'){sx=rnd(-4,4);sy=rnd(-4,4);}
+    else if(G.phase==='yell'){sx=rnd(-2,2);sy=rnd(-2,2);}
+  }
 
   ctx.save();
   ctx.translate(cx+sx,cy+sy);
@@ -750,8 +862,9 @@ function drawEyes(R,mood,stage){
     let pupilX=0,pupilY=0;
 
     if(G.reaction==='laugh'||mood>55)shape='happy';
-    else if(G.phase==='rage'||mood<-70)shape='angry';
-    else if(mood<-25)shape='sad';
+    else if((G.phase==='rage'||mood<-70)&&!G.silenceMode&&!G.enlightenMode)shape='angry';
+    else if(mood<-25&&!G.enlightenMode)shape='sad';
+    else if(G.enlightenMode)shape='happy';
 
     ctx.save();
     ctx.translate(ex,eyeY);
@@ -843,7 +956,7 @@ function drawEyes(R,mood,stage){
     ctx.quadraticCurveTo(0,eyeH*0.90,eyeW*0.7,eyeH*0.55);
     ctx.stroke();
 
-    if(mood<-20&&G.phase!=='calm'){
+    if(mood<-20&&G.phase!=='calm'&&!G.silenceMode&&!G.enlightenMode){
       ctx.fillStyle='rgba(150,210,255,0.9)';
       const t=(G.t*2.5+s*0.5)%1;
       ctx.beginPath();
@@ -890,7 +1003,9 @@ function drawMouth(R,mood,stage){
   const lipHi=stage>=2?'#8a2a3a':'#e07090';
   const mouthC=stage>=2?'#3a0008':'#8a1a30';
 
-  if(G.reaction==='laugh'||mood>60){
+  const isQuiet = G.silenceMode || G.enlightenMode;
+
+  if(G.reaction==='laugh'||mood>60||G.enlightenMode){
     ctx.fillStyle=mouthC;
     ctx.beginPath();
     ctx.moveTo(-R*0.30,0);
@@ -914,18 +1029,7 @@ function drawMouth(R,mood,stage){
     ctx.beginPath();
     ctx.ellipse(0,R*0.28,R*0.16,R*0.10,0,0,6.28);
     ctx.fill();
-  } else if(mood>15){
-    ctx.strokeStyle=lipC;ctx.lineWidth=R*0.070;ctx.lineCap='round';
-    ctx.beginPath();
-    ctx.moveTo(-R*0.24,R*0.02);
-    ctx.quadraticCurveTo(0,R*0.22,R*0.24,R*0.02);
-    ctx.stroke();
-    ctx.strokeStyle=lipHi;ctx.lineWidth=R*0.022;
-    ctx.beginPath();
-    ctx.moveTo(-R*0.16,R*0.06);
-    ctx.quadraticCurveTo(0,R*0.16,R*0.16,R*0.06);
-    ctx.stroke();
-  } else if(G.phase==='rage'||G.phase==='yell'){
+  } else if((G.phase==='rage'||G.phase==='yell')&&!isQuiet){
     const og=ctx.createRadialGradient(0,R*0.10,R*0.05,0,R*0.10,R*0.28);
     og.addColorStop(0,'#3a0008');og.addColorStop(1,'#6a0018');
     ctx.fillStyle=og;
@@ -955,19 +1059,32 @@ function drawMouth(R,mood,stage){
     ctx.beginPath();
     ctx.ellipse(0,R*0.10,R*0.26,R*0.32,0,0,6.28);
     ctx.stroke();
+  } else if(mood>15){
+    ctx.strokeStyle=lipC;ctx.lineWidth=R*0.070;ctx.lineCap='round';
+    ctx.beginPath();
+    ctx.moveTo(-R*0.24,R*0.02);
+    ctx.quadraticCurveTo(0,R*0.22,R*0.24,R*0.02);
+    ctx.stroke();
+    ctx.strokeStyle=lipHi;ctx.lineWidth=R*0.022;
+    ctx.beginPath();
+    ctx.moveTo(-R*0.16,R*0.06);
+    ctx.quadraticCurveTo(0,R*0.16,R*0.16,R*0.06);
+    ctx.stroke();
   } else if(mood<-15){
     ctx.strokeStyle=lipC;ctx.lineWidth=R*0.055;ctx.lineCap='round';
     ctx.beginPath();
     ctx.moveTo(-R*0.16,R*0.14);
     ctx.quadraticCurveTo(0,-R*0.02,R*0.16,R*0.14);
     ctx.stroke();
-    const dg=ctx.createRadialGradient(0,R*0.28,R*0.005,0,R*0.28,R*0.075);
-    dg.addColorStop(0,'rgba(200,235,255,0.9)');
-    dg.addColorStop(1,'rgba(120,180,255,0.5)');
-    ctx.fillStyle=dg;
-    ctx.beginPath();
-    ctx.ellipse(0,R*0.30,R*0.032,R*0.065,0,0,6.28);
-    ctx.fill();
+    if(!isQuiet){
+      const dg=ctx.createRadialGradient(0,R*0.28,R*0.005,0,R*0.28,R*0.075);
+      dg.addColorStop(0,'rgba(200,235,255,0.9)');
+      dg.addColorStop(1,'rgba(120,180,255,0.5)');
+      ctx.fillStyle=dg;
+      ctx.beginPath();
+      ctx.ellipse(0,R*0.30,R*0.032,R*0.065,0,0,6.28);
+      ctx.fill();
+    }
   } else {
     ctx.strokeStyle=lipC;ctx.lineWidth=R*0.048;ctx.lineCap='round';
     ctx.beginPath();
@@ -1371,7 +1488,6 @@ function drawItem(sub,size){
       break;
     }
     case 'bun':{
-      /* ПЕЧЕНЬКА — круглое шоколадное печенье с шоколадными крошками */
       ctx.fillStyle='rgba(0,0,0,0.25)';
       ctx.beginPath();ctx.ellipse(0,68,60,10,0,0,6.28);ctx.fill();
       const g=ctx.createRadialGradient(-18,-18,8,0,0,68);
@@ -1384,7 +1500,6 @@ function drawItem(sub,size){
       ctx.beginPath();ctx.arc(0,0,58,0,6.28);ctx.fill();
       ctx.fillStyle='rgba(255,255,255,0.15)';
       ctx.beginPath();ctx.ellipse(-22,-26,26,14,-0.5,0,6.28);ctx.fill();
-      /* шоколадные крошки */
       const chips=[
         [-30,-18,9],[-8,-30,10],[18,-22,8],[34,-4,9],[-40,10,8],
         [-14,10,10],[10,20,9],[30,28,8],[-24,32,8],[0,42,7],
@@ -1402,7 +1517,6 @@ function drawItem(sub,size){
       break;
     }
     case 'shoes':{
-      /* ТУФЕЛЬКИ — пара аккуратных туфелек с бантиками */
       drawShoe(-32,20,-0.15,'#c81048','#7a0028');
       drawShoe( 32,-2,0.10,'#e8286a','#8a1040');
       function drawShoe(x,y,rot,c,cd){
@@ -1410,7 +1524,6 @@ function drawItem(sub,size){
         ctx.translate(x,y);
         ctx.rotate(rot);
 
-        /* подошва */
         ctx.fillStyle='#1a1a22';
         ctx.beginPath();
         ctx.ellipse(0,36,44,9,0,0,6.28);
@@ -1420,7 +1533,6 @@ function drawItem(sub,size){
         ctx.ellipse(0,34,42,7,0,0,6.28);
         ctx.fill();
 
-        /* корпус туфельки */
         const tg=ctx.createLinearGradient(-30,-40,30,30);
         tg.addColorStop(0,c);
         tg.addColorStop(0.55,c);
@@ -1435,13 +1547,11 @@ function drawItem(sub,size){
         ctx.closePath();
         ctx.fill();
 
-        /* блик */
         ctx.fillStyle='rgba(255,255,255,0.35)';
         ctx.beginPath();
         ctx.ellipse(-16,-12,14,7,-0.5,0,6.28);
         ctx.fill();
 
-        /* каблучок */
         ctx.fillStyle=cd;
         ctx.beginPath();
         ctx.moveTo(30,30);
@@ -1451,7 +1561,6 @@ function drawItem(sub,size){
         ctx.closePath();
         ctx.fill();
 
-        /* вырез (декольте) */
         ctx.fillStyle='#1a0a14';
         ctx.beginPath();
         ctx.ellipse(0,-14,20,9,0,0,6.28);
@@ -1461,7 +1570,6 @@ function drawItem(sub,size){
         ctx.ellipse(-4,-16,14,5,0,0,6.28);
         ctx.fill();
 
-        /* бантик */
         ctx.fillStyle='#ffd000';
         ctx.beginPath();
         ctx.moveTo(0,-24);
@@ -1480,7 +1588,6 @@ function drawItem(sub,size){
         ctx.arc(0,-23,4,0,6.28);
         ctx.fill();
 
-        /* носочек — стразы */
         ctx.fillStyle='rgba(255,255,255,0.85)';
         ctx.beginPath();ctx.arc(-24,-4,2,0,6.28);ctx.fill();
         ctx.beginPath();ctx.arc(-20,4,1.6,0,6.28);ctx.fill();
@@ -1594,19 +1701,16 @@ function drawItem(sub,size){
       break;
     }
     case 'book':{
-      /* КНИГА — «ЧТЕНИЕ» */
       ctx.fillStyle='#1a3a80';
       roundRect(-50,-68,100,136,8);ctx.fill();
       ctx.fillStyle='#fff5e0';
       roundRect(-44,-62,88,124,4);ctx.fill();
-      /* строчки текста */
       ctx.fillStyle='#aaa';
       for(let i=0;i<12;i++){
         const y=-52+i*11;
         const w=50+((i*7)%20);
         ctx.fillRect(-38,y,w,3);
       }
-      /* корешок-обложка */
       ctx.fillStyle='#3a6ad0';
       ctx.beginPath();
       ctx.moveTo(-50,-68);ctx.lineTo(45,-68);
@@ -1614,12 +1718,10 @@ function drawItem(sub,size){
       ctx.lineTo(55,62);
       ctx.quadraticCurveTo(55,72,45,72);
       ctx.lineTo(-50,72);ctx.closePath();ctx.fill();
-      /* надпись «ЧТЕНИЕ» */
       ctx.fillStyle='#ffd000';
       ctx.font='bold 17px sans-serif';
       ctx.textAlign='center';ctx.textBaseline='middle';
       ctx.fillText('ЧТЕНИЕ',3,-34);
-      /* маленькая звёздочка-декор */
       ctx.fillStyle='#ffd070';
       const starX=3, starY=20, starR=20;
       ctx.beginPath();
@@ -1636,7 +1738,6 @@ function drawItem(sub,size){
       }
       ctx.closePath();
       ctx.fill();
-      /* закладка */
       ctx.fillStyle='#ff3a6a';
       ctx.beginPath();
       ctx.moveTo(-8,72);ctx.lineTo(-8,30);ctx.lineTo(3,42);ctx.lineTo(14,30);ctx.lineTo(14,72);
@@ -1644,7 +1745,6 @@ function drawItem(sub,size){
       break;
     }
     case 'apron':{
-      /* ФАРТУК — «ГОТОВКА» */
       ctx.strokeStyle='#5ab080';ctx.lineWidth=6;ctx.lineCap='round';
       ctx.beginPath();ctx.moveTo(-35,-58);ctx.lineTo(-58,-78);ctx.stroke();
       ctx.beginPath();ctx.moveTo(35,-58);ctx.lineTo(58,-78);ctx.stroke();
@@ -1662,7 +1762,6 @@ function drawItem(sub,size){
       ctx.moveTo(-28,5);ctx.lineTo(28,5);
       ctx.lineTo(24,45);ctx.lineTo(-24,45);
       ctx.closePath();ctx.fill();
-      /* поварёшка-декор вместо цветка */
       ctx.save();
       ctx.translate(-4,25);
       ctx.rotate(-0.4);
@@ -1676,7 +1775,6 @@ function drawItem(sub,size){
       break;
     }
     case 'broom':{
-      /* МЕТЛА — «УБОРКА» */
       ctx.strokeStyle='#a06030';ctx.lineWidth=9;ctx.lineCap='round';
       ctx.beginPath();ctx.moveTo(45,-88);ctx.lineTo(-10,20);ctx.stroke();
       ctx.strokeStyle='#d09050';ctx.lineWidth=2;
@@ -1781,6 +1879,7 @@ function drawSlots(){
     if(s.isUseful)br='#5ac080';
     if(G.dragging&&G.dragging.slot===i)br='#ffd000';
     if(flash>0.3)br='#fff5a0';
+    if(G.enlightenMode&&s.isUseful)br='#ffd000';
     ctx.strokeStyle=br;
     ctx.lineWidth=(G.dragging&&G.dragging.slot===i)?4:3;
     roundRect(s.x,s.y,s.w,s.h,18);ctx.stroke();
@@ -1819,13 +1918,34 @@ function drawHUD(){
   drawBar(x,y+2*(bh+8),bw,bh,'#b06aff',G.ugly);
 
   ctx.textAlign='right';ctx.textBaseline='top';
-  const ph={calm:'Спокойна',sad:'Грустит...',yell:'ОРЁТ!',rage:'ЯРОСТЬ!!!'}[G.phase];
-  const col={calm:'#c8e8ff',sad:'#a0b0ff',yell:'#ff8a8a',rage:'#ff3a3a'}[G.phase];
+  let ph, col;
+  if(G.enlightenMode){ ph='ПРОСВЕТЛЕНИЕ'; col='#ffd070'; }
+  else if(G.silenceMode){ ph='Спокойна'; col='#c8e8c8'; }
+  else {
+    ph={calm:'Спокойна',sad:'Грустит...',yell:'ОРЁТ!',rage:'ЯРОСТЬ!!!'}[G.phase];
+    col={calm:'#c8e8ff',sad:'#a0b0ff',yell:'#ff8a8a',rage:'#ff3a3a'}[G.phase];
+  }
   ctx.font='bold 20px "Segoe UI",sans-serif';
   ctx.fillStyle=col;
   ctx.shadowColor=col;ctx.shadowBlur=12;
   ctx.fillText(ph,W-pad,pad);
   ctx.shadowBlur=0;
+
+  /* Таймер до тишины/просветления */
+  if(G.monsterStage===0 && !G.enlightenMode){
+    ctx.textAlign='right';ctx.textBaseline='top';
+    ctx.font='bold 13px "Segoe UI",sans-serif';
+    ctx.fillStyle='rgba(255,255,255,0.55)';
+    let label;
+    if(!G.silenceMode){
+      const left = Math.max(0, CALM_SILENCE_TIME - G.calmTimer);
+      label = 'до спокойствия: ' + Math.ceil(left) + ' с';
+    } else {
+      const left = Math.max(0, CALM_ENLIGHTEN_TIME - G.calmTimer);
+      label = 'до просветления: ' + Math.ceil(left) + ' с';
+    }
+    ctx.fillText(label, W-pad, pad + 26);
+  }
 
   if(G.monsterStage>=3){
     ctx.font='bold 28px "Segoe UI",sans-serif';
