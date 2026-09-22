@@ -1209,7 +1209,7 @@ function initReading() {
             await typeTerm(`ВОПРОС ${examIndex + 1}: ЧТО ЗВУЧАЛО?`, 10);
             await sleep(100);
 
-            const cmdLine = await printTerm('$ ПРОИГРЫШЬ', 'cmd-underline');
+            const cmdLine = await printTerm('$ ПОВТОР', 'cmd-underline');
             cmdLine.addEventListener('click', () => playAudio(correct));
 
             const variants = new Set([correct]);
@@ -1309,7 +1309,7 @@ function initReading() {
             await typeTerm(`ЗАДАНИЕ ${dictationIndex + 1}: СОСТАВЬ СЛОГ.`, 10);
             await sleep(100);
 
-            const cmdLine = await printTerm('$ ПРОИГРЫШЬ', 'cmd-underline');
+            const cmdLine = await printTerm('$ ПОВТОР', 'cmd-underline');
             cmdLine.addEventListener('click', () => playDictAudio());
 
             renderDictAnswer();
