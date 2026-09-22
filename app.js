@@ -29,7 +29,6 @@ function initTheme(){
 
 /* ============================================================
    1. СТАРТОВАЯ АНИМАЦИЯ
-   Бургер и тема появляются СИНХРОННО — одним твином.
    ============================================================ */
 function revealHeaderControls() {
     const burger = document.getElementById('burgerBtn');
@@ -92,7 +91,6 @@ function playEntryAnimation(onDone) {
               opacity: 1, duration: 0.6, ease: 'power2.out'
           }, '-=0.5');
     } else if (page === 'games') {
-        /* На games.html нет шапки, лоадера и меню — просто показываем кнопки */
         revealHeaderControls();
         tl.to('#loader', {
             opacity: 0,
@@ -336,6 +334,7 @@ function initHome() {
             ['ИГРЫ',        'ИГРОВОЙ РАЗДЕЛ'],
             ['СТИХИ',       'ЧТЕНИЕ ПОЭЗИИ'],
             ['ВОСПИТАНИЕ',  'СТАТЬИ О ВОСПИТАНИИ'],
+            ['ИНФОРМАЦИЯ',  'СВЕДЕНИЯ О ПРОЕКТЕ'],
             ['ВЫХОД',       'ЗАВЕРШИТЬ РАБОТУ']
         ];
 
@@ -379,24 +378,48 @@ function initHome() {
             }
             await sleep(420);
 
-            await typeLine('ЭЛЕКТРОННО-ВЫЧИСЛИТЕЛЬНАЯ МАШИНА ----- ПУСК СИСТЕМЫ', { speed: 20 });
-            await sleep(180);
-            await typeLine('ДАТА: ' + formatRuDate(new Date()), { speed: 10 });
-            await typeLine('ОПЕРАТОР ---------- ГОСТЬ@ГРАМОТИНЬО', { speed: 19 });
-            await sleep(300);
-            await typeLine('ТЕСТ ОЗУ ---------- БЕЗ ДЕФЕКТОВ', { speed: 9 });
-            await sleep(200);
-            await typeLine('ТЕСТ ПЗУ ---------- БЕЗ ДЕФЕКТОВ', { speed: 19 });
-            await sleep(200);
-            await typeLine('ТЕСТ ПРОЦЕССОРА --- БЕЗ ДЕФЕКТОВ', { speed: 30 });
-            await sleep(200);
-            await typeLine('ЗАГРУЗКА МОДУЛЕЙ ------------ МОДУЛИ ЗАГРУЖЕНЫ', { speed: 25 });
+            const now = new Date();
+            const p = (n) => String(n).padStart(2, '0');
+            const dateStr = `${p(now.getDate())}.${p(now.getMonth() + 1)}.${now.getFullYear()} ${p(now.getHours())}:${p(now.getMinutes())}:${p(now.getSeconds())}`;
+
+            const L = '='.repeat(70);
+            const l = '-'.repeat(70);
+
+            const lines = [
+                L,
+                '      СИСТЕМА УПРАВЛЕНИЯ ЭВМ ',
+                L,
+                `ДАТА: ${dateStr}`,
+                'ОПЕРАТОР: ГОСТЬ ',
+                l,
+                'ПРОВЕРКА АППАРАТНОЙ ЧАСТИ:',
+                '  [ХОРОШО] ОПЕРАТИВНОЕ ЗАПОМИНАЮЩЕЕ УСТРОЙСТВО (ОЗУ)',
+                '  [ХОРОШО] ПОСТОЯННОЕ ЗАПОМИНАЮЩЕЕ УСТРОЙСТВО (ПЗУ)',
+                '  [ХОРОШО] ЦЕНТРАЛЬНЫЙ ПРОЦЕССОР (ЦП)',
+                l,
+                'СТАТУС ЗАГРУЗКИ:',
+                '  МОДУЛИ СИСТЕМЫ:  ЗАГРУЖЕНЫ',
+                '  РАЗРАБОТЧИК:      @VNVAX (ТЕЛЕГРАМ-ИНТЕРФЕЙС)',
+                l,
+                'КОМАНДЫ:',
+                '  - СПРАВКА (ВЫВОД СПИСКА ОПЕРАЦИЙ)',
+                '  - ИНФОРМАЦИЯ (ВЫВОД СВЕДЕНИЙ)',
+                '  - ВЫХОД   (ЗАВЕРШЕНИЕ СЕАНСА)',
+                '  ',
+                L,
+                ''
+            ];
+
+            for (const text of lines) {
+                const line = document.createElement('div');
+                line.className = 'term-line';
+                line.textContent = text;
+                evmBody.appendChild(line);
+                scrollTerm();
+                await sleep(55);
+            }
+
             await sleep(320);
-            await typeLine('СОСТАВИТЕЛЬ ----------------- @VNVAX ДЛЯ ТЕЛЕГРАМ.', { speed: 33 });
-            await sleep(220);
-            await typeLine('СПИСОК КОМАНД --------------- СПРАВКА', { speed: 15 });
-            await typeLine('ЗАВЕРШЕНИЕ РАБОТЫ ----------- ВЫХОД', { speed: 15 });
-            await sleep(420);
             createInputLine();
         }
 
@@ -504,6 +527,18 @@ function initHome() {
                     const key = name.toLowerCase();
                     if (ROUTES[key]) {
                         item.addEventListener('click', () => navigateWithEffect(ROUTES[key]));
+                    } else if (key === 'информация') {
+                        item.addEventListener('click', () => {
+                            const inp = document.getElementById('termInput');
+                            if (inp) {
+                                inp.value = 'информация';
+                                const m = document.getElementById('termMirror');
+                                if (m) m.textContent = 'информация';
+                                inp.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', bubbles: true }));
+                            } else {
+                                processCommand('информация');
+                            }
+                        });
                     } else if (key === 'выход') {
                         item.addEventListener('click', () => {
                             const inp = document.getElementById('termInput');
@@ -520,6 +555,16 @@ function initHome() {
                     await sleep(60);
                 }
                 await sleep(140);
+                createInputLine();
+                return;
+            }
+
+            if (cmd === 'информация' || cmd === 'info') {
+                await sleep(120);
+                await typeLine('САЙТ НАВАЙБКОДИЛ @VNVAX. ПИШИТЕ ВАШИ ОТЗЫВЫ И ПРЕДЛОЖЕНИЯ.', { speed: 14 });
+                await typeLine('ВЫ МОЖЕТЕ ОКАЗАТЬ ПОМОЩЬ, СВЯЖИТЕСЬ СО МНОЙ.', { speed: 14 });
+                await typeLine('ИДЕЙ ОЧЕНЬ МНОГО. МАКСИМАЛЬНОЕ РАСПОСТРАНЕНИЕ ПРИВЕТСТВУЕТСЯ.', { speed: 14 });
+                await sleep(180);
                 createInputLine();
                 return;
             }
@@ -742,7 +787,7 @@ function initReading() {
         }
 
         /* ====================================================
-           НОВЫЙ QUIZ / DICT — дизайн-оверлеи
+           QUIZ / DICT — дизайн-оверлеи
            ==================================================== */
         const qdOverlay = document.getElementById('qdOverlay');
         const qdClose   = document.getElementById('qdClose');
@@ -1144,6 +1189,8 @@ function initReading() {
         }
 
         async function showExamQuestion() {
+            termBody.querySelectorAll('.term-options, .term-actions').forEach((el) => el.remove());
+
             if (examIndex >= examQuestions.length) {
                 await typeTerm('$ ИТОГ', 12);
                 await sleep(200);
@@ -1158,8 +1205,10 @@ function initReading() {
             }
             const correct = examQuestions[examIndex];
             currentExamCorrect = correct;
+
             await typeTerm(`ВОПРОС ${examIndex + 1}: ЧТО ЗВУЧАЛО?`, 10);
             await sleep(100);
+
             const cmdLine = await printTerm('$ ПРОИГРЫШЬ', 'cmd-underline');
             cmdLine.addEventListener('click', () => playAudio(correct));
 
@@ -1239,6 +1288,8 @@ function initReading() {
         }
 
         async function showDictationTask() {
+            termBody.querySelectorAll('.term-options, .term-actions, .term-keyboard, .term-dict-answer').forEach((el) => el.remove());
+
             if (dictationIndex >= dictationQuestions.length) {
                 await typeTerm('$ ИТОГ', 12);
                 await sleep(200);
@@ -1254,12 +1305,16 @@ function initReading() {
             dictationLocked = false;
             dictationCurrent = dictationQuestions[dictationIndex];
             dictationInput = [];
+
             await typeTerm(`ЗАДАНИЕ ${dictationIndex + 1}: СОСТАВЬ СЛОГ.`, 10);
             await sleep(100);
+
             const cmdLine = await printTerm('$ ПРОИГРЫШЬ', 'cmd-underline');
             cmdLine.addEventListener('click', () => playDictAudio());
+
             renderDictAnswer();
             renderDictKeyboard();
+
             setTimeout(() => {
                 if (dictationCurrent) playDictAudio();
             }, 250);
@@ -1268,6 +1323,7 @@ function initReading() {
         function renderDictAnswer() {
             const old = termBody.querySelector('.term-dict-answer');
             if (old) old.remove();
+
             const line = document.createElement('div');
             line.className = 'term-line term-dict-answer';
             const before = document.createElement('span');
@@ -1299,8 +1355,8 @@ function initReading() {
         }
 
         async function renderDictKeyboard(animate = true) {
-            const old = termBody.querySelector('.term-keyboard');
-            if (old) old.remove();
+            termBody.querySelectorAll('.term-keyboard').forEach((el) => el.remove());
+
             const kb = document.createElement('div');
             kb.className = 'term-keyboard';
             termBody.appendChild(kb);
@@ -1569,6 +1625,7 @@ function initTools() {
                 if (terminalStarted) return;
                 terminalStarted = true;
                 await sleep(200);
+
                 const frame = document.createElement('div');
                 frame.className = 'term-frame';
                 const pre = document.createElement('pre');
@@ -1576,30 +1633,55 @@ function initTools() {
                 frame.appendChild(pre);
                 evmBody.appendChild(frame);
                 scrollTerm();
+
                 for (const line of ASCII_ART) {
                     pre.textContent += line + '\n';
                     scrollTerm();
                     await sleep(45);
                 }
                 await sleep(420);
-                await typeLine('ЭЛЕКТРОННО-ВЫЧИСЛИТЕЛЬНАЯ МАШИНА: ПУСК СИСТЕМЫ', { speed: 12 });
-                await sleep(180);
-                await typeLine('ДАТА: ' + formatRuDate(new Date()), { speed: 10 });
-                await typeLine('ОПЕРАТОР: ГОСТЬ@ГРАМОТИНЬО', { speed: 10 });
-                await sleep(300);
-                await typeLine('ТЕСТ ОЗУ... БЕЗ ДЕФЕКТОВ', { speed: 12 });
-                await sleep(200);
-                await typeLine('ТЕСТ ПЗУ... БЕЗ ДЕФЕКТОВ', { speed: 12 });
-                await sleep(200);
-                await typeLine('ТЕСТ ПРОЦЕССОРА... БЕЗ ДЕФЕКТОВ', { speed: 12 });
-                await sleep(200);
-                await typeLine('ЗАГРУЗКА МОДУЛЕЙ... МОДУЛИ ЗАГРУЖЕНЫ', { speed: 12 });
+
+                const now = new Date();
+                const p = (n) => String(n).padStart(2, '0');
+                const dateStr = `${p(now.getDate())}.${p(now.getMonth() + 1)}.${now.getFullYear()} ${p(now.getHours())}:${p(now.getMinutes())}:${p(now.getSeconds())}`;
+
+                const L = '='.repeat(70);
+                const l = '-'.repeat(70);
+
+                const lines = [
+                    L,
+                    '      СИСТЕМА УПРАВЛЕНИЯ ЭВМ ',
+                    L,
+                    `ДАТА: ${dateStr}`,
+                    'ОПЕРАТОР: ГОСТЬ ',
+                    l,
+                    'ПРОВЕРКА АППАРАТНОЙ ЧАСТИ:',
+                    '  [ХОРОШО] ОПЕРАТИВНОЕ ЗАПОМИНАЮЩЕЕ УСТРОЙСТВО (ОЗУ)',
+                    '  [ХОРОШО] ПОСТОЯННОЕ ЗАПОМИНАЮЩЕЕ УСТРОЙСТВО (ПЗУ)',
+                    '  [ХОРОШО] ЦЕНТРАЛЬНЫЙ ПРОЦЕССОР (ЦП)',
+                    l,
+                    'СТАТУС ЗАГРУЗКИ:',
+                    '  МОДУЛИ СИСТЕМЫ:  ЗАГРУЖЕНЫ',
+                    '  РАЗРАБОТЧИК:      @VNVAX (ТЕЛЕГРАМ-ИНТЕРФЕЙС)',
+                    l,
+                    'КОМАНДЫ:',
+                    '  - СПРАВКА (ВЫВОД СПИСКА ОПЕРАЦИЙ)',
+                    '  - ВЫХОД   (ЗАВЕРШЕНИЕ СЕАНСА)',
+                    '  ',
+                    L,
+                    ''
+                ];
+
+                for (const text of lines) {
+                    const line = document.createElement('div');
+                    line.className = 'term-line';
+                    line.textContent = text;
+                    evmBody.appendChild(line);
+                    scrollTerm();
+                    await sleep(55);
+                }
+
                 await sleep(320);
-                await typeLine('СОСТАВИТЕЛЬ: @VNVAX. БЛАГОДАРИТЬ В ТЕЛЕГРАМ.', { speed: 10 });
-                await sleep(220);
-                await typeLine('ДЛЯ СПИСКА КОМАНД ВВЕДИТЕ "СПРАВКА"', { speed: 12 });
-                await typeLine('ДЛЯ ЗАВЕРШЕНИЯ РАБОТЫ ВВЕДИТЕ "ВЫХОД"', { speed: 12 });
-                await sleep(420);
                 createInputLine();
             }
 
