@@ -1273,7 +1273,7 @@ const UGLY_SCOOTER   = 0.04;
 const FAT_BURN_BROOM = 0.012;
 const FAT_BURN_SUB   = 0.012;
 
-const MOOD_DECAY = 6;
+const MOOD_DECAY = 4;
 const MOOD_RECOVER = 12;
 
 const HAPPY_PHRASES=['Ура!','Хихи!','Моё!','Класс!','Ещё!','Ещё! Ещё!','Да!','Спасибочки!','Ня!'];
@@ -1751,7 +1751,7 @@ function updateChar(ch,dt){
     }
   }
 
-  if(ch.mood>0)ch.mood=Math.max(-30,ch.mood-dt*MOOD_DECAY);
+  if(ch.mood>0)ch.mood=Math.max(-1,ch.mood-dt*MOOD_DECAY);
   else ch.mood=Math.min(0,ch.mood+dt*MOOD_RECOVER);
 
   if(ch.globalMode==='capricious'){
