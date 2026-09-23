@@ -23,21 +23,8 @@
     60%{transform:translate(-3px,-4px)}
     80%{transform:translate(3px,4px)}
   }
-  @keyframes screenShakeHard{
-    0%,100%{transform:translate(0,0)}
-    20%{transform:translate(-9px,7px)}
-    40%{transform:translate(9px,-7px)}
-    60%{transform:translate(-7px,-9px)}
-    80%{transform:translate(7px,9px)}
-  }
   body.rage-shake #room,body.rage-shake #chars,body.rage-shake #props,
-  body.rage-shake #cat,body.rage-shake #fx{
-    animation:screenShake .14s linear infinite;
-  }
-  body.rage-shake-hard #room,body.rage-shake-hard #chars,body.rage-shake-hard #props,
-  body.rage-shake-hard #cat,body.rage-shake-hard #fx{
-    animation:screenShakeHard .09s linear infinite;
-  }
+  body.rage-shake #cat,body.rage-shake #fx{animation:screenShake .14s linear infinite;}
 
   .character-wrap{
     position:absolute;pointer-events:auto;cursor:pointer;
@@ -46,24 +33,9 @@
   }
   .character-wrap svg{display:block;width:100%;height:100%;overflow:visible;}
 
-  .character-wrap .body-lower{
-    transform-origin:200px 660px;
-    transform:scaleX(var(--fatX,1)) scaleY(var(--fatY,1));
-    transition:transform .35s ease;
-  }
-  .character-wrap .body-mid{
-    transform-origin:200px 400px;
-    transform:scaleX(var(--fatX,1)) scaleY(var(--fatY,1));
-    transition:transform .35s ease;
-  }
-  .character-wrap .head-group{
-    transform-origin:200px 170px;
-    transform:scaleX(var(--headFatX,1)) scaleY(var(--headFatY,1));
-    transition:transform .35s ease;
-  }
-  .character-wrap svg .fat-belly{display:none;}
-  .character-wrap[data-fat="1"] svg .fat-belly,
-  .character-wrap[data-fat="2"] svg .fat-belly{display:block;}
+  .character-wrap .body-lower{transform-origin:200px 660px;transform:scaleX(var(--fatX,1)) scaleY(var(--fatY,1));transition:transform .35s ease;}
+  .character-wrap .body-mid{transform-origin:200px 400px;transform:scaleX(var(--fatX,1)) scaleY(var(--fatY,1));transition:transform .35s ease;}
+  .character-wrap .head-group{transform-origin:200px 170px;transform:scaleX(var(--headFatX,1)) scaleY(var(--headFatY,1));transition:transform .35s ease;}
 
   .character-wrap[data-selected="1"]::after{
     content:'';position:absolute;left:50%;bottom:-4px;width:70%;height:14px;
@@ -101,32 +73,17 @@
     75%{transform:translate(-1.5px,-1.5px)}
   }
 
-  .character-wrap svg .anger-mark{animation:angerPulse .55s ease-in-out infinite;}
-  @keyframes angerPulse{0%,100%{transform:scale(1);opacity:.85}50%{transform:scale(1.2);opacity:1}}
   .character-wrap svg .heart-fx{animation:heartRise 1.8s ease-out infinite;}
   @keyframes heartRise{0%{transform:translateY(0) scale(.6);opacity:0}15%{opacity:1;transform:translateY(-10px) scale(1)}100%{transform:translateY(-150px) scale(.9);opacity:0}}
   .character-wrap svg .tear-fx{animation:tearFall 1.4s ease-in infinite;}
   @keyframes tearFall{0%{transform:translateY(0) scale(.4);opacity:0}20%{transform:translateY(6px) scale(1);opacity:1}100%{transform:translateY(72px) scale(1);opacity:0}}
-  .character-wrap svg .sweat-fx{animation:sweatSlide 1.6s ease-in infinite;}
-  @keyframes sweatSlide{0%{transform:translate(0,0) rotate(0);opacity:0}15%{opacity:1}100%{transform:translate(14px,42px) rotate(20deg);opacity:0}}
-  .character-wrap svg .spark{animation:sparkle 1.6s ease-in-out infinite;transform-origin:center;}
-  @keyframes sparkle{0%,100%{transform:scale(1) rotate(0);opacity:.8}50%{transform:scale(1.35) rotate(20deg);opacity:1}}
-  .character-wrap svg .smoke-1{animation:smokeRise1 2s ease-out infinite;}
-  .character-wrap svg .smoke-2{animation:smokeRise2 2.4s ease-out infinite .4s;}
-  .character-wrap svg .smoke-3{animation:smokeRise3 2.8s ease-out infinite .8s;}
-  @keyframes smokeRise1{0%{transform:translate(0,0) scale(.6);opacity:0}20%{opacity:.55}100%{transform:translate(6px,-28px) scale(1.6);opacity:0}}
-  @keyframes smokeRise2{0%{transform:translate(0,0) scale(.6);opacity:0}20%{opacity:.5}100%{transform:translate(-4px,-42px) scale(1.9);opacity:0}}
-  @keyframes smokeRise3{0%{transform:translate(0,0) scale(.7);opacity:0}25%{opacity:.42}100%{transform:translate(8px,-58px) scale(2.2);opacity:0}}
 
   .character-wrap svg .lip-glow{animation:lipPulse 1.2s ease-in-out infinite;}
-  @keyframes lipPulse{
-    0%,100%{opacity:.75;transform:scale(1)}
-    50%{opacity:1;transform:scale(1.05)}
-  }
+  @keyframes lipPulse{0%,100%{opacity:.75;transform:scale(1)}50%{opacity:1;transform:scale(1.05)}}
   .character-wrap svg .face-red{opacity:0;transition:opacity .6s ease;}
   .character-wrap[data-red="1"] svg .face-red{opacity:.45;}
 
-  /* ВИДИМОСТЬ */
+  /* ============ ВИДИМОСТЬ ============ */
   .character-wrap svg .torso-original,
   .character-wrap svg .skirt-original,
   .character-wrap svg .arms-normal,
@@ -142,9 +99,8 @@
   .character-wrap svg .arms-monster,
   .character-wrap svg .hands-monster,
   .character-wrap svg .shoes-monster,
-  .character-wrap svg .horns,
-  .character-wrap svg .warts,
-  .character-wrap svg .cigarette,
+  .character-wrap svg .monster-hair,
+  .character-wrap svg .monster-m,
   .character-wrap svg .crown,
   .character-wrap svg .lolli-in-hand,
   .character-wrap svg .phone-in-hand,
@@ -153,16 +109,14 @@
   .character-wrap svg .apron-worn,
   .character-wrap svg .lip-color-wide,
   .character-wrap svg .vampire-fangs,
-  .character-wrap svg .short-hair,
+  .character-wrap svg .monster-eye-red,
+  .character-wrap svg .monster-pimples,
+  .character-wrap svg .monster-piercing,
   .character-wrap svg .eye-neutral,
   .character-wrap svg .eye-happy,
   .character-wrap svg .eye-sad,
   .character-wrap svg .eye-rage,
   .character-wrap svg .eye-demand,
-  .character-wrap svg .brow-neutral,
-  .character-wrap svg .brow-sad,
-  .character-wrap svg .brow-rage,
-  .character-wrap svg .brow-demand,
   .character-wrap svg .mouth-neutral,
   .character-wrap svg .mouth-happy,
   .character-wrap svg .mouth-laugh,
@@ -172,6 +126,7 @@
   .character-wrap svg .mouth-scream,
   .character-wrap svg .mouth-rage,
   .character-wrap svg .mouth-demand,
+  .character-wrap svg .mouth-displeased,
   .character-wrap svg .fx-anger,
   .character-wrap svg .fx-hearts,
   .character-wrap svg .fx-sparks,
@@ -195,119 +150,95 @@
   .character-wrap[data-outfit="brat"] .shoes-brat,
   .character-wrap[data-outfit="brat"] .glasses{display:block;}
 
-  .character-wrap[data-stage="2"] .torso-monster,
-  .character-wrap[data-stage="2"] .skirt-monster,
-  .character-wrap[data-stage="2"] .arms-monster,
-  .character-wrap[data-stage="2"] .hands-monster,
-  .character-wrap[data-stage="2"] .shoes-monster,
-  .character-wrap[data-stage="2"] .horns,
-  .character-wrap[data-stage="2"] .warts,
+  /* МОНСТР — та же девочка, только волосы зелёные каре и другая одежда.
+     Руки — обычные, но НЕ arm-holding/hands-holding. */
   .character-wrap[data-stage="3"] .torso-monster,
   .character-wrap[data-stage="3"] .skirt-monster,
   .character-wrap[data-stage="3"] .arms-monster,
   .character-wrap[data-stage="3"] .hands-monster,
   .character-wrap[data-stage="3"] .shoes-monster,
-  .character-wrap[data-stage="3"] .horns,
-  .character-wrap[data-stage="3"] .warts{display:block;}
+  .character-wrap[data-stage="3"] .monster-hair,
+  .character-wrap[data-stage="3"] .monster-m,
+  .character-wrap[data-stage="3"] .monster-eye-red,
+  .character-wrap[data-stage="3"] .monster-piercing,
+  .character-wrap[data-stage="3"] .mouth-displeased,
+  .character-wrap[data-stage="3"] .vampire-fangs{display:block;}
 
-  .character-wrap[data-stage="2"] .torso-original,
-  .character-wrap[data-stage="2"] .skirt-original,
-  .character-wrap[data-stage="2"] .shoes-original,
-  .character-wrap[data-stage="2"] .cardigan,
-  .character-wrap[data-stage="2"] .torso-brat,
-  .character-wrap[data-stage="2"] .skirt-brat,
-  .character-wrap[data-stage="2"] .shoes-brat,
-  .character-wrap[data-stage="2"] .glasses,
   .character-wrap[data-stage="3"] .torso-original,
   .character-wrap[data-stage="3"] .skirt-original,
+  .character-wrap[data-stage="3"] .arms-normal,
+  .character-wrap[data-stage="3"] .hands-normal,
   .character-wrap[data-stage="3"] .shoes-original,
   .character-wrap[data-stage="3"] .cardigan,
   .character-wrap[data-stage="3"] .torso-brat,
   .character-wrap[data-stage="3"] .skirt-brat,
   .character-wrap[data-stage="3"] .shoes-brat,
-  .character-wrap[data-stage="3"] .glasses{display:none;}
+  .character-wrap[data-stage="3"] .glasses,
+  .character-wrap[data-stage="3"] .hair-bl,
+  .character-wrap[data-stage="3"] .hair-br,
+  .character-wrap[data-stage="3"] .hair-sl,
+  .character-wrap[data-stage="3"] .hair-sr,
+  .character-wrap[data-stage="3"] .hair-front,
+  .character-wrap[data-stage="3"] .hair-front-hi,
+  .character-wrap[data-stage="3"] .crown,
+  .character-wrap[data-stage="3"] .lolli-in-hand,
+  .character-wrap[data-stage="3"] .phone-in-hand,
+  .character-wrap[data-stage="3"] .arm-holding,
+  .character-wrap[data-stage="3"] .hands-holding,
+  .character-wrap[data-stage="3"] .hair-bow,
+  .character-wrap[data-stage="3"] .fox-ears,
+  .character-wrap[data-stage="3"] .apron-worn{display:none;}
 
-  .character-wrap[data-stage="3"] .cigarette{display:block;}
+  .character-wrap[data-fat="2"] svg .monster-pimples{display:block;}
+
   .character-wrap[data-boy="0"] .hair-bow{display:block;}
   .character-wrap[data-crown="1"] .crown{display:block;}
 
-  .character-wrap[data-hold="lolli"] .arm-holding,
-  .character-wrap[data-hold="lolli"] .hands-holding,
-  .character-wrap[data-hold="lolli"] .lolli-in-hand,
-  .character-wrap[data-hold="phone"] .arm-holding,
-  .character-wrap[data-hold="phone"] .hands-holding,
-  .character-wrap[data-hold="phone"] .phone-in-hand{display:block;}
-  .character-wrap[data-hold="lolli"] .arms-normal,
-  .character-wrap[data-hold="lolli"] .hands-normal,
-  .character-wrap[data-hold="phone"] .arms-normal,
-  .character-wrap[data-hold="phone"] .hands-normal,
-  .character-wrap[data-hold="lolli"] .arms-monster,
-  .character-wrap[data-hold="lolli"] .hands-monster,
-  .character-wrap[data-hold="phone"] .arms-monster,
-  .character-wrap[data-hold="phone"] .hands-monster{display:none;}
+  /* Когда леденец/телефон в руке — показываем arm-holding. У монстра — никогда. */
+  .character-wrap[data-hold="lolli"]:not([data-stage="3"]) .arm-holding,
+  .character-wrap[data-hold="lolli"]:not([data-stage="3"]) .hands-holding,
+  .character-wrap[data-hold="lolli"]:not([data-stage="3"]) .lolli-in-hand,
+  .character-wrap[data-hold="phone"]:not([data-stage="3"]) .arm-holding,
+  .character-wrap[data-hold="phone"]:not([data-stage="3"]) .hands-holding,
+  .character-wrap[data-hold="phone"]:not([data-stage="3"]) .phone-in-hand{display:block;}
+
+  .character-wrap[data-hold="lolli"]:not([data-stage="3"]) .arms-normal,
+  .character-wrap[data-hold="lolli"]:not([data-stage="3"]) .hands-normal,
+  .character-wrap[data-hold="phone"]:not([data-stage="3"]) .arms-normal,
+  .character-wrap[data-hold="phone"]:not([data-stage="3"]) .hands-normal{display:none;}
 
   .character-wrap[data-apron="1"] .apron-worn{display:block;}
   .character-wrap[data-lips="1"] .lip-color-wide{display:block;}
 
-  .character-wrap svg .apron-worn path[fill="#7ad8a8"]{fill:#a8a8a8;}
-  .character-wrap svg .apron-worn path[fill="#3a8060"]{fill:#6a6a6a;}
-
-  .character-wrap[data-stage="1"] svg .vampire-fangs,
-  .character-wrap[data-stage="2"] svg .vampire-fangs,
-  .character-wrap[data-stage="3"] svg .vampire-fangs{display:block;}
-
-  .character-wrap[data-stage="2"] svg .hair-bl,
-  .character-wrap[data-stage="2"] svg .hair-br,
-  .character-wrap[data-stage="2"] svg .hair-sl,
-  .character-wrap[data-stage="2"] svg .hair-sr,
-  .character-wrap[data-stage="2"] svg .hair-front,
-  .character-wrap[data-stage="2"] svg .hair-front-hi{
-    filter:hue-rotate(-55deg) saturate(2.4) brightness(.95);
-  }
-  .character-wrap[data-stage="3"] svg .hair-bl,
-  .character-wrap[data-stage="3"] svg .hair-br,
-  .character-wrap[data-stage="3"] svg .hair-sl,
-  .character-wrap[data-stage="3"] svg .hair-sr,
-  .character-wrap[data-stage="3"] svg .hair-front,
-  .character-wrap[data-stage="3"] svg .hair-front-hi{display:none;}
-  .character-wrap[data-stage="3"] svg .short-hair{display:block;}
-
-  /* ЭМОЦИИ: брови ТОЛЬКО для спокойна/довольна */
   .character-wrap[data-expr="neutral"] .eye-neutral,
-  .character-wrap[data-expr="neutral"] .brow-neutral,
   .character-wrap[data-expr="neutral"] .mouth-neutral{display:block;}
 
   .character-wrap[data-expr="happy"] .eye-happy,
-  .character-wrap[data-expr="happy"] .brow-neutral,
   .character-wrap[data-expr="happy"] .mouth-happy{display:block;}
 
   .character-wrap[data-expr="laugh"] .eye-happy,
-  .character-wrap[data-expr="laugh"] .brow-neutral,
   .character-wrap[data-expr="laugh"] .mouth-laugh{display:block;}
 
   .character-wrap[data-expr="bliss"] .eye-happy,
-  .character-wrap[data-expr="bliss"] .brow-neutral,
   .character-wrap[data-expr="bliss"] .mouth-bliss{display:block;}
 
-  /* sad — БЕЗ брови */
   .character-wrap[data-expr="sad"] .eye-sad,
   .character-wrap[data-expr="sad"] .mouth-sad{display:block;}
 
-  /* cry — БЕЗ брови */
   .character-wrap[data-expr="cry"] .eye-sad,
   .character-wrap[data-expr="cry"] .mouth-cry{display:block;}
 
-  /* demand — БЕЗ брови */
   .character-wrap[data-expr="demand"] .eye-demand,
   .character-wrap[data-expr="demand"] .mouth-demand{display:block;}
 
-  /* rage — БЕЗ брови */
   .character-wrap[data-expr="rage"] .eye-rage,
   .character-wrap[data-expr="rage"] .mouth-rage{display:block;}
 
-  /* scream — БЕЗ брови */
   .character-wrap[data-expr="scream"] .eye-rage,
   .character-wrap[data-expr="scream"] .mouth-scream{display:block;}
+
+  /* Монстр — всегда недовольное лицо, без тряски */
+  .character-wrap[data-stage="3"] .eye-demand{display:block;}
 
   .character-wrap[data-expr="happy"] .fx-hearts,
   .character-wrap[data-expr="laugh"] .fx-hearts,
@@ -320,8 +251,8 @@
   .character-wrap[data-expr="laugh"] .blush,
   .character-wrap[data-expr="bliss"] .blush{opacity:.72;}
 
-  #hud{display:none;}
-
+  #hud{position:fixed;top:0;left:0;z-index:30;pointer-events:none;
+    padding:10px;display:flex;flex-direction:column;gap:6px;}
   .statCard{background:rgba(20,10,36,.72);border:1px solid rgba(255,140,200,.28);
     border-radius:10px;padding:6px 10px;backdrop-filter:blur(6px);
     display:flex;align-items:center;gap:8px;}
@@ -357,15 +288,13 @@
   #dragGhost img{width:100%;height:100%;object-fit:contain;}
 
   .floor-toy{position:absolute;pointer-events:none;
-    animation:propAppear .5s ease-out;
-    filter:drop-shadow(0 3px 4px rgba(0,0,0,.5));}
+    animation:propAppear .5s ease-out;}
   .floor-toy img{width:100%;height:100%;object-fit:contain;}
   @keyframes propAppear{0%{transform:scale(.3) translateY(20px);opacity:0}100%{transform:scale(1) translateY(0);opacity:1}}
 
-  .wall-item{position:absolute;pointer-events:none;
-    animation:propAppear .5s ease-out;
-    filter:drop-shadow(0 6px 8px rgba(0,0,0,.55));}
-  .wall-item img{width:100%;height:100%;object-fit:contain;}
+  .floor-item{position:absolute;pointer-events:none;
+    animation:propAppear .5s ease-out;}
+  .floor-item img{width:100%;height:100%;object-fit:contain;}
 
   .exit-btn-fox{position:fixed;top:10px;right:10px;z-index:100;font-family:inherit;font-weight:700;font-size:13px;
     padding:9px 16px;background:rgba(255,255,255,.92);color:#120a18;border:none;border-radius:999px;cursor:pointer;
@@ -475,19 +404,17 @@ const sndMonster=()=>beep(90,.8,'sawtooth',.08,-50);
 const sndClean=()=>{beep(600,.15,'sine',.05,200);setTimeout(()=>beep(800,.18,'sine',.05,200),120);};
 const sndPop=()=>beep(520,.07,'square',.045,320);
 const sndEnlighten=()=>{beep(700,.2,'sine',.05,200);setTimeout(()=>beep(880,.2,'sine',.05,200),150);setTimeout(()=>beep(1100,.35,'sine',.06,300),320);};
-const sndBrush=()=>{beep(1200,.09,'sine',.04,-400);setTimeout(()=>beep(900,.09,'sine',.04,-300),70);};
 const sndLose=()=>{beep(300,.6,'sawtooth',.08,-200);setTimeout(()=>beep(180,.8,'sawtooth',.08,-80),400);};
 const sndDemand=()=>{beep(420,.16,'square',.07,180);setTimeout(()=>beep(520,.16,'square',.07,180),140);};
 const sndScream=(stage=0)=>{
-  const vol=Math.min(0.16,0.06+stage*0.04);
-  const dur=0.5+stage*0.12;
-  const base=750+stage*80;
+  const vol=Math.min(0.20,0.06+stage*0.05);
+  const dur=0.5+stage*0.18;
+  const base=750+stage*90;
   beep(base,dur,'sawtooth',vol,-550-stage*40);
   if(stage>=2)setTimeout(()=>beep(base*1.2,dur*0.8,'sawtooth',vol*0.8,-400),100);
   if(stage>=3)setTimeout(()=>beep(base*0.7,dur*1.1,'sawtooth',vol*0.9,-500),180);
 };
 
-/* CATALOG */
 const TOYS=[
   {kind:'toy',sub:'doll',label:'Куколка'},
   {kind:'toy',sub:'bear',label:'Мишка'},
@@ -529,6 +456,45 @@ const DRESS_COLORS=[
   {top:'#ffe080',bottom:'#ffc040',shade:'#c88800'},
   {top:'#8ae0c8',bottom:'#5ac0a0',shade:'#2a8060'},
   {top:'#c8a8ff',bottom:'#a880e0',shade:'#6a40b8'},
+  {top:'#ffb0e0',bottom:'#ff70c0',shade:'#c84088'},
+  {top:'#a0ffb0',bottom:'#60d080',shade:'#2a8060'},
+];
+
+const NATURAL_HAIR=[
+  {top:'#f0dcb8',mid:'#d4b888',bot:'#8a6a44'},
+  {top:'#d4b890',mid:'#a88058',bot:'#5a3e28'},
+  {top:'#a88260',mid:'#7a5238',bot:'#3a2418'},
+  {top:'#3a2418',mid:'#1a0e08',bot:'#050200'},
+  {top:'#d8a070',mid:'#b06a3a',bot:'#6a3018'},
+  {top:'#b08858',mid:'#8a5a30',bot:'#4a2810'},
+];
+const NATURAL_EYES=[
+  {c1:'#7a9ae8',c2:'#2a4ab8',c3:'#0a1030'},
+  {c1:'#8ae0a0',c2:'#3a9050',c3:'#0a3018'},
+  {c1:'#b87848',c2:'#7a4020',c3:'#2a1008'},
+  {c1:'#c8a848',c2:'#8a6a20',c3:'#2a1a08'},
+  {c1:'#a8b0c0',c2:'#6070a0',c3:'#1a2030'},
+];
+const WALL_COLORS=[
+  {top:'#e8ddc8',bot:'#d4c8b0'},{top:'#dcdcd0',bot:'#c8c8b8'},
+  {top:'#e0d5c8',bot:'#c8b8a8'},{top:'#d8d5e0',bot:'#b8b0c0'},
+  {top:'#e8d8c8',bot:'#d0b8a0'},{top:'#d5e0d0',bot:'#b8c8b8'},
+];
+const FLOOR_COLORS=[
+  {top:'#d8b888',bot:'#a88058',tex:'boards'},
+  {top:'#c8a878',bot:'#987048',tex:'boards'},
+  {top:'#e0c098',bot:'#b09068',tex:'boards'},
+  {top:'#b8a890',bot:'#887050',tex:'tiles'},
+  {top:'#c8c0b0',bot:'#988870',tex:'tiles'},
+  {top:'#d0b898',bot:'#a08868',tex:'parquet'},
+];
+const CAT_COLORS=[
+  {body:'#3a3a48',belly:'#5a5a70',stripe:'#2a2a38',name:'dark'},
+  {body:'#d87838',belly:'#f0a868',stripe:'#b05820',name:'ginger'},
+  {body:'#c0b0a0',belly:'#e8d8c8',stripe:'#8a7860',name:'spotted'},
+];
+const CAT_EYE_COLORS=[
+  {c:'#8affa0'},{c:'#ffa040'},{c:'#60a0ff'},
 ];
 
 /* ICONS */
@@ -543,27 +509,74 @@ function drawItemIcon(g,sub,size){
   g.fillStyle='rgba(255,255,255,0.06)';g.beginPath();g.arc(0,0,95,0,TAU);g.fill();
   switch(sub){
     case 'doll':{
-      g.fillStyle='#ffe0b0';g.beginPath();g.arc(0,-52,32,0,TAU);g.fill();
-      g.fillStyle='#ffd060';g.beginPath();g.arc(0,-58,30,Math.PI,0);g.fill();
-      g.fillRect(-30,-58,60,12);
-      g.beginPath();g.arc(-30,-42,10,0,TAU);g.fill();
-      g.beginPath();g.arc(30,-42,10,0,TAU);g.fill();
-      g.fillStyle='#ff5a9a';
-      g.beginPath();g.moveTo(-28,-20);g.lineTo(28,-20);g.lineTo(42,68);g.lineTo(-42,68);g.closePath();g.fill();
-      g.fillStyle='#333';g.beginPath();g.arc(-10,-52,3.5,0,TAU);g.fill();
-      g.beginPath();g.arc(10,-52,3.5,0,TAU);g.fill();
+      const hg=g.createRadialGradient(-15,-30,5,0,-25,70);
+      hg.addColorStop(0,'#ffe8d0');hg.addColorStop(1,'#f0c8a8');
+      g.fillStyle=hg;g.beginPath();g.arc(0,-25,62,0,TAU);g.fill();
+      g.fillStyle='#ff4fa8';g.beginPath();g.arc(0,-35,62,Math.PI,0);g.fill();
+      g.beginPath();g.arc(-42,-35,22,0,TAU);g.fill();
+      g.beginPath();g.arc(42,-35,22,0,TAU);g.fill();
+      g.fillStyle='#ff7ac0';g.beginPath();g.arc(0,-55,50,Math.PI,0);g.fill();
+      g.fillStyle='#fff';g.beginPath();g.ellipse(-22,-22,16,18,0,0,TAU);g.fill();
+      g.beginPath();g.ellipse(22,-22,16,18,0,0,TAU);g.fill();
+      const ig=g.createRadialGradient(-25,-27,2,-22,-22,13);
+      ig.addColorStop(0,'#a0d8ff');ig.addColorStop(0.5,'#4a90e0');ig.addColorStop(1,'#1a3060');
+      g.fillStyle=ig;g.beginPath();g.arc(-22,-22,12,0,TAU);g.fill();
+      g.beginPath();g.arc(22,-22,12,0,TAU);g.fill();
+      g.fillStyle='#000';
+      g.beginPath();g.arc(-22,-22,6,0,TAU);g.fill();
+      g.beginPath();g.arc(22,-22,6,0,TAU);g.fill();
+      g.fillStyle='#fff';
+      g.beginPath();g.arc(-26,-27,4,0,TAU);g.fill();
+      g.beginPath();g.arc(18,-27,4,0,TAU);g.fill();
+      g.fillStyle='#ff3a6a';
+      g.beginPath();g.ellipse(0,-3,10,5,0,0,TAU);g.fill();
+      g.fillStyle='#a02ae0';g.beginPath();
+      g.moveTo(-28,62);g.lineTo(-32,28);g.lineTo(-18,20);g.lineTo(18,20);g.lineTo(32,28);g.lineTo(28,62);g.closePath();g.fill();
+      g.fillStyle='#ffe8d0';
+      g.fillRect(-20,62,12,25);g.fillRect(8,62,12,25);
+      g.fillStyle='#ff4fa8';
+      g.beginPath();g.ellipse(-14,90,10,5,0,0,TAU);g.fill();
+      g.beginPath();g.ellipse(14,90,10,5,0,0,TAU);g.fill();
       break;}
     case 'bear':{
-      g.fillStyle='#a8703a';g.beginPath();g.ellipse(0,10,54,58,0,0,TAU);g.fill();
-      g.fillStyle='#d4a870';g.beginPath();g.ellipse(0,26,32,38,0,0,TAU);g.fill();
-      g.fillStyle='#a8703a';g.beginPath();g.arc(-42,-52,22,0,TAU);g.fill();
-      g.beginPath();g.arc(42,-52,22,0,TAU);g.fill();
-      g.fillStyle='#e0b080';g.beginPath();g.arc(-42,-52,11,0,TAU);g.fill();
-      g.beginPath();g.arc(42,-52,11,0,TAU);g.fill();
-      g.fillStyle='#a8703a';g.beginPath();g.arc(0,-30,48,0,TAU);g.fill();
-      g.fillStyle='#e0b080';g.beginPath();g.ellipse(0,-12,28,22,0,0,TAU);g.fill();
-      g.fillStyle='#2a1a10';g.beginPath();g.arc(-16,-38,5.5,0,TAU);g.fill();
-      g.beginPath();g.arc(16,-38,5.5,0,TAU);g.fill();
+      g.fillStyle='rgba(0,0,0,0.15)';g.beginPath();g.ellipse(0,85,50,8,0,0,TAU);g.fill();
+      g.fillStyle='#8a5a28';
+      g.beginPath();g.ellipse(-25,55,20,26,0,0,TAU);g.fill();
+      g.beginPath();g.ellipse(25,55,20,26,0,0,TAU);g.fill();
+      const bg2=g.createRadialGradient(-15,-15,10,0,10,80);
+      bg2.addColorStop(0,'#c88a50');bg2.addColorStop(0.6,'#a8703a');bg2.addColorStop(1,'#7a4a20');
+      g.fillStyle=bg2;g.beginPath();g.ellipse(0,10,58,62,0,0,TAU);g.fill();
+      const belly=g.createRadialGradient(-8,20,5,0,25,45);
+      belly.addColorStop(0,'#e8c090');belly.addColorStop(1,'#c8a070');
+      g.fillStyle=belly;g.beginPath();g.ellipse(0,26,36,42,0,0,TAU);g.fill();
+      g.fillStyle='#a8703a';
+      g.beginPath();g.ellipse(-50,55,16,20,0.4,0,TAU);g.fill();
+      g.beginPath();g.ellipse(50,55,16,20,-0.4,0,TAU);g.fill();
+      g.fillStyle='#8a5a28';
+      g.beginPath();g.ellipse(-52,62,8,10,0.4,0,TAU);g.fill();
+      g.beginPath();g.ellipse(52,62,8,10,-0.4,0,TAU);g.fill();
+      const hg2=g.createRadialGradient(-12,-50,5,0,-40,55);
+      hg2.addColorStop(0,'#c89060');hg2.addColorStop(1,'#a8703a');
+      g.fillStyle=hg2;g.beginPath();g.arc(0,-42,52,0,TAU);g.fill();
+      g.fillStyle='#a8703a';
+      g.beginPath();g.arc(-42,-75,20,0,TAU);g.fill();
+      g.beginPath();g.arc(42,-75,20,0,TAU);g.fill();
+      g.fillStyle='#e8b080';
+      g.beginPath();g.arc(-42,-75,11,0,TAU);g.fill();
+      g.beginPath();g.arc(42,-75,11,0,TAU);g.fill();
+      const mz=g.createRadialGradient(0,-25,5,0,-22,35);
+      mz.addColorStop(0,'#f0d0a8');mz.addColorStop(1,'#d8b080');
+      g.fillStyle=mz;g.beginPath();g.ellipse(0,-22,30,24,0,0,TAU);g.fill();
+      g.fillStyle='#2a1a10';g.beginPath();g.ellipse(0,-32,9,7,0,0,TAU);g.fill();
+      g.fillStyle='#5a3a20';g.beginPath();g.ellipse(0,-34,6,4,0,0,TAU);g.fill();
+      g.strokeStyle='#2a1a10';g.lineWidth=2.5;
+      g.beginPath();g.moveTo(0,-25);g.lineTo(0,-18);g.stroke();
+      g.fillStyle='#1a0e08';
+      g.beginPath();g.arc(-19,-52,6,0,TAU);g.fill();
+      g.beginPath();g.arc(19,-52,6,0,TAU);g.fill();
+      g.fillStyle='#fff';
+      g.beginPath();g.arc(-17,-54,2.2,0,TAU);g.fill();
+      g.beginPath();g.arc(21,-54,2.2,0,TAU);g.fill();
       break;}
     case 'phone':{
       g.fillStyle='#1a1a25';RR(-40,-80,80,160,16);g.fill();
@@ -633,9 +646,7 @@ function drawItemIcon(g,sub,size){
       break;}
     case 'fries':{
       const sticks=[[-42,-58,11,58],[-24,-66,11,66],[-6,-62,11,62],[12,-70,11,70],[30,-62,11,62],[46,-54,11,54]];
-      for(const[x,y,w,h] of sticks){
-        g.fillStyle='#ffc000';g.fillRect(x,y,w,h);
-      }
+      for(const[x,y,w,h] of sticks){g.fillStyle='#ffc000';g.fillRect(x,y,w,h);}
       g.fillStyle='#e03030';g.beginPath();g.moveTo(-52,-12);g.lineTo(52,-12);g.lineTo(40,88);g.lineTo(-40,88);g.closePath();g.fill();
       g.fillStyle='#fff';g.font='bold 40px sans-serif';
       g.textAlign='center';g.textBaseline='middle';g.fillText('F',0,48);
@@ -668,20 +679,44 @@ function drawItemIcon(g,sub,size){
       for(const[x,y,r] of chips){g.fillStyle='#3a1a08';g.beginPath();g.arc(x,y,r,0,TAU);g.fill();}
       break;}
     case 'shoes':{
-      const shoe=(x,y,rot,c,cd)=>{
+      const shoe=(x,y,rot,c)=>{
         g.save();g.translate(x,y);g.rotate(rot);
-        g.fillStyle='#2a1a1a';g.beginPath();g.ellipse(0,34,42,9,0,0,TAU);g.fill();
-        const tg=g.createLinearGradient(-30,-40,30,30);
-        tg.addColorStop(0,c);tg.addColorStop(1,cd);
-        g.fillStyle=tg;
-        g.beginPath();g.moveTo(-40,32);
-        g.bezierCurveTo(-42,4,-28,-32,-6,-38);
-        g.bezierCurveTo(12,-42,26,-30,32,-14);
-        g.bezierCurveTo(38,0,42,18,42,32);g.closePath();g.fill();
+        g.fillStyle='rgba(0,0,0,0.25)';g.beginPath();g.ellipse(0,44,48,8,0,0,TAU);g.fill();
+        g.fillStyle='#3a2a1a';
+        g.beginPath();g.moveTo(-44,36);g.quadraticCurveTo(-48,42,-42,44);
+        g.lineTo(40,44);g.quadraticCurveTo(48,42,44,34);
+        g.lineTo(38,30);g.lineTo(-40,32);g.closePath();g.fill();
+        const bg=g.createLinearGradient(-30,-30,30,30);
+        bg.addColorStop(0,c);bg.addColorStop(0.4,c);
+        bg.addColorStop(0.55,'rgba(255,255,255,0.4)');
+        bg.addColorStop(0.75,c);bg.addColorStop(1,'#00000033');
+        g.fillStyle=bg;
+        g.beginPath();
+        g.moveTo(-40,32);
+        g.bezierCurveTo(-44,10,-38,-18,-22,-30);
+        g.bezierCurveTo(-10,-38,10,-38,24,-28);
+        g.bezierCurveTo(38,-18,44,8,40,32);
+        g.closePath();g.fill();
+        g.fillStyle='rgba(255,255,255,0.5)';
+        g.beginPath();g.ellipse(-14,-14,14,8,-0.5,0,TAU);g.fill();
+        g.fillStyle='#2a1a0a';
+        g.beginPath();g.moveTo(30,30);g.lineTo(40,30);g.lineTo(38,58);g.lineTo(32,58);g.closePath();g.fill();
+        g.fillStyle='#1a0a00';g.fillRect(32,56,6,4);
+        g.fillStyle='#2a1a10';
+        g.beginPath();g.ellipse(-14,-20,18,8,0,0,TAU);g.fill();
+        g.fillStyle=c;
+        g.beginPath();
+        g.moveTo(-20,-28);g.quadraticCurveTo(-30,-38,-18,-36);
+        g.quadraticCurveTo(-12,-42,-8,-32);
+        g.quadraticCurveTo(-2,-42,4,-32);
+        g.quadraticCurveTo(12,-38,10,-28);
+        g.closePath();g.fill();
+        g.fillStyle='#7a0028';
+        g.beginPath();g.arc(-6,-33,3,0,TAU);g.fill();
         g.restore();
       };
-      shoe(-30,15,-0.1,'#e8386a','#8a1040');
-      shoe(30,-5,0.1,'#e8386a','#8a1040');
+      shoe(-28,10,-0.12,'#c81048');
+      shoe(28,-8,0.08,'#e8286a');
       break;}
     case 'dress':{
       g.strokeStyle='#c0c0c0';g.lineWidth=3;
@@ -727,14 +762,20 @@ function drawItemIcon(g,sub,size){
       g.fillText('ЧТЕНИЕ',3,-40);
       break;}
     case 'apron':{
-      g.strokeStyle='#5ab080';g.lineWidth=6;
-      g.beginPath();g.moveTo(-30,-62);g.lineTo(-54,-80);g.stroke();
-      g.beginPath();g.moveTo(30,-62);g.lineTo(54,-80);g.stroke();
-      const gr=g.createLinearGradient(0,-60,0,80);
-      gr.addColorStop(0,'#8ae0b0');gr.addColorStop(1,'#4aa080');
-      g.fillStyle=gr;
-      g.beginPath();g.moveTo(-36,-62);g.lineTo(36,-62);g.lineTo(50,80);g.lineTo(-50,80);g.closePath();g.fill();
-      g.fillStyle='#3a8060';g.fillRect(-50,-14,100,10);
+      g.strokeStyle='#7a7a7a';g.lineWidth=7;g.lineCap='round';
+      g.beginPath();g.moveTo(-28,-68);g.lineTo(-46,-86);g.stroke();
+      g.beginPath();g.moveTo(28,-68);g.lineTo(46,-86);g.stroke();
+      const ag=g.createLinearGradient(-40,-60,40,80);
+      ag.addColorStop(0,'#b8b8b8');ag.addColorStop(0.4,'#a8a8a8');
+      ag.addColorStop(0.7,'#989898');ag.addColorStop(1,'#7a7a7a');
+      g.fillStyle=ag;
+      g.beginPath();g.moveTo(-38,-62);g.lineTo(38,-62);g.lineTo(52,78);g.lineTo(-52,78);g.closePath();g.fill();
+      g.fillStyle='rgba(0,0,0,0.18)';
+      g.beginPath();g.moveTo(-38,-62);g.lineTo(-52,78);g.lineTo(-42,78);g.lineTo(-30,-62);g.closePath();g.fill();
+      g.beginPath();g.moveTo(38,-62);g.lineTo(52,78);g.lineTo(42,78);g.lineTo(30,-62);g.closePath();g.fill();
+      g.fillStyle='#5a5a5a';g.fillRect(-52,-16,104,12);
+      g.fillStyle='#989898';
+      g.beginPath();g.moveTo(-24,10);g.lineTo(24,10);g.lineTo(20,48);g.lineTo(-20,48);g.closePath();g.fill();
       break;}
     case 'broom':{
       g.strokeStyle='#a06030';g.lineWidth=9;
@@ -799,34 +840,31 @@ function getIcon(sub){
 }
 
 /* ================= SVG CHARACTER ================= */
-function buildCharacterSVG(isBoy){
+function buildCharacterSVG(isBoy, hair, eyes){
   const S = isBoy ? 'b' : 'g';
+  const H = hair || NATURAL_HAIR[1];
+  const E = eyes || NATURAL_EYES[0];
   return `
 <svg viewBox="0 0 400 720" preserveAspectRatio="xMidYMax meet" xmlns="http://www.w3.org/2000/svg">
   <defs>
     <linearGradient id="hairGrad-${S}" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0%" stop-color="#d4b890"/>
-      <stop offset="35%" stop-color="#a88058"/>
-      <stop offset="100%" stop-color="#5a3e28"/>
+      <stop offset="0%" stop-color="${H.top}"/>
+      <stop offset="35%" stop-color="${H.mid}"/>
+      <stop offset="100%" stop-color="${H.bot}"/>
     </linearGradient>
     <linearGradient id="hairHi-${S}" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0%" stop-color="#f0d8b8" stop-opacity="0.9"/>
-      <stop offset="100%" stop-color="#a08060" stop-opacity="0"/>
+      <stop offset="0%" stop-color="#ffffff" stop-opacity="0.4"/>
+      <stop offset="100%" stop-color="#ffffff" stop-opacity="0"/>
     </linearGradient>
     <linearGradient id="hairGreen-${S}" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0%" stop-color="#b8e860"/>
-      <stop offset="35%" stop-color="#6ab030"/>
-      <stop offset="100%" stop-color="#2a5010"/>
+      <stop offset="0%" stop-color="#8ee040"/>
+      <stop offset="35%" stop-color="#4aa020"/>
+      <stop offset="100%" stop-color="#1a4008"/>
     </linearGradient>
     <linearGradient id="skinGrad-${S}" x1="0" y1="0" x2="0" y2="1">
       <stop offset="0%" stop-color="#fff1e0"/>
       <stop offset="55%" stop-color="#ffe4cc"/>
       <stop offset="100%" stop-color="#f0c8a4"/>
-    </linearGradient>
-    <linearGradient id="skinMon-${S}" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0%" stop-color="#a8d078"/>
-      <stop offset="55%" stop-color="#7ab050"/>
-      <stop offset="100%" stop-color="#4a8030"/>
     </linearGradient>
     <linearGradient id="skinShade-${S}" x1="0" y1="0" x2="0" y2="1">
       <stop offset="0%" stop-color="#e8bc94"/>
@@ -846,40 +884,39 @@ function buildCharacterSVG(isBoy){
       <rect width="22" height="22" fill="#c8b878"/>
       <path d="M 0 11 L 11 0 L 22 11 L 11 22 Z" fill="#a89040" opacity="0.55"/>
     </pattern>
-    <linearGradient id="sparkleTop-${S}" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0%" stop-color="#6a1a4a"/>
-      <stop offset="50%" stop-color="#3a0a28"/>
-      <stop offset="100%" stop-color="#1a0018"/>
-    </linearGradient>
-    <pattern id="sparklePat-${S}" width="26" height="26" patternUnits="userSpaceOnUse">
-      <rect width="26" height="26" fill="none"/>
-      <circle cx="5" cy="5" r="1.3" fill="#fff" opacity="0.95"/>
-      <circle cx="18" cy="11" r="0.9" fill="#ffd0e8" opacity="0.85"/>
-      <circle cx="11" cy="20" r="1.1" fill="#fff" opacity="0.85"/>
+    <pattern id="sparklePat-${S}" width="20" height="20" patternUnits="userSpaceOnUse">
+      <rect width="20" height="20" fill="none"/>
+      <circle cx="4" cy="4" r="1.5" fill="#fff" opacity="0.95"/>
+      <circle cx="15" cy="8" r="1.1" fill="#ffe8ff" opacity="0.9"/>
+      <circle cx="8" cy="16" r="1.3" fill="#fff" opacity="0.9"/>
+      <circle cx="17" cy="18" r="1" fill="#ffc8ff" opacity="0.85"/>
     </pattern>
-    <linearGradient id="miniSkirt-${S}" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0%" stop-color="#4a1a3a"/>
-      <stop offset="55%" stop-color="#2a0a20"/>
-      <stop offset="100%" stop-color="#100008"/>
-    </linearGradient>
+    <pattern id="leopard-${S}" width="34" height="34" patternUnits="userSpaceOnUse">
+      <rect width="34" height="34" fill="#d4a030"/>
+      <ellipse cx="8" cy="8" rx="5" ry="4" fill="#3a2010" opacity="0.9"/>
+      <ellipse cx="24" cy="6" rx="4" ry="3.5" fill="#3a2010" opacity="0.9"/>
+      <ellipse cx="15" cy="20" rx="6" ry="4" fill="#3a2010" opacity="0.9"/>
+      <ellipse cx="30" cy="26" rx="4" ry="4" fill="#3a2010" opacity="0.9"/>
+      <ellipse cx="4" cy="28" rx="5" ry="4" fill="#3a2010" opacity="0.9"/>
+    </pattern>
     <linearGradient id="bratTop-${S}" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0%" stop-color="#ff5ac8"/>
-      <stop offset="50%" stop-color="#c02080"/>
-      <stop offset="100%" stop-color="#6a0050"/>
+      <stop offset="0%" stop-color="var(--dressTop,#ff5ac8)"/>
+      <stop offset="50%" stop-color="var(--dressBottom,#c02080)"/>
+      <stop offset="100%" stop-color="var(--dressShade,#6a0050)"/>
     </linearGradient>
     <linearGradient id="bratSkirt-${S}" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0%" stop-color="#ff90d8"/>
-      <stop offset="55%" stop-color="#c04090"/>
-      <stop offset="100%" stop-color="#6a1050"/>
+      <stop offset="0%" stop-color="var(--dressTop,#ff90d8)"/>
+      <stop offset="55%" stop-color="var(--dressBottom,#c04090)"/>
+      <stop offset="100%" stop-color="var(--dressShade,#6a1050)"/>
     </linearGradient>
     <radialGradient id="blushGrad-${S}">
       <stop offset="0%" stop-color="#ff8098" stop-opacity="0.85"/>
       <stop offset="100%" stop-color="#ff8098" stop-opacity="0"/>
     </radialGradient>
     <radialGradient id="irisGrad-${S}" cx="50%" cy="35%">
-      <stop offset="0%" stop-color="#7a9ae8"/>
-      <stop offset="45%" stop-color="#2a4ab8"/>
-      <stop offset="100%" stop-color="#0a1030"/>
+      <stop offset="0%" stop-color="${E.c1}"/>
+      <stop offset="45%" stop-color="${E.c2}"/>
+      <stop offset="100%" stop-color="${E.c3}"/>
     </radialGradient>
     <radialGradient id="irisGradMon-${S}" cx="50%" cy="35%">
       <stop offset="0%" stop-color="#ff2020"/>
@@ -889,10 +926,6 @@ function buildCharacterSVG(isBoy){
     <linearGradient id="foxEarGrad-${S}" x1="0" y1="0" x2="0" y2="1">
       <stop offset="0%" stop-color="#e8884a"/>
       <stop offset="100%" stop-color="#a85020"/>
-    </linearGradient>
-    <linearGradient id="bellyGrad-${S}" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0%" stop-color="#ffe4cc"/>
-      <stop offset="100%" stop-color="#e8bc94"/>
     </linearGradient>
     <radialGradient id="faceRedGrad-${S}">
       <stop offset="0%" stop-color="#ff2020" stop-opacity="0"/>
@@ -918,13 +951,6 @@ function buildCharacterSVG(isBoy){
       <feGaussianBlur stdDeviation="3.5" result="b"/>
       <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
     </filter>
-    <filter id="lipGlow-${S}" x="-150%" y="-150%" width="400%" height="400%">
-      <feGaussianBlur stdDeviation="4" result="b"/>
-      <feMerge><feMergeNode in="b"/><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
-    </filter>
-    <filter id="smokeFx-${S}" x="-100%" y="-100%" width="300%" height="300%">
-      <feGaussianBlur stdDeviation="4"/>
-    </filter>
   </defs>
 
   <g class="breathing">
@@ -933,8 +959,35 @@ function buildCharacterSVG(isBoy){
     <path class="hair-bl" d="M 155 92 C 100 130, 88 200, 96 270 C 102 310, 112 335, 130 342 L 178 342 C 165 300, 152 250, 158 200 C 165 150, 178 120, 200 100 Z" fill="url(#hairGrad-${S})"/>
     <path class="hair-br" d="M 245 92 C 300 130, 312 200, 304 270 C 298 310, 288 335, 270 342 L 222 342 C 235 300, 248 250, 242 200 C 235 150, 222 120, 200 100 Z" fill="url(#hairGrad-${S})"/>
 
-    <g class="short-hair">
-      <path d="M 158 92 C 118 120, 110 170, 118 216 L 132 200 Q 145 190 158 200 L 178 208 Q 190 200 200 208 Q 210 200 222 208 L 242 200 Q 255 190 268 200 L 282 216 C 290 170, 282 120, 242 92 Z" fill="url(#hairGreen-${S})"/>
+    <!-- КАРЕ — та же девочка, только волосы зелёные. Без ирокеза, без пробритых боков. -->
+    <g class="monster-hair">
+      <!-- задняя часть каре -->
+      <path d="M 200 82
+               C 138 82, 122 132, 128 200
+               L 132 245
+               Q 140 252, 152 246
+               L 150 200
+               Q 148 150, 175 130
+               Q 188 124, 200 124
+               Q 212 124, 225 130
+               Q 252 150, 250 200
+               L 248 246
+               Q 260 252, 268 245
+               L 272 200
+               C 278 132, 262 82, 200 82 Z" fill="url(#hairGreen-${S})"/>
+      <!-- чёлка прямая, до бровей -->
+      <path d="M 200 82
+               C 155 82, 132 108, 132 138
+               Q 138 148 148 144
+               Q 158 150 168 144
+               Q 178 152 190 144
+               Q 200 154 210 144
+               Q 222 152 232 144
+               Q 242 150 252 144
+               Q 262 148 268 138
+               C 268 108, 245 82, 200 82 Z" fill="url(#hairGreen-${S})"/>
+      <!-- блик -->
+      <path d="M 152 100 Q 175 116 200 114 Q 225 116 248 100" fill="none" stroke="#b8f068" stroke-width="3" opacity="0.55"/>
     </g>
 
     <g class="body-lower">
@@ -952,21 +1005,26 @@ function buildCharacterSVG(isBoy){
       <g class="shoes-monster">
         <path d="M 178 660 L 174 690 Q 172 696 178 696 L 198 696 Q 200 694 200 688 L 200 660 Z" fill="#1a0018"/>
         <path d="M 222 660 L 226 690 Q 228 696 222 696 L 202 696 Q 200 694 200 688 L 200 660 Z" fill="#1a0018"/>
-        <ellipse cx="188" cy="678" rx="6" ry="2" fill="#ff3d7f" opacity="0.9"/>
-        <ellipse cx="212" cy="678" rx="6" ry="2" fill="#ff3d7f" opacity="0.9"/>
       </g>
     </g>
 
     <g class="body-mid">
+      <ellipse class="fat-belly" cx="200" cy="375" rx="58" ry="46" fill="#ffe4cc" opacity="0.9"/>
+
       <g class="skirt-original">
         <path d="M 148 400 C 132 460, 128 520, 138 566 Q 200 582 262 566 C 272 520, 268 460, 252 400 Z" fill="url(#dressGrad-${S})"/>
       </g>
       <g class="skirt-brat">
         <path d="M 164 400 C 152 428, 148 452, 152 474 Q 200 486 248 474 C 252 452, 248 428, 236 400 Z" fill="url(#bratSkirt-${S})"/>
+        <g fill="#fff" opacity="0.9">
+          <circle cx="175" cy="430" r="1.8"/>
+          <circle cx="200" cy="450" r="1.8"/>
+          <circle cx="225" cy="430" r="1.8"/>
+        </g>
       </g>
       <g class="skirt-monster">
-        <path d="M 168 400 C 156 430, 152 460, 158 482 Q 200 494 242 482 C 248 460, 244 430, 232 400 Z" fill="url(#miniSkirt-${S})"/>
-        <path d="M 158 482 Q 200 494 242 482" fill="none" stroke="#ff3d7f" stroke-width="2" opacity="0.9"/>
+        <path d="M 168 400 C 156 430, 152 460, 158 482 Q 200 494 242 482 C 248 460, 244 430, 232 400 Z" fill="url(#leopard-${S})"/>
+        <path d="M 158 482 Q 200 494 242 482" fill="none" stroke="#3a2010" stroke-width="2" opacity="0.9"/>
       </g>
 
       <g class="torso-original">
@@ -979,20 +1037,18 @@ function buildCharacterSVG(isBoy){
 
       <g class="torso-brat">
         <path d="M 162 258 C 152 290, 148 320, 148 340 L 252 340 C 252 320, 248 290, 238 258 Z" fill="url(#bratTop-${S})"/>
+        <path d="M 162 258 C 152 290, 148 320, 148 340 L 252 340 C 252 320, 248 290, 238 258 Z" fill="url(#sparklePat-${S})"/>
         <path d="M 148 340 L 252 340 L 252 400 L 148 400 Z" fill="url(#skinGrad-${S})"/>
       </g>
 
       <g class="torso-monster">
-        <path d="M 162 258 C 148 300, 142 358, 144 400 L 256 400 C 258 358, 252 300, 238 258 Z" fill="url(#sparkleTop-${S})"/>
-        <path d="M 162 258 C 148 300, 142 358, 144 400 L 256 400 C 258 358, 252 300, 238 258 Z" fill="url(#sparklePat-${S})"/>
-        <g fill="#fff" filter="url(#glowFx-${S})">
-          <path class="spark" d="M 175 300 L 177 306 L 183 308 L 177 310 L 175 316 L 173 310 L 167 308 L 173 306 Z"/>
-          <path class="spark" d="M 220 320 L 222 326 L 228 328 L 222 330 L 220 336 L 218 330 L 212 328 L 218 326 Z" style="animation-delay:0.5s"/>
-        </g>
+        <path d="M 162 258 C 148 300, 142 358, 144 400 L 256 400 C 258 358, 252 300, 238 258 Z" fill="#1a0018"/>
       </g>
 
-      <ellipse class="fat-belly" cx="200" cy="375" rx="58" ry="46" fill="url(#bellyGrad-${S})" opacity="0.9"/>
-      <ellipse class="fat-belly" cx="200" cy="375" rx="58" ry="46" fill="none" stroke="rgba(0,0,0,0.12)" stroke-width="2"/>
+      <!-- Буква "М" тонкими линиями, розовая, отдельная группа -->
+      <g class="monster-m" stroke="#ff6ac8" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round" filter="url(#glowFx-${S})">
+        <path d="M 180 315 L 180 365 M 180 315 L 197 345 L 214 315 M 214 315 L 214 365"/>
+      </g>
 
       <g class="cardigan">
         <path d="M 168 262 C 145 288, 138 350, 144 402 L 176 402 L 176 268 Z" fill="url(#cardiganGrad-${S})"/>
@@ -1006,10 +1062,13 @@ function buildCharacterSVG(isBoy){
       </g>
 
       <g class="apron-worn">
-        <path d="M 168 262 L 152 232" fill="none" stroke="#5ab080" stroke-width="6" stroke-linecap="round"/>
-        <path d="M 232 262 L 248 232" fill="none" stroke="#5ab080" stroke-width="6" stroke-linecap="round"/>
-        <path d="M 175 262 L 225 262 L 245 410 L 155 410 Z" fill="#7ad8a8" opacity="0.95"/>
-        <path d="M 152 350 L 248 350 L 246 362 L 154 362 Z" fill="#3a8060"/>
+        <path d="M 168 262 L 152 232" fill="none" stroke="#7a7a7a" stroke-width="6" stroke-linecap="round"/>
+        <path d="M 232 262 L 248 232" fill="none" stroke="#7a7a7a" stroke-width="6" stroke-linecap="round"/>
+        <path d="M 175 262 L 225 262 L 245 410 L 155 410 Z" fill="#a8a8a8"/>
+        <path d="M 175 262 L 155 410 L 165 410 L 182 262 Z" fill="rgba(0,0,0,0.15)"/>
+        <path d="M 225 262 L 245 410 L 235 410 L 218 262 Z" fill="rgba(0,0,0,0.15)"/>
+        <path d="M 152 350 L 248 350 L 246 364 L 154 364 Z" fill="#5a5a5a"/>
+        <path d="M 180 375 L 220 375 L 216 402 L 184 402 Z" fill="#989898"/>
       </g>
 
       <g class="arms-normal">
@@ -1019,14 +1078,13 @@ function buildCharacterSVG(isBoy){
 
       <g class="arm-holding">
         <path d="M 168 268 C 148 300, 138 360, 158 408 Q 168 418 178 412 L 178 402 C 168 380, 172 320, 178 282 Z" fill="url(#cardiganGrad-${S})"/>
-        <path d="M 232 268 C 258 288, 280 340, 268 420 Q 264 440 250 442 L 246 430 Q 254 400, 238 340 L 222 282 Z" fill="url(#cardiganGrad-${S})"/>
+        <path d="M 232 268 C 256 282, 268 306, 260 336 Q 254 356, 244 362 L 238 356 Q 248 340, 232 314 L 222 282 Z" fill="url(#cardiganGrad-${S})"/>
       </g>
 
+      <!-- Руки монстра — обычные, опущенные, БЕЗ анимации взятия -->
       <g class="arms-monster">
-        <path d="M 168 268 C 145 300, 138 360, 152 405 Q 158 415 168 412 L 168 400 C 162 380, 168 330, 178 282 Z" fill="url(#sparkleTop-${S})"/>
-        <path d="M 168 268 C 145 300, 138 360, 152 405 Q 158 415 168 412 L 168 400 C 162 380, 168 330, 178 282 Z" fill="url(#sparklePat-${S})"/>
-        <path d="M 232 268 C 262 290, 290 330, 300 380 Q 305 400 296 406 L 286 400 Q 280 370, 260 330 L 222 282 Z" fill="url(#sparkleTop-${S})"/>
-        <path d="M 232 268 C 262 290, 290 330, 300 380 Q 305 400 296 406 L 286 400 Q 280 370, 260 330 L 222 282 Z" fill="url(#sparklePat-${S})"/>
+        <path d="M 168 268 C 148 300, 138 360, 158 408 Q 168 418 178 412 L 178 402 C 168 380, 172 320, 178 282 Z" fill="url(#skinGrad-${S})"/>
+        <path d="M 232 268 C 252 300, 262 360, 242 408 Q 232 418 222 412 L 222 402 C 232 380, 228 320, 222 282 Z" fill="url(#skinGrad-${S})"/>
       </g>
 
       <g class="hands-normal">
@@ -1037,22 +1095,25 @@ function buildCharacterSVG(isBoy){
 
       <g class="hands-holding">
         <ellipse cx="186" cy="412" rx="14" ry="6" fill="#fff"/>
-        <ellipse cx="248" cy="436" rx="13" ry="15" fill="url(#skinGrad-${S})"/>
+        <ellipse cx="246" cy="356" rx="13" ry="13" fill="url(#skinGrad-${S})"/>
+        <ellipse cx="252" cy="366" rx="7" ry="5" fill="url(#skinGrad-${S})"/>
       </g>
 
       <g class="hands-monster">
-        <ellipse cx="160" cy="410" rx="10" ry="8" fill="url(#skinMon-${S})"/>
-        <ellipse cx="296" cy="406" rx="10" ry="8" fill="url(#skinMon-${S})"/>
+        <ellipse cx="186" cy="412" rx="14" ry="6" fill="#fff"/>
+        <ellipse cx="214" cy="412" rx="14" ry="6" fill="#fff"/>
+        <ellipse cx="200" cy="425" rx="22" ry="16" fill="url(#skinGrad-${S})"/>
       </g>
 
       <g class="lolli-in-hand">
-        <rect x="244" y="400" width="4" height="42" fill="#f0e0c0"/>
-        <circle cx="246" cy="398" r="16" fill="#ff3d7f"/>
+        <rect x="246" y="336" width="4" height="30" fill="#f0e0c0"/>
+        <circle cx="248" cy="334" r="16" fill="#ff3d7f"/>
+        <path d="M 238 334 Q 248 327 258 334 Q 248 341 238 334" fill="none" stroke="#fff" stroke-width="2"/>
       </g>
 
       <g class="phone-in-hand">
-        <rect x="234" y="392" width="26" height="48" rx="4" fill="#2a2a35"/>
-        <rect x="236" y="394" width="22" height="42" rx="3" fill="#4fc8ff"/>
+        <rect x="236" y="326" width="26" height="48" rx="4" fill="#2a2a35"/>
+        <rect x="238" y="328" width="22" height="42" rx="3" fill="#4fc8ff"/>
       </g>
     </g>
 
@@ -1068,6 +1129,19 @@ function buildCharacterSVG(isBoy){
 
         <ellipse class="blush" cx="152" cy="212" rx="22" ry="14" fill="url(#blushGrad-${S})"/>
         <ellipse class="blush" cx="248" cy="212" rx="22" ry="14" fill="url(#blushGrad-${S})"/>
+
+        <g class="monster-pimples">
+          <circle cx="140" cy="200" r="6" fill="#ff5050" opacity="0.85"/>
+          <circle cx="140" cy="200" r="2.5" fill="#fff" opacity="0.6"/>
+          <circle cx="262" cy="220" r="5" fill="#ff5050" opacity="0.85"/>
+          <circle cx="262" cy="220" r="2" fill="#fff" opacity="0.6"/>
+        </g>
+
+        <g class="monster-piercing">
+          <circle cx="128" cy="190" r="2.5" fill="#ffd040"/>
+          <circle cx="128" cy="200" r="2.5" fill="#ffd040"/>
+          <circle cx="128" cy="210" r="2.5" fill="#ffd040"/>
+        </g>
 
         <g class="eye-neutral blinkable">
           <g clip-path="url(#eyeLClip-${S})">
@@ -1100,8 +1174,6 @@ function buildCharacterSVG(isBoy){
           <ellipse cx="238" cy="186" rx="6" ry="9" fill="#06030f"/>
           <circle cx="156" cy="176" r="4.5" fill="#fff"/>
           <circle cx="232" cy="176" r="4.5" fill="#fff"/>
-          <path d="M 142 186 Q 162 196 182 186" fill="none" stroke="#3a2418" stroke-width="4.5" stroke-linecap="round"/>
-          <path d="M 218 186 Q 238 196 258 186" fill="none" stroke="#3a2418" stroke-width="4.5" stroke-linecap="round"/>
         </g>
 
         <g class="eye-demand">
@@ -1126,23 +1198,20 @@ function buildCharacterSVG(isBoy){
           <ellipse cx="236" cy="188" rx="2.5" ry="11" fill="#000"/>
           <path d="M 140 176 L 184 168" fill="none" stroke="#3a2418" stroke-width="5.5" stroke-linecap="round"/>
           <path d="M 216 168 L 260 176" fill="none" stroke="#3a2418" stroke-width="5.5" stroke-linecap="round"/>
+          <g class="monster-eye-red">
+            <ellipse cx="164" cy="186" rx="12" ry="14" fill="url(#irisGradMon-${S})"/>
+            <ellipse cx="236" cy="186" rx="12" ry="14" fill="url(#irisGradMon-${S})"/>
+            <ellipse cx="164" cy="188" rx="2.5" ry="11" fill="#000"/>
+            <ellipse cx="236" cy="188" rx="2.5" ry="11" fill="#000"/>
+            <circle cx="158" cy="180" r="4" fill="#fff"/>
+            <circle cx="230" cy="180" r="4" fill="#fff"/>
+          </g>
         </g>
 
-        <g class="brow-neutral">
-          <path d="M 144 130 Q 162 122 180 128" fill="none" stroke="#5a3a28" stroke-width="3.6" stroke-linecap="round"/>
-          <path d="M 220 128 Q 238 122 256 130" fill="none" stroke="#5a3a28" stroke-width="3.6" stroke-linecap="round"/>
-        </g>
-        <g class="brow-sad">
-          <path d="M 144 132 Q 162 142 180 136" fill="none" stroke="#5a3a28" stroke-width="3.6" stroke-linecap="round"/>
-          <path d="M 220 136 Q 238 142 256 132" fill="none" stroke="#5a3a28" stroke-width="3.6" stroke-linecap="round"/>
-        </g>
-        <g class="brow-rage">
-          <path d="M 140 140 L 182 122" fill="none" stroke="#5a3a28" stroke-width="4.4" stroke-linecap="round"/>
-          <path d="M 218 122 L 260 140" fill="none" stroke="#5a3a28" stroke-width="4.4" stroke-linecap="round"/>
-        </g>
-        <g class="brow-demand">
-          <path d="M 142 128 Q 160 122 178 132" fill="none" stroke="#5a3a28" stroke-width="3.8" stroke-linecap="round"/>
-          <path d="M 222 132 Q 240 122 258 128" fill="none" stroke="#5a3a28" stroke-width="3.8" stroke-linecap="round"/>
+        <!-- Недовольный рот для монстра -->
+        <g class="mouth-displeased">
+          <path d="M 182 228 Q 200 218 218 228" fill="none" stroke="#b83a5a" stroke-width="3" stroke-linecap="round"/>
+          <path d="M 186 232 Q 200 226 214 232" fill="none" stroke="#8a1a30" stroke-width="1.6" stroke-linecap="round"/>
         </g>
 
         <path d="M 200 200 Q 203 205 200 208" fill="none" stroke="#c89070" stroke-width="1.6" stroke-linecap="round" opacity="0.7"/>
@@ -1161,22 +1230,20 @@ function buildCharacterSVG(isBoy){
           <ellipse cx="200" cy="228" rx="16" ry="14" fill="#5a0818"/>
           <path d="M 186 222 L 214 222 L 214 226 L 186 226 Z" fill="#fff"/>
           <path d="M 188 230 L 212 230 L 212 233 L 188 233 Z" fill="#fff"/>
-          <path d="M 190 226 L 194 238 L 197 226 Z" fill="#fff"/>
-          <path d="M 210 226 L 206 238 L 203 226 Z" fill="#fff"/>
         </g>
         <g class="mouth-demand">
           <path d="M 184 224 Q 200 216 216 224" fill="none" stroke="#a02040" stroke-width="2.6" stroke-linecap="round"/>
           <path d="M 188 222 Q 200 232 212 222" fill="none" stroke="#b83a5a" stroke-width="2.4" stroke-linecap="round"/>
         </g>
 
-        <g class="lip-color-wide" filter="url(#lipGlow-${S})">
+        <g class="lip-color-wide">
           <path d="M 184 220 Q 200 238 216 220 Q 200 224 184 220 Z"
             fill="#e02030" transform="translate(200 224) scale(1.15 1) translate(-200 -224)"/>
         </g>
 
         <g class="vampire-fangs">
-          <path d="M 189 221 L 192 234 L 195 221 Z" fill="#fff" stroke="#c0a8a8" stroke-width="0.6"/>
-          <path d="M 205 221 L 208 234 L 211 221 Z" fill="#fff" stroke="#c0a8a8" stroke-width="0.6"/>
+          <path d="M 187 220 L 191 236 L 195 220 Z" fill="#fff" stroke="#b09090" stroke-width="0.8"/>
+          <path d="M 205 220 L 209 236 L 213 220 Z" fill="#fff" stroke="#b09090" stroke-width="0.8"/>
         </g>
 
         <path class="hair-front" d="M 200 82 C 132 82, 122 130, 130 168 Q 138 178 148 172 Q 158 168 168 176 Q 178 168 190 172 Q 200 178 210 172 Q 222 168 232 176 Q 242 168 252 172 Q 262 178 270 168 C 278 130, 268 82, 200 82 Z" fill="url(#hairGrad-${S})"/>
@@ -1184,8 +1251,9 @@ function buildCharacterSVG(isBoy){
         <path class="hair-sl" d="M 130 165 C 118 200, 116 260, 124 310 Q 134 320, 148 312 C 142 260, 144 200, 152 172 Z" fill="url(#hairGrad-${S})"/>
         <path class="hair-sr" d="M 270 165 C 282 200, 284 260, 276 310 Q 266 320, 252 312 C 258 260, 256 200, 248 172 Z" fill="url(#hairGrad-${S})"/>
 
-        <g class="short-hair">
-          <path d="M 200 82 C 138 82, 124 130, 128 168 Q 134 178 142 172 Q 152 166 162 176 Q 172 166 184 174 Q 194 182 204 174 Q 216 166 228 174 Q 240 182 250 172 Q 260 164 268 172 C 274 140, 264 82, 200 82 Z" fill="url(#hairGreen-${S})"/>
+        <g class="hair-bow">
+          <path d="M 200 68 L 188 52 L 196 68 Z" fill="#5a3a20"/>
+          <path d="M 200 68 L 212 52 L 204 68 Z" fill="#5a3a20"/>
         </g>
 
         <g class="fox-ears">
@@ -1193,23 +1261,6 @@ function buildCharacterSVG(isBoy){
           <path d="M 158 84 Q 148 46 152 30 Q 164 46 174 78 Z" fill="#ffd0a0"/>
           <path d="M 245 88 Q 262 30 252 14 Q 232 34 220 78 Z" fill="url(#foxEarGrad-${S})" stroke="#7a3a10" stroke-width="2"/>
           <path d="M 242 84 Q 252 46 248 30 Q 236 46 226 78 Z" fill="#ffd0a0"/>
-        </g>
-
-        <g class="hair-bow">
-          <path d="M 200 68 L 188 52 L 196 68 Z" fill="#5a3a20"/>
-          <path d="M 200 68 L 212 52 L 204 68 Z" fill="#5a3a20"/>
-        </g>
-
-        <g class="horns">
-          <path d="M 168 82 Q 152 40 140 12 Q 156 44 176 76 Z" fill="#4a0808" stroke="#2a0000" stroke-width="1.5"/>
-          <path d="M 232 82 Q 248 40 260 12 Q 244 44 224 76 Z" fill="#4a0808" stroke="#2a0000" stroke-width="1.5"/>
-        </g>
-
-        <g class="warts" fill="#3a5a20">
-          <circle cx="146" cy="180" r="5"/>
-          <circle cx="254" cy="185" r="4.5"/>
-          <circle cx="150" cy="230" r="4"/>
-          <circle cx="250" cy="240" r="3.5"/>
         </g>
       </g>
     </g>
@@ -1220,34 +1271,10 @@ function buildCharacterSVG(isBoy){
       <circle cx="200" cy="78" r="4" fill="#ff2a4a"/>
     </g>
 
-    <g class="cigarette">
-      <rect x="296" y="400" width="26" height="5" rx="1" fill="#f0e8d8"/>
-      <rect x="318" y="400" width="4" height="5" rx="1" fill="#ff6020"/>
-      <ellipse cx="320" cy="402" rx="3" ry="2.5" fill="#ff9040" opacity="0.7"/>
-      <g class="smoke" filter="url(#smokeFx-${S})" fill="#c8c0d8">
-        <ellipse class="smoke-1" cx="324" cy="396" rx="3" ry="2.4"/>
-        <ellipse class="smoke-2" cx="326" cy="386" rx="4" ry="3"/>
-        <ellipse class="smoke-3" cx="330" cy="372" rx="5" ry="4"/>
-      </g>
-    </g>
-
-    <g class="fx-anger" filter="url(#glowFx-${S})">
-      <path class="anger-mark" d="M 268 120 L 282 132 L 274 138 L 286 152" fill="none" stroke="#ff3a5a" stroke-width="3" stroke-linecap="round"/>
-      <path class="anger-mark" d="M 132 120 L 118 132 L 126 138 L 114 152" fill="none" stroke="#ff3a5a" stroke-width="3" stroke-linecap="round" style="animation-delay:0.27s"/>
-    </g>
-    <g class="fx-hearts" filter="url(#glowFx-${S})">
+    <g class="fx-hearts">
       <g fill="#ff5a8a">
         <path class="heart-fx" d="M 300 200 c -6 -8 -16 -4 -12 6 c 2 8 12 12 12 12 s 10 -4 12 -12 c 4 -10 -6 -14 -12 -6 z"/>
-        <path class="heart-fx" d="M 315 240 c -5 -6 -13 -3 -10 5 c 2 6 10 9 10 9 s 8 -3 10 -9 c 3 -8 -5 -11 -10 -5 z" style="animation-delay:0.4s"/>
       </g>
-    </g>
-    <g class="fx-sparks" filter="url(#glowFx-${S})">
-      <g fill="#fff5a0">
-        <path class="spark" d="M 320 170 L 324 186 L 340 190 L 324 194 L 320 210 L 316 194 L 300 190 L 316 186 Z"/>
-      </g>
-    </g>
-    <g class="fx-sweat">
-      <path class="sweat-fx" d="M 268 130 Q 274 138 272 148 Q 268 152 264 148 Q 262 138 268 130 Z" fill="#a0d8ff" opacity="0.9"/>
     </g>
     <g class="fx-tears">
       <ellipse class="tear-fx" cx="156" cy="200" rx="3.2" ry="4.2" fill="#bfe0ff" opacity="0.9"/>
@@ -1258,31 +1285,36 @@ function buildCharacterSVG(isBoy){
 }
 
 /* ===== GAME STATE ===== */
-const CALM_SILENCE_TIME=180;
-const CALM_ENLIGHTEN_TIME=360;
 const ENLIGHTEN_WIN_TIME=120;
 const SIBLING_APPEAR_DELAY=60;
 const SIBLING_STAGE_TIME=120;
-const TOY_LIMIT=20;
+const TOY_LIMIT=30;
+const MONSTER_CLOTHES_THRESHOLD=20;
 let lastYell=0;
 let _enlightenTimer=0;
 
 const FAT_PER_FOOD   = 0.033;
 const UGLY_PER_CLOTH = 0.018;
-const UGLY_SCOOTER   = 0.04;
 const FAT_BURN_BROOM = 0.012;
-const FAT_BURN_SUB   = 0.012;
 
-const MOOD_DECAY = 4;
-const MOOD_RECOVER = 12;
+const MOOD_DECAY = 3.5;
+const MOOD_RECOVER = 4;
 
-const HAPPY_PHRASES=['Ура!','Хихи!','Моё!','Класс!','Ещё!','Ещё! Ещё!','Да!','Спасибочки!','Ня!'];
-const SAD_PHRASES=['Скучно...','Грустно...','Скучно!','Надоело...'];
+const MONSTER_PHRASES=['Мало','Ещё','И это всё','Это всё?','Хочу больше','Скудно','Давай ещё'];
+
+const HAPPY_PHRASES=['Ура!','Хихи!','Моё!','Класс!','Ещё!','Да!'];
 const DEMAND_PHRASES=['ДАЙ','НУ ДАЙ','ДАЙ ИГРУШКУ','ДАЙ ВКУСНЯШКУ','ХОЧУ ВКУСНЯШКУ','ДАЙ-ДАЙ','ИГРУШКУ ХОЧУ','ДАЙ!','НУ!'];
-const RAGE_PHRASES=['АААААА!','НЕНАВИЖУ!','ХОЧУ!!!','РРРРРРР!','ААААААААААААААА!','ДАААААЙ!','ХОООЧУ!!!'];
+const RAGE_PHRASES=['АААААА!','НЕНАВИЖУ!','ХОЧУ!!!','РРРРРРР!','ДАААААЙ!','ХОООЧУ!!!','ОТСТАНЬ!!!'];
 const USEFUL_PHRASES=['Фу!','Убери!','Не хочу!','Не буду!'];
-const ENLIGHTEN_PHRASES=['Я умница!','Самостоятельность — это свобода','Здорово!'];
 const SIBLING_PHRASES=['Ия!','Агу!','Мама!'];
+
+const ENV = {
+  wall: pick(WALL_COLORS),
+  floor: pick(FLOOR_COLORS),
+  catColor: pick(CAT_COLORS),
+  catEyes: pick(CAT_EYE_COLORS),
+  plantX: 0.55,
+};
 
 const G={
   t:0,weather:'sunny',weatherT:0,weatherDur:rnd(24,40),
@@ -1290,14 +1322,13 @@ const G={
   selected:0,slots:[],slotLock:[0,0,0,0,0],lastSlot:-1,
   usedUsefulThisBatch:{},
   particles:[],bubbles:[],
-  floorToys:[],wallItems:[],propEls:[],
+  floorToys:[],floorShoes:[],floorItems:[],propEls:[],
   cardPointer:null,gameOver:false,extraUnlocked:false,
   toyCounter:0,
   cat:{x:0,y:0,tx:0,ty:0,spot:0,lastSpot:0,timer:30,fat:false},
+  env: ENV,
 };
 window.__game=G;
-
-function isUseful(it){return it && it.kind==='useful';}
 
 function getUsefulPool(){
   const mode=G.girl?G.girl.globalMode:'capricious';
@@ -1318,11 +1349,8 @@ function rebuildAllSlots(){
   const otherCategories=[TOYS,FOODS,CLOTHES];
   G.slots=[];
   for(let i=0;i<5;i++){
-    if(i===usefulIdx){
-      G.slots.push(usefulItem);
-    } else {
-      G.slots.push(pick(pick(otherCategories)));
-    }
+    if(i===usefulIdx)G.slots.push(usefulItem);
+    else G.slots.push(pick(pick(otherCategories)));
   }
 }
 
@@ -1336,8 +1364,8 @@ function setDressColor(ch,c){
 function makeCharState(isSib,isBoy){
   return {
     isSibling:!!isSib,isBoy:!!isBoy,
-    mood:100,
-    fat:0,ugly:0,monsterStage:0,
+    mood:50,fat:0,ugly:0,monsterStage:0,
+    clothesClicks:0,
     phase:'calm',phaseT:0,happyStreak:0,lastBadT:0,
     calmTimer:0,
     reaction:null,reactionT:0,expr:'neutral',
@@ -1346,7 +1374,7 @@ function makeCharState(isSib,isBoy){
     hold:{bear:0,lolli:0,phone:0},crownT:0,
     apronT:0,lipT:0,
     dressCount:0,lipstickCount:0,shoesCount:0,crownCount:0,
-    altOutfit:false, revertBookCount:0,
+    altOutfit:false,revertBookCount:0,
     done:false,usefulCount:{book:0,apron:0,broom:0},
     dom:null,wrap:null,
     rageTimer:0,
@@ -1355,9 +1383,9 @@ function makeCharState(isSib,isBoy){
     neutralGoodClicks:0,
     enlightenedBadClicks:0,
     neutralBadClicks:0,
-    siblingStage:'none',
-    siblingStageTimer:0,
-    siblingBornAt:0,
+    siblingStage:'none',siblingStageTimer:0,siblingBornAt:0,
+    hair:pick(NATURAL_HAIR),
+    eyes:pick(NATURAL_EYES),
   };
 }
 const charsEl=document.getElementById('chars');
@@ -1386,7 +1414,7 @@ function createCharDOM(ch){
   wrap.style.setProperty('--dressTop','#ffffff');
   wrap.style.setProperty('--dressBottom','#eaf0ff');
   wrap.style.setProperty('--dressShade','#b8c8e8');
-  wrap.innerHTML=buildCharacterSVG(ch.isBoy);
+  wrap.innerHTML=buildCharacterSVG(ch.isBoy,ch.hair,ch.eyes);
   charsEl.appendChild(wrap);
   ch.wrap=wrap;
   ch.dom=wrap.querySelector('svg');
@@ -1403,20 +1431,17 @@ function positionChars(){
     if(!ch.wrap)continue;
     let charHeightOnScreen,cx,feetY;
     if(ch.isSibling){
-      if(ch.siblingStage==='cradle'){
-        ch.wrap.style.display='none';
-        continue;
-      }
+      if(ch.siblingStage==='cradle'){ch.wrap.style.display='none';continue;}
       if(ch.siblingStage==='rug'){
-        charHeightOnScreen=Math.min(H*0.30,W*0.55);
-        cx=W*0.70;feetY=H*0.90;
+        charHeightOnScreen=Math.min(H*0.22,W*0.40);
+        cx=W*0.78;feetY=H*0.75;
       } else {
-        charHeightOnScreen=Math.min(H*0.55,W*0.85);
-        cx=W*0.70;feetY=H*0.94;
+        charHeightOnScreen=Math.min(H*0.38,W*0.60);
+        cx=W*0.75;feetY=H*0.85;
       }
     } else {
-      charHeightOnScreen=Math.min(H*0.72,W*1.15);
-      cx=W*0.40;feetY=H*0.94;
+      charHeightOnScreen=Math.min(H*0.48,W*0.82);
+      cx=W*0.40;feetY=H*0.85;
     }
     ch.wrap.style.display='block';
     const scale=charHeightOnScreen/660;
@@ -1505,26 +1530,41 @@ function placeFloorToy(sub){
   propsEl.appendChild(el);
   G.floorToys.push(el);
 }
-function placeWallItem(sub,which){
+function placeFloorShoe(){
   const W=window.innerWidth,H=window.innerHeight;
-  const size=clamp(W*0.14,90,180);
+  const size=clamp(W*0.05,28,52);
+  const x=W*0.08+Math.random()*(W*0.84);
+  const y=H*0.75+Math.random()*(H*0.20);
   const el=document.createElement('div');
-  el.className='wall-item';
+  el.className='floor-toy';
+  el.style.left=(x-size/2)+'px';
+  el.style.top=(y-size/2)+'px';
   el.style.width=size+'px';
   el.style.height=size+'px';
-  if(which==='left'){
-    el.style.left=(W*0.02)+'px';
-    el.style.top=(H*0.68-size*0.85)+'px';
-  } else {
-    el.style.right=(W*0.02)+'px';
-    el.style.top=(H*0.68-size*0.85)+'px';
-  }
+  el.style.transform=`rotate(${rnd(-25,25)}deg)`;
+  el.innerHTML=`<img src="${getIcon('shoes')}" alt="">`;
+  propsEl.appendChild(el);
+  G.floorShoes.push(el);
+}
+function placeFloorItem(sub,side){
+  const W=window.innerWidth,H=window.innerHeight;
+  const size=clamp(W*0.14,100,180);
+  const el=document.createElement('div');
+  el.className='floor-item';
+  el.style.width=size+'px';
+  el.style.height=size+'px';
+  el.style.left=(W*0.03)+'px';
+  el.style.top=(H*0.86-size*0.9)+'px';
+  if(sub==='bike')el.style.top=(H*0.86-size*1.55)+'px';
   el.innerHTML=`<img src="${getIcon(sub)}" alt="">`;
   propsEl.appendChild(el);
-  G.wallItems.push({el,life:60,max:60});
+  G.floorItems.push({el,life:60,max:60});
 }
 function removeOneFloorToy(){
-  if(G.floorToys.length===0)return false;
+  if(G.floorToys.length===0){
+    if(G.floorShoes.length===0)return false;
+    const s=G.floorShoes.pop();s.remove();return true;
+  }
   const toy=G.floorToys.pop();
   toy.remove();
   G.toyCounter=Math.max(0,G.toyCounter-1);
@@ -1539,7 +1579,6 @@ function triggerLose(){
 }
 function headScreenPos(ch){if(!ch.wrap)return{x:0,y:0};const r=ch.wrap.getBoundingClientRect();return{x:r.left+r.width/2,y:r.top+r.height*0.24};}
 
-/* ===== CATEGORY / REACTION ===== */
 function itemCategory(item){
   if(item.kind==='useful'){
     if(item.sub==='book'||item.sub==='broom'||item.sub==='apron'||
@@ -1566,7 +1605,6 @@ function reactFor(mode,cat){
   return 'meh';
 }
 
-/* ===== APPLY ITEM ===== */
 function applyItem(ch,item){
   if(G.gameOver)return;
   if(ch.isSibling&&ch.siblingStage!=='grown')return;
@@ -1576,26 +1614,33 @@ function applyItem(ch,item){
   const by=Math.max(80,head.y-40);
 
   const cat=itemCategory(item);
-  const react=reactFor(ch.globalMode,cat);
 
-  if(react==='love'){
-    ch.mood=clamp(ch.mood+18,-100,100);
-    ch.happyStreak++;ch.lastBadT=G.t;
-    if(Math.random()<0.5){ch.reaction='happy';sndGood();}
-    else {ch.reaction='laugh';sndHappy();}
-    ch.reactionT=1.4;
-    spawnParticles('heart',head.x,head.y+140,10);
-    addBubble(pick(HAPPY_PHRASES),{x:bx+rnd(-30,30),y:by},{color:'happy',life:1.6,size:22});
-  } else if(react==='meh'){
-    addBubble('...',{x:bx,y:by},{color:'normal',life:1.2,size:22});
+  if(ch.monsterStage>=3){
+    sndDemand();
+    addBubble(pick(MONSTER_PHRASES),{x:bx,y:by},{color:'yell',life:1.5,size:22,shake:1});
+    ch.mood=clamp(ch.mood+8,-100,100);
+    /* МОНСТР НЕ БЕРЁТ предметы в руки */
   } else {
-    ch.mood=clamp(ch.mood-18,-100,100);
-    ch.happyStreak=0;
-    ch.reaction='cry';ch.reactionT=1.6;
-    ch.lipT=0;   /* ОТКРЫТЫЙ РОТ ОТМЕНЯЕТ ПОМАДУ */
-    sndBad();
-    spawnParticles('tear',head.x,head.y+140,10);
-    addBubble(pick(USEFUL_PHRASES),{x:bx,y:by},{color:'normal',life:1.8,size:22});
+    const react=reactFor(ch.globalMode,cat);
+    if(react==='love'){
+      ch.mood=clamp(ch.mood+18,-100,100);
+      ch.happyStreak++;ch.lastBadT=G.t;
+      if(Math.random()<0.5){ch.reaction='happy';sndGood();}
+      else {ch.reaction='laugh';sndHappy();}
+      ch.reactionT=1.4;
+      spawnParticles('heart',head.x,head.y+140,10);
+      addBubble(pick(HAPPY_PHRASES),{x:bx+rnd(-30,30),y:by},{color:'happy',life:1.6,size:22});
+    } else if(react==='meh'){
+      addBubble('...',{x:bx,y:by},{color:'normal',life:1.2,size:22});
+    } else {
+      ch.mood=clamp(ch.mood-18,-100,100);
+      ch.happyStreak=0;
+      ch.reaction='cry';ch.reactionT=1.6;
+      ch.lipT=0;
+      sndBad();
+      spawnParticles('tear',head.x,head.y+140,10);
+      addBubble(pick(USEFUL_PHRASES),{x:bx,y:by},{color:'normal',life:1.8,size:22});
+    }
   }
 
   if(item.kind==='food' && item.sub!=='gum'){
@@ -1604,15 +1649,32 @@ function applyItem(ch,item){
   if(item.sub==='doll'||item.sub==='bear'||item.sub==='unicorn'){
     placeFloorToy(item.sub);
   }
-  if(item.sub==='phone'){ch.hold.phone=12;}
-  if(item.sub==='lolli')ch.hold.lolli=12;
-  if(item.sub==='crown'){ch.crownT=9;ch.crownCount++;}
+  if(item.sub==='shoes'){
+    ch.shoesCount++;
+    placeFloorShoe();
+  }
+  /* Предметы в руку — только НЕ монстру */
+  if(ch.monsterStage<3){
+    if(item.sub==='phone'){ch.hold.phone=12;}
+    if(item.sub==='lolli'){ch.hold.lolli=12;}
+    if(item.sub==='crown'){ch.crownT=9;ch.crownCount++;}
+  }
   if(item.sub==='dress'){
     ch.dressCount++;
     setDressColor(ch,pick(DRESS_COLORS));
   }
-  if(item.sub==='shoes')ch.shoesCount++;
   if(item.sub==='lipstick'){ch.lipstickCount++;ch.lipT=15;}
+
+  if(cat==='fashion' && ch.globalMode==='capricious'){
+    ch.clothesClicks++;
+    if(ch.clothesClicks>=MONSTER_CLOTHES_THRESHOLD && ch.monsterStage<3){
+      ch.monsterStage=3;
+      ch.crownT=0;ch.apronT=0;
+      ch.hold.lolli=0;ch.hold.phone=0;ch.hold.bear=0;
+      sndMonster();
+      addBubble('МОНСТРИЧКА!',{x:bx,y:by},{color:'mon',life:2.4,size:28});
+    }
+  }
 
   const fashionScore=ch.lipstickCount+ch.dressCount+ch.shoesCount;
   if(!ch.altOutfit && fashionScore>=15){
@@ -1622,15 +1684,14 @@ function applyItem(ch,item){
   }
 
   if(item.sub==='scooter'||item.sub==='bike'){
-    placeWallItem(item.sub,item.sub==='scooter'?'left':'right');
+    placeFloorItem(item.sub,item.sub==='scooter'?'left':'right');
     ch.fat=clamp(ch.fat-0.15,0,1);
     ch.mood=clamp(ch.mood+15,-100,100);
     addBubble('Круто!',{x:bx,y:by},{color:'happy',life:1.6,size:22});
   }
 
-  if(item.sub==='broom'){
-    removeOneFloorToy();
-  }
+  if(item.sub==='broom'){removeOneFloorToy();}
+  if(item.sub==='apron'){ch.apronT=5;}
 
   if(ch.globalMode==='neutral'){
     if(cat==='good')ch.neutralGoodClicks++;
@@ -1641,20 +1702,12 @@ function applyItem(ch,item){
   }
   updateMonster(ch);
 }
-/* ИСПРАВЛЕНО: пороги реалистичные, обновляется всегда */
 function updateMonster(ch){
   if(ch.globalMode!=='capricious'){ch.monsterStage=0;return;}
-  const s=ch.fat*0.2+ch.ugly*0.8;
-  let st=0;
-  if(s>0.20)st=1;      /* было 0.90 — теперь 0.20 */
-  if(s>0.45)st=2;      /* было 1.85 — теперь 0.45 */
-  if(s>0.70)st=3;      /* было 2.85 — теперь 0.70 */
-  if(st>ch.monsterStage){
-    ch.monsterStage=st;
-    if(st>=1){sndMonster();const p=headScreenPos(ch);
-      addBubble(st===1?'Ой-ой...':st===2?'Оказывается наша девочка...':'МОНСТРИЧКА!',
-        {x:p.x,y:p.y-40},{color:'mon',life:1.8,size:24});}
-  } else if(st<ch.monsterStage)ch.monsterStage=st;
+  if(ch.clothesClicks>=MONSTER_CLOTHES_THRESHOLD && ch.monsterStage<3){
+    ch.monsterStage=3;
+    sndMonster();
+  } else if(ch.clothesClicks<MONSTER_CLOTHES_THRESHOLD)ch.monsterStage=0;
 }
 
 function moodBand(m){
@@ -1669,6 +1722,11 @@ function setPhase(ch,p){
   const stg=ch.monsterStage;
   const p2=headScreenPos(ch);
   const cx=clamp(p2.x,140,FW-140),cy=Math.max(70,p2.y-40);
+  if(ch.monsterStage>=3){
+    sndDemand();
+    addBubble(pick(MONSTER_PHRASES),{x:cx,y:cy},{color:'yell',life:1.4,size:22,shake:1});
+    return;
+  }
   if(p==='demand' && ch===G.girl && ch.globalMode!=='enlightened'){
     sndDemand();
     addBubble(pick(DEMAND_PHRASES),{x:cx,y:cy},{color:'yell',life:1.6,size:22,shake:1.5});
@@ -1678,15 +1736,12 @@ function setPhase(ch,p){
     addBubble(pick(RAGE_PHRASES),
       {x:cx,y:cy},
       {color:'rage',life:1.4+stg*0.2,size:30+stg*10,shake:6+stg*2});
-    if(stg>=2){
-      document.body.classList.add('rage-shake-hard');
-      document.body.classList.remove('rage-shake');
-    }
   }
 }
 function updatePhase(ch,dt){
   ch.phaseT+=dt;
   if(ch.globalMode==='enlightened'){if(ch.phase!=='calm')setPhase(ch,'calm');return;}
+  if(ch.monsterStage>=3){if(ch.phase!=='demand')setPhase(ch,'demand');return;}
   const band=moodBand(ch.mood);
   if(band==='calm'||band==='happy'){if(ch.phase!=='calm')setPhase(ch,'calm');return;}
   if(band==='demand'){if(ch.phase!=='demand')setPhase(ch,'demand');return;}
@@ -1697,6 +1752,15 @@ function shoutLoop(ch,dt){
     if(ch.siblingStage==='rug' && Math.random()<dt*0.35){
       const p=headScreenPos(ch);
       addBubble(pick(SIBLING_PHRASES),{x:p.x+rnd(-20,20),y:p.y-30},{color:'happy',life:1.8,size:18});
+    }
+    return;
+  }
+  if(ch.monsterStage>=3){
+    if(ch.time-lastYell>2.8){
+      lastYell=ch.time;
+      const p=headScreenPos(ch);
+      addBubble(pick(MONSTER_PHRASES),{x:p.x+rnd(-60,60),y:Math.max(70,p.y-40)},
+        {color:'yell',life:1.5,size:22,shake:1});
     }
     return;
   }
@@ -1712,11 +1776,12 @@ function shoutLoop(ch,dt){
     if(band==='demand'){
       addBubble(pick(DEMAND_PHRASES),{x:cx,y:cy},{color:'yell',life:1.7,size:22,shake:2});
     } else {
-      addBubble(pick(RAGE_PHRASES),{x:cx,y:cy},{color:'rage',life:1.4,size:28+stg*8,shake:5+stg*2});
+      addBubble(pick(RAGE_PHRASES),{x:cx,y:cy},{color:'rage',life:1.4,size:28+stg*10,shake:6+stg*3});
     }
   }
 }
 function computeExpr(ch){
+  if(ch.monsterStage>=3)return 'demand';
   if(ch.reactionT>0&&ch.reaction)return ch.reaction;
   if(ch.globalMode==='enlightened')return 'happy';
   const band=moodBand(ch.mood);
@@ -1733,15 +1798,13 @@ function updateChar(ch,dt){
     if(ch.siblingStage==='cradle'){
       ch.siblingStageTimer+=dt;
       if(ch.siblingStageTimer>=SIBLING_STAGE_TIME){
-        ch.siblingStage='rug';
-        ch.siblingStageTimer=0;
+        ch.siblingStage='rug';ch.siblingStageTimer=0;
         positionChars();
       }
     } else if(ch.siblingStage==='rug'){
       ch.siblingStageTimer+=dt;
       if(ch.siblingStageTimer>=SIBLING_STAGE_TIME){
-        ch.siblingStage='grown';
-        ch.siblingStageTimer=0;
+        ch.siblingStage='grown';ch.siblingStageTimer=0;
         positionChars();
       }
     }
@@ -1751,8 +1814,8 @@ function updateChar(ch,dt){
     }
   }
 
-  if(ch.mood>0)ch.mood=Math.max(-1,ch.mood-dt*MOOD_DECAY);
-  else ch.mood=Math.min(0,ch.mood+dt*MOOD_RECOVER);
+  if(ch.mood>0)ch.mood=Math.max(0, ch.mood-dt*MOOD_DECAY);
+  else ch.mood=Math.min(0, ch.mood+dt*MOOD_RECOVER);
 
   if(ch.globalMode==='capricious'){
     if(ch.mood<40)ch.capriciousRageTimer+=dt;
@@ -1761,6 +1824,9 @@ function updateChar(ch,dt){
       ch.globalMode='neutral';
       ch.capriciousRageTimer=0;
       ch.neutralGoodClicks=0;ch.neutralBadClicks=0;
+      ch.monsterStage=0;
+      ch.clothesClicks=0;
+      document.body.classList.remove('rage-shake-hard','rage-shake');
       sndEnlighten();
       const p=headScreenPos(ch);
       addBubble('Хм, ладно...',{x:p.x,y:p.y-40},{color:'happy',life:2.6,size:22});
@@ -1788,6 +1854,7 @@ function updateChar(ch,dt){
       sndBad();
       const p=headScreenPos(ch);
       addBubble('НЕ ХОЧУ!',{x:p.x,y:p.y-40},{color:'yell',life:2.4,size:24});
+      updateMonster(ch);
     }
   } else if(ch.globalMode==='enlightened'){
     if(ch.enlightenedBadClicks>=10){
@@ -1802,8 +1869,9 @@ function updateChar(ch,dt){
 
   updatePhase(ch,dt);
   shoutLoop(ch,dt);
+  updateMonster(ch);
 
-  const isRage=ch.globalMode==='capricious'&&ch.phase==='rage';
+  const isRage=ch.globalMode==='capricious'&&ch.phase==='rage'&&ch.monsterStage<3;
   if(isRage)ch.rageTimer+=dt; else ch.rageTimer=Math.max(0,ch.rageTimer-dt*2);
 
   ch.headTimer-=dt;
@@ -1833,14 +1901,18 @@ function updateChar(ch,dt){
   if(ch.wrap){
     ch.wrap.dataset.expr=ch.expr;
     ch.wrap.dataset.stage=String(ch.monsterStage);
-    ch.wrap.dataset.shake=(ch.phase==='rage')?'1':'0';
-    ch.wrap.dataset.red=(ch.rageTimer>3)?'1':'0';
+    /* тряска только при ярости не-монстра */
+    ch.wrap.dataset.shake=(ch.monsterStage<3 && ch.phase==='rage')?'1':'0';
+    ch.wrap.dataset.red=(ch.rageTimer>3&&ch.monsterStage<3)?'1':'0';
     ch.wrap.dataset.crown=ch.crownT>0?'1':'0';
     ch.wrap.dataset.apron=ch.apronT>0?'1':'0';
     ch.wrap.dataset.lips=ch.lipT>0?'1':'0';
     ch.wrap.dataset.outfit=ch.altOutfit?'brat':'original';
-    ch.wrap.dataset.pose=ch.altOutfit?'sassy':'normal';
-    if(ch.hold.phone>0)ch.wrap.dataset.hold='phone';
+
+    /* Монстр никогда не держит предметов */
+    if(ch.monsterStage>=3){
+      ch.wrap.dataset.hold='';
+    } else if(ch.hold.phone>0)ch.wrap.dataset.hold='phone';
     else if(ch.hold.lolli>0)ch.wrap.dataset.hold='lolli';
     else ch.wrap.dataset.hold='';
 
@@ -1859,16 +1931,16 @@ function updateChar(ch,dt){
   }
 
   if(ch===G.girl&&!G.gameOver){
-    const intense=ch.phase==='rage';
-    if(intense&&ch.monsterStage>=2){
-      document.body.classList.add('rage-shake-hard');
-      document.body.classList.remove('rage-shake');
-    } else if(intense){
+    if(ch.monsterStage>=3){
+      if(ch.phase==='demand' && Math.random()<0.3){
+        document.body.classList.add('rage-shake');
+      }
+      document.body.classList.remove('rage-shake-hard');
+    } else if(ch.phase==='rage'){
       document.body.classList.add('rage-shake');
       document.body.classList.remove('rage-shake-hard');
     } else {
-      document.body.classList.remove('rage-shake');
-      document.body.classList.remove('rage-shake-hard');
+      document.body.classList.remove('rage-shake','rage-shake-hard');
     }
   }
 }
@@ -1876,12 +1948,14 @@ function spawnSibling(){
   if(G.sibling)return;
   const isBoy=Math.random()<0.5;
   const ch=makeCharState(true,isBoy);
-  ch.siblingStage='cradle';
-  ch.siblingStageTimer=0;
+  ch.siblingStage='cradle';ch.siblingStageTimer=0;
   G.chars.push(ch);G.sibling=ch;
   createCharDOM(ch);
   positionChars();
   sndEnlighten();
+  const msg=isBoy?'Ого, мой братик!':'Ого, моя сестрёнка!';
+  const p=headScreenPos(G.girl);
+  addBubble(msg,{x:p.x,y:p.y-60},{color:'happy',life:3.2,size:24});
   updateHUD();
 }
 function checkWin(){
@@ -1984,7 +2058,6 @@ function useSlot(slot,target){
   sndPop();renderCards();
   const el=cardsEl.querySelector(`.card[data-slot="${slot}"]`);
   if(el){el.classList.add('pop');setTimeout(()=>el.classList.remove('pop'),340);}
-  updateHUD();
 }
 
 /* ROOM */
@@ -2003,17 +2076,31 @@ function drawRoom(){
   if(!RW||!RH)return;
   const floorY=RH*0.68;
   const wall=rg.createLinearGradient(0,0,0,floorY);
-  wall.addColorStop(0,'#e8ddc8');wall.addColorStop(1,'#d4c8b0');
+  wall.addColorStop(0,G.env.wall.top);wall.addColorStop(1,G.env.wall.bot);
   rg.fillStyle=wall;rg.fillRect(0,0,RW,floorY);
 
   const floor=rg.createLinearGradient(0,floorY,0,RH);
-  floor.addColorStop(0,'#d8b888');floor.addColorStop(1,'#a88058');
+  floor.addColorStop(0,G.env.floor.top);floor.addColorStop(1,G.env.floor.bot);
   rg.fillStyle=floor;rg.fillRect(0,floorY,RW,RH-floorY);
 
-  rg.strokeStyle='rgba(120,90,50,0.35)';rg.lineWidth=1.5;
-  const boardW=RW/12;
-  for(let i=1;i<12;i++){rg.beginPath();rg.moveTo(i*boardW,floorY);rg.lineTo(i*boardW,RH);rg.stroke();}
-  rg.fillStyle='#a89078';rg.fillRect(0,floorY-3,RW,6);
+  if(G.env.floor.tex==='boards'){
+    rg.strokeStyle='rgba(80,50,20,0.35)';rg.lineWidth=1.5;
+    const boardW=RW/12;
+    for(let i=1;i<12;i++){rg.beginPath();rg.moveTo(i*boardW,floorY);rg.lineTo(i*boardW,RH);rg.stroke();}
+  } else if(G.env.floor.tex==='tiles'){
+    rg.strokeStyle='rgba(80,70,60,0.35)';rg.lineWidth=1.5;
+    const tileW=RW/8;
+    const tileH=(RH-floorY)/4;
+    for(let i=1;i<8;i++){rg.beginPath();rg.moveTo(i*tileW,floorY);rg.lineTo(i*tileW,RH);rg.stroke();}
+    for(let i=1;i<4;i++){rg.beginPath();rg.moveTo(0,floorY+i*tileH);rg.lineTo(RW,floorY+i*tileH);rg.stroke();}
+  } else if(G.env.floor.tex==='parquet'){
+    rg.strokeStyle='rgba(90,60,30,0.4)';rg.lineWidth=1.2;
+    for(let i=0;i<8;i++){
+      const x=i*(RW/8);
+      rg.beginPath();rg.moveTo(x,floorY);rg.lineTo(x,RH);rg.stroke();
+    }
+  }
+  rg.fillStyle='rgba(120,90,60,0.6)';rg.fillRect(0,floorY-3,RW,6);
 
   drawClock(rg,RW*0.62,RH*0.11,Math.min(RW,RH)*0.055);
   drawChandelier(rg,RW*0.5,0);
@@ -2023,15 +2110,15 @@ function drawRoom(){
   drawFloorLamp(rg,RW*0.78,floorY-RH*0.02,RH*0.32);
   drawChair(rg,RW*0.55,floorY-RH*0.02,RW*0.10,RH*0.14);
   drawLack(rg,RW*0.34,floorY-RH*0.03,RW*0.08,RH*0.08);
-  drawRug(rg,RW*0.40,RH*0.88,RW*0.32,RH*0.08);
-  drawPlant(rg,RW*0.95,floorY-RH*0.02,RH*0.20);
+  drawRug(rg,RW*0.40,RH*0.78,RW*0.30,RH*0.06);
+  drawPlant(rg,RW*G.env.plantX,floorY-RH*0.02,RH*0.20);
   drawFrame(rg,RW*0.35,RH*0.15,RW*0.07,RH*0.13,'#f0e8d8');
 
   if(G.sibling){
     if(G.sibling.siblingStage==='cradle'){
-      drawCradle(rg,RW*0.70,RH*0.84,RW*0.16,RH*0.14);
+      drawCradle(rg,RW*0.78,RH*0.66,RW*0.16,RH*0.12);
     } else if(G.sibling.siblingStage==='rug'){
-      drawBabyRug(rg,RW*0.70,RH*0.88,RW*0.14,RH*0.06);
+      drawBabyRug(rg,RW*0.78,RH*0.70,RW*0.14,RH*0.05);
     }
   }
 }
@@ -2071,12 +2158,12 @@ function drawClock(g,x,y,r){
   g.beginPath();g.moveTo(x,y);g.lineTo(x+Math.cos(secA)*r*0.85,y+Math.sin(secA)*r*0.85);g.stroke();
   g.fillStyle='#1a1a1a';g.beginPath();g.arc(x,y,5,0,TAU);g.fill();
 }
-const CAT_SPOTS=[{x:0.72,y:0.88},{x:0.55,y:0.62},{x:0.83,y:0.66},{x:0.20,y:0.85},{x:0.40,y:0.90}];
-const CAT_SPOTS_MONSTER=[{x:0.15,y:0.85},{x:0.85,y:0.80},{x:0.50,y:0.60},{x:0.25,y:0.70},{x:0.75,y:0.55}];
+const CAT_SPOTS=[{x:0.72,y:0.86},{x:0.55,y:0.82},{x:0.83,y:0.84},{x:0.20,y:0.88},{x:0.40,y:0.90}];
+const CAT_SPOTS_MONSTER=[{x:0.15,y:0.88},{x:0.85,y:0.86},{x:0.50,y:0.82},{x:0.25,y:0.85},{x:0.75,y:0.83}];
 function updateCatState(){
   const dt=0.016;
   G.cat.timer-=dt;
-  const monster=G.girl&&G.girl.monsterStage>=2;
+  const monster=G.girl&&G.girl.monsterStage>=3;
   G.cat.fat=monster;
   if(G.cat.timer<=0){
     G.cat.timer=monster?6:30;
@@ -2158,7 +2245,10 @@ function drawPlant(g,x,y,h){
   g.fillStyle='#a87850';
   g.beginPath();g.moveTo(x-16,y);g.lineTo(x+16,y);g.lineTo(x+13,y+22);g.lineTo(x-13,y+22);g.closePath();g.fill();
   const leaves=[[x-12,y-30],[x-4,y-42],[x+8,y-38],[x+16,y-28],[x-16,y-22]];
-  for(const[lx,ly] of leaves){g.fillStyle='#3a7a48';g.beginPath();g.ellipse(lx,ly,14,10,rnd(-0.5,0.5),0,TAU);g.fill();}
+  for(const[lx,ly] of leaves){
+    g.fillStyle='#3a7a48';
+    g.beginPath();g.ellipse(lx,ly,14,10,0,0,TAU);g.fill();
+  }
 }
 function drawFrame(g,x,y,w,h,color){
   g.fillStyle=color;g.fillRect(x,y,w,h);
@@ -2166,24 +2256,31 @@ function drawFrame(g,x,y,w,h,color){
   g.fillStyle='#ffb0c0';g.beginPath();g.arc(x+w*0.5,y+h*0.45,w*0.20,0,TAU);g.fill();
 }
 
-/* КОТ РИСУЕТСЯ В ОТДЕЛЬНОМ CANVAS #cat (выше props) */
 function drawCatLayer(){
   catG.clearRect(0,0,FW,FH);
   if(!G.cat)return;
   const t=G.t;
   const x=G.cat.x,y=G.cat.y;
   const fat=G.cat.fat?1.55:1;
+  const C=G.env.catColor;
+  const E=G.env.catEyes;
   catG.save();catG.translate(x,y);catG.scale(1.1*fat,1.1*fat);
   catG.fillStyle='rgba(0,0,0,0.3)';catG.beginPath();catG.ellipse(0,0,44*fat,8,0,0,TAU);catG.fill();
-  catG.strokeStyle='#3a3a48';catG.lineWidth=8;catG.lineCap='round';
+  catG.strokeStyle=C.body;catG.lineWidth=8;catG.lineCap='round';
   const tailWig=G.cat.fat?Math.sin(t*6)*10:Math.sin(t*1.6)*4;
   catG.beginPath();catG.moveTo(-30,-18);catG.quadraticCurveTo(-48,-14+tailWig,-52,-32+tailWig);catG.stroke();
-  catG.fillStyle='#3a3a48';catG.beginPath();catG.ellipse(0,-16,32,16,0,0,TAU);catG.fill();
-  catG.fillStyle='#5a5a70';catG.beginPath();catG.ellipse(0,-12,20,11,0,0,TAU);catG.fill();
-  catG.fillStyle='#3a3a48';catG.beginPath();catG.arc(22,-30,17,0,TAU);catG.fill();
+  catG.fillStyle=C.body;catG.beginPath();catG.ellipse(0,-16,32,16,0,0,TAU);catG.fill();
+  catG.fillStyle=C.belly;catG.beginPath();catG.ellipse(0,-12,20,11,0,0,TAU);catG.fill();
+  if(C.name==='spotted'){
+    catG.fillStyle=C.stripe;
+    catG.beginPath();catG.arc(-14,-16,5,0,TAU);catG.fill();
+    catG.beginPath();catG.arc(6,-20,6,0,TAU);catG.fill();
+    catG.beginPath();catG.arc(16,-10,4,0,TAU);catG.fill();
+  }
+  catG.fillStyle=C.body;catG.beginPath();catG.arc(22,-30,17,0,TAU);catG.fill();
   catG.beginPath();catG.moveTo(14,-44);catG.lineTo(18,-54);catG.lineTo(24,-44);catG.closePath();catG.fill();
   catG.beginPath();catG.moveTo(24,-44);catG.lineTo(30,-54);catG.lineTo(32,-42);catG.closePath();catG.fill();
-  catG.fillStyle='#8affa0';
+  catG.fillStyle=E.c;
   const eyeY=-30+(G.cat.fat?Math.sin(t*8)*1.5:0);
   catG.beginPath();catG.ellipse(18,eyeY,3,3,0,0,TAU);catG.fill();
   catG.beginPath();catG.ellipse(27,eyeY,3,3,0,0,TAU);catG.fill();
@@ -2196,7 +2293,7 @@ function drawCatLayer(){
     catG.beginPath();catG.moveTo(33,eyeY-6);catG.lineTo(23,eyeY-2);catG.stroke();
   }
   catG.fillStyle='#ff9ab0';catG.beginPath();catG.arc(23,-25,1.6,0,TAU);catG.fill();
-  catG.fillStyle='#5a5a70';
+  catG.fillStyle=C.belly;
   catG.beginPath();catG.ellipse(-10,-3,7,4,0,0,TAU);catG.fill();
   catG.beginPath();catG.ellipse(8,-3,7,4,0,0,TAU);catG.fill();
   catG.restore();
@@ -2288,16 +2385,11 @@ function loop(now){
     if(G.slotLock[i]>0){G.slotLock[i]=Math.max(0,G.slotLock[i]-dt);needRender=true;}
   }
   if(needRender)renderCards();
-  for(let i=G.wallItems.length-1;i>=0;i--){
-    const wi=G.wallItems[i];
+  for(let i=G.floorItems.length-1;i>=0;i--){
+    const wi=G.floorItems[i];
     wi.life-=dt;
     if(wi.life<2)wi.el.style.opacity=clamp(wi.life/2,0,1);
-    if(wi.life<=0){wi.el.remove();G.wallItems.splice(i,1);}
-  }
-  for(let i=G.propEls.length-1;i>=0;i--){
-    const pr=G.propEls[i];
-    pr.life-=dt;
-    if(pr.life<=0){pr.el.remove();G.propEls.splice(i,1);}
+    if(wi.life<=0){wi.el.remove();G.floorItems.splice(i,1);}
   }
   if(G.girl&&G.girl.siblingBornAt>0&&!G.sibling&&G.t>=G.girl.siblingBornAt){
     G.girl.siblingBornAt=0;
@@ -2325,7 +2417,7 @@ function init(){
   renderCards();updateHUD();
   setWeather('sunny');
   G.cat.x=window.innerWidth*0.72;
-  G.cat.y=window.innerHeight*0.88;
+  G.cat.y=window.innerHeight*0.86;
   G.cat.spot=0;
   G.cat.lastSpot=0;
   requestAnimationFrame(loop);
