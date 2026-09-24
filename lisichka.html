@@ -237,22 +237,36 @@
     transform-origin: 200px 224px;
     transform-box: view-box;
   }
-  /* Красная обводка у контурных ртов */
-  .character-wrap[data-lips="1"] svg .mouth-neutral path,
-  .character-wrap[data-lips="1"] svg .mouth-happy path,
-  .character-wrap[data-lips="1"] svg .mouth-bliss path,
-  .character-wrap[data-lips="1"] svg .mouth-sad path,
-  .character-wrap[data-lips="1"] svg .mouth-demand path{
-    stroke: #d81840;
+   /* Помада — коралловая у обычной и brat-девочки */
+  .character-wrap[data-lips="1"]:not([data-stage="3"]) svg .mouth-neutral path,
+  .character-wrap[data-lips="1"]:not([data-stage="3"]) svg .mouth-happy path,
+  .character-wrap[data-lips="1"]:not([data-stage="3"]) svg .mouth-bliss path,
+  .character-wrap[data-lips="1"]:not([data-stage="3"]) svg .mouth-sad path,
+  .character-wrap[data-lips="1"]:not([data-stage="3"]) svg .mouth-demand path{
+    stroke: #ff6a5a;
     stroke-width: 4;
   }
-  /* Красная заливка у открытых ртов */
-  .character-wrap[data-lips="1"] svg .mouth-laugh path:first-child,
-  .character-wrap[data-lips="1"] svg .mouth-cry ellipse,
-  .character-wrap[data-lips="1"] svg .mouth-scream ellipse,
-  .character-wrap[data-lips="1"] svg .mouth-rage ellipse,
-  .character-wrap[data-lips="1"] svg .mouth-mon-rage ellipse{
-    fill: #d81840;
+  .character-wrap[data-lips="1"]:not([data-stage="3"]) svg .mouth-laugh path:first-child,
+  .character-wrap[data-lips="1"]:not([data-stage="3"]) svg .mouth-cry ellipse,
+  .character-wrap[data-lips="1"]:not([data-stage="3"]) svg .mouth-scream ellipse,
+  .character-wrap[data-lips="1"]:not([data-stage="3"]) svg .mouth-rage ellipse{
+    fill: #ff6a5a;
+  }
+  /* Помада — тёмно-синяя у монстра */
+  .character-wrap[data-stage="3"][data-lips="1"] svg .mouth-neutral path,
+  .character-wrap[data-stage="3"][data-lips="1"] svg .mouth-happy path,
+  .character-wrap[data-stage="3"][data-lips="1"] svg .mouth-bliss path,
+  .character-wrap[data-stage="3"][data-lips="1"] svg .mouth-sad path,
+  .character-wrap[data-stage="3"][data-lips="1"] svg .mouth-demand path{
+    stroke: #1a2a6a;
+    stroke-width: 4;
+  }
+  .character-wrap[data-stage="3"][data-lips="1"] svg .mouth-laugh path:first-child,
+  .character-wrap[data-stage="3"][data-lips="1"] svg .mouth-cry ellipse,
+  .character-wrap[data-stage="3"][data-lips="1"] svg .mouth-scream ellipse,
+  .character-wrap[data-stage="3"][data-lips="1"] svg .mouth-rage ellipse,
+  .character-wrap[data-stage="3"][data-lips="1"] svg .mouth-mon-rage ellipse{
+    fill: #1a2a6a;
   }
   /* Убираем прежний слой-накладку */
   .character-wrap svg .lip-color-wide{display:none;}
@@ -538,9 +552,26 @@ const NATURAL_EYES=[
   {c1:'#a8b0c0',c2:'#6070a0',c3:'#1a2030'},
 ];
 const WALL_COLORS=[
-  {top:'#e8ddc8',bot:'#d4c8b0'},{top:'#dcdcd0',bot:'#c8c8b8'},
-  {top:'#e0d5c8',bot:'#c8b8a8'},{top:'#d8d5e0',bot:'#b8b0c0'},
-  {top:'#e8d8c8',bot:'#d0b8a0'},{top:'#d5e0d0',bot:'#b8c8b8'},
+  {base:{top:'#e8ddc8',bot:'#d4c8b0'}, pat:null},
+  {base:{top:'#dcdcd0',bot:'#c8c8b8'}, pat:'stripesV', color:'rgba(180,170,150,.35)', step:38},
+  {base:{top:'#e0d5c8',bot:'#c8b8a8'}, pat:'dots',    color:'rgba(160,130,110,.30)', step:42},
+  {base:{top:'#d8d5e0',bot:'#b8b0c0'}, pat:'diamonds',color:'rgba(130,110,160,.28)', step:56},
+  {base:{top:'#e8d8c8',bot:'#d0b8a0'}, pat:'flowers', color:'rgba(200,120,140,.30)', step:64},
+  {base:{top:'#d5e0d0',bot:'#b8c8b8'}, pat:'stripesH',color:'rgba(120,150,130,.30)', step:34},
+  {base:{top:'#e4d8e0',bot:'#c8b8c4'}, pat:'checks',  color:'rgba(160,130,160,.26)', step:44},
+  {base:{top:'#e8ddc0',bot:'#d0c090'}, pat:'waves',   color:'rgba(170,140,90,.30)',  step:48},
+  {base:{top:'#dde0e8',bot:'#bcc4d0'}, pat:'stripesD',color:'rgba(110,140,180,.28)', step:36},
+  {base:{top:'#e8d8d0',bot:'#d0b8a8'}, pat:'herring', color:'rgba(160,110,90,.28)',  step:54},
+  {base:{top:'#d8e0d8',bot:'#b8c8b8'}, pat:'grid',    color:'rgba(120,140,120,.24)', step:30},
+  {base:{top:'#e0dcc8',bot:'#c8c0a0'}, pat:'stars',   color:'rgba(180,150,100,.32)', step:60},
+  {base:{top:'#dfd8e8',bot:'#c0b8d0'}, pat:'stripesD',color:'rgba(150,120,180,.30)', step:32},
+  {base:{top:'#e8e0d0',bot:'#d0c0a0'}, pat:'checks',  color:'rgba(200,160,120,.28)', step:40},
+  {base:{top:'#d8e0e4',bot:'#b8c4d0'}, pat:'dots',    color:'rgba(130,160,190,.30)', step:38},
+  {base:{top:'#e0d8d0',bot:'#c8b8a8'}, pat:'flowers', color:'rgba(190,140,110,.28)', step:58},
+  {base:{top:'#dcdcd8',bot:'#c0c0b8'}, pat:'waves',   color:'rgba(140,140,130,.28)', step:46},
+  {base:{top:'#e8dce0',bot:'#d0b8c0'}, pat:'diamonds',color:'rgba(190,140,160,.28)', step:50},
+  {base:{top:'#dde0d8',bot:'#bcc8b8'}, pat:'herring', color:'rgba(140,170,130,.26)', step:52},
+  {base:{top:'#e4dcc0',bot:'#c8bca0'}, pat:'stars',   color:'rgba(170,150,110,.30)', step:62},
 ];
 const FLOOR_COLORS=[
   {top:'#d8b888',bot:'#a88058',tex:'boards'},
@@ -2711,10 +2742,109 @@ function drawRoom(){
   if(!RW||!RH)return;
   const floorY=RH*0.70;
 
+  const wallBase = G.env.wall.base || G.env.wall;
   const wall=rg.createLinearGradient(0,0,0,floorY);
-  wall.addColorStop(0,G.env.wall.top);
-  wall.addColorStop(1,G.env.wall.bot);
+  wall.addColorStop(0,wallBase.top);
+  wall.addColorStop(1,wallBase.bot);
   rg.fillStyle=wall;rg.fillRect(0,0,RW,floorY);
+
+  /* Рисунок обоев */
+  if(G.env.wall.pat){
+    const pat=G.env.wall.pat;
+    const step=G.env.wall.step||40;
+    const col=G.env.wall.color||'rgba(0,0,0,.2)';
+    rg.save();
+    rg.strokeStyle=col;rg.fillStyle=col;
+    rg.lineWidth=2;
+    if(pat==='stripesV'){
+      for(let x=step/2;x<RW;x+=step){rg.beginPath();rg.moveTo(x,0);rg.lineTo(x,floorY);rg.stroke();}
+    } else if(pat==='stripesH'){
+      for(let y=step/2;y<floorY;y+=step){rg.beginPath();rg.moveTo(0,y);rg.lineTo(RW,y);rg.stroke();}
+    } else if(pat==='stripesD'){
+      rg.lineWidth=3;
+      for(let x=-floorY;x<RW+floorY;x+=step){rg.beginPath();rg.moveTo(x,0);rg.lineTo(x+floorY,floorY);rg.stroke();}
+    } else if(pat==='dots'){
+      const r=Math.max(2,step*0.08);
+      for(let y=step/2;y<floorY;y+=step){
+        const ox=(Math.floor(y/step)%2)?step/2:0;
+        for(let x=step/2;x<RW;x+=step){rg.beginPath();rg.arc(x+ox,y,r,0,TAU);rg.fill();}
+      }
+    } else if(pat==='diamonds'){
+      const r=step*0.28;
+      rg.lineWidth=1.6;
+      for(let y=step/2;y<floorY;y+=step){
+        for(let x=step/2;x<RW;x+=step){
+          rg.beginPath();rg.moveTo(x,y-r);rg.lineTo(x+r,y);rg.lineTo(x,y+r);rg.lineTo(x-r,y);rg.closePath();rg.stroke();
+        }
+      }
+    } else if(pat==='flowers'){
+      const r=step*0.18;
+      for(let y=step/2;y<floorY;y+=step){
+        const ox=(Math.floor(y/step)%2)?step/2:0;
+        for(let x=step/2;x<RW;x+=step){
+          for(let i=0;i<5;i++){
+            const a=i*TAU/5 - Math.PI/2;
+            rg.beginPath();rg.arc(x+ox+Math.cos(a)*r,y+Math.sin(a)*r,r*0.55,0,TAU);rg.fill();
+          }
+          rg.beginPath();rg.arc(x+ox,y,r*0.4,0,TAU);rg.fill();
+        }
+      }
+    } else if(pat==='checks'){
+      const s=step/2;
+      rg.globalAlpha=0.6;
+      for(let y=0;y<floorY;y+=step){
+        for(let x=0;x<RW;x+=step){
+          const dark=((x/s)+(y/s))%2===0;
+          if(dark){rg.fillRect(x,y,s,s);rg.fillRect(x+s,y+s,s,s);}
+        }
+      }
+      rg.globalAlpha=1;
+    } else if(pat==='waves'){
+      rg.lineWidth=2.4;
+      for(let y=step/2;y<floorY;y+=step){
+        rg.beginPath();
+        for(let x=0;x<=RW;x+=4){
+          const yy=y+Math.sin(x/28)*step*0.18;
+          x?rg.lineTo(x,yy):rg.moveTo(x,yy);
+        }
+        rg.stroke();
+      }
+    } else if(pat==='herring'){
+      rg.lineWidth=2;
+      for(let y=step/2;y<floorY;y+=step){
+        for(let x=0;x<RW;x+=step){
+          rg.beginPath();
+          rg.moveTo(x,y+step*0.3);
+          rg.lineTo(x+step/2,y-step*0.05);
+          rg.lineTo(x+step,y+step*0.3);
+          rg.stroke();
+        }
+      }
+    } else if(pat==='grid'){
+      rg.lineWidth=1;
+      for(let x=step/2;x<RW;x+=step){rg.beginPath();rg.moveTo(x,0);rg.lineTo(x,floorY);rg.stroke();}
+      for(let y=step/2;y<floorY;y+=step){rg.beginPath();rg.moveTo(0,y);rg.lineTo(RW,y);rg.stroke();}
+    } else if(pat==='stars'){
+      const r=step*0.18;
+      for(let y=step/2;y<floorY;y+=step){
+        const ox=(Math.floor(y/step)%2)?step/2:0;
+        for(let x=step/2;x<RW;x+=step){
+          rg.beginPath();
+          for(let i=0;i<5;i++){
+            const a=i*TAU/5 - Math.PI/2;
+            const px=x+ox+Math.cos(a)*r;
+            const py=y+Math.sin(a)*r;
+            const qx=x+ox+Math.cos(a+Math.PI/5)*r*0.45;
+            const qy=y+Math.sin(a+Math.PI/5)*r*0.45;
+            i?rg.lineTo(px,py):rg.moveTo(px,py);
+            rg.lineTo(qx,qy);
+          }
+          rg.closePath();rg.fill();
+        }
+      }
+    }
+    rg.restore();
+  }
 
   if(G.weather==='sunny'){
     const wg=rg.createRadialGradient(RW*WIN_X,RH*WIN_Y,RH*0.02,RW*WIN_X,RH*WIN_Y,RH*0.42);
