@@ -1891,11 +1891,6 @@ function placeFloorItem(sub){
   const W = window.innerWidth, H = window.innerHeight;
   const size = clamp(W*0.16, 110, 190);
 
-  /* Стеллаж (kallax) стоит у правого края.
-     Его центр: RW*0.885 - kw/2, ширина kw = RW*0.145.
-     То есть стеллаж занимает x: 0.8125*W … 0.9575*W.
-     Технику ставим ПОД стеллажом, уходя за правый край экрана. */
-
   const slot = VEHICLE_SLOTS[sub] != null ? VEHICLE_SLOTS[sub] : 0;
 
   /* Видимая часть иконки в комнате — только колёса */
@@ -1907,7 +1902,7 @@ function placeFloorItem(sub){
   const x = W - visibleW;
 
   /* Друг за другом вдоль стены — slot сдвигает вниз */
-  const floorY = H*0.70;
+  const floorY = H*0.60;
   const stackStep = size * 0.42;
 
   const el = document.createElement('div');
