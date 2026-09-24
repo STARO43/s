@@ -1883,24 +1883,27 @@ function placeFloorItem(sub){
   if(G.vehicleEls[sub]){
     const el = G.vehicleEls[sub];
     el.style.animation = 'none';
-    void el.offsetWidth;           /* форсим reflow */
+    void el.offsetWidth;
     el.style.animation = 'propAppear .4s ease-out';
     return;
   }
   const W = window.innerWidth, H = window.innerHeight;
-  const size = clamp(W*0.13, 90, 160);
+  const size = clamp(W*0.16, 110, 190);
   const slot = VEHICLE_SLOTS[sub] != null ? VEHICLE_SLOTS[sub] : 0;
-  const gap  = W*0.012;
-  const rightEdge = W - W*0.02;
-  const x = rightEdge - size - slot*(size + gap);
+  /* Доля иконки, которая остаётся в комнате (торчат только колёса) */
+  const visiblePart = 0.28;
+  const visibleW = size * visiblePart;
+  /* Левая граница элемента: техника уходит ЗА правый край */
+  const x = W - visibleW;
+  /* Друг за другом вдоль стены — slot сдвигает вниз, а не вбок */
+  const floorY = H*0.70;
+  const stackStep = size * 0.55;
   const el = document.createElement('div');
   el.className = 'floor-item';
   el.style.width  = size+'px';
   el.style.height = size+'px';
   el.style.left   = x+'px';
-  /* К стене — верх иконки у плинтуса, колёса на полу */
-  const floorY = H*0.70;
-  el.style.top = (floorY - size*0.05)+'px';
+  el.style.top    = (floorY - size*0.05 + slot*stackStep)+'px';
   el.innerHTML = `<img src="${getIcon(sub)}" alt="">`;
   propsEl.appendChild(el);
   G.vehicleEls[sub] = el;
