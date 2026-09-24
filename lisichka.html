@@ -170,7 +170,6 @@
   .character-wrap[data-stage="3"] .phone-in-hand,
   .character-wrap[data-stage="3"] .arm-holding,
   .character-wrap[data-stage="3"] .hands-holding,
-  .character-wrap[data-stage="3"] .arms-brat,
   .character-wrap[data-stage="3"] .hair-bow,
   .character-wrap[data-stage="3"] .fox-ears,
   .character-wrap[data-stage="3"] .apron-worn,
@@ -203,6 +202,13 @@
   .character-wrap[data-hold="phone"]:not([data-stage="3"]) .arms-normal,
   .character-wrap[data-hold="phone"]:not([data-stage="3"]) .hands-normal,
   .character-wrap[data-hold="phone"]:not([data-stage="3"]) .arms-brat{display:none;}
+   /* У brat-образа при телефоне/леденце arm-holding не нужен:
+     он нарисован под кардиган (жёлтый рукав), а у brat-образа рукавов нет.
+     Оставляем только кисть (hands-holding) + сам предмет. */
+  .character-wrap[data-outfit="brat"][data-hold="phone"]:not([data-stage="3"]) .arm-holding,
+  .character-wrap[data-outfit="brat"][data-hold="lolli"]:not([data-stage="3"]) .arm-holding{
+    display:none;
+  }
 
   .character-wrap[data-apron="1"] .apron-worn{display:block;}
   /* Помада — расширяем рот и красим губы в красный */
