@@ -509,18 +509,7 @@ const DRESS_COLORS=[
   {top:'#a0ffb0',bottom:'#60d080',shade:'#2a8060'},
 ];
 
- const CARDIGAN_COLORS=[
-  {top:'#e0cc94',mid:'#c8b878',bot:'#9a8a48'},  /* бежевый (по умолчанию) */
-  {top:'#e8a8c0',mid:'#d878a0',bot:'#a84878'},  /* розовый */
-  {top:'#a8c8e8',mid:'#7898d0',bot:'#4868a0'},  /* голубой */
-  {top:'#c8b8e0',mid:'#a890c8',bot:'#7860a0'},  /* сиреневый */
-  {top:'#a8d8b0',mid:'#78b880',bot:'#488858'},  /* мятный */
-  {top:'#e8c8a0',mid:'#d0a878',bot:'#a07848'},  /* персиковый */
-  {top:'#d8d8d8',mid:'#b8b8b8',bot:'#888888'},  /* серый */
-  {top:'#f0b8a0',mid:'#e08868',bot:'#a85838'},  /* коралловый */
-];
-
-const NATURAL_HAIR=[
+ const NATURAL_HAIR=[
   {top:'#f0dcb8',mid:'#d4b888',bot:'#8a6a44'},
   {top:'#d4b890',mid:'#a88058',bot:'#5a3e28'},
   {top:'#a88260',mid:'#7a5238',bot:'#3a2418'},
@@ -1207,10 +1196,10 @@ function buildCharacterSVG(isBoy, hair, eyes, style){
       <stop offset="55%" stop-color="var(--dressBottom,#eaf0ff)"/>
       <stop offset="100%" stop-color="var(--dressShade,#b8c8e8)"/>
     </linearGradient>
-       <linearGradient id="cardiganGrad-${S}" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0%" stop-color="var(--cardiganTop,#e0cc94)"/>
-      <stop offset="55%" stop-color="var(--cardiganMid,#c8b878)"/>
-      <stop offset="100%" stop-color="var(--cardiganBot,#9a8a48)"/>
+        <linearGradient id="cardiganGrad-${S}" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#e0cc94"/>
+      <stop offset="55%" stop-color="#c8b878"/>
+      <stop offset="100%" stop-color="#9a8a48"/>
     </linearGradient>
     <pattern id="argyle-${S}" width="22" height="22" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
       <rect width="22" height="22" fill="#c8b878"/>
@@ -1728,10 +1717,6 @@ function createCharDOM(ch){
   wrap.style.setProperty('--dressTop','#ffffff');
   wrap.style.setProperty('--dressBottom','#eaf0ff');
   wrap.style.setProperty('--dressShade','#b8c8e8');
-   const cc = pick(CARDIGAN_COLORS);
-  wrap.style.setProperty('--cardiganTop', cc.top);
-  wrap.style.setProperty('--cardiganMid', cc.mid);
-  wrap.style.setProperty('--cardiganBot', cc.bot);
   wrap.innerHTML=buildCharacterSVG(ch.isBoy,ch.hair,ch.eyes,ch.hairStyle);
   charsEl.appendChild(wrap);
   ch.wrap=wrap;
