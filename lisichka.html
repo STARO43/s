@@ -1766,10 +1766,10 @@ function repositionVehicles(){
   if(!G.vehicleEls) return;
   const W=window.innerWidth, H=window.innerHeight;
   const size=clamp(W*0.16,110,190);
-  const visiblePart = 0.34;
+  const visiblePart = 0.7;
   const visibleW = size * visiblePart;
   const floorY = H*0.70;
-  const stackStep = size * 0.7;
+  const stackStep = size * 0.9;
   for(const sub in G.vehicleEls){
     const el = G.vehicleEls[sub];
     const slot = VEHICLE_SLOTS[sub] != null ? VEHICLE_SLOTS[sub] : 0;
