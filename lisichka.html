@@ -1941,6 +1941,7 @@ function applyItem(ch,item){
   const cat=itemCategory(item);
 
   if(ch.monsterStage>=3){
+    /* Книга возвращает в человека и НЕ поднимает настроение */
     if(item.sub==='book'){
       ch.monsterBooks=(ch.monsterBooks||0)+1;
       sndGood();
@@ -1951,7 +1952,6 @@ function applyItem(ch,item){
         ch.monsterStage=0;
         ch.clothesClicks=0;
         ch.monsterBooks=0;
-        ch.mood=clamp(ch.mood+25,-100,100);
         sndEnlighten();
         setTimeout(()=>addBubble('Я снова человек!',
           {x:bx,y:by},{color:'happy',life:2.8,size:26}),300);
@@ -1959,10 +1959,25 @@ function applyItem(ch,item){
       updateMonster(ch);
       return;
     }
-    ch.mood=clamp(ch.mood-10,-100,100);
-    sndDemand();
-    addBubble(pick(MONSTER_PHRASES),{x:bx,y:by},{color:'yell',life:1.5,size:22,shake:1});
-    ch.screamT=1.0;
+
+    /* Монстр реагирует на то, что любит — как в капризном режиме */
+    if(cat==='sweet'||cat==='toy'||cat==='fashion'){
+      ch.mood=clamp(ch.mood+18,-100,100);
+      ch.happyStreak++;
+      ch.lastBadT=G.t;
+      ch.reaction='happy';ch.reactionT=1.2;
+      sndHappy();
+      spawnParticles('heart',head.x,head.y+140,10);
+      addBubble(pick(HAPPY_PHRASES),{x:bx+rnd(-30,30),y:by},
+        {color:'happy',life:1.6,size:22});
+    } else {
+      /* Всё остальное — недовольство */
+      ch.mood=clamp(ch.mood-6,-100,100);
+      sndDemand();
+      addBubble(pick(MONSTER_PHRASES),{x:bx,y:by},
+        {color:'yell',life:1.5,size:22,shake:1});
+      ch.screamT=1.0;
+    }
   } else {
     const react=reactFor(ch.globalMode,cat);
     if(react==='love'){
