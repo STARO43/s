@@ -1764,12 +1764,12 @@ window.addEventListener('orientationchange',()=>setTimeout(()=>{ positionChars()
 
 function repositionVehicles(){
   if(!G.vehicleEls) return;
-  const W=window.innerWidth, H=window.innerHeight;
-  const size=clamp(W*0.16,110,190);
-  const visiblePart = 0.7;
+  const W = window.innerWidth, H = window.innerHeight;
+  const size = clamp(W*0.16, 110, 190);
+  const visiblePart = 0.30;
   const visibleW = size * visiblePart;
   const floorY = H*0.70;
-  const stackStep = size * 0.9;
+  const stackStep = size * 0.42;
   for(const sub in G.vehicleEls){
     const el = G.vehicleEls[sub];
     const slot = VEHICLE_SLOTS[sub] != null ? VEHICLE_SLOTS[sub] : 0;
@@ -1877,6 +1877,8 @@ function placeFloorShoe(){
 /* ВЕЛОСИПЕД И САМОКАТ — по одному разу, каждый на своём месте у стены */
 const VEHICLE_SLOTS = { bike: 0, scooter: 1 };
 
+const VEHICLE_SLOTS = { bike: 0, scooter: 1 };
+
 function placeFloorItem(sub){
   if(!G.vehicleEls) G.vehicleEls = {};
   /* Уже стоит — просто «мигнём» и выходим */
@@ -1889,15 +1891,26 @@ function placeFloorItem(sub){
   }
   const W = window.innerWidth, H = window.innerHeight;
   const size = clamp(W*0.16, 110, 190);
+
+  /* Стеллаж (kallax) стоит у правого края.
+     Его центр: RW*0.885 - kw/2, ширина kw = RW*0.145.
+     То есть стеллаж занимает x: 0.8125*W … 0.9575*W.
+     Технику ставим ПОД стеллажом, уходя за правый край экрана. */
+
   const slot = VEHICLE_SLOTS[sub] != null ? VEHICLE_SLOTS[sub] : 0;
-  /* Доля иконки, которая остаётся в комнате (торчат только колёса) */
-  const visiblePart = 0.28;
+
+  /* Видимая часть иконки в комнате — только колёса */
+  const visiblePart = 0.30;
   const visibleW = size * visiblePart;
-  /* Левая граница элемента: техника уходит ЗА правый край */
+
+  /* Левая граница = правый край экрана минус видимая часть.
+     Так техника уходит ЗА экран, торчат только колёса. */
   const x = W - visibleW;
-  /* Друг за другом вдоль стены — slot сдвигает вниз, а не вбок */
+
+  /* Друг за другом вдоль стены — slot сдвигает вниз */
   const floorY = H*0.70;
-  const stackStep = size * 0.55;
+  const stackStep = size * 0.42;
+
   const el = document.createElement('div');
   el.className = 'floor-item';
   el.style.width  = size+'px';
