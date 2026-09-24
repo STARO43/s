@@ -2408,21 +2408,7 @@ function checkWin(dt){
 
 const hudEl=document.getElementById('hud');
 function updateHUD(){
-  let html='';
-  for(const ch of G.chars){
-    if(ch.isSibling)continue;
-    const moodPct=clamp((ch.mood+100)/2,0,100);
-    const fatPct=clamp(ch.fat*100,0,100);
-    const uglyPct=clamp(ch.ugly*100,0,100);
-    html+=`<div class="statCard">
-      <div class="bars">
-        <div class="bar mood"><i style="width:${moodPct}%"></i></div>
-        <div class="bar fat"><i style="width:${fatPct}%"></i></div>
-        <div class="bar ugly"><i style="width:${uglyPct}%"></i></div>
-      </div>
-    </div>`;
-  }
-  hudEl.innerHTML=html;
+  hudEl.innerHTML='';
 }
 function updateSelectionUI(){
   G.chars.forEach((ch,i)=>{if(ch.wrap)ch.wrap.dataset.selected=(i===G.selected)?'1':'0';});
