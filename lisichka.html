@@ -110,6 +110,7 @@
   .character-wrap svg .lolli-in-hand,
   .character-wrap svg .phone-in-hand,
   .character-wrap svg .arm-holding,
+ .character-wrap svg .arm-holding-brat,
   .character-wrap svg .hands-holding,
   .character-wrap svg .apron-worn,
   .character-wrap svg .lip-color-wide,
@@ -195,6 +196,16 @@
   .character-wrap[data-hold="phone"]:not([data-stage="3"]) .arm-holding,
   .character-wrap[data-hold="phone"]:not([data-stage="3"]) .hands-holding,
   .character-wrap[data-hold="phone"]:not([data-stage="3"]) .phone-in-hand{display:block;}
+
+   /* Brat-образ: показываем кожаную руку вместо кардиган-рукава */
+  .character-wrap[data-outfit="brat"][data-hold="phone"]:not([data-stage="3"]) .arm-holding-brat,
+  .character-wrap[data-outfit="brat"][data-hold="lolli"]:not([data-stage="3"]) .arm-holding-brat{
+    display:block;
+  }
+  .character-wrap[data-outfit="brat"][data-hold="phone"]:not([data-stage="3"]) .arm-holding,
+  .character-wrap[data-outfit="brat"][data-hold="lolli"]:not([data-stage="3"]) .arm-holding{
+    display:none;
+  }
 
    .character-wrap[data-hold="lolli"]:not([data-stage="3"]) .arms-normal,
   .character-wrap[data-hold="lolli"]:not([data-stage="3"]) .hands-normal,
@@ -1348,6 +1359,11 @@ function buildCharacterSVG(isBoy, hair, eyes, style){
       <g class="arm-holding">
         <path d="M 168 268 C 148 300, 138 360, 158 408 Q 168 418 178 412 L 178 402 C 168 380, 172 320, 178 282 Z" fill="url(#cardiganGrad-${S})"/>
         <path d="M 232 268 C 256 282, 268 306, 260 336 Q 254 356, 244 362 L 238 356 Q 248 340, 232 314 L 222 282 Z" fill="url(#cardiganGrad-${S})"/>
+      </g>
+            <!-- Рука с телефоном/леденцом для brat-образа — голая кожа, без рукава -->
+      <g class="arm-holding-brat">
+        <path d="M 168 268 C 148 300, 138 360, 158 408 Q 168 418 178 412 L 178 402 C 168 380, 172 320, 178 282 Z" fill="url(#skinGrad-${S})"/>
+        <path d="M 232 268 C 256 282, 268 306, 260 336 Q 254 356, 244 362 L 238 356 Q 248 340, 232 314 L 222 282 Z" fill="url(#skinGrad-${S})"/>
       </g>
 
       <g class="hands-normal">
