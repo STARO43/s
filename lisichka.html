@@ -2251,8 +2251,8 @@ function updateChar(ch,dt){
     }
   }
 
-  const decay = (ch.monsterStage>=3 ? MOOD_DECAY*2 : MOOD_DECAY);
-  if(ch.mood>0)ch.mood=Math.max(0, ch.mood-dt*decay);
+  const decay = (ch.monsterStage>=3 ? MOOD_DECAY*1.3 : MOOD_DECAY);
+ if(ch.mood>0)ch.mood=Math.max(0, ch.mood-dt*decay);
   else ch.mood=Math.min(0, ch.mood+dt*MOOD_RECOVER);
 
   if(ch.globalMode==='capricious'){
