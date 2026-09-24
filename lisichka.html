@@ -2031,6 +2031,7 @@ function applyItem(ch,item){
     if(ch.clothesClicks>=MONSTER_CLOTHES_THRESHOLD && ch.monsterStage<3){
       ch.monsterStage=3;
       ch.monsterBooks=0;
+      ch.capriciousRageTimer=0;
       ch.crownT=0;ch.apronT=0;
       ch.hold.lolli=0;ch.hold.phone=0;ch.hold.bear=0;
       sndMonster();
