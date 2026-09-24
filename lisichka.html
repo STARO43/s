@@ -509,6 +509,19 @@ const DRESS_COLORS=[
   {top:'#a0ffb0',bottom:'#60d080',shade:'#2a8060'},
 ];
 
+ const SHIRT_COLORS=[
+  '#6a5a5a',  /* серый (по умолчанию) */
+  '#8a3a4a',  /* бордовый */
+  '#3a4a8a',  /* синий */
+  '#3a6a4a',  /* зелёный */
+  '#8a6a2a',  /* коричневый */
+  '#6a3a8a',  /* фиолетовый */
+  '#2a6a7a',  /* бирюзовый */
+  '#8a4a2a',  /* тёмно-оранжевый */
+  '#3a3a3a',  /* почти чёрный */
+  '#a05a3a',  /* терракотовый */
+];
+
  const NATURAL_HAIR=[
   {top:'#f0dcb8',mid:'#d4b888',bot:'#8a6a44'},
   {top:'#d4b890',mid:'#a88058',bot:'#5a3e28'},
@@ -1278,7 +1291,7 @@ function buildCharacterSVG(isBoy, hair, eyes, style){
       </g>
       <g class="torso-original">
         <path d="M 166 258 C 154 300, 148 358, 148 400 L 252 400 C 252 358, 246 300, 234 258 Z" fill="url(#dressGrad-${S})"/>
-        <path d="M 176 258 L 178 340 Q 200 348 222 340 L 224 258 Q 200 250 176 258 Z" fill="#6a5a5a"/>
+        <path d="M 176 258 L 178 340 Q 200 348 222 340 L 224 258 Q 200 250 176 258 Z" fill="var(--shirtColor,#6a5a5a)"/>
         <circle cx="200" cy="278" r="2.6" fill="#1a1018"/>
         <circle cx="200" cy="304" r="2.6" fill="#1a1018"/>
         <circle cx="200" cy="330" r="2.6" fill="#1a1018"/>
@@ -1717,6 +1730,7 @@ function createCharDOM(ch){
   wrap.style.setProperty('--dressTop','#ffffff');
   wrap.style.setProperty('--dressBottom','#eaf0ff');
   wrap.style.setProperty('--dressShade','#b8c8e8');
+   wrap.style.setProperty('--shirtColor', pick(SHIRT_COLORS));
   wrap.innerHTML=buildCharacterSVG(ch.isBoy,ch.hair,ch.eyes,ch.hairStyle);
   charsEl.appendChild(wrap);
   ch.wrap=wrap;
