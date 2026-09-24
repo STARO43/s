@@ -1765,18 +1765,18 @@ window.addEventListener('orientationchange',()=>setTimeout(()=>{ positionChars()
 function repositionVehicles(){
   if(!G.vehicleEls) return;
   const W=window.innerWidth, H=window.innerHeight;
-  const size=clamp(W*0.13,90,160);
-  const gap = W*0.012;
-  const rightEdge = W - W*0.02;
+  const size=clamp(W*0.16,110,190);
+  const visiblePart = 0.28;
+  const visibleW = size * visiblePart;
   const floorY = H*0.70;
+  const stackStep = size * 0.55;
   for(const sub in G.vehicleEls){
     const el = G.vehicleEls[sub];
     const slot = VEHICLE_SLOTS[sub] != null ? VEHICLE_SLOTS[sub] : 0;
-    const x = rightEdge - size - slot*(size + gap);
     el.style.width  = size+'px';
     el.style.height = size+'px';
-    el.style.left   = x+'px';
-    el.style.top    = (floorY - size*0.05)+'px';
+    el.style.left   = (W - visibleW)+'px';
+    el.style.top    = (floorY - size*0.05 + slot*stackStep)+'px';
   }
 }
 const fxCv=document.getElementById('fx'),fxG=fxCv.getContext('2d');
