@@ -2,8 +2,8 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Earth • Moon • Sun</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Космос и часы</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -14,8 +14,9 @@
             font-family: 'Orbitron', 'Segoe UI', 'Arial', sans-serif;
             user-select: none; -webkit-user-select: none;
         }
-        canvas { display: block; }
-
+        /* 1. Убраны cursor: grab и grabbing, теперь стандартный курсор */
+        canvas { display: block; cursor: default; }
+        
         /* ===== Полупрозрачные часы в стиле «Космос» ===== */
         #clock {
             position: fixed;
@@ -26,20 +27,20 @@
             height: 190px;
             border-radius: 50%;
             background: rgba(242, 239, 232, 0.35);
-            backdrop-filter: blur(6px);
-            -webkit-backdrop-filter: blur(6px);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
             border: 1px solid rgba(60, 50, 35, 0.35);
             box-shadow:
-                0 4px 20px rgba(0, 0, 0, 0.4),
+                0 8px 32px rgba(0, 0, 0, 0.5),
                 inset 0 0 30px rgba(255, 255, 255, 0.08);
             z-index: 50;
             touch-action: none;
-            cursor: grab;
+            cursor: default; /* 1. Убран курсор-рука */
             opacity: 0.9;
-            transition: opacity 0.3s ease;
+            transition: opacity 0.3s ease, transform 0.2s ease;
         }
         #clock:hover { opacity: 1; }
-        #clock:active { cursor: grabbing; opacity: 1; }
+        #clock:active { cursor: default; transform: translateX(-50%) scale(1.02); } /* 1. Убран курсор-рука */
         #clock svg {
             position: absolute;
             inset: 0;
@@ -48,25 +49,10 @@
             overflow: visible;
         }
 
-        /* Минутные риски — тонкие */
-        .min-tick {
-            stroke: rgba(58, 48, 38, 0.45);
-            stroke-width: 0.5;
-            stroke-linecap: round;
-        }
-        /* Часовые метки — тоньше */
-        .hour-tick {
-            stroke: rgba(31, 24, 16, 0.85);
-            stroke-width: 1;
-            stroke-linecap: round;
-        }
-        /* Четвертные — чуть толще */
-        .hour-tick.qtr {
-            stroke: rgba(31, 24, 16, 0.95);
-            stroke-width: 1.4;
-        }
+        .min-tick { stroke: rgba(58, 48, 38, 0.45); stroke-width: 0.5; stroke-linecap: round; }
+        .hour-tick { stroke: rgba(31, 24, 16, 0.85); stroke-width: 1; stroke-linecap: round; }
+        .hour-tick.qtr { stroke: rgba(31, 24, 16, 0.95); stroke-width: 1.4; }
 
-        /* Цифры */
         .numeral {
             fill: rgba(31, 24, 16, 0.9);
             font-family: 'Orbitron', 'Arial', sans-serif;
@@ -77,19 +63,18 @@
             letter-spacing: 0.5px;
         }
 
-        /* Стрелки */
-        .hand {
-            stroke-linecap: round;
-            stroke-linejoin: round;
-        }
+        .hand { stroke-linecap: round; stroke-linejoin: round; }
         #hourHand   { stroke: rgba(31, 24, 16, 0.9); stroke-width: 3; }
         #minuteHand { stroke: rgba(31, 24, 16, 0.9); stroke-width: 1.6; }
+        
+        #secondHandGroup { 
+            pointer-events: none; 
+            filter: drop-shadow(0 1px 1px rgba(0,0,0,0.3));
+        }
 
-        /* Центр */
         .center-ring { fill: none; stroke: rgba(31, 24, 16, 0.9); stroke-width: 0.9; }
         .center-dot  { fill: rgba(31, 24, 16, 0.9); }
 
-        /* Подпись */
         .brand {
             fill: rgba(58, 48, 38, 0.7);
             font-family: 'Orbitron', sans-serif;
@@ -104,21 +89,21 @@
 
     <div id="clock">
         <svg viewBox="0 0 130 130">
-            <!-- Штрихи -->
             <g id="ticks"></g>
-
-            <!-- Цифры -->
             <g id="numerals"></g>
 
-            <!-- Стрелки -->
             <line id="hourHand"   class="hand" x1="65" y1="65" x2="65" y2="36" />
             <line id="minuteHand" class="hand" x1="65" y1="65" x2="65" y2="18" />
+            
+            <g id="secondHandGroup">
+                <line x1="65" y1="65" x2="65" y2="74" stroke="#e63946" stroke-width="1.5" stroke-linecap="round" />
+                <line x1="65" y1="65" x2="65" y2="22" stroke="#e63946" stroke-width="1" stroke-linecap="round" />
+                <circle cx="65" cy="65" r="2.2" fill="#e63946" />
+                <circle cx="65" cy="65" r="0.8" fill="#ffffff" />
+            </g>
 
-            <!-- Центр -->
             <circle class="center-ring" cx="65" cy="65" r="2.8" />
             <circle class="center-dot"  cx="65" cy="65" r="1.2" />
-
-            <!-- Подпись -->
             <text class="brand" x="65" y="44">КОСМОС</text>
         </svg>
     </div>
@@ -139,25 +124,16 @@
         import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
         import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
 
-        // ==============================
-        //  АСТРОНОМИЧЕСКИЕ КОНСТАНТЫ
-        // ==============================
-        const SIDEREAL_MONTH_HOURS = 27 * 24 + 7 + 43 / 60;   // 655.7166...
+        const SIDEREAL_MONTH_HOURS = 27 * 24 + 7 + 43 / 60;
         const EARTH_DAY_HOURS = 24;
-        const TIME_SCALE = 1;   // 1 = реальное время
+        const EARTH_YEAR_MINUTES = 365.25 * 24 * 60;
+        const TIME_SCALE = 1;
 
-        // ==============================
-        //  СЦЕНА
-        // ==============================
         const scene = new THREE.Scene();
         scene.background = new THREE.Color(0x03040a);
 
-        const camera = new THREE.PerspectiveCamera(
-            40, window.innerWidth / window.innerHeight, 0.1, 8000
-        );
-        camera.position.set(-120, 40, 620);
-        camera.lookAt(30, 0, 0);
-
+        const camera = new THREE.PerspectiveCamera(40, window.innerWidth / window.innerHeight, 0.1, 8000);
+        
         const renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: 'high-performance' });
         renderer.setSize(window.innerWidth, window.innerHeight);
         renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
@@ -169,55 +145,33 @@
 
         const composer = new EffectComposer(renderer);
         composer.addPass(new RenderPass(scene, camera));
-
-        const bloomPass = new UnrealBloomPass(
-            new THREE.Vector2(window.innerWidth, window.innerHeight),
-            1.4, 0.6, 0.85
-        );
-        bloomPass.threshold = 0.1;
-        bloomPass.strength = 0.7;
-        bloomPass.radius = 0.6;
+        const bloomPass = new UnrealBloomPass(new THREE.Vector2(window.innerWidth, window.innerHeight), 1.4, 0.6, 0.85);
+        bloomPass.threshold = 0.1; bloomPass.strength = 0.7; bloomPass.radius = 0.6;
         composer.addPass(bloomPass);
 
         const controls = new OrbitControls(camera, renderer.domElement);
-        controls.enableRotate = false;
-        controls.enablePan = false;
+        controls.enableRotate = true;
+        controls.enablePan = true;
         controls.enableZoom = true;
         controls.zoomSpeed = 1.1;
         controls.enableDamping = true;
         controls.dampingFactor = 0.08;
-        controls.minDistance = 8;
-        controls.maxDistance = 700;
-        controls.target.set(0, 0, 0);
+        controls.minDistance = 20;
+        controls.maxDistance = 800;
 
-        // ==============================
-        //  СОЛНЦЕ
-        // ==============================
-        const SUN_X = 320, SUN_Y = 25, SUN_Z = 0;
-        const SUN_RADIUS = 60;
+        const SUN_X = 0, SUN_Y = 0, SUN_Z = 0;
+        const SUN_RADIUS = 40;
 
-        const sunLight = new THREE.DirectionalLight(0xffeedd, 2.6);
+        const sunLight = new THREE.PointLight(0xffeedd, 2.0, 2000);
         sunLight.position.set(SUN_X, SUN_Y, SUN_Z);
         sunLight.castShadow = true;
         sunLight.shadow.mapSize.width = 2048;
         sunLight.shadow.mapSize.height = 2048;
-        sunLight.shadow.camera.near = 0.5;
-        sunLight.shadow.camera.far = 500;
-        sunLight.shadow.camera.left = -30;
-        sunLight.shadow.camera.right = 30;
-        sunLight.shadow.camera.top = 30;
-        sunLight.shadow.camera.bottom = -30;
-        sunLight.shadow.bias = -0.0005;
         scene.add(sunLight);
 
         const sunMesh = new THREE.Mesh(
             new THREE.SphereGeometry(SUN_RADIUS, 64, 64),
-            new THREE.MeshStandardMaterial({
-                color: 0xffbb44,
-                emissive: 0xff7722,
-                emissiveIntensity: 4.5,
-                roughness: 0.4
-            })
+            new THREE.MeshStandardMaterial({ color: 0xffbb44, emissive: 0xff7722, emissiveIntensity: 4.5, roughness: 0.4 })
         );
         sunMesh.position.set(SUN_X, SUN_Y, SUN_Z);
         scene.add(sunMesh);
@@ -227,102 +181,70 @@
             c.width = c.height = 256;
             const ctx = c.getContext('2d');
             const g = ctx.createRadialGradient(128, 128, 0, 128, 128, 128);
-            g.addColorStop(0.0, inner);
-            g.addColorStop(0.35, mid);
-            g.addColorStop(1.0, outer);
-            ctx.fillStyle = g;
-            ctx.fillRect(0, 0, 256, 256);
+            g.addColorStop(0.0, inner); g.addColorStop(0.35, mid); g.addColorStop(1.0, outer);
+            ctx.fillStyle = g; ctx.fillRect(0, 0, 256, 256);
             return new THREE.CanvasTexture(c);
         }
 
         const sunGlow = new THREE.Sprite(new THREE.SpriteMaterial({
             map: makeGlowTexture('rgba(255,255,255,1)', 'rgba(255,190,110,0.65)', 'rgba(255,110,40,0)'),
-            color: 0xffcc88,
-            blending: THREE.AdditiveBlending,
-            depthWrite: false, transparent: true, opacity: 0.9
+            color: 0xffcc88, blending: THREE.AdditiveBlending, depthWrite: false, transparent: true, opacity: 0.9
         }));
-        sunGlow.scale.set(400, 400, 1);
-        sunGlow.position.set(SUN_X, SUN_Y, SUN_Z);
-        scene.add(sunGlow);
+        sunGlow.scale.set(300, 300, 1); sunGlow.position.set(SUN_X, SUN_Y, SUN_Z); scene.add(sunGlow);
+        scene.add(new THREE.AmbientLight(0x404060, 0.35));
 
-        const sunGlow2 = new THREE.Sprite(new THREE.SpriteMaterial({
-            map: makeGlowTexture('rgba(255,200,120,0.6)', 'rgba(255,140,60,0.25)', 'rgba(255,80,20,0)'),
-            color: 0xffaa66,
-            blending: THREE.AdditiveBlending,
-            depthWrite: false, transparent: true, opacity: 0.5
-        }));
-        sunGlow2.scale.set(900, 900, 1);
-        sunGlow2.position.set(SUN_X, SUN_Y, SUN_Z);
-        scene.add(sunGlow2);
-
-        scene.add(new THREE.AmbientLight(0x404060, 0.55));
-
-        // ==============================
-        //  ЗВЁЗДЫ
-        // ==============================
         function createStarLayer(count, minR, maxR, size, color) {
             const geo = new THREE.BufferGeometry();
             const pos = new Float32Array(count * 3);
-            const col = new Float32Array(count * 3);
             for (let i = 0; i < count; i++) {
                 const r = minR + Math.random() * (maxR - minR);
                 const t = Math.random() * Math.PI * 2;
                 const p = Math.acos(Math.random() * 2 - 1);
-                pos[i * 3]     = r * Math.sin(p) * Math.cos(t);
+                pos[i * 3] = r * Math.sin(p) * Math.cos(t);
                 pos[i * 3 + 1] = r * Math.sin(p) * Math.sin(t);
                 pos[i * 3 + 2] = r * Math.cos(p);
-                const v = 0.75 + Math.random() * 0.45;
-                col[i * 3]     = v;
-                col[i * 3 + 1] = v * (0.92 + Math.random() * 0.08);
-                col[i * 3 + 2] = 1.0;
             }
             geo.setAttribute('position', new THREE.BufferAttribute(pos, 3));
-            geo.setAttribute('color', new THREE.BufferAttribute(col, 3));
             return new THREE.Points(geo, new THREE.PointsMaterial({
-                size, vertexColors: true, transparent: true,
-                blending: THREE.AdditiveBlending, depthWrite: false,
-                sizeAttenuation: true, color
+                size, color, transparent: true, blending: THREE.AdditiveBlending, depthWrite: false, sizeAttenuation: true
             }));
         }
-        const stars  = createStarLayer(9000, 1200, 2800, 3.0, 0xffffff);
-        const stars2 = createStarLayer(4500, 2000, 3800, 1.8, 0xaaccff);
-        scene.add(stars, stars2);
+        scene.add(createStarLayer(9000, 800, 2500, 2.5, 0xffffff));
+        scene.add(createStarLayer(4500, 1500, 3500, 1.5, 0xaaccff));
 
-        // ==============================
-        //  ЗАГРУЗКА ТЕКСТУР
-        // ==============================
         function loadTexture(url, fallbackColor) {
             return new Promise((resolve) => {
                 const loader = new THREE.TextureLoader();
                 loader.setCrossOrigin('anonymous');
-                loader.load(
-                    url,
-                    (tex) => { tex.colorSpace = THREE.SRGBColorSpace; resolve(tex); },
-                    undefined,
-                    () => {
-                        const c = document.createElement('canvas');
-                        c.width = c.height = 512;
-                        const ctx = c.getContext('2d');
-                        ctx.fillStyle = fallbackColor;
-                        ctx.fillRect(0, 0, 512, 512);
-                        for (let i = 0; i < 6000; i++) {
-                            ctx.fillStyle = `rgba(255,255,255,${Math.random() * 0.08})`;
-                            ctx.fillRect(Math.random() * 512, Math.random() * 512, 2, 2);
-                        }
-                        const t = new THREE.CanvasTexture(c);
-                        t.colorSpace = THREE.SRGBColorSpace;
-                        resolve(t);
-                    }
-                );
+                loader.load(url, (tex) => { tex.colorSpace = THREE.SRGBColorSpace; resolve(tex); },
+                    undefined, () => {
+                        const c = document.createElement('canvas'); c.width = c.height = 512;
+                        const ctx = c.getContext('2d'); ctx.fillStyle = fallbackColor; ctx.fillRect(0, 0, 512, 512);
+                        resolve(new THREE.CanvasTexture(c));
+                    });
             });
         }
 
-        // ==============================
-        //  ЗЕМЛЯ
-        // ==============================
-        const earthGroup = new THREE.Group();
-        scene.add(earthGroup);
+        const EARTH_ORBIT_RADIUS = 220;
+        const earthOrbitPivot = new THREE.Group();
+        earthOrbitPivot.position.set(SUN_X, SUN_Y, SUN_Z);
+        scene.add(earthOrbitPivot);
 
+        const earthGroup = new THREE.Group();
+        earthGroup.position.set(EARTH_ORBIT_RADIUS, 0, 0);
+        earthOrbitPivot.add(earthGroup);
+
+        const earthOrbitPts = [];
+        for (let i = 0; i <= 128; i++) {
+            const a = (i / 128) * Math.PI * 2;
+            earthOrbitPts.push(new THREE.Vector3(Math.cos(a) * EARTH_ORBIT_RADIUS, 0, Math.sin(a) * EARTH_ORBIT_RADIUS));
+        }
+        scene.add(new THREE.LineLoop(
+            new THREE.BufferGeometry().setFromPoints(earthOrbitPts),
+            new THREE.LineBasicMaterial({ color: 0x4466aa, opacity: 0.15, transparent: true })
+        ));
+
+        let earthMeshRef = null;
         let cloudMesh = null;
 
         Promise.all([
@@ -331,113 +253,64 @@
             loadTexture('https://threejs.org/examples/textures/planets/earth_normal_2048.jpg', '#8080ff'),
             loadTexture('https://threejs.org/examples/textures/planets/earth_clouds_1024.png', '#ffffff')
         ]).then(([earthMap, earthSpecular, earthNormal, cloudMap]) => {
-
             const earthMat = new THREE.MeshPhongMaterial({
-                map: earthMap,
-                specularMap: earthSpecular,
-                normalMap: earthNormal,
-                normalScale: new THREE.Vector2(0.85, 0.85),
-                shininess: 12,
-                emissive: new THREE.Color(0x000022),
-                emissiveIntensity: 0.12
+                map: earthMap, specularMap: earthSpecular, normalMap: earthNormal,
+                normalScale: new THREE.Vector2(0.85, 0.85), shininess: 12,
+                emissive: new THREE.Color(0x000022), emissiveIntensity: 0.12
             });
-
-            const earthMesh = new THREE.Mesh(new THREE.SphereGeometry(5, 128, 128), earthMat);
-            earthMesh.castShadow = true;
-            earthMesh.receiveShadow = true;
+            const earthMesh = new THREE.Mesh(new THREE.SphereGeometry(8, 128, 128), earthMat);
+            earthMesh.castShadow = true; earthMesh.receiveShadow = true;
             earthGroup.add(earthMesh);
+            earthMeshRef = earthMesh;
 
-            const cloudMat = new THREE.MeshPhongMaterial({
-                map: cloudMap,
-                transparent: true,
-                opacity: 0.65,
-                blending: THREE.AdditiveBlending,
-                depthWrite: false,
-                side: THREE.DoubleSide
-            });
-            cloudMesh = new THREE.Mesh(new THREE.SphereGeometry(5.02, 128, 128), cloudMat);
+            cloudMesh = new THREE.Mesh(new THREE.SphereGeometry(8.08, 128, 128), new THREE.MeshPhongMaterial({
+                map: cloudMap, transparent: true, opacity: 0.65, blending: THREE.AdditiveBlending, depthWrite: false, side: THREE.DoubleSide
+            }));
             earthGroup.add(cloudMesh);
 
-            const atmoTex = makeGlowTexture(
-                'rgba(200,220,255,0)',
-                'rgba(150,200,255,0.35)',
-                'rgba(50,100,200,0)'
-            );
-            const atmo1 = new THREE.Sprite(new THREE.SpriteMaterial({
-                map: atmoTex, color: 0x88aaff,
-                blending: THREE.AdditiveBlending,
-                depthWrite: false, transparent: true, opacity: 0.25
-            }));
-            atmo1.scale.set(13, 13, 1);
-            earthGroup.add(atmo1);
-
-            const atmo2 = new THREE.Sprite(new THREE.SpriteMaterial({
-                map: atmoTex, color: 0xaaccff,
-                blending: THREE.AdditiveBlending,
-                depthWrite: false, transparent: true, opacity: 0.15
-            }));
-            atmo2.scale.set(8.5, 8.5, 1);
-            earthGroup.add(atmo2);
+            const atmoTex = makeGlowTexture('rgba(200,220,255,0)', 'rgba(150,200,255,0.35)', 'rgba(50,100,200,0)');
+            const atmo1 = new THREE.Sprite(new THREE.SpriteMaterial({ map: atmoTex, color: 0x88aaff, blending: THREE.AdditiveBlending, depthWrite: false, transparent: true, opacity: 0.25 }));
+            atmo1.scale.set(22, 22, 1); earthGroup.add(atmo1);
         });
 
-        // ==============================
-        //  ЛУНА
-        // ==============================
         const moonGroup = new THREE.Group();
-        scene.add(moonGroup);
-
-        const orbitRadius = 12;
+        earthGroup.add(moonGroup);
+        const orbitRadius = 18;
         let moonMesh = null;
 
         loadTexture('https://threejs.org/examples/textures/planets/moon_1024.jpg', '#888888').then((moonMap) => {
-            const moonMat = new THREE.MeshStandardMaterial({
-                map: moonMap,
-                roughness: 0.95,
-                metalness: 0.03,
-                emissive: new THREE.Color(0x111111),
-                emissiveIntensity: 0.12,
-                bumpMap: moonMap,
-                bumpScale: 0.06
-            });
-            moonMesh = new THREE.Mesh(new THREE.SphereGeometry(1.35, 64, 64), moonMat);
-            moonMesh.castShadow = true;
-            moonMesh.receiveShadow = true;
+            moonMesh = new THREE.Mesh(new THREE.SphereGeometry(2.2, 64, 64), new THREE.MeshStandardMaterial({
+                map: moonMap, roughness: 0.95, metalness: 0.03, emissive: new THREE.Color(0x111111), emissiveIntensity: 0.12
+            }));
+            moonMesh.castShadow = true; moonMesh.receiveShadow = true;
             moonMesh.position.set(orbitRadius, 0, 0);
             moonGroup.add(moonMesh);
         });
 
-        const orbitPts = [];
-        for (let i = 0; i <= 128; i++) {
-            const a = (i / 128) * Math.PI * 2;
-            orbitPts.push(new THREE.Vector3(Math.cos(a) * orbitRadius, 0, Math.sin(a) * orbitRadius));
+        const moonOrbitPts = [];
+        for (let i = 0; i <= 64; i++) {
+            const a = (i / 64) * Math.PI * 2;
+            moonOrbitPts.push(new THREE.Vector3(Math.cos(a) * orbitRadius, 0, Math.sin(a) * orbitRadius));
         }
-        const orbitLine = new THREE.LineLoop(
-            new THREE.BufferGeometry().setFromPoints(orbitPts),
-            new THREE.LineBasicMaterial({ color: 0x4466aa, opacity: 0.16, transparent: true })
-        );
-        scene.add(orbitLine);
+        earthGroup.add(new THREE.LineLoop(
+            new THREE.BufferGeometry().setFromPoints(moonOrbitPts),
+            new THREE.LineBasicMaterial({ color: 0x8899bb, opacity: 0.2, transparent: true })
+        ));
 
-        // ==============================
-        //  ЧАСЫ — дизайн
-        // ==============================
         const CX = 65, CY = 65;
         const ticksGroup = document.getElementById('ticks');
         const numeralsGroup = document.getElementById('numerals');
 
-        // 60 рисок: 12 часовых (длинные, тонкие) + 48 минутных
         for (let i = 0; i < 60; i++) {
             const a = (i * 6 - 90) * Math.PI / 180;
             const isHour = i % 5 === 0;
-            const isQtr  = i % 15 === 0;
-
             const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
-
             if (isHour) {
                 line.setAttribute('x1', (CX + 50 * Math.cos(a)).toFixed(2));
                 line.setAttribute('y1', (CY + 50 * Math.sin(a)).toFixed(2));
                 line.setAttribute('x2', (CX + 56 * Math.cos(a)).toFixed(2));
                 line.setAttribute('y2', (CY + 56 * Math.sin(a)).toFixed(2));
-                line.setAttribute('class', 'hour-tick' + (isQtr ? ' qtr' : ''));
+                line.setAttribute('class', 'hour-tick' + (i % 15 === 0 ? ' qtr' : ''));
             } else {
                 line.setAttribute('x1', (CX + 53.5 * Math.cos(a)).toFixed(2));
                 line.setAttribute('y1', (CY + 53.5 * Math.sin(a)).toFixed(2));
@@ -447,63 +320,49 @@
             }
             ticksGroup.appendChild(line);
         }
-
-        // Цифры 1..12
         for (let n = 1; n <= 12; n++) {
             const a = (n * 30 - 90) * Math.PI / 180;
-            const r = 41;
             const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-            text.setAttribute('x', (CX + r * Math.cos(a)).toFixed(2));
-            text.setAttribute('y', (CY + r * Math.sin(a)).toFixed(2));
+            text.setAttribute('x', (CX + 41 * Math.cos(a)).toFixed(2));
+            text.setAttribute('y', (CY + 41 * Math.sin(a)).toFixed(2));
             text.setAttribute('class', 'numeral');
             text.textContent = n;
             numeralsGroup.appendChild(text);
         }
 
-        // ==============================
-        //  ЛОГИКА ВРЕМЕНИ — ровно из твоего файла
-        //  totalMinutes — единый счётчик, из него hour/minute
-        // ==============================
-        const hourHand   = document.getElementById('hourHand');
+        const hourHand = document.getElementById('hourHand');
         const minuteHand = document.getElementById('minuteHand');
-        const clockEl    = document.getElementById('clock');
+        const secondHandGroup = document.getElementById('secondHandGroup');
+        const clockEl = document.getElementById('clock');
 
-        // Стартуем с 15:00 (на 12-часовом циферблате — 3:00)
-        let hour = 3;
-        let minute = 0;
+        let hour = 3, minute = 0;
         let totalMinutes = (hour % 12) * 60 + minute;
 
-        // Обновление углов стрелок и позиций Земли/Луны
         function render() {
-            const hourDeg   = (hour % 12) * 30 + minute * 0.5;
+            const hourDeg = (hour % 12) * 30 + minute * 0.5;
             const minuteDeg = minute * 6;
+            const totalSeconds = totalMinutes * 60;
+            const secondDeg = (totalSeconds * 6) % 360;
 
-            hourHand.setAttribute('transform',   `rotate(${hourDeg} ${CX} ${CY})`);
+            hourHand.setAttribute('transform', `rotate(${hourDeg} ${CX} ${CY})`);
             minuteHand.setAttribute('transform', `rotate(${minuteDeg} ${CX} ${CY})`);
+            secondHandGroup.setAttribute('transform', `rotate(${secondDeg} ${CX} ${CY})`);
 
-            // Земля — 1 оборот за 24 часа (totalMinutes / 60 = часы от начала суток)
             const totalHoursScene = totalMinutes / 60;
             const tEarth = ((totalHoursScene % 24) + 24) % 24;
             earthGroup.rotation.y = (tEarth / EARTH_DAY_HOURS) * Math.PI * 2;
+            if (cloudMesh) cloudMesh.rotation.y = (tEarth / EARTH_DAY_HOURS) * Math.PI * 2 * 1.15;
 
-            if (cloudMesh) {
-                cloudMesh.rotation.y = (tEarth / EARTH_DAY_HOURS) * Math.PI * 2 * 1.15;
-            }
+            const earthOrbitAngle = ((totalMinutes / EARTH_YEAR_MINUTES) * Math.PI * 2);
+            earthOrbitPivot.rotation.y = earthOrbitAngle;
 
-            // Луна — использует НАКОПИТЕЛЬНЫЙ totalMinutes
             const moonAngle = ((totalMinutes / 60) / SIDEREAL_MONTH_HOURS) * Math.PI * 2;
-
             if (moonMesh) {
-                moonMesh.position.set(
-                    Math.cos(moonAngle) * orbitRadius,
-                    0,
-                    Math.sin(moonAngle) * orbitRadius
-                );
+                moonMesh.position.set(Math.cos(moonAngle) * orbitRadius, 0, Math.sin(moonAngle) * orbitRadius);
                 moonMesh.rotation.y = -moonAngle + Math.PI;
             }
         }
 
-        // Пересчёт hour/minute из totalMinutes
         function applyTotal() {
             const rounded = Math.round(totalMinutes);
             minute = ((rounded % 60) + 60) % 60;
@@ -512,28 +371,17 @@
             hour = h === 0 ? 12 : h;
         }
 
-        // ==============================
-        //  ПЕРЕТАСКИВАНИЕ — ровно из твоего файла
-        // ==============================
         const MOVE_THRESHOLD = 4;
-        const GRAB_RADIUS = 0.55;
-
-        let gesture = null;
-        let dragging = false;
-        let dragMode = null;
-        let lastAngle = 0;
-        let autoAdvance = true;
+        let gesture = null, dragging = false, dragMode = null, lastAngle = 0, autoAdvance = true;
 
         function getPoint(e) {
             if (e.touches && e.touches.length > 0) return { x: e.touches[0].clientX, y: e.touches[0].clientY };
-            if (e.changedTouches && e.changedTouches.length > 0) return { x: e.changedTouches[0].clientX, y: e.changedTouches[0].clientY };
             return { x: e.clientX, y: e.clientY };
         }
 
         function angleFromPoint(p) {
             const rect = clockEl.getBoundingClientRect();
-            const cx = rect.left + rect.width / 2;
-            const cy = rect.top + rect.height / 2;
+            const cx = rect.left + rect.width / 2, cy = rect.top + rect.height / 2;
             let a = Math.atan2(p.y - cy, p.x - cx) * 180 / Math.PI + 90;
             return (a % 360 + 360) % 360;
         }
@@ -545,56 +393,36 @@
 
         function isPointInsideClock(p) {
             const rect = clockEl.getBoundingClientRect();
-            const cx = rect.left + rect.width / 2;
-            const cy = rect.top + rect.height / 2;
-            const r = rect.width / 2;
-            return Math.hypot(p.x - cx, p.y - cy) <= r * 0.95;
+            const cx = rect.left + rect.width / 2, cy = rect.top + rect.height / 2;
+            return Math.hypot(p.x - cx, p.y - cy) <= (rect.width / 2) * 0.95;
         }
 
         function startGesture(point, source) {
             if (gesture) return;
             autoAdvance = false;
-            gesture = {
-                startX: point.x,
-                startY: point.y,
-                startTime: Date.now(),
-                mode: null,
-                source
-            };
+            gesture = { startX: point.x, startY: point.y, mode: null, source };
         }
 
         function moveGesture(e, point) {
             if (!gesture) return;
-
-            const dx = point.x - gesture.startX;
-            const dy = point.y - gesture.startY;
-            const adx = Math.abs(dx), ady = Math.abs(dy);
+            const adx = Math.abs(point.x - gesture.startX), ady = Math.abs(point.y - gesture.startY);
 
             if (!gesture.mode) {
                 if (adx < MOVE_THRESHOLD && ady < MOVE_THRESHOLD) return;
-
                 if (isPointInsideClock(point)) {
                     gesture.mode = 'drag';
                     const ang = angleFromPoint(point);
-
-                    const hourAng = ((hour % 12) * 30 + minute * 0.5 + 360) % 360;
-                    const minAng  = (minute * 6 + 360) % 360;
-
                     const rect = clockEl.getBoundingClientRect();
-                    const cx = rect.left + rect.width / 2;
-                    const cy = rect.top + rect.height / 2;
+                    const cx = rect.left + rect.width / 2, cy = rect.top + rect.height / 2;
                     const relR = Math.hypot(point.x - cx, point.y - cy) / (rect.width / 2);
+                    const hourAng = ((hour % 12) * 30 + minute * 0.5 + 360) % 360;
+                    const minAng = (minute * 6 + 360) % 360;
 
-                    if (relR < 0.35) {
-                        dragMode = 'hour';
-                    } else if (relR > 0.55) {
-                        dragMode = 'minute';
-                    } else {
-                        dragMode = angleDiff(ang, minAng) <= angleDiff(ang, hourAng) ? 'minute' : 'hour';
-                    }
-
-                    lastAngle = ang;
-                    dragging = true;
+                    if (relR < 0.35) dragMode = 'hour';
+                    else if (relR > 0.55) dragMode = 'minute';
+                    else dragMode = angleDiff(ang, minAng) <= angleDiff(ang, hourAng) ? 'minute' : 'hour';
+                    
+                    lastAngle = ang; dragging = true;
                 } else {
                     gesture.mode = 'other';
                 }
@@ -613,95 +441,114 @@
                 } else {
                     const h = (ang - minute * 0.5) / 30;
                     let newHour = ((Math.round(h) % 12) + 12) % 12;
-                    newHour = newHour === 0 ? 12 : newHour;
-                    hour = newHour;
+                    hour = newHour === 0 ? 12 : newHour;
                     totalMinutes = ((hour % 12) * 60 + minute);
                 }
-
                 lastAngle = ang;
                 render();
             }
         }
 
-        function endGesture(point) {
+        function endGesture() {
             if (!gesture) return;
             const wasDrag = gesture.mode === 'drag';
-            gesture = null;
-            dragging = false;
-            dragMode = null;
+            gesture = null; dragging = false; dragMode = null;
             autoAdvance = true;
-            if (wasDrag) lastAngle = 0;
         }
 
-        clockEl.addEventListener('touchstart', e => {
-            if (e.touches.length !== 1) return;
-            startGesture(getPoint(e), 'touch');
-        }, { passive: true });
+        clockEl.addEventListener('touchstart', e => { if (e.touches.length === 1) startGesture(getPoint(e), 'touch'); }, { passive: true });
+        clockEl.addEventListener('touchmove', e => { if (gesture?.source === 'touch' && e.touches.length === 1) moveGesture(e, getPoint(e)); }, { passive: false });
+        clockEl.addEventListener('touchend', () => { if (gesture?.source === 'touch') endGesture(); }, { passive: true });
+        clockEl.addEventListener('mousedown', e => { if (e.button === 0) { e.preventDefault(); startGesture(getPoint(e), 'mouse'); } });
+        window.addEventListener('mousemove', e => { if (gesture?.source === 'mouse') moveGesture(e, getPoint(e)); });
+        window.addEventListener('mouseup', () => { if (gesture?.source === 'mouse') endGesture(); });
 
-        clockEl.addEventListener('touchmove', e => {
-            if (!gesture || gesture.source !== 'touch') return;
-            if (e.touches.length !== 1) { endGesture(null); return; }
-            moveGesture(e, getPoint(e));
-        }, { passive: false });
+        const raycaster = new THREE.Raycaster();
+        const mouse = new THREE.Vector2();
+        let earthDragActive = false;
+        let lastEarthDragX = 0;
 
-        clockEl.addEventListener('touchend', e => {
-            if (!gesture || gesture.source !== 'touch') return;
-            endGesture(getPoint(e));
-        }, { passive: true });
+        function handleEarthStart(e) {
+            if (gesture) return;
+            const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+            const clientY = e.touches ? e.touches[0].clientY : e.clientY;
 
-        clockEl.addEventListener('touchcancel', () => {
-            if (!gesture || gesture.source !== 'touch') return;
-            endGesture(null);
-        }, { passive: true });
+            mouse.x = (clientX / window.innerWidth) * 2 - 1;
+            mouse.y = -(clientY / window.innerHeight) * 2 + 1;
+            raycaster.setFromCamera(mouse, camera);
 
-        clockEl.addEventListener('mousedown', e => {
-            if (e.button !== 0) return;
-            e.preventDefault();
-            startGesture(getPoint(e), 'mouse');
-        });
+            if (earthMeshRef) {
+                const intersects = raycaster.intersectObject(earthMeshRef);
+                if (intersects.length > 0) {
+                    earthDragActive = true;
+                    autoAdvance = false;
+                    lastEarthDragX = clientX;
+                    controls.enabled = false;
+                    // 1. Убрано изменение курсора на 'grabbing', теперь остаётся 'default'
+                    if(e.cancelable !== false) e.preventDefault();
+                }
+            }
+        }
 
-        window.addEventListener('mousemove', e => {
-            if (!gesture || gesture.source !== 'mouse') return;
-            moveGesture(e, getPoint(e));
-        });
+        function handleEarthMove(e) {
+            if (!earthDragActive) return;
+            const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+            const deltaX = clientX - lastEarthDragX;
+            lastEarthDragX = clientX;
 
-        window.addEventListener('mouseup', e => {
-            if (!gesture || gesture.source !== 'mouse') return;
-            endGesture(getPoint(e));
-        });
+            totalMinutes += deltaX * 0.6;
+            applyTotal();
+            render();
+            if(e.cancelable !== false) e.preventDefault();
+        }
 
-        // ==============================
-        //  АВТОХОД ВРЕМЕНИ — ровно из твоего файла
-        // ==============================
+        function handleEarthEnd() {
+            if (earthDragActive) {
+                earthDragActive = false;
+                autoAdvance = true;
+                controls.enabled = true;
+            }
+        }
+
+        renderer.domElement.addEventListener('mousedown', handleEarthStart);
+        window.addEventListener('mousemove', handleEarthMove);
+        window.addEventListener('mouseup', handleEarthEnd);
+        renderer.domElement.addEventListener('touchstart', handleEarthStart, { passive: false });
+        window.addEventListener('touchmove', handleEarthMove, { passive: false });
+        window.addEventListener('touchend', handleEarthEnd);
+
         let lastTime = performance.now();
+        // 2. Вектор для хранения мировых координат Земли (для слежения камеры)
+        const earthWorldPos = new THREE.Vector3();
 
         function tickAuto(now) {
             const dt = (now - lastTime) / 1000;
             lastTime = now;
 
-            if (autoAdvance && !dragging) {
+            if (autoAdvance && !dragging && !earthDragActive) {
                 totalMinutes += (dt * TIME_SCALE) / 60;
                 applyTotal();
                 render();
             }
-
-            stars.rotation.y  += 0.000015;
-            stars2.rotation.y -= 0.000010;
-
-            if (sunGlow) {
-                sunGlow.material.opacity = 0.82 + Math.sin(now * 0.002) * 0.08;
-            }
+            
+            if (sunGlow) sunGlow.material.opacity = 0.82 + Math.sin(now * 0.002) * 0.08;
         }
 
-        // ==============================
-        //  АНИМАЦИЯ
-        // ==============================
         function animate(now) {
             requestAnimationFrame(animate);
             tickAuto(now || performance.now());
+            
+            // 2. Камера плавно следует за Землей, чтобы она всегда была в центре внимания
+            earthGroup.getWorldPosition(earthWorldPos);
+            controls.target.lerp(earthWorldPos, 0.05);
+            
             controls.update();
             composer.render();
         }
+
+        // 2. Начальная позиция камеры настроена так, чтобы смотреть прямо на Землю
+        camera.position.set(EARTH_ORBIT_RADIUS + 60, 40, 80);
+        controls.target.set(EARTH_ORBIT_RADIUS, 0, 0);
 
         render();
         requestAnimationFrame(animate);
