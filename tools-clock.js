@@ -487,6 +487,39 @@ window.initToolsClock = function () {
             minuteScheme.appendChild(t);
         }
     })();
+   (function () {
+    // Определяем телефон (не планшет, не комп)
+    function isPhone() {
+        var ua = navigator.userAgent || navigator.vendor || window.opera || '';
+
+        // iPad — это планшет (в т.ч. iPadOS 13+, который маскируется под Mac)
+        if (/iPad/i.test(ua)) return false;
+        if (/Macintosh/.test(ua) && navigator.maxTouchPoints > 1) return false;
+
+        // iPhone / iPod — телефон
+        if (/iPhone|iPod/i.test(ua)) return true;
+
+        // Android: с "Mobile" — телефон, без — планшет/ТВ
+        if (/Android/i.test(ua)) return /Mobile/i.test(ua);
+
+        // Прочие мобильные
+        if (/Mobi|BlackBerry|IEMobile|Opera Mini|Windows Phone/i.test(ua)) return true;
+
+        // Fallback: узкий экран + тач → телефон
+        if (window.matchMedia('(pointer: coarse)').matches && window.innerWidth < 768) return true;
+
+        return false;
+    }
+
+    var btn = document.getElementById('spaceSwitch');
+    if (!btn) return;
+
+    btn.addEventListener('click', function (e) {
+        e.preventDefault();
+        var target = isPhone() ? 'spacewatch2.html' : 'spacewatch.html';
+        window.location.href = target;
+    });
+})();
 
     applyStyle('minimal');
     setView('watch');
