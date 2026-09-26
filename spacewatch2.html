@@ -1,0 +1,959 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Космос и часы</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        html, body {
+            margin: 0; padding: 0; overflow: hidden;
+            background: #070b22; height: 100%; width: 100%;
+            font-family: 'Orbitron', 'Segoe UI', 'Arial', sans-serif;
+            user-select: none; -webkit-user-select: none;
+        }
+        canvas { display: block; cursor: default; }
+
+        /* ===== Полупрозрачные часы ===== */
+        #clock {
+            position: fixed;
+            left: 50%;
+            bottom: 24px;
+            transform: translateX(-50%);
+            width: 190px;
+            height: 190px;
+            border-radius: 50%;
+            background: rgba(245, 240, 226, 0.40);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            border: 2px solid rgba(90, 70, 45, 0.35);
+            box-shadow:
+                0 10px 30px rgba(0, 0, 0, 0.45),
+                inset 0 0 30px rgba(255, 255, 255, 0.10);
+            z-index: 50;
+            touch-action: none;
+            cursor: default;
+            opacity: 0.92;
+            transition: opacity 0.3s ease, transform 0.2s ease;
+        }
+        #clock:hover { opacity: 1; }
+        #clock:active { cursor: default; transform: translateX(-50%) scale(1.02); }
+        #clock svg {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            overflow: visible;
+        }
+
+        .min-tick { stroke: rgba(70, 55, 40, 0.45); stroke-width: 0.7; stroke-linecap: round; }
+        .hour-tick { stroke: rgba(38, 28, 18, 0.88); stroke-width: 1.4; stroke-linecap: round; }
+        .hour-tick.qtr { stroke: rgba(38, 28, 18, 0.98); stroke-width: 1.9; }
+
+        .numeral {
+            fill: rgba(38, 28, 18, 0.92);
+            font-family: 'Orbitron', 'Arial', sans-serif;
+            font-size: 11px;
+            font-weight: 600;
+            text-anchor: middle;
+            dominant-baseline: central;
+            letter-spacing: 0.5px;
+        }
+
+        .hand { stroke-linecap: round; stroke-linejoin: round; }
+        #hourHand   { stroke: rgba(38, 28, 18, 0.92); stroke-width: 3.4; }
+        #minuteHand { stroke: rgba(38, 28, 18, 0.92); stroke-width: 1.9; }
+
+        #secondHandGroup {
+            pointer-events: none;
+            filter: drop-shadow(0 1px 1px rgba(0,0,0,0.3));
+        }
+
+        .center-ring { fill: none; stroke: rgba(38, 28, 18, 0.9); stroke-width: 1; }
+        .center-dot  { fill: rgba(38, 28, 18, 0.9); }
+
+        .brand {
+            fill: rgba(70, 55, 40, 0.72);
+            font-family: 'Orbitron', sans-serif;
+            font-size: 4px;
+            font-weight: 600;
+            text-anchor: middle;
+            letter-spacing: 2px;
+        }
+
+        /* ===== Плашка с датой ===== */
+        #datePlate {
+            position: fixed;
+            top: 24px;
+            right: 24px;
+            padding: 10px 18px 12px;
+            border-radius: 18px;
+            background: rgba(245, 240, 226, 0.40);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            border: 2px solid rgba(90, 70, 45, 0.35);
+            box-shadow:
+                0 10px 30px rgba(0, 0, 0, 0.45),
+                inset 0 0 30px rgba(255, 255, 255, 0.10);
+            z-index: 50;
+            opacity: 0.92;
+            text-align: center;
+            line-height: 1.15;
+            pointer-events: none;
+            white-space: nowrap;
+        }
+        #dpDate {
+            font-size: 11px;
+            font-weight: 600;
+            letter-spacing: 2px;
+            color: rgba(70, 55, 40, 0.88);
+            text-transform: lowercase;
+        }
+        #dpYear {
+            margin-top: 4px;
+            font-size: 22px;
+            font-weight: 700;
+            letter-spacing: 3px;
+            color: rgba(38, 28, 18, 0.92);
+        }
+    </style>
+</head>
+<body>
+
+    <div id="clock">
+        <svg viewBox="0 0 130 130">
+            <g id="ticks"></g>
+            <g id="numerals"></g>
+
+            <line id="hourHand"   class="hand" x1="65" y1="65" x2="65" y2="36" />
+            <line id="minuteHand" class="hand" x1="65" y1="65" x2="65" y2="18" />
+
+            <g id="secondHandGroup">
+                <line x1="65" y1="65" x2="65" y2="74" stroke="#ff4d5a" stroke-width="1.6" stroke-linecap="round" />
+                <line x1="65" y1="65" x2="65" y2="22" stroke="#ff4d5a" stroke-width="1.1" stroke-linecap="round" />
+                <circle cx="65" cy="65" r="2.2" fill="#ff4d5a" />
+                <circle cx="65" cy="65" r="0.8" fill="#ffffff" />
+            </g>
+
+            <circle class="center-ring" cx="65" cy="65" r="2.8" />
+            <circle class="center-dot"  cx="65" cy="65" r="1.2" />
+            <text class="brand" x="65" y="44">КОСМОС</text>
+        </svg>
+    </div>
+
+    <div id="datePlate">
+        <div id="dpDate">—</div>
+        <div id="dpYear">—</div>
+    </div>
+
+    <script type="importmap">
+        {
+            "imports": {
+                "three": "https://unpkg.com/three@0.126.0/build/three.module.js",
+                "three/addons/": "https://unpkg.com/three@0.126.0/examples/jsm/"
+            }
+        }
+    </script>
+
+    <script type="module">
+        import * as THREE from 'three';
+        import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+
+        // =====================================================================
+        //  КОНСТАНТЫ ВРЕМЕНИ (не изменялись)
+        // =====================================================================
+        const SIDEREAL_MONTH_HOURS = 27 * 24 + 7 + 43 / 60;
+        const SIDEREAL_MONTH_MINUTES = SIDEREAL_MONTH_HOURS * 60;
+        const EARTH_DAY_HOURS = 24;
+        const EARTH_YEAR_MINUTES = 365.25 * 24 * 60;
+        const TIME_SCALE = 1;
+        const DEG = Math.PI / 180;
+
+        const isMobile = /Android|iPhone|iPad|iPod|Mobile|Silk/i.test(navigator.userAgent)
+                      || (navigator.maxTouchPoints > 1 && window.innerWidth < 900);
+
+        // =====================================================================
+        //  СЦЕНА / РЕНДЕР
+        //  Убраны: EffectComposer, UnrealBloom, shadowMap — самые тяжёлые
+        //  вещи для мобильного GPU. Всё «свечение» теперь на спрайтах.
+        // =====================================================================
+        const scene = new THREE.Scene();
+        scene.background = new THREE.Color(0x070b22);
+
+        const camera = new THREE.PerspectiveCamera(40, window.innerWidth / window.innerHeight, 0.1, 12000);
+
+        const renderer = new THREE.WebGLRenderer({ antialias: !isMobile, powerPreference: 'high-performance' });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, isMobile ? 1.5 : 1.75));
+        renderer.toneMapping = THREE.NoToneMapping;
+        document.body.appendChild(renderer.domElement);
+
+        const controls = new OrbitControls(camera, renderer.domElement);
+        controls.enableRotate = true;
+        controls.enablePan = true;
+        controls.enableZoom = true;
+        controls.zoomSpeed = 1.1;
+        controls.enableDamping = true;
+        controls.dampingFactor = 0.08;
+        controls.minDistance = 20;
+        controls.maxDistance = 800;
+
+        // =====================================================================
+        //  ХЕЛПЕРЫ: псевдослучайные числа + генераторы мультяшных текстур
+        // =====================================================================
+        let _seed = 987654321;
+        function rnd() {
+            _seed = (_seed * 1664525 + 1013904223) >>> 0;
+            return _seed / 4294967296;
+        }
+        function rrange(a, b) { return a + rnd() * (b - a); }
+
+        // --- Ступенчатый градиент для toon-материалов (cel-shading) ---
+        function makeToonGradient(steps) {
+            const c = document.createElement('canvas');
+            c.width = steps; c.height = 1;
+            const ctx = c.getContext('2d');
+            for (let i = 0; i < steps; i++) {
+                const t = i / (steps - 1);
+                const v = Math.round(255 * Math.pow(t, 0.78));
+                ctx.fillStyle = 'rgb(' + v + ',' + v + ',' + v + ')';
+                ctx.fillRect(i, 0, 1, 1);
+            }
+            const tex = new THREE.CanvasTexture(c);
+            tex.minFilter = THREE.NearestFilter;
+            tex.magFilter = THREE.NearestFilter;
+            tex.generateMipmaps = false;
+            return tex;
+        }
+        const TOON_GRADIENT = makeToonGradient(4);
+
+        // --- Небо: мягкий сине-фиолетовый градиент ---
+        function makeSkyTexture() {
+            const c = document.createElement('canvas');
+            c.width = 8; c.height = 256;
+            const ctx = c.getContext('2d');
+            const g = ctx.createLinearGradient(0, 0, 0, 256);
+            g.addColorStop(0.00, '#050818');
+            g.addColorStop(0.38, '#151d4e');
+            g.addColorStop(0.62, '#2a1c58');
+            g.addColorStop(0.82, '#1a1440');
+            g.addColorStop(1.00, '#070a1e');
+            ctx.fillStyle = g;
+            ctx.fillRect(0, 0, 8, 256);
+            return new THREE.CanvasTexture(c);
+        }
+
+        // --- Мягкая звёздочка ---
+        function makeStarTexture() {
+            const S = 64;
+            const c = document.createElement('canvas');
+            c.width = c.height = S;
+            const ctx = c.getContext('2d');
+            const g = ctx.createRadialGradient(S / 2, S / 2, 0, S / 2, S / 2, S / 2);
+            g.addColorStop(0.00, 'rgba(255,255,255,1)');
+            g.addColorStop(0.22, 'rgba(255,255,255,0.90)');
+            g.addColorStop(0.55, 'rgba(190,220,255,0.28)');
+            g.addColorStop(1.00, 'rgba(190,220,255,0)');
+            ctx.fillStyle = g;
+            ctx.fillRect(0, 0, S, S);
+            return new THREE.CanvasTexture(c);
+        }
+
+        // --- Мультяшная Земля ---
+        function makeEarthTexture() {
+            const W = 1024, H = 512;
+            const c = document.createElement('canvas');
+            c.width = W; c.height = H;
+            const ctx = c.getContext('2d');
+
+            // Океан
+            const og = ctx.createLinearGradient(0, 0, 0, H);
+            og.addColorStop(0.0, '#2a7cc6');
+            og.addColorStop(0.5, '#41aeea');
+            og.addColorStop(1.0, '#2a7cc6');
+            ctx.fillStyle = og;
+            ctx.fillRect(0, 0, W, H);
+
+            // Мультяшные блики на воде
+            ctx.globalAlpha = 0.14;
+            ctx.fillStyle = '#d6f2ff';
+            for (let i = 0; i < 55; i++) {
+                ctx.beginPath();
+                ctx.ellipse(rnd() * W, rnd() * H, 25 + rnd() * 80, 5 + rnd() * 9, 0, 0, Math.PI * 2);
+                ctx.fill();
+            }
+            ctx.globalAlpha = 1;
+
+            // Материки — набор «пухлых» блобов
+            const LAND = [
+                // Северная Америка
+                [168, 148, 62, 46], [226, 120, 46, 32], [134, 192, 32, 28],
+                [238, 186, 36, 26], [188, 208, 30, 22], [205, 165, 30, 22],
+                // Гренландия
+                [356, 84, 33, 24],
+                // Южная Америка
+                [276, 300, 35, 46], [296, 352, 26, 40], [264, 264, 28, 25],
+                // Европа
+                [520, 146, 38, 28], [562, 166, 30, 24], [496, 168, 22, 18],
+                // Африка
+                [536, 246, 46, 38], [556, 312, 38, 48], [578, 356, 24, 26],
+                // Азия
+                [672, 136, 76, 46], [772, 166, 56, 38], [732, 202, 40, 30],
+                [636, 192, 36, 26], [692, 236, 25, 28],
+                // Австралия
+                [846, 346, 42, 30], [882, 372, 22, 18],
+                // Острова
+                [408, 250, 14, 10], [440, 300, 12, 9], [900, 260, 16, 12]
+            ];
+            const greens = ['#5ecb63', '#52c25a', '#6cd46e'];
+            for (let i = 0; i < LAND.length; i++) {
+                const [cx, cy, rx, ry] = LAND[i];
+                const pts = 13;
+                ctx.beginPath();
+                for (let p = 0; p <= pts; p++) {
+                    const a = (p / pts) * Math.PI * 2;
+                    const rr = 0.72 + rnd() * 0.5;
+                    const x = cx + Math.cos(a) * rx * rr;
+                    const y = cy + Math.sin(a) * ry * rr;
+                    if (p === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+                }
+                ctx.closePath();
+                ctx.fillStyle = greens[i % greens.length];
+                ctx.fill();
+            }
+
+            // Тёмно-зелёные «лесные» точки
+            ctx.fillStyle = 'rgba(48,150,70,0.55)';
+            for (let i = 0; i < 90; i++) {
+                const b = LAND[(Math.random() * LAND.length) | 0];
+                ctx.beginPath();
+                ctx.arc(b[0] + rrange(-b[2], b[2]) * 0.7, b[1] + rrange(-b[3], b[3]) * 0.7,
+                        3 + rnd() * 7, 0, Math.PI * 2);
+                ctx.fill();
+            }
+
+            // Полярные шапки
+            ctx.fillStyle = '#f0fbff';
+            ctx.beginPath();
+            ctx.ellipse(W / 2, 6, W * 0.78, 52, 0, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.beginPath();
+            ctx.ellipse(W / 2, H - 6, W * 0.88, 66, 0, 0, Math.PI * 2);
+            ctx.fill();
+
+            return new THREE.CanvasTexture(c);
+        }
+
+        // --- Мультяшная Луна ---
+        function makeMoonTexture() {
+            const W = 512, H = 256;
+            const c = document.createElement('canvas');
+            c.width = W; c.height = H;
+            const ctx = c.getContext('2d');
+
+            ctx.fillStyle = '#ece6d6';
+            ctx.fillRect(0, 0, W, H);
+
+            // Мягкие «моря»
+            for (let i = 0; i < 26; i++) {
+                const x = rnd() * W, y = rnd() * H, r = 16 + rnd() * 38;
+                const g = ctx.createRadialGradient(x, y, 0, x, y, r);
+                g.addColorStop(0, 'rgba(196,187,166,0.75)');
+                g.addColorStop(1, 'rgba(196,187,166,0)');
+                ctx.fillStyle = g;
+                ctx.beginPath(); ctx.arc(x, y, r, 0, Math.PI * 2); ctx.fill();
+            }
+
+            // Кратеры
+            for (let i = 0; i < 24; i++) {
+                const x = rnd() * W, y = 22 + rnd() * (H - 44), r = 5 + rnd() * 15;
+                ctx.beginPath(); ctx.arc(x, y, r, 0, Math.PI * 2);
+                ctx.fillStyle = '#d6cfbb'; ctx.fill();
+                ctx.lineWidth = 2.4; ctx.strokeStyle = '#bdb59f'; ctx.stroke();
+                ctx.beginPath(); ctx.arc(x - r * 0.26, y - r * 0.26, r * 0.58, 0, Math.PI * 2);
+                ctx.fillStyle = 'rgba(255,255,255,0.40)'; ctx.fill();
+            }
+
+            return new THREE.CanvasTexture(c);
+        }
+
+        // --- Мультяшные облака ---
+        function makeCloudTexture() {
+            const W = 1024, H = 512;
+            const c = document.createElement('canvas');
+            c.width = W; c.height = H;
+            const ctx = c.getContext('2d');
+            ctx.clearRect(0, 0, W, H);
+            for (let i = 0; i < 130; i++) {
+                const x = rnd() * W;
+                const y = 34 + rnd() * (H - 68);
+                const r = 12 + rnd() * 36;
+                const g = ctx.createRadialGradient(x, y, 0, x, y, r);
+                g.addColorStop(0.0, 'rgba(255,255,255,0.98)');
+                g.addColorStop(0.45, 'rgba(255,255,255,0.72)');
+                g.addColorStop(1.0, 'rgba(255,255,255,0)');
+                ctx.fillStyle = g;
+                ctx.beginPath(); ctx.arc(x, y, r, 0, Math.PI * 2); ctx.fill();
+            }
+            return new THREE.CanvasTexture(c);
+        }
+
+        // --- Солнце: лучи + ядро ---
+        function makeSunGlowTexture() {
+            const S = 512;
+            const c = document.createElement('canvas');
+            c.width = c.height = S;
+            const ctx = c.getContext('2d');
+            const cx = S / 2, cy = S / 2;
+
+            ctx.save();
+            ctx.translate(cx, cy);
+            const rays = 14;
+            for (let i = 0; i < rays; i++) {
+                const a = (i / rays) * Math.PI * 2;
+                const len = 195 + (i % 2) * 55;
+                ctx.save();
+                ctx.rotate(a);
+                const g = ctx.createLinearGradient(0, -40, 0, -len);
+                g.addColorStop(0.00, 'rgba(255,232,140,0.60)');
+                g.addColorStop(0.50, 'rgba(255,196,90,0.24)');
+                g.addColorStop(1.00, 'rgba(255,160,50,0)');
+                ctx.fillStyle = g;
+                ctx.beginPath();
+                ctx.moveTo(-22, -40);
+                ctx.lineTo(0, -len);
+                ctx.lineTo(22, -40);
+                ctx.closePath();
+                ctx.fill();
+                ctx.restore();
+            }
+            ctx.restore();
+
+            const g2 = ctx.createRadialGradient(cx, cy, 0, cx, cy, 175);
+            g2.addColorStop(0.00, 'rgba(255,255,240,1)');
+            g2.addColorStop(0.22, 'rgba(255,240,150,0.95)');
+            g2.addColorStop(0.52, 'rgba(255,200,90,0.42)');
+            g2.addColorStop(1.00, 'rgba(255,150,40,0)');
+            ctx.fillStyle = g2;
+            ctx.beginPath(); ctx.arc(cx, cy, 175, 0, Math.PI * 2); ctx.fill();
+
+            return new THREE.CanvasTexture(c);
+        }
+
+        // =====================================================================
+        //  ФОН: небесная сфера + звёзды
+        // =====================================================================
+        const skyMesh = new THREE.Mesh(
+            new THREE.SphereGeometry(6000, 24, 16),
+            new THREE.MeshBasicMaterial({
+                map: makeSkyTexture(), side: THREE.BackSide,
+                depthWrite: false, depthTest: false, fog: false
+            })
+        );
+        skyMesh.renderOrder = -1;
+        scene.add(skyMesh);
+
+        const starTex = makeStarTexture();
+
+        function createStarLayer(count, minR, maxR, size, color) {
+            const geo = new THREE.BufferGeometry();
+            const pos = new Float32Array(count * 3);
+            for (let i = 0; i < count; i++) {
+                const r = minR + Math.random() * (maxR - minR);
+                const t = Math.random() * Math.PI * 2;
+                const p = Math.acos(Math.random() * 2 - 1);
+                pos[i * 3]     = r * Math.sin(p) * Math.cos(t);
+                pos[i * 3 + 1] = r * Math.sin(p) * Math.sin(t);
+                pos[i * 3 + 2] = r * Math.cos(p);
+            }
+            geo.setAttribute('position', new THREE.BufferAttribute(pos, 3));
+            return new THREE.Points(geo, new THREE.PointsMaterial({
+                size, color, map: starTex,
+                transparent: true, blending: THREE.AdditiveBlending,
+                depthWrite: false, sizeAttenuation: true
+            }));
+        }
+
+        scene.add(createStarLayer(isMobile ? 1500 : 3500, 900, 2600, 16, 0xffffff));
+        scene.add(createStarLayer(isMobile ? 700 : 1600, 1800, 3600, 10, 0xaaccff));
+
+        // =====================================================================
+        //  СВЕТ
+        //  Направление — как от Солнца. Тени отключены (дорого на мобильных),
+        //  вместо них — плоская мультяшная заливка через toon-градиент.
+        // =====================================================================
+        const sunLight = new THREE.DirectionalLight(0xfff0d0, 1.05);
+        scene.add(sunLight);
+        scene.add(sunLight.target);
+        scene.add(new THREE.AmbientLight(0x8899cc, 0.5));
+
+        // =====================================================================
+        //  СОЛНЦЕ
+        // =====================================================================
+        const SUN_X = 0, SUN_Y = 0, SUN_Z = 0;
+        const SUN_RADIUS = 40;
+
+        const sunMesh = new THREE.Mesh(
+            new THREE.SphereGeometry(SUN_RADIUS, 32, 24),
+            new THREE.MeshBasicMaterial({ color: 0xffd94a })
+        );
+        sunMesh.position.set(SUN_X, SUN_Y, SUN_Z);
+        scene.add(sunMesh);
+
+        const sunGlow = new THREE.Sprite(new THREE.SpriteMaterial({
+            map: makeSunGlowTexture(),
+            color: 0xffffff,
+            blending: THREE.AdditiveBlending,
+            depthWrite: false,
+            transparent: true,
+            opacity: 0.95
+        }));
+        sunGlow.scale.set(360, 360, 1);
+        sunGlow.position.set(SUN_X, SUN_Y, SUN_Z);
+        scene.add(sunGlow);
+
+        // =====================================================================
+        //  ЗЕМЛЯ + ЛУНА  (геометрия облегчена под мобильные)
+        // =====================================================================
+        const EARTH_ORBIT_RADIUS = 220;
+        const earthOrbitPivot = new THREE.Group();
+        earthOrbitPivot.position.set(SUN_X, SUN_Y, SUN_Z);
+        scene.add(earthOrbitPivot);
+
+        const earthGroup = new THREE.Group();
+        earthGroup.position.set(EARTH_ORBIT_RADIUS, 0, 0);
+        earthOrbitPivot.add(earthGroup);
+
+        // Орбита Земли
+        const earthOrbitPts = [];
+        for (let i = 0; i <= 128; i++) {
+            const a = (i / 128) * Math.PI * 2;
+            earthOrbitPts.push(new THREE.Vector3(Math.cos(a) * EARTH_ORBIT_RADIUS, 0, Math.sin(a) * EARTH_ORBIT_RADIUS));
+        }
+        scene.add(new THREE.LineLoop(
+            new THREE.BufferGeometry().setFromPoints(earthOrbitPts),
+            new THREE.LineBasicMaterial({ color: 0x6f9be0, opacity: 0.18, transparent: true })
+        ));
+
+        // Земля
+        const earthMesh = new THREE.Mesh(
+            new THREE.SphereGeometry(8, isMobile ? 48 : 72, isMobile ? 48 : 72),
+            new THREE.MeshToonMaterial({
+                map: makeEarthTexture(),
+                gradientMap: TOON_GRADIENT
+            })
+        );
+        earthGroup.add(earthMesh);
+        const earthMeshRef = earthMesh;
+
+        // Облака
+        const cloudMesh = new THREE.Mesh(
+            new THREE.SphereGeometry(8.09, 40, 28),
+            new THREE.MeshLambertMaterial({
+                map: makeCloudTexture(),
+                transparent: true,
+                opacity: 0.85,
+                depthWrite: false
+            })
+        );
+        earthGroup.add(cloudMesh);
+
+        // Мультяшная атмосферная кайма (BackSide + additive = дешёвый rim)
+        const atmoShell = new THREE.Mesh(
+            new THREE.SphereGeometry(8.75, 32, 22),
+            new THREE.MeshBasicMaterial({
+                color: 0x8fd0ff,
+                transparent: true,
+                opacity: 0.22,
+                blending: THREE.AdditiveBlending,
+                side: THREE.BackSide,
+                depthWrite: false
+            })
+        );
+        earthGroup.add(atmoShell);
+
+        // Луна
+        const moonGroup = new THREE.Group();
+        earthGroup.add(moonGroup);
+        const orbitRadius = 18;
+
+        const moonMesh = new THREE.Mesh(
+            new THREE.SphereGeometry(2.2, isMobile ? 24 : 36, isMobile ? 24 : 36),
+            new THREE.MeshToonMaterial({
+                map: makeMoonTexture(),
+                gradientMap: TOON_GRADIENT
+            })
+        );
+        moonMesh.position.set(orbitRadius, 0, 0);
+        moonGroup.add(moonMesh);
+
+        const moonOrbitPts = [];
+        for (let i = 0; i <= 64; i++) {
+            const a = (i / 64) * Math.PI * 2;
+            moonOrbitPts.push(new THREE.Vector3(Math.cos(a) * orbitRadius, 0, Math.sin(a) * orbitRadius));
+        }
+        earthGroup.add(new THREE.LineLoop(
+            new THREE.BufferGeometry().setFromPoints(moonOrbitPts),
+            new THREE.LineBasicMaterial({ color: 0x9fb4e0, opacity: 0.25, transparent: true })
+        ));
+
+        // =====================================================================
+        //  ЦИФЕРБЛАТ ЧАСОВ (SVG) — логика без изменений
+        // =====================================================================
+        const CX = 65, CY = 65;
+        const ticksGroup = document.getElementById('ticks');
+        const numeralsGroup = document.getElementById('numerals');
+
+        for (let i = 0; i < 60; i++) {
+            const a = (i * 6 - 90) * Math.PI / 180;
+            const isHour = i % 5 === 0;
+            const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+            if (isHour) {
+                line.setAttribute('x1', (CX + 50 * Math.cos(a)).toFixed(2));
+                line.setAttribute('y1', (CY + 50 * Math.sin(a)).toFixed(2));
+                line.setAttribute('x2', (CX + 56 * Math.cos(a)).toFixed(2));
+                line.setAttribute('y2', (CY + 56 * Math.sin(a)).toFixed(2));
+                line.setAttribute('class', 'hour-tick' + (i % 15 === 0 ? ' qtr' : ''));
+            } else {
+                line.setAttribute('x1', (CX + 53.5 * Math.cos(a)).toFixed(2));
+                line.setAttribute('y1', (CY + 53.5 * Math.sin(a)).toFixed(2));
+                line.setAttribute('x2', (CX + 56 * Math.cos(a)).toFixed(2));
+                line.setAttribute('y2', (CY + 56 * Math.sin(a)).toFixed(2));
+                line.setAttribute('class', 'min-tick');
+            }
+            ticksGroup.appendChild(line);
+        }
+        for (let n = 1; n <= 12; n++) {
+            const a = (n * 30 - 90) * Math.PI / 180;
+            const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+            text.setAttribute('x', (CX + 41 * Math.cos(a)).toFixed(2));
+            text.setAttribute('y', (CY + 41 * Math.sin(a)).toFixed(2));
+            text.setAttribute('class', 'numeral');
+            text.textContent = n;
+            numeralsGroup.appendChild(text);
+        }
+
+        const hourHand = document.getElementById('hourHand');
+        const minuteHand = document.getElementById('minuteHand');
+        const secondHandGroup = document.getElementById('secondHandGroup');
+        const clockEl = document.getElementById('clock');
+
+        // =====================================================================
+        //  ПРИВЯЗКА К РЕАЛЬНОМУ ВРЕМЕНИ
+        // =====================================================================
+        const J2000_MS = Date.UTC(2000, 0, 1, 12, 0, 0);
+
+        function sunEclipticLongitude(d) {
+            const L = 280.460 + 0.9856474 * d;
+            const g = (357.528 + 0.9856003 * d) * DEG;
+            return L + 1.915 * Math.sin(g) + 0.020 * Math.sin(2 * g);
+        }
+        function moonEclipticLongitude(d) {
+            const Lm = 218.316 + 13.176396 * d;
+            const Mm = (134.963 + 13.064993 * d) * DEG;
+            const Ls = 280.460 + 0.9856474 * d;
+            const D  = (Lm - Ls) * DEG;
+            return Lm
+                + 6.289 * Math.sin(Mm)
+                + 1.274 * Math.sin(2 * D - Mm)
+                + 0.658 * Math.sin(2 * D);
+        }
+
+        const startDate = new Date();
+        const localMinutes = startDate.getHours() * 60 + startDate.getMinutes()
+                           + startDate.getSeconds() / 60 + startDate.getMilliseconds() / 60000;
+        const minutesSinceJ2000 = (startDate.getTime() - J2000_MS) / 60000;
+
+        let totalMinutes = localMinutes + 1440 * Math.round((minutesSinceJ2000 - localMinutes) / 1440);
+
+        const d0 = totalMinutes / 1440;
+        const lambdaSun0   = sunEclipticLongitude(d0);
+        const lambdaMoon0  = moonEclipticLongitude(d0);
+        const lambdaEarth0 = lambdaSun0 - 180;
+
+        const ORBIT_PHASE = -lambdaEarth0 * DEG
+                          + (totalMinutes / EARTH_YEAR_MINUTES) * Math.PI * 2;
+        const MOON_PHASE  = lambdaMoon0 * DEG
+                          - (totalMinutes / SIDEREAL_MONTH_MINUTES) * Math.PI * 2;
+
+        const utcHours = startDate.getUTCHours() + startDate.getUTCMinutes() / 60 + startDate.getUTCSeconds() / 3600;
+        const subsolarLon = 180 - 15 * utcHours;
+        const earthRot0 = (subsolarLon - lambdaSun0) * DEG;
+        const t0h = ((totalMinutes / 60) % 24 + 24) % 24;
+        const EARTH_ROT_PHASE = earthRot0 + (t0h / EARTH_DAY_HOURS) * Math.PI * 2;
+
+        let hour = 3, minute = 0;
+
+        const MONTHS_RU = ['января','февраля','марта','апреля','мая','июня',
+                           'июля','августа','сентября','октября','ноября','декабря'];
+        const dpDateEl = document.getElementById('dpDate');
+        const dpYearEl = document.getElementById('dpYear');
+        let lastDateKey = null;
+
+        function updateDatePlate() {
+            const key = Math.round(totalMinutes);
+            if (key === lastDateKey) return;
+            lastDateKey = key;
+            const dt = new Date(J2000_MS + key * 60000);
+            dpDateEl.textContent = dt.getDate() + ' ' + MONTHS_RU[dt.getMonth()];
+            dpYearEl.textContent = String(dt.getFullYear());
+        }
+
+        function render() {
+            const hourDeg = (hour % 12) * 30 + minute * 0.5;
+            const minuteDeg = minute * 6;
+            const totalSeconds = totalMinutes * 60;
+            const secondDeg = (totalSeconds * 6) % 360;
+
+            hourHand.setAttribute('transform', `rotate(${hourDeg} ${CX} ${CY})`);
+            minuteHand.setAttribute('transform', `rotate(${minuteDeg} ${CX} ${CY})`);
+            secondHandGroup.setAttribute('transform', `rotate(${secondDeg} ${CX} ${CY})`);
+
+            const tH = ((totalMinutes / 60) % 24 + 24) % 24;
+            const earthRot = EARTH_ROT_PHASE - (tH / EARTH_DAY_HOURS) * Math.PI * 2;
+            const orbitRot = ORBIT_PHASE - (totalMinutes / EARTH_YEAR_MINUTES) * Math.PI * 2;
+
+            earthGroup.rotation.y = earthRot;
+            if (cloudMesh) cloudMesh.rotation.y = -(tH / EARTH_DAY_HOURS) * Math.PI * 2 * 0.15;
+            earthOrbitPivot.rotation.y = orbitRot;
+
+            const moonWorldAngle = MOON_PHASE + (totalMinutes / SIDEREAL_MONTH_MINUTES) * Math.PI * 2;
+            const moonLocalAngle = moonWorldAngle + earthRot + orbitRot;
+            if (moonMesh) {
+                moonMesh.position.set(
+                    Math.cos(moonLocalAngle) * orbitRadius, 0,
+                    Math.sin(moonLocalAngle) * orbitRadius
+                );
+                moonMesh.rotation.y = -moonLocalAngle + Math.PI;
+            }
+
+            updateDatePlate();
+        }
+
+        function applyTotal() {
+            const rounded = Math.round(totalMinutes);
+            minute = ((rounded % 60) + 60) % 60;
+            let h = Math.floor(rounded / 60) % 12;
+            h = ((h % 12) + 12) % 12;
+            hour = h === 0 ? 12 : h;
+        }
+
+        // =====================================================================
+        //  ЖЕСТЫ ПО ЧАСАМ — без изменений
+        // =====================================================================
+        const MOVE_THRESHOLD = 4;
+        let gesture = null, dragging = false, dragMode = null, lastAngle = 0, autoAdvance = true;
+
+        function getPoint(e) {
+            if (e.touches && e.touches.length > 0) return { x: e.touches[0].clientX, y: e.touches[0].clientY };
+            return { x: e.clientX, y: e.clientY };
+        }
+
+        function angleFromPoint(p) {
+            const rect = clockEl.getBoundingClientRect();
+            const cx = rect.left + rect.width / 2, cy = rect.top + rect.height / 2;
+            let a = Math.atan2(p.y - cy, p.x - cx) * 180 / Math.PI + 90;
+            return (a % 360 + 360) % 360;
+        }
+
+        function angleDiff(a, b) {
+            const d = Math.abs(a - b) % 360;
+            return d > 180 ? 360 - d : d;
+        }
+
+        function isPointInsideClock(p) {
+            const rect = clockEl.getBoundingClientRect();
+            const cx = rect.left + rect.width / 2, cy = rect.top + rect.height / 2;
+            return Math.hypot(p.x - cx, p.y - cy) <= (rect.width / 2) * 0.95;
+        }
+
+        function startGesture(point, source) {
+            if (gesture) return;
+            autoAdvance = false;
+            gesture = { startX: point.x, startY: point.y, mode: null, source };
+        }
+
+        function moveGesture(e, point) {
+            if (!gesture) return;
+            const adx = Math.abs(point.x - gesture.startX), ady = Math.abs(point.y - gesture.startY);
+
+            if (!gesture.mode) {
+                if (adx < MOVE_THRESHOLD && ady < MOVE_THRESHOLD) return;
+                if (isPointInsideClock(point)) {
+                    gesture.mode = 'drag';
+                    const ang = angleFromPoint(point);
+                    const rect = clockEl.getBoundingClientRect();
+                    const cx = rect.left + rect.width / 2, cy = rect.top + rect.height / 2;
+                    const relR = Math.hypot(point.x - cx, point.y - cy) / (rect.width / 2);
+                    const hourAng = ((hour % 12) * 30 + minute * 0.5 + 360) % 360;
+                    const minAng = (minute * 6 + 360) % 360;
+
+                    if (relR < 0.35) dragMode = 'hour';
+                    else if (relR > 0.55) dragMode = 'minute';
+                    else dragMode = angleDiff(ang, minAng) <= angleDiff(ang, hourAng) ? 'minute' : 'hour';
+
+                    lastAngle = ang; dragging = true;
+                } else {
+                    gesture.mode = 'other';
+                }
+            }
+
+            if (gesture.mode === 'drag') {
+                if (e.cancelable !== false) { try { e.preventDefault(); } catch (err) {} }
+                const ang = angleFromPoint(point);
+                let delta = ang - lastAngle;
+                if (delta > 180) delta -= 360;
+                if (delta < -180) delta += 360;
+
+                if (dragMode === 'minute') {
+                    totalMinutes += delta / 6;
+                    applyTotal();
+                } else {
+                    const h = (ang - minute * 0.5) / 30;
+                    const newHour12 = ((Math.round(h) % 12) + 12) % 12;
+                    const curHour12 = ((Math.floor(totalMinutes / 60) % 12) + 12) % 12;
+                    let diff = newHour12 - curHour12;
+                    if (diff > 6) diff -= 12;
+                    if (diff < -6) diff += 12;
+                    if (diff !== 0) {
+                        totalMinutes += diff * 60;
+                        applyTotal();
+                    }
+                }
+                lastAngle = ang;
+                render();
+            }
+        }
+
+        function endGesture() {
+            if (!gesture) return;
+            gesture = null; dragging = false; dragMode = null;
+            autoAdvance = true;
+        }
+
+        clockEl.addEventListener('touchstart', e => { if (e.touches.length === 1) startGesture(getPoint(e), 'touch'); }, { passive: true });
+        clockEl.addEventListener('touchmove', e => { if (gesture?.source === 'touch' && e.touches.length === 1) moveGesture(e, getPoint(e)); }, { passive: false });
+        clockEl.addEventListener('touchend', () => { if (gesture?.source === 'touch') endGesture(); }, { passive: true });
+        clockEl.addEventListener('mousedown', e => { if (e.button === 0) { e.preventDefault(); startGesture(getPoint(e), 'mouse'); } });
+        window.addEventListener('mousemove', e => { if (gesture?.source === 'mouse') moveGesture(e, getPoint(e)); });
+        window.addEventListener('mouseup', () => { if (gesture?.source === 'mouse') endGesture(); });
+
+        // =====================================================================
+        //  ПЕРЕТАСКИВАНИЕ ЗЕМЛИ — без изменений
+        // =====================================================================
+        const raycaster = new THREE.Raycaster();
+        const mouse = new THREE.Vector2();
+        let earthDragActive = false;
+        let lastEarthDragX = 0;
+
+        function handleEarthStart(e) {
+            if (gesture) return;
+            const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+            const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+
+            mouse.x = (clientX / window.innerWidth) * 2 - 1;
+            mouse.y = -(clientY / window.innerHeight) * 2 + 1;
+            raycaster.setFromCamera(mouse, camera);
+
+            if (earthMeshRef) {
+                const intersects = raycaster.intersectObject(earthMeshRef);
+                if (intersects.length > 0) {
+                    earthDragActive = true;
+                    autoAdvance = false;
+                    lastEarthDragX = clientX;
+                    controls.enabled = false;
+                    if (e.cancelable !== false) e.preventDefault();
+                }
+            }
+        }
+
+        function handleEarthMove(e) {
+            if (!earthDragActive) return;
+            const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+            const deltaX = clientX - lastEarthDragX;
+            lastEarthDragX = clientX;
+
+            totalMinutes += deltaX * 0.6;
+            applyTotal();
+            render();
+            if (e.cancelable !== false) e.preventDefault();
+        }
+
+        function handleEarthEnd() {
+            if (earthDragActive) {
+                earthDragActive = false;
+                autoAdvance = true;
+                controls.enabled = true;
+            }
+        }
+
+        renderer.domElement.addEventListener('mousedown', handleEarthStart);
+        window.addEventListener('mousemove', handleEarthMove);
+        window.addEventListener('mouseup', handleEarthEnd);
+        renderer.domElement.addEventListener('touchstart', handleEarthStart, { passive: false });
+        window.addEventListener('touchmove', handleEarthMove, { passive: false });
+        window.addEventListener('touchend', handleEarthEnd);
+
+        // =====================================================================
+        //  АНИМАЦИЯ
+        // =====================================================================
+        let lastTime = performance.now();
+        const earthWorldPos = new THREE.Vector3();
+        const sunDir = new THREE.Vector3();
+
+        function tickAuto(now) {
+            const dt = (now - lastTime) / 1000;
+            lastTime = now;
+
+            if (autoAdvance && !dragging && !earthDragActive) {
+                totalMinutes += (dt * TIME_SCALE) / 60;
+                applyTotal();
+                render();
+            }
+
+            // Лёгкое «дыхание» солнца + вращение лучей
+            const pulse = 0.9 + Math.sin(now * 0.002) * 0.08;
+            sunGlow.material.opacity = pulse;
+            sunGlow.material.rotation = (now * 0.00006) % (Math.PI * 2);
+        }
+
+        function animate(now) {
+            requestAnimationFrame(animate);
+            tickAuto(now || performance.now());
+
+            earthGroup.getWorldPosition(earthWorldPos);
+            controls.target.lerp(earthWorldPos, 0.05);
+
+            // Свет идёт от Солнца к Земле
+            sunDir.copy(earthWorldPos).normalize();
+            sunLight.position.copy(earthWorldPos).addScaledVector(sunDir, -150);
+            sunLight.target.position.copy(earthWorldPos);
+
+            controls.update();
+            renderer.render(scene, camera);
+        }
+
+        // ===== Старт =====
+        applyTotal();
+        render();
+
+        earthGroup.getWorldPosition(earthWorldPos);
+        camera.position.copy(earthWorldPos).add(new THREE.Vector3(60, 40, 80));
+        controls.target.copy(earthWorldPos);
+        sunDir.copy(earthWorldPos).normalize();
+        sunLight.position.copy(earthWorldPos).addScaledVector(sunDir, -150);
+        sunLight.target.position.copy(earthWorldPos);
+        controls.update();
+
+        requestAnimationFrame(animate);
+
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+    </script>
+</body>
+</html>
