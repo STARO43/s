@@ -14,9 +14,8 @@
             font-family: 'Orbitron', 'Segoe UI', 'Arial', sans-serif;
             user-select: none; -webkit-user-select: none;
         }
-        /* 1. Убраны cursor: grab и grabbing, теперь стандартный курсор */
         canvas { display: block; cursor: default; }
-        
+
         /* ===== Полупрозрачные часы в стиле «Космос» ===== */
         #clock {
             position: fixed;
@@ -35,12 +34,12 @@
                 inset 0 0 30px rgba(255, 255, 255, 0.08);
             z-index: 50;
             touch-action: none;
-            cursor: default; /* 1. Убран курсор-рука */
+            cursor: default;
             opacity: 0.9;
             transition: opacity 0.3s ease, transform 0.2s ease;
         }
         #clock:hover { opacity: 1; }
-        #clock:active { cursor: default; transform: translateX(-50%) scale(1.02); } /* 1. Убран курсор-рука */
+        #clock:active { cursor: default; transform: translateX(-50%) scale(1.02); }
         #clock svg {
             position: absolute;
             inset: 0;
@@ -66,9 +65,9 @@
         .hand { stroke-linecap: round; stroke-linejoin: round; }
         #hourHand   { stroke: rgba(31, 24, 16, 0.9); stroke-width: 3; }
         #minuteHand { stroke: rgba(31, 24, 16, 0.9); stroke-width: 1.6; }
-        
-        #secondHandGroup { 
-            pointer-events: none; 
+
+        #secondHandGroup {
+            pointer-events: none;
             filter: drop-shadow(0 1px 1px rgba(0,0,0,0.3));
         }
 
@@ -83,6 +82,42 @@
             text-anchor: middle;
             letter-spacing: 2px;
         }
+
+        /* ===== Плашка с датой (та же прозрачность, что и у часов) ===== */
+        #datePlate {
+            position: fixed;
+            top: 24px;
+            right: 24px;
+            padding: 10px 18px 12px;
+            border-radius: 16px;
+            background: rgba(242, 239, 232, 0.35);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            border: 1px solid rgba(60, 50, 35, 0.35);
+            box-shadow:
+                0 8px 32px rgba(0, 0, 0, 0.5),
+                inset 0 0 30px rgba(255, 255, 255, 0.08);
+            z-index: 50;
+            opacity: 0.9;
+            text-align: center;
+            line-height: 1.15;
+            pointer-events: none;
+            white-space: nowrap;
+        }
+        #dpDate {
+            font-size: 11px;
+            font-weight: 500;
+            letter-spacing: 2px;
+            color: rgba(58, 48, 38, 0.85);
+            text-transform: lowercase;
+        }
+        #dpYear {
+            margin-top: 4px;
+            font-size: 22px;
+            font-weight: 700;
+            letter-spacing: 3px;
+            color: rgba(31, 24, 16, 0.9);
+        }
     </style>
 </head>
 <body>
@@ -94,7 +129,7 @@
 
             <line id="hourHand"   class="hand" x1="65" y1="65" x2="65" y2="36" />
             <line id="minuteHand" class="hand" x1="65" y1="65" x2="65" y2="18" />
-            
+
             <g id="secondHandGroup">
                 <line x1="65" y1="65" x2="65" y2="74" stroke="#e63946" stroke-width="1.5" stroke-linecap="round" />
                 <line x1="65" y1="65" x2="65" y2="22" stroke="#e63946" stroke-width="1" stroke-linecap="round" />
@@ -106,6 +141,11 @@
             <circle class="center-dot"  cx="65" cy="65" r="1.2" />
             <text class="brand" x="65" y="44">КОСМОС</text>
         </svg>
+    </div>
+
+    <div id="datePlate">
+        <div id="dpDate">—</div>
+        <div id="dpYear">—</div>
     </div>
 
     <script type="importmap">
@@ -125,15 +165,17 @@
         import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
 
         const SIDEREAL_MONTH_HOURS = 27 * 24 + 7 + 43 / 60;
+        const SIDEREAL_MONTH_MINUTES = SIDEREAL_MONTH_HOURS * 60;
         const EARTH_DAY_HOURS = 24;
         const EARTH_YEAR_MINUTES = 365.25 * 24 * 60;
         const TIME_SCALE = 1;
+        const DEG = Math.PI / 180;
 
         const scene = new THREE.Scene();
         scene.background = new THREE.Color(0x03040a);
 
         const camera = new THREE.PerspectiveCamera(40, window.innerWidth / window.innerHeight, 0.1, 8000);
-        
+
         const renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: 'high-performance' });
         renderer.setSize(window.innerWidth, window.innerHeight);
         renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
@@ -162,12 +204,27 @@
         const SUN_X = 0, SUN_Y = 0, SUN_Z = 0;
         const SUN_RADIUS = 40;
 
-        const sunLight = new THREE.PointLight(0xffeedd, 2.0, 2000);
-        sunLight.position.set(SUN_X, SUN_Y, SUN_Z);
+        // =====================================================================
+        // 1. ИСПРАВЛЕНИЕ СВЕТА И ТЕНИ
+        //    Направленный свет теперь размещается МЕЖДУ Солнцем и Землёй
+        //    и светит точно на Землю. Это даёт правильное направление лучей
+        //    (как от Солнца) и при этом позволяет использовать очень плотную
+        //    ортографическую камеру теней — тень от Луны становится чёткой.
+        // =====================================================================
+        const sunLight = new THREE.DirectionalLight(0xffeedd, 1.6);
         sunLight.castShadow = true;
-        sunLight.shadow.mapSize.width = 2048;
-        sunLight.shadow.mapSize.height = 2048;
+        sunLight.shadow.mapSize.set(4096, 4096);
+        sunLight.shadow.camera.near = 120;
+        sunLight.shadow.camera.far = 300;
+        sunLight.shadow.camera.left = -32;
+        sunLight.shadow.camera.right = 32;
+        sunLight.shadow.camera.top = 32;
+        sunLight.shadow.camera.bottom = -32;
+        sunLight.shadow.camera.updateProjectionMatrix();
+        sunLight.shadow.bias = -0.0004;
+        sunLight.shadow.normalBias = 0.05;
         scene.add(sunLight);
+        scene.add(sunLight.target);
 
         const sunMesh = new THREE.Mesh(
             new THREE.SphereGeometry(SUN_RADIUS, 64, 64),
@@ -335,8 +392,70 @@
         const secondHandGroup = document.getElementById('secondHandGroup');
         const clockEl = document.getElementById('clock');
 
+        // =====================================================================
+        // 2. ПРИВЯЗКА К РЕАЛЬНОМУ ВРЕМЕНИ
+        //    Положение Земли, Луны и ориентация Земли вычисляются
+        //    по реальной дате и времени на момент загрузки страницы.
+        //    Дальше всё живёт в переменной totalMinutes, которую
+        //    можно крутить в обе стороны.
+        // =====================================================================
+        const J2000_MS = Date.UTC(2000, 0, 1, 12, 0, 0);
+
+        function sunEclipticLongitude(d) {
+            const L = 280.460 + 0.9856474 * d;
+            const g = (357.528 + 0.9856003 * d) * DEG;
+            return L + 1.915 * Math.sin(g) + 0.020 * Math.sin(2 * g);
+        }
+        function moonEclipticLongitude(d) {
+            const Lm = 218.316 + 13.176396 * d;
+            const Mm = (134.963 + 13.064993 * d) * DEG;
+            const Ls = 280.460 + 0.9856474 * d;
+            const D  = (Lm - Ls) * DEG;
+            return Lm
+                + 6.289 * Math.sin(Mm)
+                + 1.274 * Math.sin(2 * D - Mm)
+                + 0.658 * Math.sin(2 * D);
+        }
+
+        const startDate = new Date();
+        const localMinutes = startDate.getHours() * 60 + startDate.getMinutes()
+                           + startDate.getSeconds() / 60 + startDate.getMilliseconds() / 60000;
+        const minutesSinceJ2000 = (startDate.getTime() - J2000_MS) / 60000;
+
+        let totalMinutes = localMinutes + 1440 * Math.round((minutesSinceJ2000 - localMinutes) / 1440);
+
+        const d0 = totalMinutes / 1440;
+        const lambdaSun0   = sunEclipticLongitude(d0);
+        const lambdaMoon0  = moonEclipticLongitude(d0);
+        const lambdaEarth0 = lambdaSun0 - 180;
+
+        const ORBIT_PHASE = -lambdaEarth0 * DEG
+                          + (totalMinutes / EARTH_YEAR_MINUTES) * Math.PI * 2;
+        const MOON_PHASE  = lambdaMoon0 * DEG
+                          - (totalMinutes / SIDEREAL_MONTH_MINUTES) * Math.PI * 2;
+
+        const utcHours = startDate.getUTCHours() + startDate.getUTCMinutes() / 60 + startDate.getUTCSeconds() / 3600;
+        const subsolarLon = 180 - 15 * utcHours;
+        const earthRot0 = (subsolarLon - lambdaSun0) * DEG;
+        const t0h = ((totalMinutes / 60) % 24 + 24) % 24;
+        const EARTH_ROT_PHASE = earthRot0 + (t0h / EARTH_DAY_HOURS) * Math.PI * 2;
+
         let hour = 3, minute = 0;
-        let totalMinutes = (hour % 12) * 60 + minute;
+
+        const MONTHS_RU = ['января','февраля','марта','апреля','мая','июня',
+                           'июля','августа','сентября','октября','ноября','декабря'];
+        const dpDateEl = document.getElementById('dpDate');
+        const dpYearEl = document.getElementById('dpYear');
+        let lastDateKey = null;
+
+        function updateDatePlate() {
+            const key = Math.round(totalMinutes);
+            if (key === lastDateKey) return;
+            lastDateKey = key;
+            const dt = new Date(J2000_MS + key * 60000);
+            dpDateEl.textContent = dt.getDate() + ' ' + MONTHS_RU[dt.getMonth()];
+            dpYearEl.textContent = String(dt.getFullYear());
+        }
 
         function render() {
             const hourDeg = (hour % 12) * 30 + minute * 0.5;
@@ -348,19 +467,25 @@
             minuteHand.setAttribute('transform', `rotate(${minuteDeg} ${CX} ${CY})`);
             secondHandGroup.setAttribute('transform', `rotate(${secondDeg} ${CX} ${CY})`);
 
-            const totalHoursScene = totalMinutes / 60;
-            const tEarth = ((totalHoursScene % 24) + 24) % 24;
-            earthGroup.rotation.y = (tEarth / EARTH_DAY_HOURS) * Math.PI * 2;
-            if (cloudMesh) cloudMesh.rotation.y = (tEarth / EARTH_DAY_HOURS) * Math.PI * 2 * 1.15;
+            const tH = ((totalMinutes / 60) % 24 + 24) % 24;
+            const earthRot = EARTH_ROT_PHASE - (tH / EARTH_DAY_HOURS) * Math.PI * 2;
+            const orbitRot = ORBIT_PHASE - (totalMinutes / EARTH_YEAR_MINUTES) * Math.PI * 2;
 
-            const earthOrbitAngle = ((totalMinutes / EARTH_YEAR_MINUTES) * Math.PI * 2);
-            earthOrbitPivot.rotation.y = earthOrbitAngle;
+            earthGroup.rotation.y = earthRot;
+            if (cloudMesh) cloudMesh.rotation.y = -(tH / EARTH_DAY_HOURS) * Math.PI * 2 * 0.15;
+            earthOrbitPivot.rotation.y = orbitRot;
 
-            const moonAngle = ((totalMinutes / 60) / SIDEREAL_MONTH_HOURS) * Math.PI * 2;
+            const moonWorldAngle = MOON_PHASE + (totalMinutes / SIDEREAL_MONTH_MINUTES) * Math.PI * 2;
+            const moonLocalAngle = moonWorldAngle + earthRot + orbitRot;
             if (moonMesh) {
-                moonMesh.position.set(Math.cos(moonAngle) * orbitRadius, 0, Math.sin(moonAngle) * orbitRadius);
-                moonMesh.rotation.y = -moonAngle + Math.PI;
+                moonMesh.position.set(
+                    Math.cos(moonLocalAngle) * orbitRadius, 0,
+                    Math.sin(moonLocalAngle) * orbitRadius
+                );
+                moonMesh.rotation.y = -moonLocalAngle + Math.PI;
             }
+
+            updateDatePlate();
         }
 
         function applyTotal() {
@@ -421,7 +546,7 @@
                     if (relR < 0.35) dragMode = 'hour';
                     else if (relR > 0.55) dragMode = 'minute';
                     else dragMode = angleDiff(ang, minAng) <= angleDiff(ang, hourAng) ? 'minute' : 'hour';
-                    
+
                     lastAngle = ang; dragging = true;
                 } else {
                     gesture.mode = 'other';
@@ -440,9 +565,15 @@
                     applyTotal();
                 } else {
                     const h = (ang - minute * 0.5) / 30;
-                    let newHour = ((Math.round(h) % 12) + 12) % 12;
-                    hour = newHour === 0 ? 12 : newHour;
-                    totalMinutes = ((hour % 12) * 60 + minute);
+                    const newHour12 = ((Math.round(h) % 12) + 12) % 12;
+                    const curHour12 = ((Math.floor(totalMinutes / 60) % 12) + 12) % 12;
+                    let diff = newHour12 - curHour12;
+                    if (diff > 6) diff -= 12;
+                    if (diff < -6) diff += 12;
+                    if (diff !== 0) {
+                        totalMinutes += diff * 60;
+                        applyTotal();
+                    }
                 }
                 lastAngle = ang;
                 render();
@@ -451,7 +582,6 @@
 
         function endGesture() {
             if (!gesture) return;
-            const wasDrag = gesture.mode === 'drag';
             gesture = null; dragging = false; dragMode = null;
             autoAdvance = true;
         }
@@ -484,8 +614,7 @@
                     autoAdvance = false;
                     lastEarthDragX = clientX;
                     controls.enabled = false;
-                    // 1. Убрано изменение курсора на 'grabbing', теперь остаётся 'default'
-                    if(e.cancelable !== false) e.preventDefault();
+                    if (e.cancelable !== false) e.preventDefault();
                 }
             }
         }
@@ -499,7 +628,7 @@
             totalMinutes += deltaX * 0.6;
             applyTotal();
             render();
-            if(e.cancelable !== false) e.preventDefault();
+            if (e.cancelable !== false) e.preventDefault();
         }
 
         function handleEarthEnd() {
@@ -518,8 +647,8 @@
         window.addEventListener('touchend', handleEarthEnd);
 
         let lastTime = performance.now();
-        // 2. Вектор для хранения мировых координат Земли (для слежения камеры)
         const earthWorldPos = new THREE.Vector3();
+        const sunDir = new THREE.Vector3();
 
         function tickAuto(now) {
             const dt = (now - lastTime) / 1000;
@@ -530,27 +659,41 @@
                 applyTotal();
                 render();
             }
-            
+
             if (sunGlow) sunGlow.material.opacity = 0.82 + Math.sin(now * 0.002) * 0.08;
         }
 
         function animate(now) {
             requestAnimationFrame(animate);
             tickAuto(now || performance.now());
-            
-            // 2. Камера плавно следует за Землей, чтобы она всегда была в центре внимания
+
             earthGroup.getWorldPosition(earthWorldPos);
             controls.target.lerp(earthWorldPos, 0.05);
-            
+
+            // =================================================================
+            // ИСПРАВЛЕНИЕ: свет размещается МЕЖДУ Солнцем и Землёй,
+            // чтобы направление лучей совпадало с реальным (от Солнца).
+            // =================================================================
+            sunDir.copy(earthWorldPos).normalize(); // вектор от Солнца (0,0,0) к Земле
+            sunLight.position.copy(earthWorldPos).addScaledVector(sunDir, -150); // ставим свет на линии Солнце–Земля, ближе к Земле
+            sunLight.target.position.copy(earthWorldPos); // светим точно на Землю
+
             controls.update();
             composer.render();
         }
 
-        // 2. Начальная позиция камеры настроена так, чтобы смотреть прямо на Землю
-        camera.position.set(EARTH_ORBIT_RADIUS + 60, 40, 80);
-        controls.target.set(EARTH_ORBIT_RADIUS, 0, 0);
-
+        // ===== Старт: сразу ставим камеру и свет к текущему положению Земли =====
+        applyTotal();
         render();
+
+        earthGroup.getWorldPosition(earthWorldPos);
+        camera.position.copy(earthWorldPos).add(new THREE.Vector3(60, 40, 80));
+        controls.target.copy(earthWorldPos);
+        sunDir.copy(earthWorldPos).normalize();
+        sunLight.position.copy(earthWorldPos).addScaledVector(sunDir, -150);
+        sunLight.target.position.copy(earthWorldPos);
+        controls.update();
+
         requestAnimationFrame(animate);
 
         window.addEventListener('resize', () => {
