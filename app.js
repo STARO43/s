@@ -2726,8 +2726,8 @@ function initArticles() {
                 a.rel = 'noopener noreferrer';
 
                 const num = document.createElement('span');
-num.className = 'parents-num';
-num.textContent = toRomanLower(idx + 1) + ')';
+                num.className = 'parents-num';
+                num.textContent = toRomanLower(i + 1) + ')';
 
                 const body = document.createElement('div');
                 body.className = 'parents-body';
@@ -2916,7 +2916,7 @@ num.textContent = toRomanLower(idx + 1) + ')';
 
                 const num = document.createElement('span');
                 num.className = 'parents-num';
-                num.textContent = String(idx + 1).padStart(2, '0');
+                num.textContent = toRomanLower(idx + 1) + ')';
 
                 const body = document.createElement('div');
                 body.className = 'parents-body';
@@ -3079,54 +3079,6 @@ num.textContent = toRomanLower(idx + 1) + ')';
             .finally(() => { handleHash(); });
     });
 }
-
-/* ---------- 6.8 GAMES — выход по Esc ---------- */
-function initGames() {
-    once('games', () => {
-        const overlay = document.createElement('div');
-        overlay.className = 'exit-overlay';
-        overlay.setAttribute('aria-hidden', 'true');
-        overlay.innerHTML = `
-            <div class="exit-dialog">
-                <div class="exit-dialog-title">ВЫЙТИ В МЕНЮ?</div>
-                <div class="exit-dialog-buttons">
-                    <button type="button" class="exit-btn exit-btn-yes">ДА</button>
-                    <button type="button" class="exit-btn exit-btn-no">НЕТ</button>
-                </div>
-            </div>
-        `;
-        document.body.appendChild(overlay);
-
-        const btnYes = overlay.querySelector('.exit-btn-yes');
-        const btnNo  = overlay.querySelector('.exit-btn-no');
-
-        function showExit() {
-            overlay.classList.add('show');
-            overlay.setAttribute('aria-hidden', 'false');
-        }
-        function hideExit() {
-            overlay.classList.remove('show');
-            overlay.setAttribute('aria-hidden', 'true');
-        }
-
-        btnYes.addEventListener('click', () => {
-            window.location.href = 'index.html';
-        });
-        btnNo.addEventListener('click', hideExit);
-
-        overlay.addEventListener('click', (e) => {
-            if (e.target === overlay) hideExit();
-        });
-
-        document.addEventListener('keydown', (e) => {
-            if (e.key === 'Escape') {
-                if (overlay.classList.contains('show')) hideExit();
-                else showExit();
-            }
-        });
-    });
-}
-
 /* ============================================================
    7. СТРАНИЦА И СТАРТ
    ============================================================ */
