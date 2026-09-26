@@ -482,6 +482,7 @@
     transform: rotate(8deg);
   }
 
+  /* ===== ЧАСЫ (реальное время) ===== */
   .clock {
     position: absolute;
     top: 12%;
@@ -495,23 +496,154 @@
     box-shadow: 0 0 0 2px #0a0604, 3px 3px 0 rgba(0,0,0,0.6);
     filter: brightness(0.7);
   }
-  .clock::before {
-    content: "";
+  .clock-face {
     position: absolute;
-    top: 50%; left: 50%;
-    width: 3px; height: 15px;
-    background: #1a1208;
-    transform: translate(-50%, -100%) rotate(40deg);
-    transform-origin: bottom center;
+    inset: 4px;
+    border-radius: 50%;
+    background: #8a8070;
   }
-  .clock::after {
+  .clock-hand {
+    position: absolute;
+    left: 50%;
+    bottom: 50%;
+    transform-origin: bottom center;
+    background: #1a1208;
+    border-radius: 1px;
+    z-index: 2;
+  }
+  .clock-hand.hour {
+    width: 3px;
+    height: 12px;
+    margin-left: -1.5px;
+  }
+  .clock-hand.minute {
+    width: 2px;
+    height: 16px;
+    margin-left: -1px;
+  }
+  .clock-hand.second {
+    width: 1px;
+    height: 17px;
+    margin-left: -0.5px;
+    background: #8a1a1a;
+  }
+
+  /* ===== ПЛАКАТ «УХОДЯ ГАСИ СВЕТ» (уменьшен на 20%) ===== */
+  .poster {
+    position: absolute;
+    top: 10%;
+    left: 5%;
+    width: 96px;
+    height: 128px;
+    z-index: 35;
+    background: #e8b830;
+    border: 2px solid #a08020;
+    box-shadow:
+      0 0 0 1px #5a4a2a,
+      3px 4px 0 rgba(0,0,0,0.45);
+    cursor: default;
+    user-select: none;
+    -webkit-user-select: none;
+    -webkit-tap-highlight-color: transparent;
+    overflow: hidden;
+  }
+  /* лёгкая "бумажная" текстура */
+  .poster::after {
     content: "";
     position: absolute;
-    top: 50%; left: 50%;
-    width: 3px; height: 10px;
-    background: #1a1208;
-    transform: translate(-50%, -100%) rotate(160deg);
-    transform-origin: bottom center;
+    inset: 0;
+    background-image:
+      repeating-linear-gradient(0deg,
+        transparent 0px, transparent 3px,
+        rgba(0,0,0,0.025) 3px, rgba(0,0,0,0.025) 4px);
+    pointer-events: none;
+  }
+  /* текст «УХОДЯ ГАСИ СВЕТ!» */
+  .poster-text {
+    position: absolute;
+    top: 8px;
+    left: 6px;
+    right: 34px;
+    font-family: 'Press Start 2P', monospace;
+    font-size: 7px;
+    line-height: 1.45;
+    color: #1a1a1a;
+    letter-spacing: 1px;
+    text-align: left;
+    text-transform: uppercase;
+    z-index: 2;
+  }
+  .poster-text span {
+    display: block;
+  }
+  /* рука с указательным пальцем */
+  .poster-hand {
+    position: absolute;
+    right: 8px;
+    bottom: 0;
+    width: 46px;
+    height: 78px;
+    z-index: 3;
+  }
+  /* указательный палец */
+  .poster-finger {
+    position: absolute;
+    top: 0;
+    left: 14px;
+    width: 12px;
+    height: 48px;
+    background: #c62828;
+    border-radius: 6px 6px 0 0;
+  }
+  /* остальные пальцы (загнутые) */
+  .poster-knuckle {
+    position: absolute;
+    width: 10px;
+    height: 14px;
+    background: #c62828;
+    border-radius: 4px;
+  }
+  .poster-knuckle.k1 { top: 40px; left: 8px; }
+  .poster-knuckle.k2 { top: 48px; left: 20px; }
+  .poster-knuckle.k3 { top: 54px; left: 32px; }
+  /* ладонь / основание руки */
+  .poster-palm {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 32px;
+    background: #c62828;
+    border-radius: 4px 4px 0 0;
+  }
+  /* маленький выключатель в углу */
+  .poster-switch {
+    position: absolute;
+    top: 6px;
+    right: 6px;
+    width: 20px;
+    height: 20px;
+    border: 1.5px solid #1a1a1a;
+    background: #e8b830;
+    z-index: 4;
+  }
+  .poster-switch::before {
+    content: "";
+    position: absolute;
+    top: 3px;
+    left: 3px;
+    width: 12px;
+    height: 12px;
+    background: #1a1a1a;
+  }
+  .poster-switch::after {
+    content: "";
+    position: absolute;
+    top: 5px;
+    left: 5px;
+    width: 8px;
+    height: 8px;
+    background: #e8b830;
   }
 
   .cabinet {
@@ -1026,11 +1158,34 @@
     <div class="curtain-rod"></div>
   </div>
 
-  <div class="clock"></div>
+  <!-- Часы с реальным временем -->
+  <div class="clock">
+    <div class="clock-face"></div>
+    <div class="clock-hand hour" id="clockHour"></div>
+    <div class="clock-hand minute" id="clockMinute"></div>
+    <div class="clock-hand second" id="clockSecond"></div>
+  </div>
 
   <div class="carpet"></div>
 
   <div class="tv-glow"></div>
+
+  <!-- Плакат «УХОДЯ ГАСИ СВЕТ!» -->
+  <div class="poster" id="posterBtn">
+    <div class="poster-text">
+      <span>УХОДЯ,</span>
+      <span>ГАСИ</span>
+      <span>СВЕТ!</span>
+    </div>
+    <div class="poster-switch"></div>
+    <div class="poster-hand">
+      <div class="poster-finger"></div>
+      <div class="poster-knuckle k1"></div>
+      <div class="poster-knuckle k2"></div>
+      <div class="poster-knuckle k3"></div>
+      <div class="poster-palm"></div>
+    </div>
+  </div>
 
   <div class="cabinet">
     <div class="cabinet-body">
@@ -1088,16 +1243,12 @@
   'use strict';
 
   var games = [
-    { id: 'road', title: 'Переходим дорогу', url: 'pdd.html' },
     { id: 'fox',  title: 'Лисичка-истеричка', url: 'lisichka.html' }
   ];
 
   var currentIndex = 0;
-  var rotation = 0;
 
   var menuEl    = document.getElementById('gameMenu');
-  var switchEl  = document.getElementById('roundSwitch');
-  var handleEl  = document.getElementById('roundHandle');
   var screenEl  = document.getElementById('tvScreen');
   var rainEl    = document.getElementById('rain');
 
@@ -1170,32 +1321,31 @@
     }, 900);
   }
 
-  function rotateSwitch() {
-    rotation += 180;
-    handleEl.style.transform = 'rotate(' + rotation + 'deg)';
-
-    screenEl.classList.add('changing');
-
-    setTimeout(function() {
-      currentIndex = currentIndex === 0 ? 1 : 0;
-      renderMenu();
-    }, 270);
-
-    setTimeout(function() {
-      screenEl.classList.remove('changing');
-    }, 580);
-  }
-
   createRain();
   renderMenu();
-  handleEl.style.transform = 'rotate(0deg)';
 
-  switchEl.addEventListener('click', rotateSwitch);
-  switchEl.addEventListener('mousedown', function(e) { e.preventDefault(); });
+  /* ====== ЧАСЫ — реальное время ====== */
+  function updateClock() {
+    var now = new Date();
+    var seconds = now.getSeconds();
+    var minutes = now.getMinutes();
+    var hours = now.getHours();
+
+    var secondDeg = seconds * 6;
+    var minuteDeg = minutes * 6 + seconds * 0.1;
+    var hourDeg = (hours % 12) * 30 + minutes * 0.5;
+
+    document.getElementById('clockSecond').style.transform = 'translateX(-50%) rotate(' + secondDeg + 'deg)';
+    document.getElementById('clockMinute').style.transform = 'translateX(-50%) rotate(' + minuteDeg + 'deg)';
+    document.getElementById('clockHour').style.transform = 'translateX(-50%) rotate(' + hourDeg + 'deg)';
+  }
+  updateClock();
+  setInterval(updateClock, 1000);
+
 })();
 </script>
 
-<!-- Esc → «ВЫЙТИ В МЕНЮ?» -->
+<!-- Плакат → «ВЫЙТИ В МЕНЮ?» -->
 <script>
 (function() {
   'use strict';
@@ -1215,6 +1365,7 @@
 
   var btnYes = overlay.querySelector('.exit-btn-yes');
   var btnNo  = overlay.querySelector('.exit-btn-no');
+  var poster = document.getElementById('posterBtn');
 
   function show() {
     overlay.classList.add('show');
@@ -1233,6 +1384,8 @@
   overlay.addEventListener('click', function(e) {
     if (e.target === overlay) hide();
   });
+
+  poster.addEventListener('click', show);
 
   document.addEventListener('keydown', function(e) {
     if (e.key === 'Escape') {
