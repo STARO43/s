@@ -2938,11 +2938,12 @@ num.textContent = String(idx + 1).padStart(2, '0');
                 card.appendChild(body);
                 card.appendChild(arrow);
 
-                card.addEventListener('click', (e) => {
-                    if (window.location.hash === card.getAttribute('href')) {
-                        e.preventDefault();
-                        openBySlug(slug);
+                               card.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    if (window.location.hash !== card.getAttribute('href')) {
+                        history.pushState('', document.title, card.getAttribute('href'));
                     }
+                    openBySlug(slug);
                 });
 
                 frag.appendChild(card);
