@@ -133,6 +133,11 @@ function playEntryAnimation(onDone) {
 let _menuBound = false;
 
 function openMenu() {
+    // Если открыт ридер статьи — закрываем его и сбрасываем hash
+    if (typeof window.__gramotinoCloseArticle === 'function') {
+        window.__gramotinoCloseArticle();
+    }
+
     const menu = document.getElementById('burgerMenu');
     const btn  = document.getElementById('burgerBtn');
     if (!menu || !btn) return;
@@ -2654,7 +2659,7 @@ function initArt() {
     });
 }
 
-/* ---------- 6.7 ARTICLES ---------- */
+/* ---------- 6.7 ARTICLES (ПЕДАГОГИКА) ---------- */
 function initArticles() {
     once('articles', () => {
         const INDEX_URL      = 'articles/index.json';
@@ -2662,19 +2667,91 @@ function initArticles() {
         const HASH_PREFIX    = '#article/';
         const ARTICLE_SUFFIX = '.md';
 
-        const list           = document.getElementById('parentsList');
         const reader         = document.getElementById('reader');
         const readerBody     = document.getElementById('readerBody');
         const readerTitle    = document.getElementById('readerTitle');
         const readerContent  = document.getElementById('readerContent');
         const readerTime     = document.getElementById('readerTime');
         const progressFill   = document.getElementById('progressFill');
-        const backBtn        = document.getElementById('backBtn');
-        const closeBtn       = document.getElementById('closeBtn');
-        const typewriterBtn  = document.getElementById('typewriterToggle');
 
-        if (!list || !reader) return;
+        const listArticles   = document.getElementById('articlesList');
+        const listClassics   = document.getElementById('classicsList');
+        const listLectures   = document.getElementById('lecturesList');
 
+        if (!reader) return;
+
+        /* ---------- ЛЕКЦИИ (жёстко зашиты) ---------- */
+        const LECTURES = [
+            {
+                title: 'Катерина Мурашова — Мифы о воспитании',
+                url: 'https://rutube.ru/video/2682b8d57013da9808ca3aff3915a1d9/'
+            },
+            {
+                title: 'Лекция 2',
+                url: 'https://rutube.ru/video/9d513d4b017437fef934b1dd3ea1ca33/'
+            },
+            {
+                title: 'Лекция 3',
+                url: 'https://rutube.ru/video/196e1f77157584c4bb110baa361992fe/'
+            },
+            {
+                title: 'Лекция 4',
+                url: 'https://rutube.ru/video/9972f63838c5766ce6d12dfefe950219/'
+            }
+        ];
+
+        function renderLectures() {
+            if (!listLectures) return;
+            listLectures.innerHTML = '';
+            const frag = document.createDocumentFragment();
+            LECTURES.forEach((lec, i) => {
+                const a = document.createElement('a');
+                a.className = 'parents-card lecture-card';
+                a.href = lec.url;
+                a.target = '_blank';
+                a.rel = 'noopener noreferrer';
+
+                const num = document.createElement('span');
+                num.className = 'parents-num';
+                num.textContent = String(i + 1).padStart(2, '0');
+
+                const body = document.createElement('div');
+                body.className = 'parents-body';
+
+                const label = document.createElement('div');
+                label.className = 'parents-label';
+                const dot = document.createElement('span');
+                dot.className = 'dot';
+                const labelText = document.createElement('span');
+                labelText.textContent = 'ЛЕКЦИЯ · RUTUBE';
+                label.appendChild(dot);
+                label.appendChild(labelText);
+
+                const titleEl = document.createElement('div');
+                titleEl.className = 'parents-title';
+                titleEl.textContent = lec.title;
+
+                const line = document.createElement('span');
+                line.className = 'parents-title-line';
+
+                body.appendChild(label);
+                body.appendChild(titleEl);
+                body.appendChild(line);
+
+                const arrow = document.createElement('span');
+                arrow.className = 'parents-arrow';
+                arrow.textContent = '→';
+
+                a.appendChild(num);
+                a.appendChild(body);
+                a.appendChild(arrow);
+
+                frag.appendChild(a);
+            });
+            listLectures.appendChild(frag);
+        }
+
+        /* ---------- СТАТЬИ / КЛАССИКА ---------- */
         const indexCache   = { loaded: false, data: [] };
         const articleCache = new Map();
         let readingSlug    = null;
@@ -2789,27 +2866,31 @@ function initArticles() {
             return text;
         }
 
-        function renderLoading() {
-            list.innerHTML = '<div class="parents-state">ЗАГРУЗКА…</div>';
+        function renderLoading(container) {
+            if (!container) return;
+            container.innerHTML = '<div class="parents-state">ЗАГРУЗКА…</div>';
         }
-        function renderError(msg) {
-            list.innerHTML = '';
+        function renderError(container, msg) {
+            if (!container) return;
+            container.innerHTML = '';
             const div = document.createElement('div');
             div.className = 'parents-state is-error';
             div.innerHTML = 'НЕ УДАЛОСЬ ЗАГРУЗИТЬ СТАТЬИ' +
                 '<small>' + esc(msg) +
                 '<br>Убедитесь, что сайт открыт через веб-сервер (не file://), а файл articles/index.json существует.</small>';
-            list.appendChild(div);
+            container.appendChild(div);
         }
-        function renderEmpty() {
-            list.innerHTML = '<div class="parents-state">ПОКА НЕТ СТАТЕЙ<small>Создайте articles/index.json и добавьте первый материал</small></div>';
+        function renderEmpty(container, text) {
+            if (!container) return;
+            container.innerHTML = '<div class="parents-state">' + (text || 'ПОКА НЕТ МАТЕРИАЛОВ') + '</div>';
         }
 
-        function renderList(items) {
-            list.innerHTML = '';
-            if (!items.length) { renderEmpty(); return; }
+        function renderList(container, items, opts = {}) {
+            if (!container) return;
+            container.innerHTML = '';
+            if (!items.length) { renderEmpty(container, opts.emptyText); return; }
             const frag = document.createDocumentFragment();
-            items.forEach((item) => {
+            items.forEach((item, idx) => {
                 const slug  = String(item.slug || '').trim();
                 const title = String(item.title || slug || 'Без названия');
                 if (!slug) return;
@@ -2821,6 +2902,7 @@ function initArticles() {
 
                 const num = document.createElement('span');
                 num.className = 'parents-num';
+                num.textContent = String(idx + 1).padStart(2, '0');
 
                 const body = document.createElement('div');
                 body.className = 'parents-body';
@@ -2830,7 +2912,7 @@ function initArticles() {
                 const dot = document.createElement('span');
                 dot.className = 'dot';
                 const labelText = document.createElement('span');
-                labelText.textContent = 'ЗАМЕТКИ · РАЗМЫШЛЕНИЯ · ТЕОРИЯ';
+                labelText.textContent = opts.label || 'ЗАМЕТКИ · РАЗМЫШЛЕНИЯ · ТЕОРИЯ';
                 label.appendChild(dot);
                 label.appendChild(labelText);
 
@@ -2862,7 +2944,7 @@ function initArticles() {
 
                 frag.appendChild(card);
             });
-            list.appendChild(frag);
+            container.appendChild(frag);
         }
 
         function readTime(text) {
@@ -2920,6 +3002,8 @@ function initArticles() {
                 closeReader();
             }
         }
+        // ← ГЛАВНОЕ: делаем закрытие доступным для бургер-меню
+        window.__gramotinoCloseArticle = closeArticle;
 
         function handleHash() {
             const hash = window.location.hash;
@@ -2938,24 +3022,6 @@ function initArticles() {
         if (backBtnTop)    backBtnTop.addEventListener('click', closeArticle);
         if (backBtnBottom) backBtnBottom.addEventListener('click', closeArticle);
 
-        if (typewriterBtn) {
-            let lastTap = 0;
-            const toggleAlt = (e) => {
-                if (e) { e.preventDefault(); e.stopPropagation(); }
-                reader.classList.toggle('reader-alt');
-            };
-            typewriterBtn.addEventListener('click', (e) => {
-                const now = Date.now();
-                if (now - lastTap < 350) {
-                    lastTap = 0;
-                    toggleAlt(e);
-                } else {
-                    lastTap = now;
-                }
-            });
-            typewriterBtn.addEventListener('dblclick', toggleAlt);
-        }
-
         document.addEventListener('keydown', (e) => {
             if (reader.classList.contains('show') && e.key === 'Escape') closeArticle();
         });
@@ -2968,10 +3034,34 @@ function initArticles() {
             }, { passive: true });
         }
 
-        renderLoading();
+        renderLoading(listArticles);
+        renderLoading(listClassics);
+        renderLectures();
+
         loadIndex()
-            .then((items) => renderList(items))
-            .catch((err) => { console.warn('Parents:', err); renderError(err.message || 'Ошибка загрузки'); })
+            .then((items) => {
+                // Классика — всё, где в slug/названии есть "макаренко"
+                const isMakarenko = (it) => {
+                    const hay = ((it.slug || '') + ' ' + (it.title || '')).toLowerCase();
+                    return hay.includes('макаренко');
+                };
+                const classics = items.filter(isMakarenko);
+                const articles = items.filter((it) => !isMakarenko(it));
+
+                renderList(listArticles, articles, {
+                    label: 'СТАТЬИ · ВОСПИТАНИЕ · ПРАКТИКА',
+                    emptyText: 'ПОКА НЕТ СТАТЕЙ'
+                });
+                renderList(listClassics, classics, {
+                    label: 'КЛАССИКА · А. С. МАКАРЕНКО',
+                    emptyText: 'ПОКА НЕТ МАТЕРИАЛОВ'
+                });
+            })
+            .catch((err) => {
+                console.warn('Articles:', err);
+                renderError(listArticles, err.message || 'Ошибка загрузки');
+                renderError(listClassics, err.message || 'Ошибка загрузки');
+            })
             .finally(() => { handleHash(); });
     });
 }
