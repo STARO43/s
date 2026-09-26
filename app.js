@@ -2680,6 +2680,20 @@ function initArticles() {
 
         if (!reader) return;
 
+        /* ---------- РИМСКИЕ СТРОЧНЫЕ: i, ii, iii... ---------- */
+        function toRomanLower(n) {
+            const map = [
+                [1000,'m'],[900,'cm'],[500,'d'],[400,'cd'],
+                [100,'c'],[90,'xc'],[50,'l'],[40,'xl'],
+                [10,'x'],[9,'ix'],[5,'v'],[4,'iv'],[1,'i']
+            ];
+            let res = '';
+            for (const [v, s] of map) {
+                while (n >= v) { res += s; n -= v; }
+            }
+            return res;
+        }
+
         /* ---------- ЛЕКЦИИ (жёстко зашиты) ---------- */
         const LECTURES = [
             {
@@ -2687,15 +2701,15 @@ function initArticles() {
                 url: 'https://rutube.ru/video/2682b8d57013da9808ca3aff3915a1d9/'
             },
             {
-                title: 'Лекция 2',
+                title: 'Катерина Мурашова об индивидуальном подходе',
                 url: 'https://rutube.ru/video/9d513d4b017437fef934b1dd3ea1ca33/'
             },
             {
-                title: 'Лекция 3',
+                title: 'Катерина Мурашова — ребёнок не хочет учиться',
                 url: 'https://rutube.ru/video/196e1f77157584c4bb110baa361992fe/'
             },
             {
-                title: 'Лекция 4',
+                title: 'Катерина Мурашова — Школа. Уроки. Быт',
                 url: 'https://rutube.ru/video/9972f63838c5766ce6d12dfefe950219/'
             }
         ];
@@ -2712,8 +2726,8 @@ function initArticles() {
                 a.rel = 'noopener noreferrer';
 
                 const num = document.createElement('span');
-                num.className = 'parents-num';
-                num.textContent = String(i + 1).padStart(2, '0');
+num.className = 'parents-num';
+num.textContent = toRomanLower(idx + 1) + ')';
 
                 const body = document.createElement('div');
                 body.className = 'parents-body';
