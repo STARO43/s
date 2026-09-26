@@ -2681,18 +2681,7 @@ function initArticles() {
         if (!reader) return;
 
         /* ---------- РИМСКИЕ СТРОЧНЫЕ: i, ii, iii... ---------- */
-        function toRomanLower(n) {
-            const map = [
-                [1000,'m'],[900,'cm'],[500,'d'],[400,'cd'],
-                [100,'c'],[90,'xc'],[50,'l'],[40,'xl'],
-                [10,'x'],[9,'ix'],[5,'v'],[4,'iv'],[1,'i']
-            ];
-            let res = '';
-            for (const [v, s] of map) {
-                while (n >= v) { res += s; n -= v; }
-            }
-            return res;
-        }
+        
 
         /* ---------- ЛЕКЦИИ (жёстко зашиты) ---------- */
         const LECTURES = [
@@ -2727,7 +2716,7 @@ function initArticles() {
 
                 const num = document.createElement('span');
                 num.className = 'parents-num';
-                num.textContent = toRomanLower(i + 1) + ')';
+num.textContent = String(i + 1).padStart(2, '0');
 
                 const body = document.createElement('div');
                 body.className = 'parents-body';
@@ -2916,7 +2905,7 @@ function initArticles() {
 
                 const num = document.createElement('span');
                 num.className = 'parents-num';
-                num.textContent = toRomanLower(idx + 1) + ')';
+num.textContent = String(idx + 1).padStart(2, '0');
 
                 const body = document.createElement('div');
                 body.className = 'parents-body';
