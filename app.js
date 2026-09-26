@@ -12,6 +12,21 @@ const SPEED_MULT = IS_MOBILE ? 0.65 : 1;
 const $  = (sel, root = document) => root.querySelector(sel);
 const $$ = (sel, root = document) => Array.from(root.querySelectorAll(sel));
 
+ 
+const GRAMOTINO_UPDATES = [
+    { date: '18 · 09 · 2026', title: 'АЗБУКА ПОПОЛНЕНА',      text: 'Новые слоги и короткие слова для самых маленьких читателей.' },
+    { date: '20 · 09 · 2026', title: 'ЗВУК НА iOS',           text: 'Воспроизведение звука снова работает без сбоев. Спасибо тем, кто написал об ошибке.' },
+    { date: '22 · 09 · 2026', title: 'ХРОНОЛОГИЯ ГЕРОЕВ',     text: 'Восемь биографий великих личностей Родины с ключевыми событиями эпохи.' },
+    { date: '24 · 09 · 2026', title: 'ДИКТАНТ QWERTY',        text: 'Клавиатурный диктант получил раскладку QWERTY для слепой печати.' },
+    { date: '26 · 09 · 2026', title: 'ГОЛОСА ПОЭТОВ',         text: 'Четырнадцать новых записей: Есенин, Симонов, Пушкин, Лермонтов, Некрасов.' },
+    { date: '27 · 09 · 2026', title: 'ЗАЛ ЖИВОПИСИ ОТКРЫТ',   text: 'Сорок восемь полотен творческого подъёма. Листайте жестом или колесом мыши.' }
+];
+
+function initUpdatesBlock() {
+    initKinetic();
+    initUpCards();
+}
+
 /* ============================================================
    0.1 ТЕМА
    ============================================================ */
@@ -608,6 +623,8 @@ function initHome() {
             terminalWord.addEventListener('click', openTerminal);
         }
         window.__gramotinoHomeCloseTerminal = closeTerminal;
+        initUpdatesBlock();
+
     });
 }
 
@@ -3124,4 +3141,528 @@ if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', bootstrap);
 } else {
     bootstrap();
+}
+
+
+/* ============================================================
+   8.1 КИНЕТИЧЕСКАЯ ТИПОГРАФИКА
+   ============================================================ */
+function initKinetic() {
+    const section = document.getElementById('updatesSection');
+    const canvas  = document.getElementById('kineticCanvas');
+    const counter = document.getElementById('updatesCounter');
+    if (!section || !canvas) return;
+
+    const ctx = canvas.getContext('2d');
+    let W = 0, H = 0, DPR = 1;
+    let letters = [];
+    let currentIdx = 0;
+    let phase = 'idle';        // 'enter' | 'hold' | 'exit'
+    let phaseStart = 0;
+    const HOLD_MS = 3400;
+    const ENTER_MS = 1100;
+    const EXIT_MS = 700;
+
+    function readColors() {
+        const cs = getComputedStyle(document.documentElement);
+        return {
+            text: cs.getPropertyValue('--text').trim() || '#0A0A0A',
+            red:  cs.getPropertyValue('--red').trim()  || '#D90429'
+        };
+    }
+
+    function resize() {
+        const rect = section.querySelector('.updates-kinetic').getBoundingClientRect();
+        DPR = Math.min(window.devicePixelRatio || 1, 2);
+        W = rect.width;
+        H = rect.height;
+        canvas.width = W * DPR;
+        canvas.height = H * DPR;
+        canvas.style.width = W + 'px';
+        canvas.style.height = H + 'px';
+        ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
+        // Пересобрать текущее слово
+        if (phase === 'hold') {
+            buildTargets(currentIdx);
+        }
+    }
+
+    /* Считает позиции букв для заголовка */
+    function computeTargets(text) {
+        // Подбираем размер шрифта, чтобы строка влезла в 90% ширины
+        let fontSize = Math.min(W / (text.length * 0.62), H * 0.55, 140);
+        fontSize = Math.max(fontSize, 26);
+
+        ctx.save();
+        ctx.font = `700 ${fontSize}px "Oswald", sans-serif`;
+        const spacing = fontSize * 0.02;
+        const widths = [...text].map(ch => ctx.measureText(ch).width);
+        const totalW = widths.reduce((a, b) => a + b, 0) + spacing * (text.length - 1);
+        ctx.restore();
+
+        const startX = W / 2 - totalW / 2;
+        const baseY = H / 2;
+        const targets = [];
+        let cx = startX;
+        [...text].forEach((ch, i) => {
+            targets.push({
+                ch,
+                x: cx + widths[i] / 2,
+                y: baseY,
+                size: fontSize
+            });
+            cx += widths[i] + spacing;
+        });
+        return targets;
+    }
+
+    /* Создаёт букву, летящую извне */
+    function spawnLetter(target, delay) {
+        const angle = Math.random() * Math.PI * 2;
+        const r = Math.max(W, H) * (0.7 + Math.random() * 0.5);
+        return {
+            x: W / 2 + Math.cos(angle) * r,
+            y: H / 2 + Math.sin(angle) * r,
+            vx: 0, vy: 0,
+            tx: target.x, ty: target.y,
+            ch: target.ch,
+            size: target.size,
+            alpha: 0,
+            delay: delay,
+            state: 'enter',           // 'enter' | 'settle' | 'exit'
+            rot: (Math.random() - 0.5) * 0.6,
+            rotV: 0
+        };
+    }
+
+    function buildTargets(idx) {
+        const u = GRAMOTINO_UPDATES[idx % GRAMOTINO_UPDATES.length];
+        const targets = computeTargets(u.title.toUpperCase());
+
+        // Пулы: старые буквы, которые могут стать новыми
+        const remaining = letters.slice();
+        const next = [];
+
+        // Попарно сопоставляем по символу — сохраняемся где можем
+        targets.forEach((t, i) => {
+            // Ищем букву с таким же символом
+            const foundIdx = remaining.findIndex(L => L.ch === t.ch && L.state !== 'exit');
+            if (foundIdx >= 0) {
+                const L = remaining.splice(foundIdx, 1)[0];
+                L.tx = t.x;
+                L.ty = t.y;
+                L.size = t.size;
+                L.state = 'enter';
+                L.delay = i * 22;
+                next.push(L);
+            } else {
+                next.push(spawnLetter(t, i * 22));
+            }
+        });
+
+        // Остальные буквы — на выход
+        remaining.forEach(L => {
+            L.state = 'exit';
+            const angle = Math.random() * Math.PI * 2;
+            L.exitX = W / 2 + Math.cos(angle) * W;
+            L.exitY = H / 2 + Math.sin(angle) * H;
+            next.push(L);
+        });
+
+        letters = next;
+        if (counter) {
+            counter.textContent =
+                String(idx + 1).padStart(2, '0') + ' / ' +
+                String(GRAMOTINO_UPDATES.length).padStart(2, '0');
+        }
+    }
+
+    function tick(now) {
+        const colors = readColors();
+        ctx.clearRect(0, 0, W, H);
+
+        const dt = 16;
+
+        letters.forEach(L => {
+            if (L.delay > 0) { L.delay -= dt; return; }
+
+            if (L.state === 'enter') {
+                const dx = L.tx - L.x;
+                const dy = L.ty - L.y;
+                L.vx += dx * 0.014;
+                L.vy += dy * 0.014;
+                L.vx *= 0.86;
+                L.vy *= 0.86;
+                L.x += L.vx;
+                L.y += L.vy;
+                L.alpha += (1 - L.alpha) * 0.10;
+                L.rot *= 0.94;
+
+                const dist = Math.hypot(dx, dy);
+                if (dist < 2 && Math.abs(L.vx) < 0.4) L.state = 'settle';
+            } else if (L.state === 'settle') {
+                // Микро-дыхание вокруг цели
+                L.x += (L.tx - L.x) * 0.14;
+                L.y += (L.ty - L.y) * 0.14;
+                L.alpha += (1 - L.alpha) * 0.16;
+            } else if (L.state === 'exit') {
+                const dx = L.exitX - L.x;
+                const dy = L.exitY - L.y;
+                L.vx += dx * 0.010;
+                L.vy += dy * 0.010;
+                L.vx *= 0.94;
+                L.vy *= 0.94;
+                L.x += L.vx;
+                L.y += L.vy;
+                L.alpha *= 0.92;
+                L.rotV += (Math.random() - 0.5) * 0.02;
+                L.rot += L.rotV;
+            }
+        });
+
+        // Чистим улетевшие
+        letters = letters.filter(L => !(L.state === 'exit' && L.alpha < 0.02));
+
+        // Рисуем
+        letters.forEach(L => {
+            if (L.alpha < 0.02) return;
+            ctx.save();
+            ctx.globalAlpha = L.alpha;
+            ctx.translate(L.x, L.y);
+            ctx.rotate(L.rot);
+            ctx.font = `700 ${L.size}px "Oswald", sans-serif`;
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            // Цвет: инвертируем при выходе
+            ctx.fillStyle = L.state === 'exit' ? colors.red : colors.text;
+            ctx.fillText(L.ch, 0, 0);
+            ctx.restore();
+        });
+
+        // Смена фаз
+        if (phase === 'enter') {
+            if (now - phaseStart > ENTER_MS) {
+                phase = 'hold';
+                phaseStart = now;
+            }
+        } else if (phase === 'hold') {
+            if (now - phaseStart > HOLD_MS) {
+                phase = 'exit';
+                phaseStart = now;
+                // Все буквы на выход
+                letters.forEach(L => {
+                    if (L.state !== 'exit') {
+                        L.state = 'exit';
+                        const angle = Math.random() * Math.PI * 2;
+                        L.exitX = W / 2 + Math.cos(angle) * W;
+                        L.exitY = H / 2 + Math.sin(angle) * H;
+                    }
+                });
+            }
+        } else if (phase === 'exit') {
+            if (now - phaseStart > EXIT_MS) {
+                currentIdx = (currentIdx + 1) % GRAMOTINO_UPDATES.length;
+                buildTargets(currentIdx);
+                phase = 'enter';
+                phaseStart = now;
+            }
+        } else {
+            // Старт
+            currentIdx = GRAMOTINO_UPDATES.length - 1;
+            buildTargets(currentIdx);
+            phase = 'enter';
+            phaseStart = now;
+        }
+
+        requestAnimationFrame(tick);
+    }
+
+    // IntersectionObserver — запуск, когда блок в поле зрения
+    const io = new IntersectionObserver((entries) => {
+        entries.forEach(e => {
+            if (e.isIntersecting) {
+                section.classList.add('in');
+                if (phase === 'idle') {
+                    currentIdx = GRAMOTINO_UPDATES.length - 1;
+                    buildTargets(currentIdx);
+                    phase = 'enter';
+                    phaseStart = performance.now();
+                    requestAnimationFrame(tick);
+                }
+                io.unobserve(section);
+            }
+        });
+    }, { threshold: 0.15 });
+    io.observe(section);
+
+    window.addEventListener('resize', () => {
+        resize();
+    });
+    // Первичная инициализация размеров
+    setTimeout(resize, 80);
+}
+
+/* ============================================================
+   8.2 ЖИВОЙ ЗВУК · СЮДА
+   ============================================================ */
+function initLive() {
+    const square = document.getElementById('liveSquare');
+    const canvas = document.getElementById('liveCanvas');
+    if (!square || !canvas) return;
+
+    const ctx = canvas.getContext('2d');
+    let W = 0, H = 0, DPR = 1;
+    let souls = [];
+    let generation = 0;
+    let audioCtx = null;
+    let analyser = null;
+    let freqData = null;
+
+    const uiCount = document.getElementById('liveCount');
+    const uiGen   = document.getElementById('liveGen');
+    const uiInfo  = document.getElementById('liveInfo');
+    const uiDate  = document.getElementById('liveDate');
+    const uiTitle = document.getElementById('liveTitle');
+    const uiText  = document.getElementById('liveText');
+
+    const BASE_FREQ = 174.61;                 // F3
+    const CONSONANT = [0, 4, 5, 7, 9, 12];    // мажорная пентатоника
+
+    function ensureAudio() {
+        if (!audioCtx) {
+            try {
+                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                analyser = audioCtx.createAnalyser();
+                analyser.fftSize = 256;
+                freqData = new Uint8Array(analyser.frequencyBinCount);
+                // Подключаем анализатор к destination через gain
+                const master = audioCtx.createGain();
+                master.gain.value = 1;
+                master.connect(audioCtx.destination);
+                master.connect(analyser);
+                audioCtx._master = master;
+            } catch (e) { audioCtx = null; }
+        }
+        if (audioCtx && audioCtx.state === 'suspended') audioCtx.resume();
+        return audioCtx;
+    }
+
+    function playTone(freq, pan, vol, dur, type) {
+        const a = ensureAudio();
+        if (!a) return;
+        const osc = a.createOscillator();
+        const gain = a.createGain();
+        const panner = a.createStereoPanner ? a.createStereoPanner() : null;
+        osc.type = type || 'sine';
+        osc.frequency.value = freq;
+        const now = a.currentTime;
+        gain.gain.setValueAtTime(0, now);
+        gain.gain.linearRampToValueAtTime(vol, now + 0.02);
+        gain.gain.exponentialRampToValueAtTime(0.0001, now + dur);
+        if (panner) {
+            panner.pan.value = Math.max(-1, Math.min(1, pan));
+            osc.connect(gain); gain.connect(panner);
+            panner.connect(a._master || a.destination);
+        } else {
+            osc.connect(gain); gain.connect(a._master || a.destination);
+        }
+        osc.start(now);
+        osc.stop(now + dur + 0.05);
+    }
+
+    function resize() {
+        const rect = square.getBoundingClientRect();
+        DPR = Math.min(window.devicePixelRatio || 1, 2);
+        W = rect.width;
+        H = rect.height;
+        canvas.width = W * DPR;
+        canvas.height = H * DPR;
+        canvas.style.width = W + 'px';
+        canvas.style.height = H + 'px';
+        ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
+    }
+
+    function spawn(x, y) {
+        ensureAudio();
+        const u = GRAMOTINO_UPDATES[generation % GRAMOTINO_UPDATES.length];
+        const semi = CONSONANT[Math.floor(Math.random() * CONSONANT.length)];
+        const octave = Math.random() < 0.3 ? 2 : 1;
+        const freq = BASE_FREQ * octave * Math.pow(2, semi / 12);
+
+        souls.push({
+            x, y,
+            vx: (Math.random() - 0.5) * 0.5,
+            vy: (Math.random() - 0.5) * 0.5,
+            freq,
+            born: performance.now(),
+            life: 9000,
+            phase: Math.random() * Math.PI * 2,
+            rhythm: 1.0 + Math.random() * 0.9,
+            lastNote: 0,
+            update: u,
+            hovered: false,
+            pulse: 0
+        });
+        generation++;
+        if (uiGen) uiGen.textContent = 'ГЕН ' + String(generation).padStart(2, '0');
+        // Приветственная нота
+        playTone(freq * 1.5, (x / W) * 2 - 1, 0.05, 0.5, 'triangle');
+    }
+
+    square.addEventListener('pointerdown', (e) => {
+        const r = square.getBoundingClientRect();
+        spawn(e.clientX - r.left, e.clientY - r.top);
+    });
+
+    square.addEventListener('pointermove', (e) => {
+        const r = square.getBoundingClientRect();
+        const mx = e.clientX - r.left;
+        const my = e.clientY - r.top;
+        let found = null, best = 46;
+        souls.forEach(s => {
+            const d = Math.hypot(s.x - mx, s.y - my);
+            if (d < best) { best = d; found = s; }
+        });
+        souls.forEach(s => s.hovered = (s === found));
+        if (found) {
+            if (uiDate)  uiDate.textContent  = found.update.date.toUpperCase();
+            if (uiTitle) uiTitle.textContent = found.update.title;
+            if (uiText)  uiText.textContent  = found.update.text;
+            if (uiInfo)  uiInfo.classList.add('show');
+        } else {
+            if (uiInfo) uiInfo.classList.remove('show');
+        }
+    });
+
+    square.addEventListener('pointerleave', () => {
+        if (uiInfo) uiInfo.classList.remove('show');
+        souls.forEach(s => s.hovered = false);
+    });
+
+    function tick(now) {
+        ctx.clearRect(0, 0, W, H);
+        const cs = getComputedStyle(document.documentElement);
+        const red  = cs.getPropertyValue('--red').trim()  || '#D90429';
+        const text = cs.getPropertyValue('--text').trim() || '#0A0A0A';
+
+        // Амплитуда из анализатора
+        let amp = 0;
+        if (analyser && freqData) {
+            analyser.getByteFrequencyData(freqData);
+            let sum = 0;
+            for (let i = 0; i < freqData.length; i++) sum += freqData[i];
+            amp = sum / freqData.length / 255;
+        }
+
+        souls = souls.filter(s => now - s.born < s.life);
+
+        souls.forEach(s => {
+            const age = now - s.born;
+            const lifeT = age / s.life;
+            const alpha = lifeT < 0.72 ? 1 : 1 - (lifeT - 0.72) / 0.28;
+
+            s.phase += 0.012 + amp * 0.02;
+            s.vx += Math.sin(s.phase) * (0.008 + amp * 0.012);
+            s.vy += Math.cos(s.phase * 1.3) * (0.008 + amp * 0.012);
+            s.vx *= 0.985;
+            s.vy *= 0.985;
+            s.x += s.vx;
+            s.y += s.vy;
+
+            // Ритмичная нота
+            if (now - s.lastNote > s.rhythm * 1000) {
+                playTone(s.freq, (s.x / W) * 2 - 1, 0.03, 1.4, 'sine');
+                s.lastNote = now;
+            }
+
+            // Пульс от амплитуды
+            s.pulse += (amp - s.pulse) * 0.08;
+            const r = 3 + s.pulse * 8 + (1 - lifeT) * 1.5;
+
+            // Ореол
+            const halo = ctx.createRadialGradient(s.x, s.y, 0, s.x, s.y, r * 6);
+            halo.addColorStop(0, `rgba(217,4,41,${alpha * 0.20 * (1 + s.pulse * 2)})`);
+            halo.addColorStop(1, 'rgba(217,4,41,0)');
+            ctx.fillStyle = halo;
+            ctx.beginPath();
+            ctx.arc(s.x, s.y, r * 6, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Точка
+            ctx.globalAlpha = alpha;
+            ctx.fillStyle = s.hovered ? red : text;
+            ctx.beginPath();
+            ctx.arc(s.x, s.y, r, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Подпись при наведении
+            if (s.hovered) {
+                ctx.globalAlpha = 0.9;
+                ctx.fillStyle = red;
+                ctx.font = '700 10px "Space Mono", monospace';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillText(s.update.title.toUpperCase(), s.x, s.y - r - 12);
+            }
+
+            ctx.globalAlpha = 1;
+        });
+
+        if (uiCount) uiCount.textContent = String(souls.length).padStart(2, '0');
+        requestAnimationFrame(tick);
+    }
+
+    resize();
+    window.addEventListener('resize', resize);
+    requestAnimationFrame(tick);
+
+    // Показ блока
+    const io = new IntersectionObserver((entries) => {
+        entries.forEach(e => {
+            if (e.isIntersecting) {
+                const section = document.getElementById('liveSection');
+                if (section) section.classList.add('in');
+                io.unobserve(e.target);
+            }
+        });
+    }, { threshold: 0.15 });
+    io.observe(square);
+}
+
+/* ============================================================
+   8.3 КАРТОЧКИ-КАДРЫ · только mobile
+   ============================================================ */
+function initUpCards() {
+    const wrap = document.getElementById('upCards');
+    if (!wrap) return;
+
+    // Порядок: новые сверху
+    const list = GRAMOTINO_UPDATES.slice().reverse();
+
+    const frag = document.createDocumentFragment();
+    list.forEach((u, i) => {
+        const card = document.createElement('article');
+        card.className = 'up-card';
+        card.innerHTML = `
+            <div class="up-card-num">
+                <span>${String(list.length - i).padStart(2, '0')} / ${String(list.length).padStart(2, '0')}</span>
+                <span class="up-card-date">${u.date.toUpperCase()}</span>
+            </div>
+            <h3 class="up-card-title">${u.title}</h3>
+            <p class="up-card-text">${u.text}</p>
+        `;
+        frag.appendChild(card);
+    });
+    wrap.appendChild(frag);
+
+    const io = new IntersectionObserver((entries) => {
+        entries.forEach(e => {
+            if (e.isIntersecting) {
+                const section = document.getElementById('updatesCardsSection');
+                if (section) section.classList.add('in');
+                io.unobserve(e.target);
+            }
+        });
+    }, { threshold: 0.1 });
+    io.observe(wrap);
 }
