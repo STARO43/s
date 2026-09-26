@@ -2667,7 +2667,3 @@ html[data-theme="dark"] .clock-switch .switch-ring { border-color: rgba(221,224,
     background: #7dff8a;
     border-color: #7dff8a;
 }
-
-body:has(#reader[aria-hidden="false"]) .burger-btn {
-    display: none;
-}
