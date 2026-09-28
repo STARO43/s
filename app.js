@@ -724,50 +724,53 @@ function initReading() {
         }
 
         function renderGrid() {
-            const items = currentMode === 'random' ? randomItems : syllables;
+    const scrollY = window.scrollY;
+    const items = currentMode === 'random' ? randomItems : syllables;
 
-            grid.innerHTML = '';
-            grid.classList.add('collision-mode');
-            grid.classList.toggle('is-random', currentMode === 'random');
+    grid.innerHTML = '';
+    grid.classList.add('collision-mode');
+    grid.classList.toggle('is-random', currentMode === 'random');
 
-            const words = items.map((s, i) => makeSyllableWord(s, i));
+    const words = items.map((s, i) => makeSyllableWord(s, i));
 
-            const meas = document.createElement('div');
-            meas.className = 'syl-row';
-            meas.style.cssText = 'position:absolute;visibility:hidden;pointer-events:none;width:auto;white-space:nowrap;';
-            grid.appendChild(meas);
-            words.forEach((w) => meas.appendChild(w));
-            const widths = words.map((w) => w.getBoundingClientRect().width);
-            meas.remove();
+    const meas = document.createElement('div');
+    meas.className = 'syl-row';
+    meas.style.cssText = 'position:absolute;visibility:hidden;pointer-events:none;width:auto;white-space:nowrap;';
+    grid.appendChild(meas);
+    words.forEach((w) => meas.appendChild(w));
+    const widths = words.map((w) => w.getBoundingClientRect().width);
+    meas.remove();
 
-            const containerW = grid.clientWidth || window.innerWidth;
-            const MAX_ROW_W  = containerW * 0.98;
+    const containerW = grid.clientWidth || window.innerWidth;
+    const MAX_ROW_W  = containerW * 0.98;
 
-            const rows = [];
-            let row = [];
-            let rowW = 0;
+    const rows = [];
+    let row = [];
+    let rowW = 0;
 
-            widths.forEach((w, i) => {
-                if (rowW + w > MAX_ROW_W && row.length > 0) {
-                    rows.push(row);
-                    row = [];
-                    rowW = 0;
-                }
-                row.push(words[i]);
-                rowW += w;
-            });
-            if (row.length) rows.push(row);
-
-            rows.forEach((r) => {
-                const rowEl = document.createElement('div');
-                rowEl.className = 'syl-row';
-                r.forEach((w) => rowEl.appendChild(w));
-                grid.appendChild(rowEl);
-            });
-
-            refreshProgressData();
-            scheduleFit();
+    widths.forEach((w, i) => {
+        if (rowW + w > MAX_ROW_W && row.length > 0) {
+            rows.push(row);
+            row = [];
+            rowW = 0;
         }
+        row.push(words[i]);
+        rowW += w;
+    });
+    if (row.length) rows.push(row);
+
+    rows.forEach((r) => {
+        const rowEl = document.createElement('div');
+        rowEl.className = 'syl-row';
+        r.forEach((w) => rowEl.appendChild(w));
+        grid.appendChild(rowEl);
+    });
+
+    refreshProgressData();
+    scheduleFit();
+
+    window.scrollTo(0, scrollY);
+}
 
         /* ---------- Автоподгон кегля по ширине ряда ---------- */
 
