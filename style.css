@@ -2727,21 +2727,7 @@ html[data-theme="dark"] .clock-switch .switch-ring { border-color: rgba(221,224,
 
 @media (max-width: 768px) {
     .updates-section {
-        margin: 3.5rem 0 2rem;
-    }
-    .updates-head {
-        padding-bottom: .8rem;
-        margin-bottom: 1.4rem;
-    }
-    .updates-label {
-        font-size: clamp(1.2rem, 6vw, 1.6rem);
-    }
-    .updates-counter {
-        font-size: 0.55rem;
-        letter-spacing: 0.18em;
-    }
-    .updates-kinetic {
-        height: 240px;
+        display: none !important;
     }
 }
 
