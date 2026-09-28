@@ -1,0 +1,836 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>КОСМОС · СИСТЕМА НАБЛЮДЕНИЯ</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@300;400;500;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+    <style>
+        html, body {
+            margin: 0; padding: 0; overflow: hidden;
+            background: #020306; height: 100%; width: 100%;
+            font-family: 'Rajdhani', 'Segoe UI', sans-serif;
+            user-select: none; -webkit-user-select: none;
+            color: #cfe3ff;
+        }
+        canvas { display: block; cursor: crosshair; }
+
+        /* ===== HUD-рамка по краям экрана ===== */
+        #hudFrame {
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            z-index: 40;
+        }
+        #hudFrame::before,
+        #hudFrame::after {
+            content: '';
+            position: absolute;
+            background: linear-gradient(90deg, transparent, rgba(120,200,255,0.55), transparent);
+            height: 1px;
+            left: 8%;
+            right: 8%;
+        }
+        #hudFrame::before { top: 10px; }
+        #hudFrame::after { bottom: 10px; }
+
+        .corner {
+            position: absolute;
+            width: 26px; height: 26px;
+            border-color: rgba(130,210,255,0.65);
+            border-style: solid;
+            border-width: 0;
+        }
+        .corner.tl { top: 14px; left: 14px; border-top-width: 1px; border-left-width: 1px; }
+        .corner.tr { top: 14px; right: 14px; border-top-width: 1px; border-right-width: 1px; }
+        .corner.bl { bottom: 14px; left: 14px; border-bottom-width: 1px; border-left-width: 1px; }
+        .corner.br { bottom: 14px; right: 14px; border-bottom-width: 1px; border-right-width: 1px; }
+
+        /* ===== Верхняя системная строка ===== */
+        #sysBar {
+            position: fixed;
+            top: 22px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 50;
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 10px;
+            letter-spacing: 3px;
+            color: rgba(150,220,255,0.55);
+            text-transform: uppercase;
+            pointer-events: none;
+            display: flex;
+            gap: 22px;
+            align-items: center;
+        }
+        #sysBar .dot {
+            width: 5px; height: 5px; border-radius: 50%;
+            background: #4fd6ff;
+            box-shadow: 0 0 10px #4fd6ff, 0 0 20px rgba(79,214,255,0.6);
+            animation: pulse 2.2s infinite ease-in-out;
+        }
+        @keyframes pulse {
+            0%, 100% { opacity: 0.35; transform: scale(0.8); }
+            50% { opacity: 1; transform: scale(1.15); }
+        }
+
+        /* ===== Часы: тактильный металлический циферблат ===== */
+        #clock {
+            position: fixed;
+            left: 50%;
+            bottom: 28px;
+            transform: translateX(-50%);
+            width: 210px;
+            height: 210px;
+            border-radius: 50%;
+            background:
+                radial-gradient(circle at 50% 28%, rgba(70,110,150,0.30) 0%, rgba(6,12,22,0.92) 62%, rgba(2,4,9,0.98) 100%);
+            border: 1px solid rgba(120,190,255,0.35);
+            box-shadow:
+                0 0 0 6px rgba(4,8,16,0.65),
+                0 0 0 7px rgba(90,150,210,0.18),
+                0 18px 50px rgba(0,0,0,0.85),
+                inset 0 0 42px rgba(70,140,220,0.10),
+                inset 0 2px 2px rgba(255,255,255,0.10);
+            z-index: 50;
+            touch-action: none;
+            cursor: crosshair;
+            transition: box-shadow 0.4s ease, transform 0.25s ease;
+            backdrop-filter: blur(2px);
+            -webkit-backdrop-filter: blur(2px);
+        }
+        #clock:hover {
+            box-shadow:
+                0 0 0 6px rgba(4,8,16,0.65),
+                0 0 0 7px rgba(120,200,255,0.35),
+                0 18px 55px rgba(0,0,0,0.9),
+                inset 0 0 55px rgba(90,170,255,0.16),
+                inset 0 2px 2px rgba(255,255,255,0.14);
+        }
+        #clock:active { transform: translateX(-50%) scale(1.015); }
+        #clock svg {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            overflow: visible;
+        }
+
+        .min-tick { stroke: rgba(130,190,240,0.28); stroke-width: 0.4; stroke-linecap: round; }
+        .hour-tick { stroke: rgba(170,220,255,0.75); stroke-width: 0.9; stroke-linecap: round; }
+        .hour-tick.qtr { stroke: rgba(220,240,255,0.98); stroke-width: 1.6; filter: drop-shadow(0 0 3px rgba(120,200,255,0.9)); }
+
+        .numeral {
+            fill: rgba(200,230,255,0.88);
+            font-family: 'Rajdhani', sans-serif;
+            font-size: 12px;
+            font-weight: 600;
+            text-anchor: middle;
+            dominant-baseline: central;
+            letter-spacing: 1px;
+            text-shadow: 0 0 6px rgba(100,180,255,0.5);
+        }
+
+        .hand { stroke-linecap: round; stroke-linejoin: round; }
+        #hourHand   { stroke: rgba(220,240,255,0.95); stroke-width: 3; filter: drop-shadow(0 0 5px rgba(120,200,255,0.75)); }
+        #minuteHand { stroke: rgba(200,230,255,0.9); stroke-width: 1.5; filter: drop-shadow(0 0 4px rgba(120,200,255,0.6)); }
+
+        #secondHandGroup {
+            pointer-events: none;
+            filter: drop-shadow(0 0 6px rgba(255,70,90,0.9));
+        }
+
+        .center-ring { fill: none; stroke: rgba(200,230,255,0.85); stroke-width: 0.9; }
+        .center-dot  { fill: rgba(220,240,255,0.95); }
+
+        .brand {
+            fill: rgba(150,210,255,0.65);
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 3.6px;
+            font-weight: 400;
+            text-anchor: middle;
+            letter-spacing: 2.5px;
+        }
+
+        /* ===== Плашка с датой ===== */
+        #datePlate {
+            position: fixed;
+            top: 24px;
+            right: 24px;
+            padding: 12px 22px 14px;
+            border-radius: 4px;
+            background:
+                linear-gradient(180deg, rgba(14,26,44,0.78) 0%, rgba(6,12,22,0.88) 100%);
+            border: 1px solid rgba(120,190,255,0.35);
+            box-shadow:
+                0 0 0 1px rgba(4,8,16,0.8),
+                0 12px 40px rgba(0,0,0,0.7),
+                inset 0 0 24px rgba(70,140,220,0.10);
+            z-index: 50;
+            text-align: right;
+            line-height: 1.1;
+            pointer-events: none;
+            white-space: nowrap;
+            backdrop-filter: blur(4px);
+            -webkit-backdrop-filter: blur(4px);
+        }
+        #datePlate::before {
+            content: '';
+            position: absolute;
+            left: 0; top: 0; bottom: 0;
+            width: 3px;
+            background: linear-gradient(180deg, #4fd6ff, #1a6fb0);
+            box-shadow: 0 0 12px rgba(79,214,255,0.8);
+        }
+        #dpLabel {
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 8px;
+            letter-spacing: 3px;
+            color: rgba(120,190,255,0.6);
+            margin-bottom: 5px;
+            text-transform: uppercase;
+        }
+        #dpDate {
+            font-family: 'Rajdhani', sans-serif;
+            font-size: 13px;
+            font-weight: 500;
+            letter-spacing: 3px;
+            color: rgba(200,230,255,0.9);
+            text-transform: uppercase;
+        }
+        #dpYear {
+            margin-top: 5px;
+            font-family: 'Rajdhani', sans-serif;
+            font-size: 26px;
+            font-weight: 700;
+            letter-spacing: 4px;
+            color: rgba(230,245,255,0.98);
+            text-shadow: 0 0 14px rgba(100,180,255,0.6);
+        }
+
+        /* ===== Нижняя подпись системы ===== */
+        #sysFooter {
+            position: fixed;
+            bottom: 22px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 45;
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 9px;
+            letter-spacing: 4px;
+            color: rgba(120,190,255,0.4);
+            text-transform: uppercase;
+            pointer-events: none;
+            margin-bottom: 0;
+        }
+        #sysFooter span {
+            color: rgba(255,80,100,0.7);
+        }
+    </style>
+</head>
+<body>
+
+    <div id="hudFrame">
+        <div class="corner tl"></div>
+        <div class="corner tr"></div>
+        <div class="corner bl"></div>
+        <div class="corner br"></div>
+    </div>
+
+    <div id="sysBar">
+        <span class="dot"></span>
+        <span>ОРБИТАЛЬНАЯ СИСТЕМА · v2.0</span>
+        <span class="dot"></span>
+    </div>
+
+    <div id="clock">
+        <svg viewBox="0 0 130 130">
+            <g id="ticks"></g>
+            <g id="numerals"></g>
+
+            <line id="hourHand"   class="hand" x1="65" y1="65" x2="65" y2="36" />
+            <line id="minuteHand" class="hand" x1="65" y1="65" x2="65" y2="18" />
+
+            <g id="secondHandGroup">
+                <line x1="65" y1="65" x2="65" y2="76" stroke="#ff3b52" stroke-width="1.6" stroke-linecap="round" />
+                <line x1="65" y1="65" x2="65" y2="20" stroke="#ff3b52" stroke-width="1" stroke-linecap="round" />
+                <circle cx="65" cy="65" r="2.4" fill="#ff3b52" />
+                <circle cx="65" cy="65" r="0.9" fill="#ffffff" />
+            </g>
+
+            <circle class="center-ring" cx="65" cy="65" r="3" />
+            <circle class="center-dot"  cx="65" cy="65" r="1.2" />
+            <text class="brand" x="65" y="43">SYS · КОСМОС</text>
+        </svg>
+    </div>
+
+    <div id="datePlate">
+        <div id="dpLabel">ТЕКУЩАЯ ДАТА</div>
+        <div id="dpDate">—</div>
+        <div id="dpYear">—</div>
+    </div>
+
+    <div id="sysFooter">СИСТЕМА НАБЛЮДЕНИЯ · <span>СИГНАЛ АКТИВЕН</span></div>
+
+    <script type="importmap">
+        {
+            "imports": {
+                "three": "https://unpkg.com/three@0.126.0/build/three.module.js",
+                "three/addons/": "https://unpkg.com/three@0.126.0/examples/jsm/"
+            }
+        }
+    </script>
+
+    <script type="module">
+        import * as THREE from 'three';
+        import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+        import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
+        import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
+        import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
+
+        const SIDEREAL_MONTH_HOURS = 27 * 24 + 7 + 43 / 60;
+        const SIDEREAL_MONTH_MINUTES = SIDEREAL_MONTH_HOURS * 60;
+        const EARTH_DAY_HOURS = 24;
+        const EARTH_YEAR_MINUTES = 365.25 * 24 * 60;
+        const TIME_SCALE = 1;
+        const DEG = Math.PI / 180;
+
+        const scene = new THREE.Scene();
+        scene.background = new THREE.Color(0x010206);
+        scene.fog = new THREE.FogExp2(0x010206, 0.00035);
+
+        const camera = new THREE.PerspectiveCamera(38, window.innerWidth / window.innerHeight, 0.1, 8000);
+
+        const renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: 'high-performance' });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+        renderer.shadowMap.enabled = true;
+        renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+        renderer.toneMapping = THREE.ACESFilmicToneMapping;
+        renderer.toneMappingExposure = 1.05;
+        document.body.appendChild(renderer.domElement);
+
+        const composer = new EffectComposer(renderer);
+        composer.addPass(new RenderPass(scene, camera));
+        const bloomPass = new UnrealBloomPass(new THREE.Vector2(window.innerWidth, window.innerHeight), 1.6, 0.75, 0.82);
+        bloomPass.threshold = 0.12; bloomPass.strength = 0.85; bloomPass.radius = 0.7;
+        composer.addPass(bloomPass);
+
+        const controls = new OrbitControls(camera, renderer.domElement);
+        controls.enableRotate = true;
+        controls.enablePan = true;
+        controls.enableZoom = true;
+        controls.zoomSpeed = 1.1;
+        controls.enableDamping = true;
+        controls.dampingFactor = 0.08;
+        controls.minDistance = 20;
+        controls.maxDistance = 800;
+
+        const SUN_X = 0, SUN_Y = 0, SUN_Z = 0;
+        const SUN_RADIUS = 40;
+
+        // ===== Свет: холодный кинематографичный ключевой свет =====
+        const sunLight = new THREE.DirectionalLight(0xfff0dd, 1.7);
+        sunLight.castShadow = true;
+        sunLight.shadow.mapSize.set(4096, 4096);
+        sunLight.shadow.camera.near = 120;
+        sunLight.shadow.camera.far = 300;
+        sunLight.shadow.camera.left = -32;
+        sunLight.shadow.camera.right = 32;
+        sunLight.shadow.camera.top = 32;
+        sunLight.shadow.camera.bottom = -32;
+        sunLight.shadow.camera.updateProjectionMatrix();
+        sunLight.shadow.bias = -0.0004;
+        sunLight.shadow.normalBias = 0.05;
+        scene.add(sunLight);
+        scene.add(sunLight.target);
+
+        // ===== Солнце: раскалённый шар с холодным ореолом =====
+        const sunMesh = new THREE.Mesh(
+            new THREE.SphereGeometry(SUN_RADIUS, 64, 64),
+            new THREE.MeshBasicMaterial({ color: 0xffd9a0 })
+        );
+        sunMesh.position.set(SUN_X, SUN_Y, SUN_Z);
+        scene.add(sunMesh);
+
+        function makeGlowTexture(inner, mid, outer) {
+            const c = document.createElement('canvas');
+            c.width = c.height = 256;
+            const ctx = c.getContext('2d');
+            const g = ctx.createRadialGradient(128, 128, 0, 128, 128, 128);
+            g.addColorStop(0.0, inner); g.addColorStop(0.35, mid); g.addColorStop(1.0, outer);
+            ctx.fillStyle = g; ctx.fillRect(0, 0, 256, 256);
+            return new THREE.CanvasTexture(c);
+        }
+
+        const sunGlow = new THREE.Sprite(new THREE.SpriteMaterial({
+            map: makeGlowTexture('rgba(255,255,255,1)', 'rgba(255,210,150,0.75)', 'rgba(255,140,60,0)'),
+            color: 0xffe0b0, blending: THREE.AdditiveBlending, depthWrite: false, transparent: true, opacity: 0.95
+        }));
+        sunGlow.scale.set(340, 340, 1); sunGlow.position.set(SUN_X, SUN_Y, SUN_Z); scene.add(sunGlow);
+
+        // Холодный внешний ореол
+        const sunHalo = new THREE.Sprite(new THREE.SpriteMaterial({
+            map: makeGlowTexture('rgba(180,220,255,0)', 'rgba(120,180,255,0.22)', 'rgba(60,100,200,0)'),
+            color: 0x88bbff, blending: THREE.AdditiveBlending, depthWrite: false, transparent: true, opacity: 0.7
+        }));
+        sunHalo.scale.set(620, 620, 1); sunHalo.position.set(SUN_X, SUN_Y, SUN_Z); scene.add(sunHalo);
+
+        // Холодный заполняющий свет
+        scene.add(new THREE.AmbientLight(0x223355, 0.55));
+        const rimLight = new THREE.DirectionalLight(0x4f8fff, 0.55);
+        rimLight.position.set(-200, 120, -180);
+        scene.add(rimLight);
+
+        // ===== Звёздные слои: глубина и холод =====
+        function createStarLayer(count, minR, maxR, size, color) {
+            const geo = new THREE.BufferGeometry();
+            const pos = new Float32Array(count * 3);
+            for (let i = 0; i < count; i++) {
+                const r = minR + Math.random() * (maxR - minR);
+                const t = Math.random() * Math.PI * 2;
+                const p = Math.acos(Math.random() * 2 - 1);
+                pos[i * 3] = r * Math.sin(p) * Math.cos(t);
+                pos[i * 3 + 1] = r * Math.sin(p) * Math.sin(t);
+                pos[i * 3 + 2] = r * Math.cos(p);
+            }
+            geo.setAttribute('position', new THREE.BufferAttribute(pos, 3));
+            return new THREE.Points(geo, new THREE.PointsMaterial({
+                size, color, transparent: true, blending: THREE.AdditiveBlending, depthWrite: false, sizeAttenuation: true,
+                opacity: 0.9
+            }));
+        }
+        scene.add(createStarLayer(9000, 800, 2500, 2.5, 0xffffff));
+        scene.add(createStarLayer(4500, 1500, 3500, 1.5, 0xaaccff));
+        scene.add(createStarLayer(2200, 2500, 4500, 1.0, 0x6688cc));
+
+        function loadTexture(url, fallbackColor) {
+            return new Promise((resolve) => {
+                const loader = new THREE.TextureLoader();
+                loader.setCrossOrigin('anonymous');
+                loader.load(url, (tex) => { tex.colorSpace = THREE.SRGBColorSpace; resolve(tex); },
+                    undefined, () => {
+                        const c = document.createElement('canvas'); c.width = c.height = 512;
+                        const ctx = c.getContext('2d'); ctx.fillStyle = fallbackColor; ctx.fillRect(0, 0, 512, 512);
+                        resolve(new THREE.CanvasTexture(c));
+                    });
+            });
+        }
+
+        const EARTH_ORBIT_RADIUS = 220;
+        const earthOrbitPivot = new THREE.Group();
+        earthOrbitPivot.position.set(SUN_X, SUN_Y, SUN_Z);
+        scene.add(earthOrbitPivot);
+
+        const earthGroup = new THREE.Group();
+        earthGroup.position.set(EARTH_ORBIT_RADIUS, 0, 0);
+        earthOrbitPivot.add(earthGroup);
+
+        const earthOrbitPts = [];
+        for (let i = 0; i <= 128; i++) {
+            const a = (i / 128) * Math.PI * 2;
+            earthOrbitPts.push(new THREE.Vector3(Math.cos(a) * EARTH_ORBIT_RADIUS, 0, Math.sin(a) * EARTH_ORBIT_RADIUS));
+        }
+        scene.add(new THREE.LineLoop(
+            new THREE.BufferGeometry().setFromPoints(earthOrbitPts),
+            new THREE.LineBasicMaterial({ color: 0x2a5a9a, opacity: 0.22, transparent: true })
+        ));
+
+        let earthMeshRef = null;
+        let cloudMesh = null;
+
+        Promise.all([
+            loadTexture('https://threejs.org/examples/textures/planets/earth_atmos_2048.jpg', '#1a3050'),
+            loadTexture('https://threejs.org/examples/textures/planets/earth_specular_2048.jpg', '#000000'),
+            loadTexture('https://threejs.org/examples/textures/planets/earth_normal_2048.jpg', '#8080ff'),
+            loadTexture('https://threejs.org/examples/textures/planets/earth_clouds_1024.png', '#ffffff')
+        ]).then(([earthMap, earthSpecular, earthNormal, cloudMap]) => {
+            const earthMat = new THREE.MeshPhongMaterial({
+                map: earthMap, specularMap: earthSpecular, normalMap: earthNormal,
+                normalScale: new THREE.Vector2(0.9, 0.9), shininess: 14,
+                specular: new THREE.Color(0x335577),
+                emissive: new THREE.Color(0x000818), emissiveIntensity: 0.25
+            });
+            const earthMesh = new THREE.Mesh(new THREE.SphereGeometry(8, 128, 128), earthMat);
+            earthMesh.castShadow = true; earthMesh.receiveShadow = true;
+            earthGroup.add(earthMesh);
+            earthMeshRef = earthMesh;
+
+            cloudMesh = new THREE.Mesh(new THREE.SphereGeometry(8.08, 128, 128), new THREE.MeshPhongMaterial({
+                map: cloudMap, transparent: true, opacity: 0.55, blending: THREE.AdditiveBlending, depthWrite: false, side: THREE.DoubleSide
+            }));
+            earthGroup.add(cloudMesh);
+
+            // Холодная атмосферная дымка
+            const atmoTex = makeGlowTexture('rgba(180,220,255,0)', 'rgba(120,180,255,0.45)', 'rgba(40,90,180,0)');
+            const atmo1 = new THREE.Sprite(new THREE.SpriteMaterial({ map: atmoTex, color: 0x88bbff, blending: THREE.AdditiveBlending, depthWrite: false, transparent: true, opacity: 0.35 }));
+            atmo1.scale.set(24, 24, 1); earthGroup.add(atmo1);
+        });
+
+        const moonGroup = new THREE.Group();
+        earthGroup.add(moonGroup);
+        const orbitRadius = 18;
+        let moonMesh = null;
+
+        loadTexture('https://threejs.org/examples/textures/planets/moon_1024.jpg', '#666666').then((moonMap) => {
+            moonMesh = new THREE.Mesh(new THREE.SphereGeometry(2.2, 64, 64), new THREE.MeshStandardMaterial({
+                map: moonMap, roughness: 0.95, metalness: 0.03,
+                emissive: new THREE.Color(0x0a1420), emissiveIntensity: 0.35
+            }));
+            moonMesh.castShadow = true; moonMesh.receiveShadow = true;
+            moonMesh.position.set(orbitRadius, 0, 0);
+            moonGroup.add(moonMesh);
+        });
+
+        const moonOrbitPts = [];
+        for (let i = 0; i <= 64; i++) {
+            const a = (i / 64) * Math.PI * 2;
+            moonOrbitPts.push(new THREE.Vector3(Math.cos(a) * orbitRadius, 0, Math.sin(a) * orbitRadius));
+        }
+        earthGroup.add(new THREE.LineLoop(
+            new THREE.BufferGeometry().setFromPoints(moonOrbitPts),
+            new THREE.LineBasicMaterial({ color: 0x6688cc, opacity: 0.28, transparent: true })
+        ));
+
+        const CX = 65, CY = 65;
+        const ticksGroup = document.getElementById('ticks');
+        const numeralsGroup = document.getElementById('numerals');
+
+        for (let i = 0; i < 60; i++) {
+            const a = (i * 6 - 90) * Math.PI / 180;
+            const isHour = i % 5 === 0;
+            const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+            if (isHour) {
+                line.setAttribute('x1', (CX + 50 * Math.cos(a)).toFixed(2));
+                line.setAttribute('y1', (CY + 50 * Math.sin(a)).toFixed(2));
+                line.setAttribute('x2', (CX + 56 * Math.cos(a)).toFixed(2));
+                line.setAttribute('y2', (CY + 56 * Math.sin(a)).toFixed(2));
+                line.setAttribute('class', 'hour-tick' + (i % 15 === 0 ? ' qtr' : ''));
+            } else {
+                line.setAttribute('x1', (CX + 53.5 * Math.cos(a)).toFixed(2));
+                line.setAttribute('y1', (CY + 53.5 * Math.sin(a)).toFixed(2));
+                line.setAttribute('x2', (CX + 56 * Math.cos(a)).toFixed(2));
+                line.setAttribute('y2', (CY + 56 * Math.sin(a)).toFixed(2));
+                line.setAttribute('class', 'min-tick');
+            }
+            ticksGroup.appendChild(line);
+        }
+        for (let n = 1; n <= 12; n++) {
+            const a = (n * 30 - 90) * Math.PI / 180;
+            const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+            text.setAttribute('x', (CX + 41 * Math.cos(a)).toFixed(2));
+            text.setAttribute('y', (CY + 41 * Math.sin(a)).toFixed(2));
+            text.setAttribute('class', 'numeral');
+            text.textContent = n;
+            numeralsGroup.appendChild(text);
+        }
+
+        const hourHand = document.getElementById('hourHand');
+        const minuteHand = document.getElementById('minuteHand');
+        const secondHandGroup = document.getElementById('secondHandGroup');
+        const clockEl = document.getElementById('clock');
+
+        const J2000_MS = Date.UTC(2000, 0, 1, 12, 0, 0);
+
+        function sunEclipticLongitude(d) {
+            const L = 280.460 + 0.9856474 * d;
+            const g = (357.528 + 0.9856003 * d) * DEG;
+            return L + 1.915 * Math.sin(g) + 0.020 * Math.sin(2 * g);
+        }
+        function moonEclipticLongitude(d) {
+            const Lm = 218.316 + 13.176396 * d;
+            const Mm = (134.963 + 13.064993 * d) * DEG;
+            const Ls = 280.460 + 0.9856474 * d;
+            const D  = (Lm - Ls) * DEG;
+            return Lm
+                + 6.289 * Math.sin(Mm)
+                + 1.274 * Math.sin(2 * D - Mm)
+                + 0.658 * Math.sin(2 * D);
+        }
+
+        const startDate = new Date();
+        const localMinutes = startDate.getHours() * 60 + startDate.getMinutes()
+                           + startDate.getSeconds() / 60 + startDate.getMilliseconds() / 60000;
+        const minutesSinceJ2000 = (startDate.getTime() - J2000_MS) / 60000;
+
+        let totalMinutes = localMinutes + 1440 * Math.round((minutesSinceJ2000 - localMinutes) / 1440);
+
+        const d0 = totalMinutes / 1440;
+        const lambdaSun0   = sunEclipticLongitude(d0);
+        const lambdaMoon0  = moonEclipticLongitude(d0);
+        const lambdaEarth0 = lambdaSun0 - 180;
+
+        const ORBIT_PHASE = -lambdaEarth0 * DEG
+                          + (totalMinutes / EARTH_YEAR_MINUTES) * Math.PI * 2;
+        const MOON_PHASE  = lambdaMoon0 * DEG
+                          - (totalMinutes / SIDEREAL_MONTH_MINUTES) * Math.PI * 2;
+
+        const utcHours = startDate.getUTCHours() + startDate.getUTCMinutes() / 60 + startDate.getUTCSeconds() / 3600;
+        const subsolarLon = 180 - 15 * utcHours;
+        const earthRot0 = (subsolarLon - lambdaSun0) * DEG;
+        const t0h = ((totalMinutes / 60) % 24 + 24) % 24;
+        const EARTH_ROT_PHASE = earthRot0 + (t0h / EARTH_DAY_HOURS) * Math.PI * 2;
+
+        let hour = 3, minute = 0;
+
+        const MONTHS_RU = ['января','февраля','марта','апреля','мая','июня',
+                           'июля','августа','сентября','октября','ноября','декабря'];
+        const dpDateEl = document.getElementById('dpDate');
+        const dpYearEl = document.getElementById('dpYear');
+        let lastDateKey = null;
+
+        function updateDatePlate() {
+            const key = Math.round(totalMinutes);
+            if (key === lastDateKey) return;
+            lastDateKey = key;
+            const dt = new Date(J2000_MS + key * 60000);
+            dpDateEl.textContent = dt.getDate() + ' ' + MONTHS_RU[dt.getMonth()];
+            dpYearEl.textContent = String(dt.getFullYear());
+        }
+
+        function render() {
+            const hourDeg = (hour % 12) * 30 + minute * 0.5;
+            const minuteDeg = minute * 6;
+            const totalSeconds = totalMinutes * 60;
+            const secondDeg = (totalSeconds * 6) % 360;
+
+            hourHand.setAttribute('transform', `rotate(${hourDeg} ${CX} ${CY})`);
+            minuteHand.setAttribute('transform', `rotate(${minuteDeg} ${CX} ${CY})`);
+            secondHandGroup.setAttribute('transform', `rotate(${secondDeg} ${CX} ${CY})`);
+
+            const tH = ((totalMinutes / 60) % 24 + 24) % 24;
+            const earthRot = EARTH_ROT_PHASE - (tH / EARTH_DAY_HOURS) * Math.PI * 2;
+            const orbitRot = ORBIT_PHASE - (totalMinutes / EARTH_YEAR_MINUTES) * Math.PI * 2;
+
+            earthGroup.rotation.y = earthRot;
+            if (cloudMesh) cloudMesh.rotation.y = -(tH / EARTH_DAY_HOURS) * Math.PI * 2 * 0.15;
+            earthOrbitPivot.rotation.y = orbitRot;
+
+            const moonWorldAngle = MOON_PHASE + (totalMinutes / SIDEREAL_MONTH_MINUTES) * Math.PI * 2;
+            const moonLocalAngle = moonWorldAngle + earthRot + orbitRot;
+            if (moonMesh) {
+                moonMesh.position.set(
+                    Math.cos(moonLocalAngle) * orbitRadius, 0,
+                    Math.sin(moonLocalAngle) * orbitRadius
+                );
+                moonMesh.rotation.y = -moonLocalAngle + Math.PI;
+            }
+
+            updateDatePlate();
+        }
+
+        function applyTotal() {
+            const rounded = Math.round(totalMinutes);
+            minute = ((rounded % 60) + 60) % 60;
+            let h = Math.floor(rounded / 60) % 12;
+            h = ((h % 12) + 12) % 12;
+            hour = h === 0 ? 12 : h;
+        }
+
+        const MOVE_THRESHOLD = 4;
+        let gesture = null, dragging = false, dragMode = null, lastAngle = 0, autoAdvance = true;
+
+        function getPoint(e) {
+            if (e.touches && e.touches.length > 0) return { x: e.touches[0].clientX, y: e.touches[0].clientY };
+            return { x: e.clientX, y: e.clientY };
+        }
+
+        function angleFromPoint(p) {
+            const rect = clockEl.getBoundingClientRect();
+            const cx = rect.left + rect.width / 2, cy = rect.top + rect.height / 2;
+            let a = Math.atan2(p.y - cy, p.x - cx) * 180 / Math.PI + 90;
+            return (a % 360 + 360) % 360;
+        }
+
+        function angleDiff(a, b) {
+            const d = Math.abs(a - b) % 360;
+            return d > 180 ? 360 - d : d;
+        }
+
+        function isPointInsideClock(p) {
+            const rect = clockEl.getBoundingClientRect();
+            const cx = rect.left + rect.width / 2, cy = rect.top + rect.height / 2;
+            return Math.hypot(p.x - cx, p.y - cy) <= (rect.width / 2) * 0.95;
+        }
+
+        function startGesture(point, source) {
+            if (gesture) return;
+            autoAdvance = false;
+            gesture = { startX: point.x, startY: point.y, mode: null, source };
+        }
+
+        function moveGesture(e, point) {
+            if (!gesture) return;
+            const adx = Math.abs(point.x - gesture.startX), ady = Math.abs(point.y - gesture.startY);
+
+            if (!gesture.mode) {
+                if (adx < MOVE_THRESHOLD && ady < MOVE_THRESHOLD) return;
+                if (isPointInsideClock(point)) {
+                    gesture.mode = 'drag';
+                    const ang = angleFromPoint(point);
+                    const rect = clockEl.getBoundingClientRect();
+                    const cx = rect.left + rect.width / 2, cy = rect.top + rect.height / 2;
+                    const relR = Math.hypot(point.x - cx, point.y - cy) / (rect.width / 2);
+                    const hourAng = ((hour % 12) * 30 + minute * 0.5 + 360) % 360;
+                    const minAng = (minute * 6 + 360) % 360;
+
+                    if (relR < 0.35) dragMode = 'hour';
+                    else if (relR > 0.55) dragMode = 'minute';
+                    else dragMode = angleDiff(ang, minAng) <= angleDiff(ang, hourAng) ? 'minute' : 'hour';
+
+                    lastAngle = ang; dragging = true;
+                } else {
+                    gesture.mode = 'other';
+                }
+            }
+
+            if (gesture.mode === 'drag') {
+                if (e.cancelable !== false) { try { e.preventDefault(); } catch (err) {} }
+                const ang = angleFromPoint(point);
+                let delta = ang - lastAngle;
+                if (delta > 180) delta -= 360;
+                if (delta < -180) delta += 360;
+
+                if (dragMode === 'minute') {
+                    totalMinutes += delta / 6;
+                    applyTotal();
+                } else {
+                    const h = (ang - minute * 0.5) / 30;
+                    const newHour12 = ((Math.round(h) % 12) + 12) % 12;
+                    const curHour12 = ((Math.floor(totalMinutes / 60) % 12) + 12) % 12;
+                    let diff = newHour12 - curHour12;
+                    if (diff > 6) diff -= 12;
+                    if (diff < -6) diff += 12;
+                    if (diff !== 0) {
+                        totalMinutes += diff * 60;
+                        applyTotal();
+                    }
+                }
+                lastAngle = ang;
+                render();
+            }
+        }
+
+        function endGesture() {
+            if (!gesture) return;
+            gesture = null; dragging = false; dragMode = null;
+            autoAdvance = true;
+        }
+
+        clockEl.addEventListener('touchstart', e => { if (e.touches.length === 1) startGesture(getPoint(e), 'touch'); }, { passive: true });
+        clockEl.addEventListener('touchmove', e => { if (gesture?.source === 'touch' && e.touches.length === 1) moveGesture(e, getPoint(e)); }, { passive: false });
+        clockEl.addEventListener('touchend', () => { if (gesture?.source === 'touch') endGesture(); }, { passive: true });
+        clockEl.addEventListener('mousedown', e => { if (e.button === 0) { e.preventDefault(); startGesture(getPoint(e), 'mouse'); } });
+        window.addEventListener('mousemove', e => { if (gesture?.source === 'mouse') moveGesture(e, getPoint(e)); });
+        window.addEventListener('mouseup', () => { if (gesture?.source === 'mouse') endGesture(); });
+
+        const raycaster = new THREE.Raycaster();
+        const mouse = new THREE.Vector2();
+        let earthDragActive = false;
+        let lastEarthDragX = 0;
+
+        function handleEarthStart(e) {
+            if (gesture) return;
+            const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+            const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+
+            mouse.x = (clientX / window.innerWidth) * 2 - 1;
+            mouse.y = -(clientY / window.innerHeight) * 2 + 1;
+            raycaster.setFromCamera(mouse, camera);
+
+            if (earthMeshRef) {
+                const intersects = raycaster.intersectObject(earthMeshRef);
+                if (intersects.length > 0) {
+                    earthDragActive = true;
+                    autoAdvance = false;
+                    lastEarthDragX = clientX;
+                    controls.enabled = false;
+                    if (e.cancelable !== false) e.preventDefault();
+                }
+            }
+        }
+
+        function handleEarthMove(e) {
+            if (!earthDragActive) return;
+            const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+            const deltaX = clientX - lastEarthDragX;
+            lastEarthDragX = clientX;
+
+            totalMinutes += deltaX * 0.6;
+            applyTotal();
+            render();
+            if (e.cancelable !== false) e.preventDefault();
+        }
+
+        function handleEarthEnd() {
+            if (earthDragActive) {
+                earthDragActive = false;
+                autoAdvance = true;
+                controls.enabled = true;
+            }
+        }
+
+        renderer.domElement.addEventListener('mousedown', handleEarthStart);
+        window.addEventListener('mousemove', handleEarthMove);
+        window.addEventListener('mouseup', handleEarthEnd);
+        renderer.domElement.addEventListener('touchstart', handleEarthStart, { passive: false });
+        window.addEventListener('touchmove', handleEarthMove, { passive: false });
+        window.addEventListener('touchend', handleEarthEnd);
+
+        let lastTime = performance.now();
+        const earthWorldPos = new THREE.Vector3();
+        const sunDir = new THREE.Vector3();
+
+        function tickAuto(now) {
+            const dt = (now - lastTime) / 1000;
+            lastTime = now;
+
+            if (autoAdvance && !dragging && !earthDragActive) {
+                totalMinutes += (dt * TIME_SCALE) / 60;
+                applyTotal();
+                render();
+            }
+
+            if (sunGlow) sunGlow.material.opacity = 0.88 + Math.sin(now * 0.0018) * 0.07;
+            if (sunHalo) sunHalo.material.opacity = 0.55 + Math.sin(now * 0.0012 + 1.5) * 0.12;
+        }
+
+        function animate(now) {
+            requestAnimationFrame(animate);
+            tickAuto(now || performance.now());
+
+            earthGroup.getWorldPosition(earthWorldPos);
+            controls.target.lerp(earthWorldPos, 0.05);
+
+            sunDir.copy(earthWorldPos).normalize();
+            sunLight.position.copy(earthWorldPos).addScaledVector(sunDir, -150);
+            sunLight.target.position.copy(earthWorldPos);
+
+            controls.update();
+            composer.render();
+        }
+
+        applyTotal();
+        render();
+
+        earthGroup.getWorldPosition(earthWorldPos);
+        camera.position.copy(earthWorldPos).add(new THREE.Vector3(60, 40, 80));
+        controls.target.copy(earthWorldPos);
+        sunDir.copy(earthWorldPos).normalize();
+        sunLight.position.copy(earthWorldPos).addScaledVector(sunDir, -150);
+        sunLight.target.position.copy(earthWorldPos);
+        controls.update();
+
+        requestAnimationFrame(animate);
+
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            composer.setSize(window.innerWidth, window.innerHeight);
+        });
+    </script>
+</body>
+</html>
