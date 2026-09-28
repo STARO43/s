@@ -646,6 +646,47 @@
     background: #e8b830;
   }
 
+  /* ============================================================
+     НОВЫЙ ПЛАКАТ «РЕКОМЕНДАЦИИ ИГР» (СПРАВА)
+     ============================================================ */
+  .poster-games {
+    position: absolute;
+    top: 10%;
+    right: 5%;
+    width: 96px;
+    height: 128px;
+    z-index: 35;
+    background: #e8dab0; /* Изменённый цвет бумаги */
+    border: 2px solid #a08020;
+    box-shadow:
+      0 0 0 1px #5a4a2a,
+      3px 4px 0 rgba(0,0,0,0.45);
+    cursor: pointer;
+    user-select: none;
+    -webkit-user-select: none;
+    -webkit-tap-highlight-color: transparent;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .poster-games::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background-image:
+      repeating-linear-gradient(0deg,
+        transparent 0px, transparent 3px,
+        rgba(0,0,0,0.025) 3px, rgba(0,0,0,0.025) 4px);
+    pointer-events: none;
+    z-index: 10;
+  }
+  .poster-games svg {
+    width: 100%;
+    height: 100%;
+    display: block;
+  }
+
   .cabinet {
     position: absolute;
     left: 50%;
@@ -1187,6 +1228,11 @@
     </div>
   </div>
 
+  <!-- НОВЫЙ ПЛАКАТ «РЕКОМЕНДАЦИИ ИГР» (СПРАВА) -->
+  <div class="poster-games" id="gamePosterBtn">
+    <!-- Сюда будет вставляться SVG -->
+  </div>
+
   <div class="cabinet">
     <div class="cabinet-body">
       <div class="cabinet-door left"></div>
@@ -1341,6 +1387,142 @@
   }
   updateClock();
   setInterval(updateClock, 1000);
+
+  /* ============================================================
+     ПЛАКАТ С РЕКОМЕНДАЦИЯМИ ИГР (SVG-ГЕНЕРАЦИЯ)
+     ============================================================ */
+  var recGames = [
+    {
+      name: 'Sailwind',
+      svg: `<svg viewBox="0 0 96 128" xmlns="http://www.w3.org/2000/svg">
+        <rect width="96" height="128" fill="#e8dab0"/>
+        <rect x="4" y="4" width="88" height="120" fill="none" stroke="#8b2f2f" stroke-width="2"/>
+        <text x="48" y="18" font-family="'Press Start 2P', monospace" font-size="6" fill="#1a1a1a" text-anchor="middle" font-weight="bold">SAILWIND</text>
+        <circle cx="48" cy="35" r="8" fill="#f1c40f"/>
+        <polygon points="48,45 48,80 25,80" fill="#e74c3c"/>
+        <polygon points="48,50 48,80 65,80" fill="#c0392b"/>
+        <rect x="45" y="45" width="6" height="35" fill="#1a1a1a"/>
+        <path d="M0,90 Q 24,80 48,90 T 96,90 L 96,128 L 0,128 Z" fill="#2c3e50"/>
+        <path d="M0,100 Q 24,95 48,100 T 96,100 L 96,128 L 0,128 Z" fill="#34495e"/>
+      </svg>`
+    },
+    {
+      name: 'Stardew Valley',
+      svg: `<svg viewBox="0 0 96 128" xmlns="http://www.w3.org/2000/svg">
+        <rect width="96" height="128" fill="#e8dab0"/>
+        <rect x="4" y="4" width="88" height="120" fill="none" stroke="#8b2f2f" stroke-width="2"/>
+        <text x="48" y="16" font-family="'Press Start 2P', monospace" font-size="6" fill="#1a1a1a" text-anchor="middle" font-weight="bold">STARDEW</text>
+        <text x="48" y="26" font-family="'Press Start 2P', monospace" font-size="6" fill="#1a1a1a" text-anchor="middle" font-weight="bold">VALLEY</text>
+        <path d="M0,80 Q 30,50 60,80 T 96,80 L 96,128 L 0,128 Z" fill="#27ae60"/>
+        <path d="M0,95 Q 30,75 60,95 T 96,95 L 96,128 L 0,128 Z" fill="#2ecc71"/>
+        <rect x="30" y="75" width="36" height="25" fill="#8b4513"/>
+        <polygon points="25,75 48,55 71,75" fill="#c0392b"/>
+        <rect x="40" y="85" width="8" height="15" fill="#5d2e0c"/>
+        <rect x="55" y="82" width="6" height="6" fill="#f1c40f"/>
+        <circle cx="20" cy="85" r="10" fill="#27ae60"/>
+        <rect x="18" y="85" width="4" height="15" fill="#5d2e0c"/>
+      </svg>`
+    },
+    {
+      name: 'Farming Sim',
+      svg: `<svg viewBox="0 0 96 128" xmlns="http://www.w3.org/2000/svg">
+        <rect width="96" height="128" fill="#e8dab0"/>
+        <rect x="4" y="4" width="88" height="120" fill="none" stroke="#8b2f2f" stroke-width="2"/>
+        <text x="48" y="16" font-family="'Press Start 2P', monospace" font-size="6" fill="#1a1a1a" text-anchor="middle" font-weight="bold">FARMING</text>
+        <text x="48" y="26" font-family="'Press Start 2P', monospace" font-size="6" fill="#1a1a1a" text-anchor="middle" font-weight="bold">SIM</text>
+        <rect x="0" y="80" width="96" height="48" fill="#f39c12"/>
+        <line x1="0" y1="90" x2="96" y2="90" stroke="#e67e22" stroke-width="2"/>
+        <line x1="0" y1="100" x2="96" y2="100" stroke="#e67e22" stroke-width="2"/>
+        <line x1="0" y1="110" x2="96" y2="110" stroke="#e67e22" stroke-width="2"/>
+        <rect x="25" y="65" width="45" height="25" fill="#2ecc71"/>
+        <rect x="30" y="55" width="20" height="15" fill="#2ecc71"/>
+        <rect x="25" y="70" width="10" height="8" fill="#1a1a1a"/>
+        <circle cx="32" cy="92" r="10" fill="#1a1a1a" stroke="#f1c40f" stroke-width="2"/>
+        <circle cx="62" cy="92" r="10" fill="#1a1a1a" stroke="#f1c40f" stroke-width="2"/>
+        <rect x="55" y="60" width="15" height="15" fill="#3498db" opacity="0.6"/>
+      </svg>`
+    },
+    {
+      name: 'Running Train',
+      svg: `<svg viewBox="0 0 96 128" xmlns="http://www.w3.org/2000/svg">
+        <rect width="96" height="128" fill="#e8dab0"/>
+        <rect x="4" y="4" width="88" height="120" fill="none" stroke="#8b2f2f" stroke-width="2"/>
+        <text x="48" y="16" font-family="'Press Start 2P', monospace" font-size="6" fill="#1a1a1a" text-anchor="middle" font-weight="bold">RUNNING</text>
+        <text x="48" y="26" font-family="'Press Start 2P', monospace" font-size="6" fill="#1a1a1a" text-anchor="middle" font-weight="bold">TRAIN</text>
+        <rect x="15" y="60" width="66" height="35" fill="#f1c40f"/>
+        <rect x="15" y="55" width="66" height="5" fill="#e67e22"/>
+        <rect x="20" y="65" width="8" height="8" fill="#3498db"/>
+        <rect x="32" y="65" width="8" height="8" fill="#3498db"/>
+        <rect x="44" y="65" width="8" height="8" fill="#3498db"/>
+        <rect x="56" y="65" width="8" height="8" fill="#3498db"/>
+        <rect x="68" y="65" width="8" height="8" fill="#3498db"/>
+        <rect x="15" y="80" width="66" height="6" fill="#1a1a1a"/>
+        <line x1="0" y1="100" x2="96" y2="100" stroke="#1a1a1a" stroke-width="4"/>
+        <line x1="0" y1="108" x2="96" y2="108" stroke="#1a1a1a" stroke-width="4"/>
+        <line x1="10" y1="100" x2="10" y2="108" stroke="#1a1a1a" stroke-width="2"/>
+        <line x1="30" y1="100" x2="30" y2="108" stroke="#1a1a1a" stroke-width="2"/>
+        <line x1="50" y1="100" x2="50" y2="108" stroke="#1a1a1a" stroke-width="2"/>
+        <line x1="70" y1="100" x2="70" y2="108" stroke="#1a1a1a" stroke-width="2"/>
+        <line x1="90" y1="100" x2="90" y2="108" stroke="#1a1a1a" stroke-width="2"/>
+        <line x1="80" y1="40" x2="10" y2="55" stroke="#e74c3c" stroke-width="2" stroke-dasharray="4,2"/>
+      </svg>`
+    },
+    {
+      name: 'Town To City',
+      svg: `<svg viewBox="0 0 96 128" xmlns="http://www.w3.org/2000/svg">
+        <rect width="96" height="128" fill="#e8dab0"/>
+        <rect x="4" y="4" width="88" height="120" fill="none" stroke="#8b2f2f" stroke-width="2"/>
+        <text x="48" y="16" font-family="'Press Start 2P', monospace" font-size="5" fill="#1a1a1a" text-anchor="middle" font-weight="bold">TOWN TO CITY</text>
+        <rect x="10" y="70" width="20" height="20" fill="#8b4513"/>
+        <polygon points="8,70 20,55 32,70" fill="#c0392b"/>
+        <rect x="60" y="40" width="25" height="50" fill="#34495e"/>
+        <rect x="65" y="45" width="5" height="5" fill="#f1c40f"/>
+        <rect x="75" y="45" width="5" height="5" fill="#f1c40f"/>
+        <rect x="65" y="55" width="5" height="5" fill="#f1c40f"/>
+        <rect x="75" y="55" width="5" height="5" fill="#f1c40f"/>
+        <rect x="65" y="65" width="5" height="5" fill="#f1c40f"/>
+        <rect x="75" y="65" width="5" height="5" fill="#f1c40f"/>
+        <line x1="35" y1="80" x2="55" y2="80" stroke="#e74c3c" stroke-width="3"/>
+        <polygon points="55,75 65,80 55,85" fill="#e74c3c"/>
+        <path d="M0,90 Q 48,80 96,90 L 96,128 L 0,128 Z" fill="#27ae60"/>
+      </svg>`
+    },
+    {
+      name: 'Townscaper',
+      svg: `<svg viewBox="0 0 96 128" xmlns="http://www.w3.org/2000/svg">
+        <rect width="96" height="128" fill="#e8dab0"/>
+        <rect x="4" y="4" width="88" height="120" fill="none" stroke="#8b2f2f" stroke-width="2"/>
+        <text x="48" y="16" font-family="'Press Start 2P', monospace" font-size="6" fill="#1a1a1a" text-anchor="middle" font-weight="bold">TOWN</text>
+        <text x="48" y="26" font-family="'Press Start 2P', monospace" font-size="6" fill="#1a1a1a" text-anchor="middle" font-weight="bold">SCAPER</text>
+        <rect x="20" y="90" width="20" height="20" fill="#e74c3c"/>
+        <rect x="40" y="70" width="20" height="40" fill="#3498db"/>
+        <rect x="30" y="60" width="20" height="30" fill="#f1c40f"/>
+        <rect x="50" y="50" width="20" height="20" fill="#2ecc71"/>
+        <rect x="25" y="95" width="5" height="5" fill="#1a1a1a"/>
+        <rect x="45" y="80" width="5" height="5" fill="#1a1a1a"/>
+        <rect x="55" y="55" width="5" height="5" fill="#1a1a1a"/>
+        <path d="M0,110 L 96,110 L 96,128 L 0,128 Z" fill="#34495e"/>
+      </svg>`
+    }
+  ];
+
+  var recIndex = 0;
+  var gamePosterContainer = document.getElementById('gamePosterBtn');
+
+  function renderPoster() {
+    if (gamePosterContainer) {
+      gamePosterContainer.innerHTML = recGames[recIndex].svg;
+    }
+  }
+
+  if (gamePosterContainer) {
+    renderPoster(); // Первый рендер
+
+    gamePosterContainer.addEventListener('click', function() {
+      recIndex = (recIndex + 1) % recGames.length;
+      renderPoster();
+    });
+  }
 
 })();
 </script>
