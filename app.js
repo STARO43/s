@@ -752,8 +752,46 @@ function renderGrid() {
     }
 
     refreshProgressData();
+    scheduleFit();
 }
+        /* ---------- Автоподгон кегля по ширине ряда ---------- */
 
+        function fitRow(row) {
+            const words = row.querySelectorAll('.syl-w');
+            if (!words.length) return;
+
+            words.forEach((w) => { w.style.fontSize = ''; });
+            row.style.transform = 'none';
+
+            const containerW = row.clientWidth;
+            const naturalW   = row.scrollWidth;
+
+            if (naturalW <= containerW || containerW === 0) {
+                row.style.transform = '';
+                return;
+            }
+
+            const baseSize = parseFloat(getComputedStyle(words[0]).fontSize);
+            const scale    = (containerW / naturalW) * 0.97;
+            const newSize  = Math.max(32, baseSize * scale);
+
+            words.forEach((w) => { w.style.fontSize = newSize + 'px'; });
+            row.style.transform = '';
+        }
+
+        function fitAllRows() {
+            if (!grid.classList.contains('collision-mode')) return;
+            grid.querySelectorAll('.syl-row').forEach(fitRow);
+        }
+
+        function scheduleFit() {
+            requestAnimationFrame(fitAllRows);
+        }
+
+        window.addEventListener('resize', () => {
+            if (window._fitTimer) clearTimeout(window._fitTimer);
+            window._fitTimer = setTimeout(fitAllRows, 120);
+        });
         function toggleLearned(s, item) {
             if (learnedSet.has(s)) learnedSet.delete(s); else learnedSet.add(s);
             saveLearnedSet(learnedSet);
