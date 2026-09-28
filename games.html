@@ -528,7 +528,7 @@
     background: #8a1a1a;
   }
 
-  /* ===== ПЛАКАТ «УХОДЯ ГАСИ СВЕТ» (уменьшен на 20%) ===== */
+  /* ===== ПЛАКАТ «УХОДЯ ГАСИ СВЕТ» ===== */
   .poster {
     position: absolute;
     top: 10%;
@@ -547,7 +547,6 @@
     -webkit-tap-highlight-color: transparent;
     overflow: hidden;
   }
-  /* лёгкая "бумажная" текстура */
   .poster::after {
     content: "";
     position: absolute;
@@ -558,7 +557,6 @@
         rgba(0,0,0,0.025) 3px, rgba(0,0,0,0.025) 4px);
     pointer-events: none;
   }
-  /* текст «УХОДЯ ГАСИ СВЕТ!» */
   .poster-text {
     position: absolute;
     top: 8px;
@@ -576,7 +574,6 @@
   .poster-text span {
     display: block;
   }
-  /* рука с указательным пальцем */
   .poster-hand {
     position: absolute;
     right: 8px;
@@ -585,7 +582,6 @@
     height: 78px;
     z-index: 3;
   }
-  /* указательный палец */
   .poster-finger {
     position: absolute;
     top: 0;
@@ -595,7 +591,6 @@
     background: #c62828;
     border-radius: 6px 6px 0 0;
   }
-  /* остальные пальцы (загнутые) */
   .poster-knuckle {
     position: absolute;
     width: 10px;
@@ -606,7 +601,6 @@
   .poster-knuckle.k1 { top: 40px; left: 8px; }
   .poster-knuckle.k2 { top: 48px; left: 20px; }
   .poster-knuckle.k3 { top: 54px; left: 32px; }
-  /* ладонь / основание руки */
   .poster-palm {
     position: absolute;
     bottom: 0;
@@ -616,7 +610,6 @@
     background: #c62828;
     border-radius: 4px 4px 0 0;
   }
-  /* маленький выключатель в углу */
   .poster-switch {
     position: absolute;
     top: 6px;
@@ -646,9 +639,7 @@
     background: #e8b830;
   }
 
-  /* ============================================================
-     НОВЫЙ ПЛАКАТ «РЕКОМЕНДАЦИИ ИГР» (СПРАВА)
-     ============================================================ */
+  /* ===== ПЛАКАТ «РЕКОМЕНДАЦИИ ИГР» (СПРАВА) ===== */
   .poster-games {
     position: absolute;
     top: 10%;
@@ -656,7 +647,7 @@
     width: 96px;
     height: 128px;
     z-index: 35;
-    background: #e8dab0; /* Изменённый цвет бумаги */
+    background: #e8dab0;
     border: 2px solid #a08020;
     box-shadow:
       0 0 0 1px #5a4a2a,
@@ -1099,9 +1090,7 @@
     z-index: 40;
   }
 
-  /* ============================================================
-     EXIT OVERLAY — «ВЫЙТИ В МЕНЮ?»
-     ============================================================ */
+  /* ===== EXIT OVERLAY — «ВЫЙТИ В МЕНЮ?» ===== */
   .exit-overlay {
       position: fixed;
       inset: 0;
@@ -1228,9 +1217,9 @@
     </div>
   </div>
 
-  <!-- НОВЫЙ ПЛАКАТ «РЕКОМЕНДАЦИИ ИГР» (СПРАВА) -->
+  <!-- ПЛАКАТ «РЕКОМЕНДАЦИИ ИГР» (СПРАВА) -->
   <div class="poster-games" id="gamePosterBtn">
-    <!-- Сюда будет вставляться SVG -->
+    <!-- Сюда вставляется SVG -->
   </div>
 
   <div class="cabinet">
@@ -1289,15 +1278,15 @@
   'use strict';
 
   var games = [
-    { id: 'fox',  title: 'Лисичка-истеричка', url: 'lisichka.html' },
-    { id: 'el',  title: 'Элементы', url: 'elements.html' }
+    { id: 'fox', title: 'Лисичка-истеричка', url: 'lisichka.html' },
+    { id: 'el',  title: 'Элементы',          url: 'elements.html' }
   ];
 
   var currentIndex = 0;
 
-  var menuEl    = document.getElementById('gameMenu');
-  var screenEl  = document.getElementById('tvScreen');
-  var rainEl    = document.getElementById('rain');
+  var menuEl   = document.getElementById('gameMenu');
+  var screenEl = document.getElementById('tvScreen');
+  var rainEl   = document.getElementById('rain');
 
   /* ====== АДАПТАЦИЯ ПОД ЭКРАН ====== */
   function fitRoom() {
@@ -1517,11 +1506,36 @@
   }
 
   if (gamePosterContainer) {
-    renderPoster(); // Первый рендер
+    renderPoster();
 
     gamePosterContainer.addEventListener('click', function() {
       recIndex = (recIndex + 1) % recGames.length;
       renderPoster();
+    });
+  }
+
+  /* ============================================================
+     РУЧКА «КАНАЛ» — ПЕРЕКЛЮЧЕНИЕ ИГР
+     ============================================================ */
+  var roundSwitch = document.getElementById('roundSwitch');
+  var roundHandle = document.getElementById('roundHandle');
+
+  if (roundSwitch && roundHandle) {
+    roundSwitch.addEventListener('click', function() {
+      currentIndex = (currentIndex + 1) % games.length;
+
+      var angle = currentIndex * (360 / games.length);
+      roundHandle.style.transform = 'rotate(' + angle + 'deg)';
+
+      /* глитч-эффект при переключении */
+      screenEl.classList.remove('changing');
+      void screenEl.offsetWidth;
+      screenEl.classList.add('changing');
+      setTimeout(function() {
+        screenEl.classList.remove('changing');
+      }, 550);
+
+      renderMenu();
     });
   }
 
@@ -1577,16 +1591,6 @@
     }
   });
 })();
-  var roundSwitch = document.getElementById('roundSwitch');
-var roundHandle = document.getElementById('roundHandle');
-
-roundSwitch.addEventListener('click', function() {
-  currentIndex = (currentIndex + 1) % games.length;
-  // визуальный поворот ручки
-  var angle = currentIndex * (360 / games.length);
-  roundHandle.style.transform = 'rotate(' + angle + 'deg)';
-  renderMenu(); // показать следующую игру
-});
 </script>
 </body>
 </html>
