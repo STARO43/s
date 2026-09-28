@@ -3185,12 +3185,6 @@ html[data-theme="dark"] .history-check svg { stroke: #E0E0E0; }
     will-change: transform;
 }
 
-/* Ритмический сдвиг рядов — не даёт вёрстке «застыть» */
-.syl-row:nth-child(4n+1) { transform: translateX(-2%); }
-.syl-row:nth-child(4n+2) { transform: translateX(-9%); }
-.syl-row:nth-child(4n+3) { transform: translateX( 3%); }
-.syl-row:nth-child(4n+4) { transform: translateX(-6%); }
-
 /* Слово-слог внутри ряда */
 .syl-w {
     position: relative;
