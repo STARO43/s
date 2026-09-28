@@ -2679,6 +2679,250 @@ function initArt() {
     });
 }
 
+/* ============================================================
+   6.8 HISTORY — лекции с отметкой «просмотрено»
+   ============================================================ */
+function initHistory() {
+    once('history', () => {
+        const gridEl   = document.getElementById('historyGrid');
+        const headEl   = document.getElementById('historyProgressLabel');
+        const fillEl   = document.getElementById('historyProgressFill');
+        const resetBtn = document.getElementById('historyResetBtn');
+        const modal    = document.getElementById('mediaPlayerModal');
+        const frame    = document.getElementById('mediaPlayerFrame');
+        const close    = document.getElementById('mediaPlayerClose');
+        if (!gridEl || !modal || !frame) return;
+
+        const STORAGE_KEY = 'history_viewed_v1';
+        const HASH_PREFIX = '#lecture/';
+
+        /* ----- Список лекций (порядок сохраняется) ----- */
+        const LECTURES = [
+            { id: 'f5fb4cb726c27681aa9e59c571e697e3', title: 'Лекция 01' },
+            { id: 'eca937c817e6d670f1a363da0a14f252', title: 'Лекция 02' },
+            { id: '29dc22108b0b84f881983540dc402f8e', title: 'Лекция 03' },
+            { id: 'cf37d1fa77e46f4582d5347c7a3093c6', title: 'Лекция 04' },
+            { id: 'd1ac447c741a8a2bf1bbe4d76a4f6669', title: 'Лекция 05' },
+            { id: '8205e0c2d9d727e94aa92894e16908b3', title: 'Лекция 06' },
+            { id: '0d0e92d6f60f84638144892baf81eefe', title: 'Лекция 07' },
+            { id: 'cfce0166e76831de069d037a7dfcfd22', title: 'Лекция 08' },
+            { id: 'c6f38f33ca1540e075184cbd71b71857', title: 'Лекция 09' },
+            { id: '094c6d3382efbfec6836c0f99c0a9dea', title: 'Лекция 10' },
+            { id: 'c717db4ef54272a623c527e5098347b5', title: 'Лекция 11' },
+            { id: '66d97bc44d667456ece0466f00277617', title: 'Лекция 12' },
+            { id: 'b99ae3bbc3e3969cb499e2173ff6006d', title: 'Лекция 13' },
+            { id: '9ee0875716aae4fd6873101ec4d4809b', title: 'Лекция 14' },
+            { id: '3eaf4eecb8099388baf9b604a4dac196', title: 'Лекция 15' },
+            { id: '4bbdc41a1260376bb1b9e1a734446673', title: 'Лекция 16' },
+            { id: '9a6731c0f77d9fe869ffba38e7031790', title: 'Лекция 17' },
+            { id: '8ecc21eb7c80fa73a8e6e16994e02c2f', title: 'Лекция 18' },
+            { id: 'a68941ddbb2bf385081af65496f8f0ed', title: 'Лекция 19' },
+            { id: '9143f2e2da6d82297bc0d30b1cacf58f', title: 'Лекция 20' },
+            { id: 'f0ba65295a4fce8481162f5f5e480804', title: 'Лекция 21' },
+            { id: '821defaef2c22ff5ae4060c6f3ddbd83', title: 'Лекция 22' },
+            { id: '2b3be0f6a22d70e35b63bbdb4c0b50bf', title: 'Лекция 23' },
+            { id: '7002a8bf7af9cfa85ce6a5dc03b9b98e', title: 'Лекция 24' },
+            { id: '94849f45c56fbfc8fa6c4d790b23c509', title: 'Лекция 25' },
+            { id: '2912633f9f1464c5b96f162d647b37ef', title: 'Лекция 26' },
+            { id: '9f6d714e2027de22bdc0b6a0b4a3ca95', title: 'Лекция 27' },
+            { id: '537f725724b999a360cf4b3da653d153', title: 'Лекция 28' },
+            { id: '9570e565e9bc637b202871e1c12ed375', title: 'Лекция 29' },
+            { id: 'a79bbea5edc79b93cf3cae929357c6c1', title: 'Лекция 30' },
+            { id: '0a79f5bf0bacdef42136f0160f17a2d2', title: 'Лекция 31' },
+            { id: '6b282dc87d2c0b6c9117fe9a3e1a74a7', title: 'Лекция 32' },
+            { id: '42634bbf6907ae686d12ca594b6f1441', title: 'Лекция 33' },
+            { id: '5b5162f0f3f01a7832d059173bddb8c8', title: 'Лекция 34' },
+            { id: '86bea0361e7121e66c6dad4aad2ef6d4', title: 'Лекция 35' },
+            { id: 'd1f9f9dfc0e3718f3396c6e40ee358f8', title: 'Лекция 36' },
+            { id: '78b2865ed2c1e0b2d89f24986edda8cf', title: 'Лекция 37' },
+            { id: 'd0e9217286838eeab7368a51fa2ef925', title: 'Лекция 38' },
+            { id: '9e9c54599ba96cbaf1deb112645e7db8', title: 'Лекция 39' }
+        ];
+
+        const pad2 = (n) => String(n).padStart(2, '0');
+
+        /* ----- Хранилище просмотренного ----- */
+        function loadViewed() {
+            try {
+                const raw = localStorage.getItem(STORAGE_KEY);
+                const arr = raw ? JSON.parse(raw) : [];
+                return new Set(Array.isArray(arr) ? arr : []);
+            } catch { return new Set(); }
+        }
+        function saveViewed(set) {
+            try { localStorage.setItem(STORAGE_KEY, JSON.stringify(Array.from(set))); }
+            catch (e) { /* quota */ }
+        }
+        let viewed = loadViewed();
+
+        /* ----- Прогресс ----- */
+        function updateProgress() {
+            const total = LECTURES.length;
+            const done  = LECTURES.filter((l) => viewed.has(l.id)).length;
+            const pct   = total ? Math.round((done / total) * 100) : 0;
+            if (headEl) headEl.innerHTML = `<b>${pad2(done)}</b> / <b>${pad2(total)}</b> ПРОСМОТРЕНО`;
+            if (fillEl) fillEl.style.width = pct + '%';
+        }
+
+        /* ----- Отрисовка сетки ----- */
+        function renderGrid() {
+            gridEl.innerHTML = '';
+            const frag = document.createDocumentFragment();
+
+            LECTURES.forEach((lec, i) => {
+                const card = document.createElement('a');
+                card.className = 'history-card' + (viewed.has(lec.id) ? ' viewed' : '');
+                card.href = HASH_PREFIX + lec.id;
+                card.dataset.videoId = lec.id;
+
+                /* Превью */
+                const thumb = document.createElement('div');
+                thumb.className = 'history-thumb';
+
+                const img = document.createElement('img');
+                img.className = 'thumb-img';
+                img.alt = lec.title;
+                img.loading = 'lazy';
+                img.decoding = 'async';
+                img.src = 'https://rutube.ru/api/video/' + lec.id + '/thumbnail/?redirect=1';
+                img.onerror = function () { img.style.display = 'none'; };
+
+                const num = document.createElement('div');
+                num.className = 'history-num';
+                num.textContent = pad2(i + 1);
+
+                /* Кнопка-галочка */
+                const check = document.createElement('button');
+                check.type = 'button';
+                check.className = 'history-check';
+                check.setAttribute('aria-label', 'Отметить просмотренным');
+                check.innerHTML = `
+                    <svg viewBox="0 0 24 24" aria-hidden="true">
+                        <polyline class="check-path" points="4 12.5 10 18.5 20 6.5"/>
+                    </svg>
+                `;
+                check.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    if (viewed.has(lec.id)) {
+                        viewed.delete(lec.id);
+                        card.classList.remove('viewed');
+                    } else {
+                        viewed.add(lec.id);
+                        card.classList.add('viewed');
+                    }
+                    saveViewed(viewed);
+                    updateProgress();
+                });
+
+                thumb.appendChild(img);
+                thumb.appendChild(num);
+                thumb.appendChild(check);
+
+                /* Инфо */
+                const info = document.createElement('div');
+                info.className = 'history-info';
+
+                const top = document.createElement('div');
+                top.className = 'history-info-top';
+                const dot = document.createElement('span');
+                dot.className = 'dot';
+                const labelEl = document.createElement('span');
+                labelEl.textContent = 'ЛЕКЦИЯ · RUTUBE';
+                top.appendChild(dot);
+                top.appendChild(labelEl);
+
+                const title = document.createElement('div');
+                title.className = 'history-title';
+                title.textContent = lec.title;
+
+                const line = document.createElement('span');
+                line.className = 'history-title-line';
+
+                info.appendChild(top);
+                info.appendChild(title);
+                info.appendChild(line);
+
+                card.appendChild(thumb);
+                card.appendChild(info);
+                frag.appendChild(card);
+            });
+
+            gridEl.appendChild(frag);
+        }
+
+        /* ----- Плеер ----- */
+        function openPlayer(id) {
+            frame.src = 'https://rutube.ru/play/embed/' + id + '/';
+            modal.classList.add('show');
+            modal.setAttribute('aria-hidden', 'false');
+            document.body.style.overflow = 'hidden';
+        }
+        function closePlayer() {
+            modal.classList.remove('show');
+            modal.setAttribute('aria-hidden', 'true');
+            document.body.style.overflow = '';
+            setTimeout(() => { frame.src = 'about:blank'; }, 400);
+        }
+        function closeAndClearHash() {
+            if (window.location.hash.startsWith(HASH_PREFIX)) {
+                history.pushState('', document.title, window.location.pathname + window.location.search);
+                closePlayer();
+            } else {
+                closePlayer();
+            }
+        }
+        function handleHash() {
+            const hash = window.location.hash;
+            if (hash.startsWith(HASH_PREFIX)) {
+                const id = hash.slice(HASH_PREFIX.length);
+                if (id) openPlayer(id);
+            } else {
+                if (modal.classList.contains('show')) closePlayer();
+            }
+        }
+
+        if (close) close.addEventListener('click', (e) => { e.preventDefault(); closeAndClearHash(); });
+        modal.addEventListener('click', (e) => { if (e.target === modal) closeAndClearHash(); });
+        document.addEventListener('keydown', (e) => {
+            if (modal.classList.contains('show') && e.key === 'Escape') closeAndClearHash();
+        });
+        window.addEventListener('hashchange', handleHash);
+
+        /* Клик по карточке: если хэш уже равен — открываем вручную (иначе hashchange сам сработает) */
+        document.addEventListener('click', (e) => {
+            const card = e.target.closest('.history-card');
+            if (!card) return;
+            if (e.target.closest('.history-check')) return; // галочка уже обработана
+            if (window.location.hash === card.getAttribute('href')) {
+                e.preventDefault();
+                const id = card.dataset.videoId;
+                if (id) openPlayer(id);
+            }
+        });
+
+        /* ----- Сброс прогресса ----- */
+        if (resetBtn) {
+            resetBtn.addEventListener('click', () => {
+                if (viewed.size === 0) {
+                    if (typeof showToast === 'function') showToast('ПРОГРЕСС УЖЕ ПУСТ');
+                    return;
+                }
+                viewed.clear();
+                saveViewed(viewed);
+                gridEl.querySelectorAll('.history-card').forEach((c) => c.classList.remove('viewed'));
+                updateProgress();
+                if (typeof showToast === 'function') showToast('ПРОГРЕСС ОЧИЩЕН');
+            });
+        }
+
+        /* ----- Старт ----- */
+        renderGrid();
+        updateProgress();
+        handleHash();
+    });
+}
+
 /* ---------- 6.7 ARTICLES (ПЕДАГОГИКА) ---------- */
 function initArticles() {
     once('articles', () => {
@@ -3104,7 +3348,7 @@ function detectPage() {
     if (path === 'art')        return 'art';
     if (path === 'articles')   return 'articles';
     if (path === 'games')      return 'games';
-    if (path === 'pdd')        return 'games';
+    if (path === 'history')    return 'history';
     if (path === 'lisichka')   return 'games';
     return 'unknown';
 }
@@ -3120,6 +3364,7 @@ function initPageSpecific(page) {
         case 'art':      initArt();      break;
         case 'articles': initArticles(); break;
         case 'games':    initGames();    break;
+        case 'history':  initHistory();  break;
     }
 }
 
