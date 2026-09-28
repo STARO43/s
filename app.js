@@ -2832,16 +2832,7 @@ function initHistory() {
                 top.appendChild(dot);
                 top.appendChild(labelEl);
 
-                const title = document.createElement('div');
-                title.className = 'history-title';
-                title.textContent = lec.title;
-
-                const line = document.createElement('span');
-                line.className = 'history-title-line';
-
                 info.appendChild(top);
-                info.appendChild(title);
-                info.appendChild(line);
 
                 card.appendChild(thumb);
                 card.appendChild(info);
