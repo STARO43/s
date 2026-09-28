@@ -1833,7 +1833,7 @@ html[data-theme="dark"] .reader.reader-alt .reader-content h4 { color: #2A1F0F; 
     flex-wrap: wrap;
     align-items: baseline;
     column-gap: 0;
-    row-gap: 0.1em;
+    row-gap: 0.4em;
     font-family: var(--font-display);
     line-height: 0.95;
 }
