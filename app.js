@@ -717,12 +717,7 @@ function initReading() {
                 item.addEventListener('click', () => handleSyllableClick(syllable, item));
                 frag.appendChild(item);
 
-                if (idx < items.length - 1) {
-                    const sep = document.createElement('span');
-                    sep.className = 'syllable-sep';
-                    sep.textContent = '·';
-                    frag.appendChild(sep);
-                }
+               
             });
             grid.innerHTML = '';
             grid.appendChild(frag);
