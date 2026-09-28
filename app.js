@@ -692,7 +692,7 @@ function initReading() {
             progressTimer = setTimeout(() => progressContainer.classList.remove('show'), 2200);
         }
 
-       /* ---------- Новый рендер «Столкновение» ---------- */
+        /* ---------- Новый рендер «Столкновение» ---------- */
 
         function makeSyllableWord(syllable, idx) {
             const w = document.createElement('span');
@@ -730,21 +730,18 @@ function initReading() {
             grid.classList.add('collision-mode');
             grid.classList.toggle('is-random', currentMode === 'random');
 
-            /* 1. Создаём все слова заранее */
-            const words = items.map((s, i) => makeSyllableWord(s, i, i));
+            const words = items.map((s, i) => makeSyllableWord(s, i));
 
-            /* 2. Измеряем их ширину при базовом кегле, временно добавив в DOM */
             const meas = document.createElement('div');
             meas.className = 'syl-row';
             meas.style.cssText = 'position:absolute;visibility:hidden;pointer-events:none;width:auto;white-space:nowrap;';
             grid.appendChild(meas);
-            words.forEach(w => meas.appendChild(w));
-            const widths = words.map(w => w.getBoundingClientRect().width);
+            words.forEach((w) => meas.appendChild(w));
+            const widths = words.map((w) => w.getBoundingClientRect().width);
             meas.remove();
 
-            /* 3. Упаковываем в ряды по принципу: сколько влезет в ширину контейнера */
             const containerW = grid.clientWidth || window.innerWidth;
-            const MAX_ROW_W  = containerW * 0.98;    /* запас на padding */
+            const MAX_ROW_W  = containerW * 0.98;
 
             const rows = [];
             let row = [];
@@ -761,20 +758,20 @@ function initReading() {
             });
             if (row.length) rows.push(row);
 
-            /* 4. Добавляем ряды в DOM */
-            rows.forEach(r => {
+            rows.forEach((r) => {
                 const rowEl = document.createElement('div');
                 rowEl.className = 'syl-row';
-                r.forEach(w => rowEl.appendChild(w));
+                r.forEach((w) => rowEl.appendChild(w));
                 grid.appendChild(rowEl);
             });
 
             refreshProgressData();
             scheduleFit();
         }
+
         /* ---------- Автоподгон кегля по ширине ряда ---------- */
 
-              function fitRow(row) {
+        function fitRow(row) {
             const words = row.querySelectorAll('.syl-w');
             if (!words.length) return;
 
@@ -792,14 +789,6 @@ function initReading() {
             words.forEach((w) => { w.style.fontSize = newSize + 'px'; });
         }
 
-            const baseSize = parseFloat(getComputedStyle(words[0]).fontSize);
-            const scale    = (containerW / naturalW) * 0.97;
-            const newSize  = Math.max(32, baseSize * scale);
-
-            words.forEach((w) => { w.style.fontSize = newSize + 'px'; });
-            row.style.transform = '';
-        }
-
         function fitAllRows() {
             if (!grid.classList.contains('collision-mode')) return;
             grid.querySelectorAll('.syl-row').forEach(fitRow);
@@ -813,6 +802,7 @@ function initReading() {
             if (window._fitTimer) clearTimeout(window._fitTimer);
             window._fitTimer = setTimeout(fitAllRows, 120);
         });
+
         function toggleLearned(s, item) {
             if (learnedSet.has(s)) learnedSet.delete(s); else learnedSet.add(s);
             saveLearnedSet(learnedSet);
