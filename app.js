@@ -694,8 +694,6 @@ function initReading() {
 
        /* ---------- Новый рендер «Столкновение» ---------- */
 
-const ROW_PATTERN = [4, 5, 3, 6, 4, 5, 3, 4, 6, 5, 3, 4, 5, 4, 3, 6];
-
 function makeSyllableWord(syllable, idx, pos) {
     const w = document.createElement('span');
     w.className = 'syl-w';
@@ -728,32 +726,55 @@ function makeSyllableWord(syllable, idx, pos) {
     return w;
 }
 
-function renderGrid() {
-    const items = currentMode === 'random' ? randomItems : syllables;
+        function renderGrid() {
+            const items = currentMode === 'random' ? randomItems : syllables;
 
-    grid.innerHTML = '';
-    grid.classList.add('collision-mode');
-    grid.classList.toggle('is-random', currentMode === 'random');
+            grid.innerHTML = '';
+            grid.classList.add('collision-mode');
+            grid.classList.toggle('is-random', currentMode === 'random');
 
-    let idx = 0;
-    let rowIdx = 0;
+            /* 1. Создаём все слова заранее */
+            const words = items.map((s, i) => makeSyllableWord(s, i, i));
 
-    while (idx < items.length) {
-        const rowLen = ROW_PATTERN[rowIdx % ROW_PATTERN.length];
-        const row = document.createElement('div');
-        row.className = 'syl-row';
+            /* 2. Измеряем их ширину при базовом кегле, временно добавив в DOM */
+            const meas = document.createElement('div');
+            meas.className = 'syl-row';
+            meas.style.cssText = 'position:absolute;visibility:hidden;pointer-events:none;width:auto;white-space:nowrap;';
+            grid.appendChild(meas);
+            words.forEach(w => meas.appendChild(w));
+            const widths = words.map(w => w.getBoundingClientRect().width);
+            meas.remove();
 
-        for (let k = 0; k < rowLen && idx < items.length; k++, idx++) {
-            row.appendChild(makeSyllableWord(items[idx], idx, rowIdx + k));
+            /* 3. Упаковываем в ряды по принципу: сколько влезет в ширину контейнера */
+            const containerW = grid.clientWidth || window.innerWidth;
+            const MAX_ROW_W  = containerW * 0.98;    /* запас на padding */
+
+            const rows = [];
+            let row = [];
+            let rowW = 0;
+
+            widths.forEach((w, i) => {
+                if (rowW + w > MAX_ROW_W && row.length > 0) {
+                    rows.push(row);
+                    row = [];
+                    rowW = 0;
+                }
+                row.push(words[i]);
+                rowW += w;
+            });
+            if (row.length) rows.push(row);
+
+            /* 4. Добавляем ряды в DOM */
+            rows.forEach(r => {
+                const rowEl = document.createElement('div');
+                rowEl.className = 'syl-row';
+                r.forEach(w => rowEl.appendChild(w));
+                grid.appendChild(rowEl);
+            });
+
+            refreshProgressData();
+            scheduleFit();
         }
-
-        grid.appendChild(row);
-        rowIdx++;
-    }
-
-    refreshProgressData();
-    scheduleFit();
-}
         /* ---------- Автоподгон кегля по ширине ряда ---------- */
 
         function fitRow(row) {
