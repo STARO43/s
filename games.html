@@ -1577,6 +1577,16 @@
     }
   });
 })();
+  var roundSwitch = document.getElementById('roundSwitch');
+var roundHandle = document.getElementById('roundHandle');
+
+roundSwitch.addEventListener('click', function() {
+  currentIndex = (currentIndex + 1) % games.length;
+  // визуальный поворот ручки
+  var angle = currentIndex * (360 / games.length);
+  roundHandle.style.transform = 'rotate(' + angle + 'deg)';
+  renderMenu(); // показать следующую игру
+});
 </script>
 </body>
 </html>
