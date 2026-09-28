@@ -1,0 +1,1671 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>Элементы</title>
+<style>
+:root{
+  --bg:#fbfbfd;
+  --panel:#ffffff;
+  --line:rgba(0,0,0,.06);
+  --line-hi:rgba(0,0,0,.12);
+  --ink:#1d1d1f;
+  --ink-mid:#86868b;
+  --ink-dim:#c7c7cc;
+  --accent:#0071e3;
+  --accent-soft:rgba(0,113,227,.08);
+  --canvas-bg:#f5f5f7;
+}
+[data-theme="dark"]{
+  --bg:#000000;
+  --panel:#0a0a0a;
+  --line:rgba(255,255,255,.08);
+  --line-hi:rgba(255,255,255,.16);
+  --ink:#f5f5f7;
+  --ink-mid:#86868b;
+  --ink-dim:#48484a;
+  --accent:#0a84ff;
+  --accent-soft:rgba(10,132,255,.14);
+  --canvas-bg:#0a0a0a;
+}
+*{box-sizing:border-box;}
+html,body{height:100%;margin:0;}
+body{
+  background:var(--bg);color:var(--ink);
+  font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Segoe UI',system-ui,sans-serif;
+  font-size:13px;overflow:hidden;
+  -webkit-user-select:none;user-select:none;
+  -webkit-tap-highlight-color:transparent;
+  letter-spacing:-.01em;
+  transition:background .3s ease,color .3s ease;
+}
+#app{display:flex;height:100%;height:100dvh;}
+
+#creaturePanel{
+  width:120px;flex:none;
+  background:var(--panel);
+  border-right:1px solid var(--line);
+  display:flex;flex-direction:column;
+  padding:20px 12px;gap:10px;
+  transition:background .3s ease,border-color .3s ease;
+}
+.creature-head{
+  font-size:11px;color:var(--ink-dim);font-weight:500;
+  letter-spacing:.04em;text-transform:uppercase;
+  text-align:center;padding-bottom:8px;
+  border-bottom:1px solid var(--line);
+}
+.creature-btn{
+  display:flex;flex-direction:column;align-items:center;gap:6px;
+  padding:10px 6px;
+  background:transparent;border:0;border-radius:10px;
+  cursor:pointer;
+  transition:background .15s ease;
+}
+.creature-btn:hover{background:var(--line);}
+.creature-btn.active{background:var(--accent-soft);}
+.creature-btn svg{display:block;}
+.creature-btn .lbl{
+  font-family:inherit;font-size:11px;font-weight:500;
+  color:var(--ink-mid);
+  letter-spacing:-.01em;
+}
+.creature-btn.active .lbl{color:var(--accent);}
+
+#stage{
+  flex:1;min-width:0;position:relative;
+  display:flex;align-items:center;justify-content:center;
+  padding:24px;
+}
+#canvasWrap{
+  position:relative;
+  border-radius:12px;
+  overflow:hidden;
+  background:var(--canvas-bg);
+  transition:background .3s ease;
+}
+#glcanvas{
+  display:block;
+  background:transparent;
+  cursor:crosshair;touch-action:none;
+}
+#overlay{
+  position:absolute;top:0;left:0;
+  pointer-events:none;
+}
+
+#panel{
+  width:220px;flex:none;
+  background:var(--panel);
+  border-left:1px solid var(--line);
+  display:flex;flex-direction:column;
+  padding:22px 16px 16px;gap:20px;overflow-y:auto;
+  transition:background .3s ease,border-color .3s ease;
+}
+#panel::-webkit-scrollbar{width:0;}
+
+#palette{display:grid;grid-template-columns:1fr 1fr;gap:4px;}
+
+.el{
+  display:flex;align-items:center;gap:8px;
+  padding:8px 10px;
+  background:transparent;
+  border:0;
+  border-radius:7px;
+  font-family:inherit;font-size:12px;font-weight:400;
+  color:var(--ink-mid);text-align:left;cursor:pointer;
+  min-width:0;overflow:hidden;
+  transition:background .15s ease,color .15s ease;
+}
+.el:hover{background:var(--line);color:var(--ink);}
+.el.active{background:var(--accent-soft);color:var(--accent);font-weight:500;}
+.el .sw{
+  width:10px;height:10px;flex:none;background:var(--c);
+  border-radius:50%;
+}
+.el .nm{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1;}
+
+.ctrl{display:flex;flex-direction:column;gap:10px;}
+.ctrl.row{flex-direction:row;gap:6px;}
+
+input[type=range]{
+  -webkit-appearance:none;appearance:none;
+  width:100%;height:18px;background:transparent;outline:none;cursor:pointer;
+}
+input[type=range]::-webkit-slider-runnable-track{
+  height:2px;background:var(--line-hi);border-radius:1px;
+}
+input[type=range]::-webkit-slider-thumb{
+  -webkit-appearance:none;appearance:none;
+  width:14px;height:14px;margin-top:-6px;
+  background:var(--ink);border-radius:50%;
+  border:0;
+  transition:transform .15s ease;
+}
+input[type=range]::-webkit-slider-thumb:hover{transform:scale(1.15);}
+input[type=range]::-moz-range-track{
+  height:2px;background:var(--line-hi);border-radius:1px;
+}
+input[type=range]::-moz-range-thumb{
+  width:14px;height:14px;background:var(--ink);border-radius:50%;border:0;
+}
+
+button.btn{
+  flex:1;padding:9px 8px;
+  background:transparent;
+  border:1px solid var(--line-hi);
+  border-radius:7px;
+  color:var(--ink);
+  font-family:inherit;font-size:12px;font-weight:400;
+  cursor:pointer;
+  transition:background .15s ease,border-color .15s ease,color .15s ease;
+}
+button.btn:hover{background:var(--line);border-color:var(--line-hi);}
+button.btn.on{
+  background:var(--accent-soft);
+  border-color:transparent;
+  color:var(--accent);
+}
+
+.theme-toggle{
+  position:absolute;
+  top:22px;right:16px;
+  width:32px;height:32px;
+  display:flex;align-items:center;justify-content:center;
+  background:transparent;border:0;
+  border-radius:50%;
+  color:var(--ink-mid);
+  cursor:pointer;
+  transition:background .15s ease,color .15s ease;
+}
+.theme-toggle:hover{background:var(--line);color:var(--ink);}
+.theme-toggle svg{width:16px;height:16px;}
+
+.panel-head{
+  display:flex;align-items:center;justify-content:space-between;
+  font-size:11px;color:var(--ink-dim);font-weight:500;
+  letter-spacing:.02em;
+  padding-right:36px;
+}
+
+.panel-foot{
+  margin-top:auto;padding-top:16px;
+  border-top:1px solid var(--line);
+  font-size:11px;color:var(--ink-dim);text-align:center;
+}
+
+@media (max-width:900px){
+  #app{flex-direction:column;}
+  #creaturePanel{
+    width:100%;height:auto;
+    flex-direction:row;flex-wrap:wrap;
+    border-right:none;border-bottom:1px solid var(--line);
+    padding:10px 12px;gap:6px;
+    justify-content:center;
+  }
+  .creature-head{display:none;}
+  .creature-btn{padding:6px 8px;}
+  .creature-btn svg{width:28px;height:28px;}
+  .creature-btn .lbl{font-size:10px;}
+  #stage{padding:12px;flex:1 1 auto;min-height:0;}
+  #panel{
+    width:100%;height:auto;max-height:40%;
+    border-left:none;border-top:1px solid var(--line);
+    padding:14px 12px 12px;gap:14px;
+  }
+  #palette{grid-template-columns:repeat(3,1fr);gap:3px;}
+  .el{font-size:11px;padding:7px 8px;}
+  .el .sw{width:9px;height:9px;}
+  .theme-toggle{top:14px;right:12px;}
+}
+</style>
+<script type="importmap">
+{
+  "imports": {
+    "three": "https://unpkg.com/three@0.160.0/build/three.module.js"
+  }
+}
+</script>
+</head>
+<body data-theme="light">
+<div id="app">
+  <aside id="creaturePanel">
+    <div class="creature-head">(─‿‿─)</div>
+    <button class="creature-btn" data-t="cat">
+      <svg viewBox="0 0 40 40" width="36" height="36">
+        <ellipse cx="20" cy="35" rx="11" ry="1.4" fill="rgba(0,0,0,.10)"/>
+        <path d="M8 27 Q4 24 6 20" stroke="#d97d24" stroke-width="3" fill="none" stroke-linecap="round"/>
+        <ellipse cx="18" cy="27" rx="10" ry="6" fill="#f5a04a"/>
+        <ellipse cx="18" cy="29" rx="5" ry="4" fill="#ffd9a0"/>
+        <circle cx="27" cy="22" r="6" fill="#f5a04a"/>
+        <path d="M22 18 L20 12 L25 15 Z" fill="#f5a04a"/>
+        <path d="M32 18 L34 12 L29 15 Z" fill="#f5a04a"/>
+        <path d="M22.5 17.5 L21.2 13.5 L24.5 15 Z" fill="#ffb3d9"/>
+        <path d="M31.5 17.5 L32.8 13.5 L29.5 15 Z" fill="#ffb3d9"/>
+        <circle cx="25" cy="22" r="1.3" fill="#7dd87d"/>
+        <circle cx="29" cy="22" r="1.3" fill="#7dd87d"/>
+        <circle cx="25" cy="22" r="0.6" fill="#1a1a2e"/>
+        <circle cx="29" cy="22" r="0.6" fill="#1a1a2e"/>
+        <path d="M26 24 L27 25 L28 24" stroke="#ff8c9d" stroke-width="1" fill="none"/>
+        <circle cx="18" cy="22" r="0.8" fill="#d97d24"/>
+        <circle cx="14" cy="22" r="0.8" fill="#d97d24"/>
+        <circle cx="20" cy="26" r="0.8" fill="#d97d24"/>
+      </svg>
+      <span class="lbl">Кот</span>
+    </button>
+    <button class="creature-btn" data-t="fish">
+      <svg viewBox="0 0 40 40" width="36" height="36">
+        <path d="M6 20 L2 15 L2 25 Z" fill="#ff3d7a"/>
+        <ellipse cx="20" cy="20" rx="14" ry="7" fill="#ff6b9d"/>
+        <path d="M18 13 L22 9 L24 14 Z" fill="#ff3d7a"/>
+        <circle cx="28" cy="18" r="2.5" fill="#fff"/>
+        <circle cx="29" cy="18" r="1.3" fill="#1a1a2e"/>
+        <circle cx="29.5" cy="17.5" r="0.5" fill="#fff"/>
+        <path d="M14 20 Q20 22 26 20" stroke="#ffa0c4" stroke-width="0.8" fill="none"/>
+      </svg>
+      <span class="lbl">Рыбка</span>
+    </button>
+  </aside>
+
+  <main id="stage">
+    <div id="canvasWrap">
+      <canvas id="glcanvas"></canvas>
+      <canvas id="overlay"></canvas>
+    </div>
+  </main>
+
+  <aside id="panel">
+    <div class="panel-head">
+      <span>Элементы</span>
+      <button class="theme-toggle" id="themeToggle" aria-label="Тема">
+        <svg id="themeIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="4"/>
+          <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/>
+        </svg>
+      </button>
+    </div>
+
+    <div id="palette"></div>
+
+    <div class="ctrl">
+      <input id="brush" type="range" min="1" max="40" value="7">
+    </div>
+
+    <div class="ctrl row">
+      <button class="btn" id="pauseBtn">Пауза</button>
+      <button class="btn" id="clearBtn">Очистить</button>
+    </div>
+
+    <div class="panel-foot">Грамотиньо. Элементы</div>
+  </aside>
+</div>
+
+<script type="module">
+import * as THREE from 'three';
+
+/* ============================================================
+   СЕТКА
+   ============================================================ */
+const W = 300, H = 300, N = W * H;
+
+/* ============================================================
+   ЭЛЕМЕНТЫ
+   ============================================================ */
+const EMPTY = 0;
+const SAND = 1;
+const WATER = 2;
+const EARTH = 3;
+const SEED = 4;
+const STEM = 5;
+const LEAF = 6;
+const FIRE = 7;
+const SMOKE = 8;
+const STEAM = 9;
+const ICE = 10;
+const SALT = 11;
+const METAL = 12;
+const GUNPOWDER = 13;
+const SNOW = 14;
+
+const S_EMPTY = 0;
+const S_POWDER = 1;
+const S_LIQUID = 2;
+const S_GAS = 3;
+const S_SOLID = 4;
+
+const EL = [];
+
+function hex2rgb(h){
+  const n = parseInt(h.slice(1), 16);
+  return [(n >> 16) & 255, (n >> 8) & 255, n & 255];
+}
+
+function def(id, name, hex, state, density, opt){
+  const c = hex2rgb(hex);
+  const base = {
+    id, name, hex,
+    r: c[0], g: c[1], b: c[2],
+    state, density,
+    disp: 0, flam: 0, burn: 0, life: 0
+  };
+  if (opt){
+    if (opt.disp !== undefined) base.disp = opt.disp;
+    if (opt.flam !== undefined) base.flam = opt.flam;
+    if (opt.burn !== undefined) base.burn = opt.burn;
+    if (opt.life !== undefined) base.life = opt.life;
+  }
+  EL[id] = base;
+}
+
+def(EMPTY,       'Ластик',   '#f5f5f7', S_EMPTY,   0);
+def(SAND,        'Песок',    '#ffd633', S_POWDER, 60);
+def(WATER,       'Вода',     '#33bbff', S_LIQUID, 10, {disp:3});
+def(EARTH,       'Земля',    '#8a5a3a', S_POWDER, 50);
+def(SEED,        'Семена',   '#d4a84b', S_POWDER, 45);
+def(STEM,        '—',        '#5eb85a', S_SOLID, 255, {flam:.18, burn:20});
+def(LEAF,        '—',        '#4aa84a', S_SOLID, 255, {flam:.14, burn:30});
+def(FIRE,        'Огонь',    '#ff1a1a', S_GAS,     1, {life:40});
+def(SMOKE,       'Дым',      '#6a7a8a', S_GAS,     2, {life:110});
+def(STEAM,       'Пар',      '#b8c8d8', S_GAS,     2, {life:150});
+def(ICE,         'Лёд',      '#8ec8e8', S_SOLID, 255);
+def(SALT,        'Соль',     '#e8e0c8', S_POWDER, 55);
+def(METAL,       'Металл',   '#8a96a4', S_SOLID, 255);
+def(GUNPOWDER,   'Порох',    '#3a342c', S_POWDER, 50, {flam:.55, burn:14});
+def(SNOW,        'Снег',     '#e8f0f8', S_POWDER, 35);
+
+const NUM_EL = EL.length;
+
+/* ============================================================
+   ЦВЕТОВЫЕ LUT
+   ============================================================ */
+const LUT = new Uint32Array(NUM_EL * 16);
+for (let t = 0; t < NUM_EL; t++){
+  const e = EL[t];
+  for (let s = 0; s < 16; s++){
+    const k = 0.88 + (s / 15) * 0.24;
+    const r = Math.min(255, Math.round(e.r * k));
+    const g = Math.min(255, Math.round(e.g * k));
+    const b = Math.min(255, Math.round(e.b * k));
+    LUT[(t << 4) | s] = ((255 << 24) | (b << 16) | (g << 8) | r) >>> 0;
+  }
+}
+
+const LEAF_COLORS = [
+  [232, 90, 138],  [232, 120, 120], [240, 180, 100], [240, 210, 90],
+  [220, 80, 100],  [240, 120, 170], [210, 90, 140],  [190, 60, 100],
+  [240, 150, 100], [220, 60, 90],   [245, 140, 60],  [220, 150, 50],
+  [235, 110, 90],  [220, 170, 60],  [200, 80, 130],  [210, 110, 110]
+];
+const LEAF_LUT = new Uint32Array(16 * 16);
+for (let ci = 0; ci < 16; ci++){
+  const col = LEAF_COLORS[ci];
+  for (let v = 0; v < 16; v++){
+    const k = 0.85 + (v / 15) * 0.32;
+    const rr = Math.min(255, Math.round(col[0] * k));
+    const gg = Math.min(255, Math.round(col[1] * k));
+    const bb = Math.min(255, Math.round(col[2] * k));
+    LEAF_LUT[(ci << 4) | v] = ((255 << 24) | (bb << 16) | (gg << 8) | rr) >>> 0;
+  }
+}
+
+const FIRE_LUT = new Uint32Array(64);
+for (let k = 0; k < 64; k++){
+  const f = k / 63;
+  const r = 255;
+  const g = Math.round(20 + 140 * Math.pow(f, 0.55));
+  const b = Math.round(10 * Math.pow(1 - f, 2));
+  FIRE_LUT[k] = ((255 << 24) | (Math.min(255, b) << 16) | (g << 8) | r) >>> 0;
+}
+
+/* ============================================================
+   СОСТОЯНИЕ
+   ============================================================ */
+const type  = new Uint8Array(N);
+const life  = new Uint8Array(N);
+const tint  = new Uint8Array(N);
+const moved = new Uint8Array(N);
+for (let i = 0; i < N; i++) tint[i] = (Math.random() * 16) | 0;
+
+const pixels = new Uint8Array(N * 4);
+const buf32  = new Uint32Array(pixels.buffer);
+
+/* ============================================================
+   БАЗОВЫЕ ОПЕРАЦИИ
+   ============================================================ */
+function setCell(i, t, l){
+  type[i] = t;
+  if (l === undefined) life[i] = EL[t].life;
+  else life[i] = l;
+  tint[i] = (Math.random() * 16) | 0;
+  moved[i] = 1;
+}
+
+function swap(i, j){
+  const tt = type[i]; type[i] = type[j]; type[j] = tt;
+  const ll = life[i]; life[i] = life[j]; life[j] = ll;
+  const cc = tint[i]; tint[i] = tint[j]; tint[j] = cc;
+  moved[i] = 1; moved[j] = 1;
+}
+
+function canFall(t, o){
+  if (o === EMPTY) return true;
+  if (o === SEED) return true;
+  const s = EL[o].state;
+  if (s === S_SOLID || s === S_POWDER) return false;
+  return EL[t].density > EL[o].density;
+}
+
+function canRise(t, o){
+  if (o === EMPTY) return true;
+  const s = EL[o].state;
+  if (s === S_SOLID || s === S_POWDER) return false;
+  return EL[o].density > EL[t].density;
+}
+
+function findWater(x, y, rad){
+  for (let dy = -rad; dy <= rad; dy++){
+    const ny = y + dy;
+    if (ny < 0 || ny >= H) continue;
+    for (let dx = -rad; dx <= rad; dx++){
+      if (dx === 0 && dy === 0) continue;
+      if (dx*dx + dy*dy > rad*rad) continue;
+      const nx = x + dx;
+      if (nx < 0 || nx >= W) continue;
+      const j = ny * W + nx;
+      if (type[j] === WATER) return j;
+    }
+  }
+  return -1;
+}
+
+function earthDepthBelow(x, startY){
+  let d = 0;
+  for (let ny = startY; ny < H; ny++){
+    const t = type[ny * W + x];
+    if (t === EARTH || t === STEM) d++;
+    else break;
+  }
+  return d;
+}
+
+function fallLikePowder(x, y, i, t){
+  if (y + 1 >= H) return false;
+  const bi = i + W;
+  if (canFall(t, type[bi])){ swap(i, bi); return true; }
+  const d0 = Math.random() < 0.5 ? -1 : 1;
+  for (let k = 0; k < 2; k++){
+    const d = (k === 0) ? d0 : -d0;
+    const nx = x + d;
+    if (nx < 0 || nx >= W) continue;
+    const j = bi + d;
+    if (canFall(t, type[j]) && canFall(t, type[i + d])){
+      swap(i, j);
+      return true;
+    }
+  }
+  return false;
+}
+
+function stepPowder(x, y, i, t){
+  if (t === SALT){
+    if (y > 0 && type[i - W] === ICE && Math.random() < 0.05){
+      setCell(i - W, WATER); setCell(i, EMPTY); return;
+    }
+    if (y < H - 1 && type[i + W] === ICE && Math.random() < 0.05){
+      setCell(i + W, WATER); setCell(i, EMPTY); return;
+    }
+  } else if (t === SNOW){
+    if (x > 0 && type[i - 1] === FIRE){ setCell(i, WATER); return; }
+    if (x < W - 1 && type[i + 1] === FIRE){ setCell(i, WATER); return; }
+    if (y > 0 && type[i - W] === FIRE){ setCell(i, WATER); return; }
+    if (y < H - 1 && type[i + W] === FIRE){ setCell(i, WATER); return; }
+  }
+  fallLikePowder(x, y, i, t);
+}
+
+function stepSeed(x, y, i){
+  if (y + 1 >= H) return;
+  const below = type[i + W];
+  const onSoil = (below === EARTH || below === STEM);
+  if (onSoil){
+    const w = findWater(x, y, 6);
+    if (w < 0) return;
+    const depth = earthDepthBelow(x, y + 1);
+    if (depth <= 0) return;
+    setCell(w, EMPTY);
+    const maxDepth = H - 20;
+    const ratio = Math.min(1, depth / maxDepth);
+    const r = Math.random();
+    let kind;
+    if (r < 0.40) kind = 'grass';
+    else if (r < 0.72) kind = 'flower';
+    else kind = 'tree';
+    const baseY = y - 1;
+    if (baseY < 0) return;
+    if (kind === 'tree'){
+      const treeH = Math.max(5, Math.round(5 + ratio * 21));
+      const trunkW = Math.max(1, Math.round(1 + ratio * 1));
+      for (let s = 0; s < treeH; s++){
+        const ny = baseY - s;
+        if (ny < 0) break;
+        for (let ox = -Math.floor(trunkW/2); ox <= Math.floor(trunkW/2); ox++){
+          const nx = x + ox;
+          if (nx < 0 || nx >= W) continue;
+          const j = ny * W + nx;
+          if (type[j] !== EMPTY && type[j] !== SEED && type[j] !== STEM) continue;
+          setCell(j, STEM);
+        }
+      }
+      const rad = Math.max(1, Math.round(1 + ratio * 3));
+      const cyT = baseY - treeH + 1;
+      for (let dy = -rad; dy <= rad; dy++){
+        for (let dx = -rad; dx <= rad; dx++){
+          if (dx*dx + dy*dy > rad*rad) continue;
+          const nx = x + dx;
+          const ny = cyT + dy;
+          if (nx < 0 || nx >= W || ny < 0 || ny >= H) continue;
+          const j = ny * W + nx;
+          if (type[j] === EMPTY || type[j] === SEED){
+            setCell(j, LEAF);
+            life[j] = (Math.random() * 16) | 0;
+          }
+        }
+      }
+    } else if (kind === 'flower'){
+      const stemH = Math.max(2, Math.round(2 + ratio * 9));
+      for (let s = 0; s < stemH; s++){
+        const ny = baseY - s;
+        if (ny < 0) break;
+        const j = ny * W + x;
+        if (type[j] !== EMPTY && type[j] !== SEED && type[j] !== STEM) continue;
+        setCell(j, STEM);
+      }
+      const rad = Math.max(1, Math.round(1 + ratio * 3));
+      const cyT = baseY - stemH;
+      for (let dy = -rad; dy <= rad; dy++){
+        for (let dx = -rad; dx <= rad; dx++){
+          if (dx*dx + dy*dy > rad*rad) continue;
+          const nx = x + dx;
+          const ny = cyT + dy;
+          if (nx < 0 || nx >= W || ny < 0 || ny >= H) continue;
+          const j = ny * W + nx;
+          if (type[j] === EMPTY || type[j] === SEED){
+            setCell(j, LEAF);
+            life[j] = (Math.random() * 16) | 0;
+          }
+        }
+      }
+    } else {
+      const stemH = Math.max(1, Math.round(1 + ratio * 5));
+      for (let s = 0; s < stemH; s++){
+        const ny = baseY - s;
+        if (ny < 0) break;
+        const j = ny * W + x;
+        if (type[j] !== EMPTY && type[j] !== SEED && type[j] !== STEM) continue;
+        setCell(j, STEM);
+      }
+      const rad = Math.max(1, Math.round(1 + ratio * 2));
+      const cyT = baseY - stemH;
+      for (let dy = -rad; dy <= rad; dy++){
+        for (let dx = -rad; dx <= rad; dx++){
+          if (dx*dx + dy*dy > rad*rad) continue;
+          const nx = x + dx;
+          const ny = cyT + dy;
+          if (nx < 0 || nx >= W || ny < 0 || ny >= H) continue;
+          const j = ny * W + nx;
+          if (type[j] === EMPTY || type[j] === SEED){
+            setCell(j, LEAF);
+            life[j] = (Math.random() * 16) | 0;
+          }
+        }
+      }
+    }
+    return;
+  }
+  fallLikePowder(x, y, i, SEED);
+}
+
+function stepLiquid(x, y, i, t){
+  const disp = EL[t].disp || 1;
+  if (y + 1 < H){
+    const bi = i + W;
+    if (canFall(t, type[bi])){ swap(i, bi); return; }
+    const d0 = Math.random() < 0.5 ? -1 : 1;
+    for (let k = 0; k < 2; k++){
+      const d = (k === 0) ? d0 : -d0;
+      const nx = x + d;
+      if (nx < 0 || nx >= W) continue;
+      const j = bi + d;
+      if (canFall(t, type[j]) && canFall(t, type[i + d])){
+        swap(i, j);
+        return;
+      }
+    }
+  }
+  const d0 = Math.random() < 0.5 ? -1 : 1;
+  for (let k = 0; k < 2; k++){
+    const d = (k === 0) ? d0 : -d0;
+    let target = -1;
+    for (let s = 1; s <= disp; s++){
+      const nx = x + d * s;
+      if (nx < 0 || nx >= W) break;
+      const j = y * W + nx;
+      if (!canFall(t, type[j])) break;
+      target = j;
+    }
+    if (target >= 0){ swap(i, target); return; }
+  }
+}
+
+function stepGas(x, y, i, t){
+  const l = life[i];
+  if (l === 0){
+    if (t === STEAM) setCell(i, WATER);
+    else             setCell(i, EMPTY);
+    return;
+  }
+  life[i] = l - 1;
+  if (y > 0){
+    const ui = i - W;
+    if (canRise(t, type[ui])){ swap(i, ui); return; }
+    const d0 = Math.random() < 0.5 ? -1 : 1;
+    for (let k = 0; k < 2; k++){
+      const d = (k === 0) ? d0 : -d0;
+      const nx = x + d;
+      if (nx < 0 || nx >= W) continue;
+      const j = ui + d;
+      if (canRise(t, type[j])){ swap(i, j); return; }
+    }
+  }
+  const d = Math.random() < 0.5 ? -1 : 1;
+  const nx = x + d;
+  if (nx >= 0 && nx < W){
+    const j = i + d;
+    if (canRise(t, type[j])) swap(i, j);
+  }
+}
+
+function stepFire(x, y, i){
+  let l = life[i];
+  if (l === 0) l = 30;
+  const x0 = x > 0 ? x - 1 : 0;
+  const x1 = x < W - 1 ? x + 1 : W - 1;
+  const y0 = y > 0 ? y - 1 : 0;
+  const y1 = y < H - 1 ? y + 1 : H - 1;
+  for (let ny = y0; ny <= y1; ny++){
+    const row = ny * W;
+    for (let nx = x0; nx <= x1; nx++){
+      if (nx === x && ny === y) continue;
+      const j = row + nx;
+      const o = type[j];
+      if (o === EMPTY || o === FIRE || o === SMOKE) continue;
+      if (o === WATER){ setCell(j, STEAM); setCell(i, SMOKE, 40); return; }
+      if (o === ICE || o === SNOW){ setCell(j, WATER); continue; }
+      if (o === GUNPOWDER){ explode(nx, ny, 5); return; }
+      const oe = EL[o];
+      if (oe.flam > 0 && Math.random() < oe.flam){
+        setCell(j, FIRE, oe.burn || 30);
+      }
+    }
+  }
+  l--;
+  if (l <= 0){
+    if (Math.random() < 0.4) setCell(i, SMOKE, 70);
+    else                     setCell(i, EMPTY);
+    return;
+  }
+  life[i] = l;
+  if (y > 0 && Math.random() < 0.35){
+    const ui = i - W;
+    if (type[ui] === EMPTY){ swap(i, ui); return; }
+  }
+  if (Math.random() < 0.15){
+    const d = Math.random() < 0.5 ? -1 : 1;
+    const nx = x + d;
+    if (nx >= 0 && nx < W){
+      const j = i + d;
+      if (type[j] === EMPTY) swap(i, j);
+    }
+  }
+}
+
+function stepIce(x, y, i){
+  if (Math.random() > 0.25) return;
+  for (let k = 0; k < 4; k++){
+    let j = -1;
+    if (k === 0){ if (x === 0) continue; j = i - 1; }
+    else if (k === 1){ if (x === W - 1) continue; j = i + 1; }
+    else if (k === 2){ if (y === 0) continue; j = i - W; }
+    else { if (y === H - 1) continue; j = i + W; }
+    if (type[j] === FIRE){ setCell(i, WATER); return; }
+  }
+}
+
+function explode(cx, cy, r){
+  for (let y = cy - r; y <= cy + r; y++){
+    if (y < 0 || y >= H) continue;
+    for (let x = cx - r; x <= cx + r; x++){
+      if (x < 0 || x >= W) continue;
+      const dx = x - cx;
+      const dy = y - cy;
+      const d2 = dx * dx + dy * dy;
+      if (d2 > r * r) continue;
+      const i = y * W + x;
+      const o = type[i];
+      if (o === METAL) continue;
+      if (o === GUNPOWDER){ setCell(i, FIRE, 10 + ((Math.random() * 20) | 0)); }
+      else if (d2 < r * r * 0.25){ setCell(i, FIRE, 20 + ((Math.random() * 30) | 0)); }
+      else if (Math.random() < 0.55){ setCell(i, FIRE, 8 + ((Math.random() * 20) | 0)); }
+      else if (o !== EMPTY && Math.random() < 0.3){ setCell(i, SMOKE, 70); }
+    }
+  }
+}
+
+/* ============================================================
+   СУЩЕСТВА
+   ============================================================ */
+const FISH_SIZE = 1.2;
+const CAT_SIZE  = 3.5;
+
+const MAX_CATS = 3;
+const MAX_FISH = 5;
+
+const creatures = [];
+
+const CAT_PALETTES = [
+  { body:'#f5a04a', bodyDark:'#d97d24', belly:'#ffd9a0', eye:'#7dd87d', nose:'#ff8c9d', pattern:'stripes', bow:false },
+  { body:'#a8a8b8', bodyDark:'#7a7a8a', belly:'#e0e0ea', eye:'#6ec8ff', nose:'#8a8a9a', pattern:'solid',   bow:false },
+  { body:'#ffffff', bodyDark:'#e0e0ea', belly:'#ffffff', eye:'#6ec8ff', nose:'#ff8c9d', pattern:'solid',   bow:true  }
+];
+
+function countType(pred){
+  let n = 0;
+  for (const c of creatures) if (pred(c)) n++;
+  return n;
+}
+
+function canSpawn(kind){
+  if (kind === 'cat')  return countType(c => c.kind === 'cat') < MAX_CATS;
+  if (kind === 'fish') return countType(c => c.kind === 'fish') < MAX_FISH;
+  return false;
+}
+
+function spawnCreature(kind, x, y){
+  if (!canSpawn(kind)) return false;
+  const c = {
+    kind,
+    variant: kind === 'cat' ? (Math.random() * CAT_PALETTES.length) | 0 : 0,
+    x, y,
+    vy: 0,
+    dir: Math.random() < 0.5 ? -1 : 1,
+    state: 'walk',
+    timer: 40 + ((Math.random() * 90) | 0),
+    vert: Math.random() < 0.5 ? -1 : 1,
+    jumpFrames: 0
+  };
+  creatures.push(c);
+  return true;
+}
+
+function isWaterAt(x, y){
+  const ix = Math.floor(x);
+  const iy = Math.floor(y);
+  if (ix < 0 || ix >= W || iy < 0 || iy >= H) return false;
+  return type[iy * W + ix] === WATER;
+}
+
+function isSolidAt(x, y){
+  const ix = Math.floor(x);
+  const iy = Math.floor(y);
+  if (ix < 0 || ix >= W || iy < 0 || iy >= H) return true;
+  const t = type[iy * W + ix];
+  if (t === EMPTY) return false;
+  if (t === WATER) return false;
+  if (t === FIRE || t === SMOKE || t === STEAM) return false;
+  return true;
+}
+
+function isGroundAt(x, y){
+  const ix = Math.floor(x);
+  const iy = Math.floor(y);
+  if (ix < 0 || ix >= W || iy < 0 || iy >= H) return false;
+  const t = type[iy * W + ix];
+  return t === EARTH || t === STEM || t === SAND || t === METAL ||
+         t === ICE || t === SALT || t === SNOW || t === SEED;
+}
+
+/* ============================================================
+   РЫБА
+   ============================================================ */
+function stepFish(c){
+  c.inWater = isWaterAt(c.x, c.y);
+  if (!c.inWater){
+    c.timer -= 1;
+    if (c.timer <= 0) c.dead = true;
+    return;
+  }
+  c.timer -= 1;
+  if (c.timer <= 0){
+    c.timer = 60 + ((Math.random() * 120) | 0);
+    c.vert = Math.random() < 0.5 ? -1 : 1;
+  }
+  const nx = c.x + c.dir * 0.15;
+  if (isWaterAt(nx, c.y)) c.x = nx;
+  else {
+    c.dir = -c.dir;
+    const nx2 = c.x + c.dir * 0.15;
+    if (isWaterAt(nx2, c.y)) c.x = nx2;
+  }
+  let ny = c.y + c.vert * 0.08;
+  if (c.vert > 0 && !isWaterAt(c.x, c.y + 1.0)){ c.vert = -1; ny = c.y - 0.08; }
+  if (c.vert < 0 && !isWaterAt(c.x, c.y - 0.8)){ c.vert = 1;  ny = c.y + 0.08; }
+  if (isWaterAt(c.x, ny)) c.y = ny;
+}
+
+/* ============================================================
+   КОТ — новая чистая логика
+   ============================================================ */
+
+// центр кота (точка, которую проверяем)
+function catCenterY(c){ return c.y; }
+
+// «ноги» кота — низ фигуры
+function catFeetY(c){ return c.y + CAT_SIZE * 0.45; }
+
+// проверка земли ровно под центром кота
+function catOnGround(c){
+  return isGroundAt(c.x, catFeetY(c));
+}
+
+// проверка, есть ли земля на 1 клетку ниже (чтобы понять, падаем или нет)
+function catGroundBelow(c){
+  return isGroundAt(c.x, catFeetY(c) + 1);
+}
+
+function stepCat(c){
+  // === 1. ВОДА — приоритет ===
+  if (isWaterAt(c.x, c.y)){
+    if (c.state !== 'jump'){
+      c.state = 'jump';
+      c.vy = -3.0;
+      c.jumpFrames = 400;
+    }
+    c.vy += 0.18;
+    c.y += c.vy;
+    c.jumpFrames--;
+    if (c.y < -CAT_SIZE * 3 || c.jumpFrames <= 0){
+      c.dead = true;
+    }
+    return;
+  }
+
+  // === 2. ПАДЕНИЕ ===
+  // если под ногами нет земли И мы не в состоянии прыжка — падаем
+  if (!catOnGround(c) && c.state !== 'jump'){
+    c.vy += 0.4;
+    if (c.vy > 2.5) c.vy = 2.5;
+    c.y += c.vy;
+    // приземление: ноги коснулись земли
+    if (catOnGround(c)){
+      // выравниваем ровно на землю
+      while (catOnGround(c) && isGroundAt(c.x, catFeetY(c) - 1)){
+        c.y -= 0.25;
+      }
+      c.vy = 0;
+    }
+    if (c.y > H + CAT_SIZE) c.dead = true;
+    return;
+  }
+
+  // если мы в состоянии jump (от стены), обрабатываем прыжок
+  if (c.state === 'jump'){
+    c.jumpFrames--;
+    c.vy += 0.35;
+    c.y += c.vy;
+    // приземление
+    if (c.vy > 0 && catOnGround(c)){
+      while (catOnGround(c) && isGroundAt(c.x, catFeetY(c) - 1)){
+        c.y -= 0.25;
+      }
+      c.vy = 0;
+      c.state = 'walk';
+      c.timer = 30 + ((Math.random() * 40) | 0);
+    }
+    if (c.y > H + CAT_SIZE) c.dead = true;
+    return;
+  }
+
+  // === 3. СТОИМ НА ЗЕМЛЕ ===
+  c.vy = 0;
+
+  // таймер смены поведения
+  c.timer -= 1;
+  if (c.timer <= 0){
+    c.timer = 60 + ((Math.random() * 140) | 0);
+    const r = Math.random();
+    if (r < 0.28) c.state = 'lie';
+    else if (r < 0.48) c.state = 'sit';
+    else if (r < 0.65) c.state = 'jump';
+    else c.state = 'walk';
+    if (Math.random() < 0.4) c.dir = -c.dir;
+  }
+
+  // === ЛЕЖИТ ===
+  if (c.state === 'lie'){
+    if (Math.random() < 0.02) c.state = 'walk';
+    return;
+  }
+
+  // === СИДИТ ===
+  if (c.state === 'sit'){
+    if (Math.random() < 0.02) c.state = 'walk';
+    return;
+  }
+
+  // === ПРЫЖОК ===
+  if (c.state === 'jump'){
+    c.vy = -1.8;
+    c.jumpFrames = 30;
+    return;
+  }
+
+  // === ХОДИТ ===
+  // смотрим, есть ли земля в точке чуть впереди
+  const aheadX = c.x + c.dir * 0.5;
+  const aheadGround = isGroundAt(aheadX, catFeetY(c));
+
+  if (aheadGround){
+    c.x = aheadX;
+  } else {
+    // впереди нет земли — разворачиваемся (не падаем в яму)
+    c.dir = -c.dir;
+  }
+}
+
+function stepCreature(c){
+  if (c.kind === 'fish') return stepFish(c);
+  if (c.kind === 'cat')  return stepCat(c);
+}
+
+function stepCreatures(){
+  for (let k = creatures.length - 1; k >= 0; k--){
+    const c = creatures[k];
+    stepCreature(c);
+    if (c.dead) creatures.splice(k, 1);
+  }
+}
+
+/* ============================================================
+   ДИСПЕТЧЕР
+   ============================================================ */
+let frame = 0;
+
+function stepElement(t, x, y, i){
+  switch (t){
+    case FIRE:      stepFire(x, y, i); break;
+    case SEED:      stepSeed(x, y, i); break;
+    case SMOKE:     stepGas(x, y, i, t); break;
+    case STEAM:     stepGas(x, y, i, t); break;
+    case SAND:      stepPowder(x, y, i, t); break;
+    case EARTH:     stepPowder(x, y, i, t); break;
+    case SALT:      stepPowder(x, y, i, t); break;
+    case SNOW:      stepPowder(x, y, i, t); break;
+    case GUNPOWDER: stepPowder(x, y, i, t); break;
+    case WATER:     stepLiquid(x, y, i, t); break;
+    case ICE:       stepIce(x, y, i); break;
+    default: break;
+  }
+}
+
+function simulate(){
+  frame++;
+  moved.fill(0);
+  for (let y = H - 1; y >= 0; y--){
+    const ltr = ((frame + y) & 1) === 0;
+    for (let n = 0; n < W; n++){
+      const x = ltr ? n : (W - 1 - n);
+      const i = y * W + x;
+      const t = type[i];
+      if (t === EMPTY || moved[i]) continue;
+      stepElement(t, x, y, i);
+    }
+  }
+  stepCreatures();
+}
+
+function fillPixels(){
+  for (let i = 0; i < N; i++){
+    const t = type[i];
+    if (t === FIRE){
+      let l = life[i] - (tint[i] & 3);
+      if (l < 0) l = 0;
+      else if (l > 63) l = 63;
+      buf32[i] = FIRE_LUT[l];
+    } else if (t === LEAF){
+      const ci = life[i] & 15;
+      const v  = tint[i] & 15;
+      buf32[i] = LEAF_LUT[(ci << 4) | v];
+    } else {
+      buf32[i] = LUT[(t << 4) | (tint[i] & 15)];
+    }
+  }
+}
+
+/* ============================================================
+   THREE.JS
+   ============================================================ */
+const glCanvas = document.getElementById('glcanvas');
+const overlay = document.getElementById('overlay');
+const octx = overlay.getContext('2d');
+
+const renderer = new THREE.WebGLRenderer({
+  canvas: glCanvas,
+  antialias: false,
+  alpha: false,
+  powerPreference: 'high-performance'
+});
+renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+
+const simTex = new THREE.DataTexture(
+  pixels, W, H,
+  THREE.RGBAFormat,
+  THREE.UnsignedByteType
+);
+simTex.minFilter = THREE.NearestFilter;
+simTex.magFilter = THREE.NearestFilter;
+simTex.wrapS = THREE.ClampToEdgeWrapping;
+simTex.wrapT = THREE.ClampToEdgeWrapping;
+simTex.generateMipmaps = false;
+simTex.needsUpdate = true;
+
+const camera = new THREE.OrthographicCamera(-0.5, 0.5, 0.5, -0.5, 0, 1);
+const scene = new THREE.Scene();
+
+const uniforms = {
+  uTex: { value: simTex },
+  uTime: { value: 0 },
+  uResolution: { value: new THREE.Vector2(W, H) }
+};
+
+const vertexShader = [
+  'varying vec2 vUv;',
+  'void main(){',
+  '  vUv = uv;',
+  '  gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);',
+  '}'
+].join('\n');
+
+const fragmentShader = [
+  'precision highp float;',
+  'varying vec2 vUv;',
+  'uniform sampler2D uTex;',
+  'void main(){',
+  '  vec2 uv = vec2(vUv.x, 1.0 - vUv.y);',
+  '  vec3 col = texture2D(uTex, uv).rgb;',
+  '  gl_FragColor = vec4(col, 1.0);',
+  '}'
+].join('\n');
+
+const material = new THREE.ShaderMaterial({
+  uniforms,
+  vertexShader,
+  fragmentShader,
+  depthTest: false,
+  depthWrite: false
+});
+
+const quad = new THREE.Mesh(new THREE.PlaneGeometry(1, 1), material);
+scene.add(quad);
+
+let CSS_SIZE = 600;
+let PX_PER_CELL = 2;
+
+function resizeRenderer(){
+  const stageEl = document.getElementById('stage');
+  const wrapEl  = document.getElementById('canvasWrap');
+  const availW = stageEl.clientWidth - 48;
+  const availH = stageEl.clientHeight - 48;
+  const size = Math.max(160, Math.min(availW, availH, 900));
+  CSS_SIZE = size;
+  PX_PER_CELL = size / W;
+
+  const dpr = Math.min(window.devicePixelRatio || 1, 2);
+  renderer.setPixelRatio(dpr);
+  renderer.setSize(size, size, false);
+  glCanvas.style.width  = size + 'px';
+  glCanvas.style.height = size + 'px';
+  wrapEl.style.width  = size + 'px';
+  wrapEl.style.height = size + 'px';
+
+  overlay.width  = size * dpr;
+  overlay.height = size * dpr;
+  overlay.style.width  = size + 'px';
+  overlay.style.height = size + 'px';
+  octx.setTransform(dpr, 0, 0, dpr, 0, 0);
+}
+
+new ResizeObserver(resizeRenderer).observe(document.getElementById('stage'));
+window.addEventListener('resize', resizeRenderer);
+
+function worldToPx(x, y){
+  return [x * PX_PER_CELL, y * PX_PER_CELL];
+}
+
+/* ============================================================
+   РИСОВАНИЕ — РЫБА
+   ============================================================ */
+function drawFish(ctx, cx, cy, dir, size){
+  const L = size;
+  const Hh = size * 0.5;
+  ctx.save();
+  ctx.translate(cx, cy);
+  if (dir < 0) ctx.scale(-1, 1);
+
+  ctx.fillStyle = '#ff3d7a';
+  ctx.beginPath();
+  ctx.moveTo(-L * 0.45, 0);
+  ctx.lineTo(-L * 0.75, -Hh * 0.6);
+  ctx.lineTo(-L * 0.75,  Hh * 0.6);
+  ctx.closePath();
+  ctx.fill();
+
+  const grd = ctx.createLinearGradient(0, -Hh*0.5, 0, Hh*0.5);
+  grd.addColorStop(0, '#ffa0c4');
+  grd.addColorStop(1, '#ff6b9d');
+  ctx.fillStyle = grd;
+  ctx.beginPath();
+  ctx.ellipse(0, 0, L * 0.45, Hh * 0.55, 0, 0, Math.PI * 2);
+  ctx.fill();
+
+  ctx.fillStyle = '#ff3d7a';
+  ctx.beginPath();
+  ctx.moveTo(-L * 0.05, -Hh * 0.5);
+  ctx.lineTo( L * 0.15, -Hh * 0.95);
+  ctx.lineTo( L * 0.25, -Hh * 0.5);
+  ctx.closePath();
+  ctx.fill();
+
+  ctx.fillStyle = '#fff';
+  ctx.beginPath();
+  ctx.arc(L * 0.22, -Hh * 0.1, Hh * 0.18, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.fillStyle = '#1a1a2e';
+  ctx.beginPath();
+  ctx.arc(L * 0.24, -Hh * 0.1, Hh * 0.10, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.fillStyle = 'rgba(255,255,255,0.9)';
+  ctx.beginPath();
+  ctx.arc(L * 0.27, -Hh * 0.15, Hh * 0.04, 0, Math.PI * 2);
+  ctx.fill();
+
+  ctx.restore();
+}
+
+/* ============================================================
+   РИСОВАНИЕ — КОТ
+   ============================================================ */
+function drawCat(ctx, cx, cy, dir, size, variant, state, walkPhase){
+  const L = size;
+  const Hh = size * 0.9;
+  const P = CAT_PALETTES[variant] || CAT_PALETTES[0];
+
+  ctx.save();
+  ctx.translate(cx, cy);
+  if (dir < 0) ctx.scale(-1, 1);
+
+  const isLie = state === 'lie';
+  const isJump = state === 'jump';
+
+  // тень только на земле
+  if (!isJump){
+    ctx.fillStyle = 'rgba(0,0,0,0.08)';
+    ctx.beginPath();
+    ctx.ellipse(0, Hh * 0.48, L * 0.45, Hh * 0.08, 0, 0, Math.PI * 2);
+    ctx.fill();
+  }
+
+  const tailSwing = Math.sin(walkPhase * 1.3) * 0.4;
+
+  const bodyY = isLie ? Hh * 0.25 : Hh * 0.15;
+  const bodyW = isLie ? L * 0.50 : L * 0.42;
+  const bodyH = isLie ? Hh * 0.22 : Hh * 0.32;
+  const headY = isLie ? -Hh * 0.05 : -Hh * 0.15;
+
+  // хвост
+  ctx.save();
+  ctx.translate(-L * 0.35, bodyY);
+  ctx.rotate(tailSwing);
+  ctx.strokeStyle = P.bodyDark;
+  ctx.lineWidth = L * 0.10;
+  ctx.lineCap = 'round';
+  ctx.beginPath();
+  ctx.moveTo(0, 0);
+  ctx.quadraticCurveTo(-L * 0.30, -Hh * 0.25, -L * 0.20, -Hh * 0.55);
+  ctx.stroke();
+  ctx.restore();
+
+  // тело
+  const bodyGrd = ctx.createLinearGradient(0, bodyY - bodyH, 0, bodyY + bodyH);
+  bodyGrd.addColorStop(0, P.body);
+  bodyGrd.addColorStop(1, P.bodyDark);
+  ctx.fillStyle = bodyGrd;
+  ctx.beginPath();
+  ctx.ellipse(-L * 0.05, bodyY, bodyW, bodyH, 0, 0, Math.PI * 2);
+  ctx.fill();
+
+  // грудка
+  ctx.fillStyle = P.belly;
+  ctx.beginPath();
+  ctx.ellipse(-L * 0.05, bodyY + Hh * 0.07, bodyW * 0.5, bodyH * 0.7, 0, 0, Math.PI * 2);
+  ctx.fill();
+
+  // полоски
+  if (P.pattern === 'stripes'){
+    ctx.strokeStyle = P.bodyDark;
+    ctx.lineWidth = L * 0.05;
+    ctx.lineCap = 'round';
+    for (let i = 0; i < 3; i++){
+      ctx.beginPath();
+      ctx.moveTo(-L * 0.25 + i * L * 0.12, bodyY - Hh * 0.15);
+      ctx.lineTo(-L * 0.20 + i * L * 0.12, bodyY + Hh * 0.10);
+      ctx.stroke();
+    }
+  }
+
+  // лапки
+  ctx.fillStyle = P.bodyDark;
+  ctx.beginPath();
+  ctx.ellipse(-L * 0.25, Hh * 0.42, L * 0.08, Hh * 0.08, 0, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.beginPath();
+  ctx.ellipse( L * 0.15, Hh * 0.42, L * 0.08, Hh * 0.08, 0, 0, Math.PI * 2);
+  ctx.fill();
+
+  // голова
+  const headX = L * 0.30;
+  const headR = L * 0.28;
+  ctx.fillStyle = P.body;
+  ctx.beginPath();
+  ctx.arc(headX, headY, headR, 0, Math.PI * 2);
+  ctx.fill();
+
+  // ушки
+  ctx.beginPath();
+  ctx.moveTo(headX - headR * 0.7, headY - headR * 0.5);
+  ctx.lineTo(headX - headR * 0.3, headY - headR * 1.25);
+  ctx.lineTo(headX + headR * 0.1, headY - headR * 0.75);
+  ctx.closePath();
+  ctx.fill();
+  ctx.beginPath();
+  ctx.moveTo(headX + headR * 0.7, headY - headR * 0.5);
+  ctx.lineTo(headX + headR * 0.3, headY - headR * 1.25);
+  ctx.lineTo(headX - headR * 0.1, headY - headR * 0.75);
+  ctx.closePath();
+  ctx.fill();
+
+  // внутренние ушки
+  ctx.fillStyle = '#ffb3d9';
+  ctx.beginPath();
+  ctx.moveTo(headX - headR * 0.55, headY - headR * 0.6);
+  ctx.lineTo(headX - headR * 0.3, headY - headR * 1.05);
+  ctx.lineTo(headX + headR * 0.0, headY - headR * 0.75);
+  ctx.closePath();
+  ctx.fill();
+  ctx.beginPath();
+  ctx.moveTo(headX + headR * 0.55, headY - headR * 0.6);
+  ctx.lineTo(headX + headR * 0.3, headY - headR * 1.05);
+  ctx.lineTo(headX + headR * 0.0, headY - headR * 0.75);
+  ctx.closePath();
+  ctx.fill();
+
+  // глаза
+  if (isLie || state === 'sit'){
+    ctx.strokeStyle = '#1a1a2e';
+    ctx.lineWidth = Math.max(1, L * 0.014);
+    ctx.lineCap = 'round';
+    ctx.beginPath();
+    ctx.arc(headX - headR * 0.3, headY - headR * 0.05, headR * 0.15, 0.2, Math.PI - 0.2);
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.arc(headX + headR * 0.3, headY - headR * 0.05, headR * 0.15, 0.2, Math.PI - 0.2);
+    ctx.stroke();
+  } else {
+    ctx.fillStyle = '#fff';
+    ctx.beginPath();
+    ctx.arc(headX - headR * 0.3, headY - headR * 0.05, headR * 0.20, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.beginPath();
+    ctx.arc(headX + headR * 0.3, headY - headR * 0.05, headR * 0.20, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.fillStyle = P.eye;
+    ctx.beginPath();
+    ctx.arc(headX - headR * 0.28, headY - headR * 0.03, headR * 0.13, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.beginPath();
+    ctx.arc(headX + headR * 0.32, headY - headR * 0.03, headR * 0.13, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.fillStyle = '#1a1a2e';
+    ctx.beginPath();
+    ctx.ellipse(headX - headR * 0.28, headY - headR * 0.03, headR * 0.05, headR * 0.11, 0, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.beginPath();
+    ctx.ellipse(headX + headR * 0.32, headY - headR * 0.03, headR * 0.05, headR * 0.11, 0, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.fillStyle = 'rgba(255,255,255,0.95)';
+    ctx.beginPath();
+    ctx.arc(headX - headR * 0.32, headY - headR * 0.08, headR * 0.05, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.beginPath();
+    ctx.arc(headX + headR * 0.28, headY - headR * 0.08, headR * 0.05, 0, Math.PI * 2);
+    ctx.fill();
+  }
+
+  // носик
+  ctx.fillStyle = P.nose;
+  ctx.beginPath();
+  ctx.moveTo(headX, headY + headR * 0.20);
+  ctx.lineTo(headX - headR * 0.10, headY + headR * 0.30);
+  ctx.lineTo(headX + headR * 0.10, headY + headR * 0.30);
+  ctx.closePath();
+  ctx.fill();
+
+  // ротик
+  ctx.strokeStyle = '#1a1a2e';
+  ctx.lineWidth = Math.max(1, L * 0.010);
+  ctx.lineCap = 'round';
+  ctx.beginPath();
+  ctx.moveTo(headX, headY + headR * 0.30);
+  ctx.lineTo(headX, headY + headR * 0.40);
+  ctx.moveTo(headX, headY + headR * 0.40);
+  ctx.quadraticCurveTo(headX - headR * 0.15, headY + headR * 0.50, headX - headR * 0.25, headY + headR * 0.35);
+  ctx.moveTo(headX, headY + headR * 0.40);
+  ctx.quadraticCurveTo(headX + headR * 0.15, headY + headR * 0.50, headX + headR * 0.25, headY + headR * 0.35);
+  ctx.stroke();
+
+  // усы
+  ctx.strokeStyle = 'rgba(120,120,140,0.7)';
+  ctx.lineWidth = Math.max(1, L * 0.008);
+  for (let i = 0; i < 3; i++){
+    const yOff = (i - 1) * headR * 0.15;
+    ctx.beginPath();
+    ctx.moveTo(headX - headR * 0.4, headY + headR * 0.30 + yOff);
+    ctx.lineTo(headX - headR * 1.0, headY + headR * 0.25 + yOff * 1.5);
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.moveTo(headX + headR * 0.4, headY + headR * 0.30 + yOff);
+    ctx.lineTo(headX + headR * 1.0, headY + headR * 0.25 + yOff * 1.5);
+    ctx.stroke();
+  }
+
+  // бантик
+  if (P.bow){
+    ctx.fillStyle = '#ff5a8a';
+    const bx = headX + headR * 0.6;
+    const by = headY - headR * 0.8;
+    ctx.beginPath();
+    ctx.ellipse(bx - headR * 0.2, by, headR * 0.22, headR * 0.14, -0.5, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.beginPath();
+    ctx.ellipse(bx + headR * 0.2, by, headR * 0.22, headR * 0.14, 0.5, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.fillStyle = '#ff3d6e';
+    ctx.beginPath();
+    ctx.arc(bx, by, headR * 0.10, 0, Math.PI * 2);
+    ctx.fill();
+  }
+
+  ctx.restore();
+}
+
+let walkPhase = 0;
+
+function renderCreatures(){
+  octx.clearRect(0, 0, CSS_SIZE, CSS_SIZE);
+  walkPhase += 0.12;
+
+  for (const c of creatures){
+    const [px, py] = worldToPx(c.x, c.y);
+    if (c.kind === 'fish'){
+      const size = FISH_SIZE * PX_PER_CELL * 5;
+      drawFish(octx, px, py, c.dir, size);
+    } else if (c.kind === 'cat'){
+      const size = CAT_SIZE * PX_PER_CELL * 5;
+      drawCat(octx, px, py, c.dir, size, c.variant, c.state, walkPhase);
+    }
+  }
+}
+
+/* ============================================================
+   ИНТЕРФЕЙС
+   ============================================================ */
+const PALETTE = [
+  EMPTY, SAND, WATER, EARTH, SEED,
+  FIRE, ICE, SNOW,
+  SALT, METAL, GUNPOWDER, SMOKE, STEAM
+];
+
+let currentEl = SAND;
+let currentCreature = null;
+let brushSize = 7;
+let paused = false;
+
+const paletteEl = document.getElementById('palette');
+const buttons = [];
+
+for (let k = 0; k < PALETTE.length; k++){
+  (function(id){
+    const e = EL[id];
+    const b = document.createElement('button');
+    b.className = 'el' + (id === currentEl ? ' active' : '');
+    b.type = 'button';
+    b.innerHTML =
+      '<span class="sw" style="--c:' + e.hex + '"></span>' +
+      '<span class="nm">' + e.name + '</span>';
+    b.addEventListener('click', function(){
+      currentEl = id;
+      currentCreature = null;
+      for (let m = 0; m < buttons.length; m++){
+        if (PALETTE[m] === id) buttons[m].classList.add('active');
+        else                   buttons[m].classList.remove('active');
+      }
+      document.querySelectorAll('.creature-btn').forEach(el => el.classList.remove('active'));
+    });
+    buttons.push(b);
+    paletteEl.appendChild(b);
+  })(PALETTE[k]);
+}
+
+document.querySelectorAll('.creature-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    currentCreature = btn.dataset.t;
+    currentEl = null;
+    for (let m = 0; m < buttons.length; m++){
+      buttons[m].classList.remove('active');
+    }
+    document.querySelectorAll('.creature-btn').forEach(el => el.classList.remove('active'));
+    btn.classList.add('active');
+  });
+});
+
+const brushInput = document.getElementById('brush');
+brushInput.addEventListener('input', function(){
+  brushSize = parseInt(brushInput.value, 10);
+});
+
+const pauseBtn = document.getElementById('pauseBtn');
+pauseBtn.addEventListener('click', function(){
+  paused = !paused;
+  if (paused) pauseBtn.classList.add('on');
+  else        pauseBtn.classList.remove('on');
+});
+
+document.getElementById('clearBtn').addEventListener('click', function(){
+  type.fill(0);
+  life.fill(0);
+  moved.fill(0);
+  creatures.length = 0;
+});
+
+/* ============================================================
+   ТЕМА
+   ============================================================ */
+const themeToggle = document.getElementById('themeToggle');
+const themeIcon = document.getElementById('themeIcon');
+const root = document.body;
+
+const ICONS = {
+  light: '<circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/>',
+  dark:  '<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>'
+};
+
+function applyTheme(t){
+  root.setAttribute('data-theme', t);
+  themeIcon.innerHTML = t === 'dark' ? ICONS.dark : ICONS.light;
+  const bg = t === 'dark' ? 0x0a0a0a : 0xf5f5f7;
+  renderer.setClearColor(bg, 1);
+  try { localStorage.setItem('sandtable-theme', t); } catch(e){}
+}
+
+themeToggle.addEventListener('click', function(){
+  const cur = root.getAttribute('data-theme');
+  applyTheme(cur === 'dark' ? 'light' : 'dark');
+});
+
+let savedTheme = 'light';
+try { savedTheme = localStorage.getItem('sandtable-theme') || 'light'; } catch(e){}
+applyTheme(savedTheme);
+
+/* ============================================================
+   РИСОВАНИЕ КИСТЬЮ
+   ============================================================ */
+function paintCell(cx, cy){
+  if (currentCreature){
+    spawnCreature(currentCreature, cx + 0.5, cy + 0.5);
+    return;
+  }
+  if (!currentEl) return;
+
+  const t = currentEl;
+  const r = brushSize;
+  const r2 = r * r;
+  const solid = EL[t].state === S_SOLID;
+
+  for (let y = cy - r; y <= cy + r; y++){
+    if (y < 0 || y >= H) continue;
+    for (let x = cx - r; x <= cx + r; x++){
+      if (x < 0 || x >= W) continue;
+      const dx = x - cx;
+      const dy = y - cy;
+      if (dx * dx + dy * dy > r2) continue;
+      const i = y * W + x;
+      if (t === EMPTY){ setCell(i, EMPTY); continue; }
+      const cur = type[i];
+      if (cur !== EMPTY && !solid && Math.random() > 0.28) continue;
+      setCell(i, t);
+    }
+  }
+}
+
+let drawing = false;
+let lastX = null;
+let lastY = null;
+
+function toGrid(e){
+  const rect = glCanvas.getBoundingClientRect();
+  const x = Math.floor((e.clientX - rect.left) / rect.width  * W);
+  const y = Math.floor((e.clientY - rect.top)  / rect.height * H);
+  return [
+    Math.max(0, Math.min(W - 1, x)),
+    Math.max(0, Math.min(H - 1, y))
+  ];
+}
+
+function stroke(gx, gy){
+  if (lastX === null) paintCell(gx, gy);
+  else {
+    const dx = gx - lastX;
+    const dy = gy - lastY;
+    const steps = Math.max(Math.abs(dx), Math.abs(dy), 1);
+    for (let s = 1; s <= steps; s++){
+      paintCell(
+        Math.round(lastX + dx * s / steps),
+        Math.round(lastY + dy * s / steps)
+      );
+    }
+  }
+  lastX = gx;
+  lastY = gy;
+}
+
+glCanvas.addEventListener('pointerdown', function(e){
+  e.preventDefault();
+  drawing = true;
+  lastX = null;
+  lastY = null;
+  try { glCanvas.setPointerCapture(e.pointerId); } catch(err){}
+  const g = toGrid(e);
+  stroke(g[0], g[1]);
+});
+
+glCanvas.addEventListener('pointermove', function(e){
+  if (!drawing) return;
+  e.preventDefault();
+  const g = toGrid(e);
+  stroke(g[0], g[1]);
+});
+
+function endStroke(){ drawing = false; lastX = null; lastY = null; }
+glCanvas.addEventListener('pointerup', endStroke);
+glCanvas.addEventListener('pointercancel', endStroke);
+glCanvas.addEventListener('contextmenu', function(e){ e.preventDefault(); });
+
+glCanvas.addEventListener('wheel', function(e){
+  e.preventDefault();
+  brushSize = Math.max(1, Math.min(40, brushSize + (e.deltaY < 0 ? 1 : -1)));
+  brushInput.value = brushSize;
+}, { passive: false });
+
+/* ============================================================
+   СТАРТ
+   ============================================================ */
+type.fill(0);
+life.fill(0);
+moved.fill(0);
+
+/* ============================================================
+   ГЛАВНЫЙ ЦИКЛ
+   ============================================================ */
+let lastT = performance.now();
+let simAcc = 0;
+const SIM_STEP = 1000 / 60;
+
+function loop(now){
+  requestAnimationFrame(loop);
+  const dt = Math.min(now - lastT, 100);
+  lastT = now;
+
+  if (!paused){
+    simAcc += dt;
+    let iter = 0;
+    while (simAcc >= SIM_STEP && iter < 3){
+      simulate();
+      simAcc -= SIM_STEP;
+      iter++;
+    }
+    if (iter === 3) simAcc = 0;
+  }
+
+  fillPixels();
+  simTex.needsUpdate = true;
+  uniforms.uTime.value = now * 0.001;
+
+  renderer.render(scene, camera);
+  renderCreatures();
+}
+
+resizeRenderer();
+requestAnimationFrame(loop);
+</script>
+</body>
+</html>
