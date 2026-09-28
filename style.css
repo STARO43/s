@@ -1851,7 +1851,6 @@ html[data-theme="dark"] .reader.reader-alt .reader-content h4 { color: #2A1F0F; 
     color: var(--text);
     padding: 0.02em 0;
     transition: color 0.2s ease;
-    margin-right: 0.5em;
 }
 .syllable-dot {
     position: relative;
