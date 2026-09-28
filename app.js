@@ -692,42 +692,67 @@ function initReading() {
             progressTimer = setTimeout(() => progressContainer.classList.remove('show'), 2200);
         }
 
-        function renderGrid() {
-            const items = currentMode === 'random' ? randomItems : syllables;
-            const frag = document.createDocumentFragment();
-            items.forEach((syllable, idx) => {
-                const item = document.createElement('span');
-                item.className = 'syllable-item';
-                item.dataset.syllable = syllable;
-                if (learnedSet.has(syllable)) item.classList.add('learned');
+       /* ---------- Новый рендер «Столкновение» ---------- */
 
-                const dot = document.createElement('span');
-                dot.className = 'syllable-dot';
-                dot.addEventListener('click', (e) => {
-                    e.stopPropagation();
-                    toggleLearned(syllable, item);
-                });
+const ROW_PATTERN = [4, 5, 3, 6, 4, 5, 3, 4, 6, 5, 3, 4, 5, 4, 3, 6];
 
-                const txt = document.createElement('span');
-                txt.className = 'syllable-text';
-                txt.textContent = syllable;
+function makeSyllableWord(syllable, idx, pos) {
+    const w = document.createElement('span');
+    w.className = 'syl-w';
+    if (learnedSet.has(syllable)) w.classList.add('learned');
 
-                item.appendChild(dot);
-                item.appendChild(txt);
-                item.addEventListener('click', () => handleSyllableClick(syllable, item));
-                frag.appendChild(item);
+    /* Детерминированная стилевая вариация — чтобы не мигала при перерендере */
+    const h = (idx * 7 + pos * 5) % 13;
+    if (h === 0 || h === 9)      w.classList.add('outline');
+    else if (h === 2 || h === 11) w.classList.add('fill');
+    else if (h === 4)             w.classList.add('italic');
+    else if (h === 6)             w.classList.add('lean');
 
-                if (idx < items.length - 1) {
-                    const sep = document.createElement('span');
-                    sep.className = 'syllable-sep';
-                    sep.textContent = '·';
-                    frag.appendChild(sep);
-                }
-            });
-            grid.innerHTML = '';
-            grid.appendChild(frag);
-            refreshProgressData();
+    /* Точка-переключатель */
+    const dot = document.createElement('span');
+    dot.className = 'syl-dot';
+    dot.addEventListener('click', (e) => {
+        e.stopPropagation();
+        toggleLearned(syllable, w);
+    });
+
+    /* Сам слог */
+    const txt = document.createElement('span');
+    txt.className = 'syl-txt';
+    txt.textContent = syllable;
+
+    w.appendChild(dot);
+    w.appendChild(txt);
+    w.addEventListener('click', () => handleSyllableClick(syllable, w));
+
+    return w;
+}
+
+function renderGrid() {
+    const items = currentMode === 'random' ? randomItems : syllables;
+
+    grid.innerHTML = '';
+    grid.classList.add('collision-mode');
+    grid.classList.toggle('is-random', currentMode === 'random');
+
+    let idx = 0;
+    let rowIdx = 0;
+
+    while (idx < items.length) {
+        const rowLen = ROW_PATTERN[rowIdx % ROW_PATTERN.length];
+        const row = document.createElement('div');
+        row.className = 'syl-row';
+
+        for (let k = 0; k < rowLen && idx < items.length; k++, idx++) {
+            row.appendChild(makeSyllableWord(items[idx], idx, rowIdx + k));
         }
+
+        grid.appendChild(row);
+        rowIdx++;
+    }
+
+    refreshProgressData();
+}
 
         function toggleLearned(s, item) {
             if (learnedSet.has(s)) learnedSet.delete(s); else learnedSet.add(s);
