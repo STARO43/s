@@ -195,6 +195,27 @@ button.btn.on{
   font-size:11px;color:var(--ink-dim);text-align:center;
 }
 
+.exit-btn{
+  display:flex;align-items:center;justify-content:center;gap:8px;
+  width:100%;padding:9px 10px;
+  background:transparent;
+  border:1px solid var(--line-hi);
+  border-radius:7px;
+  color:var(--ink);
+  font-family:inherit;font-size:12px;font-weight:400;
+  letter-spacing:-.01em;
+  text-decoration:none;
+  cursor:pointer;
+  transition:background .15s ease,border-color .15s ease,color .15s ease;
+}
+.exit-btn svg{width:14px;height:14px;flex:none;}
+.exit-btn:hover{
+  background:var(--accent-soft);
+  border-color:transparent;
+  color:var(--accent);
+}
+.exit-btn:active{transform:scale(.985);}
+
 @media (max-width:900px){
   #app{flex-direction:column;}
   #creaturePanel{
@@ -296,6 +317,16 @@ button.btn.on{
       <button class="btn" id="pauseBtn">Пауза</button>
       <button class="btn" id="clearBtn">Очистить</button>
     </div>
+
+    <a class="exit-btn" href="https://gramotinho.kick.sh/">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+           stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+        <polyline points="16 17 21 12 16 7"/>
+        <line x1="21" y1="12" x2="9" y2="12"/>
+      </svg>
+      <span>Выход</span>
+    </a>
 
     <div class="panel-foot">Грамотиньо. Элементы</div>
   </aside>
@@ -864,27 +895,15 @@ function stepFish(c){
 }
 
 /* ============================================================
-   КОТ — новая чистая логика
+   КОТ
    ============================================================ */
-
-// центр кота (точка, которую проверяем)
-function catCenterY(c){ return c.y; }
-
-// «ноги» кота — низ фигуры
 function catFeetY(c){ return c.y + CAT_SIZE * 0.45; }
 
-// проверка земли ровно под центром кота
 function catOnGround(c){
   return isGroundAt(c.x, catFeetY(c));
 }
 
-// проверка, есть ли земля на 1 клетку ниже (чтобы понять, падаем или нет)
-function catGroundBelow(c){
-  return isGroundAt(c.x, catFeetY(c) + 1);
-}
-
 function stepCat(c){
-  // === 1. ВОДА — приоритет ===
   if (isWaterAt(c.x, c.y)){
     if (c.state !== 'jump'){
       c.state = 'jump';
@@ -900,15 +919,11 @@ function stepCat(c){
     return;
   }
 
-  // === 2. ПАДЕНИЕ ===
-  // если под ногами нет земли И мы не в состоянии прыжка — падаем
   if (!catOnGround(c) && c.state !== 'jump'){
     c.vy += 0.4;
     if (c.vy > 2.5) c.vy = 2.5;
     c.y += c.vy;
-    // приземление: ноги коснулись земли
     if (catOnGround(c)){
-      // выравниваем ровно на землю
       while (catOnGround(c) && isGroundAt(c.x, catFeetY(c) - 1)){
         c.y -= 0.25;
       }
@@ -918,12 +933,10 @@ function stepCat(c){
     return;
   }
 
-  // если мы в состоянии jump (от стены), обрабатываем прыжок
   if (c.state === 'jump'){
     c.jumpFrames--;
     c.vy += 0.35;
     c.y += c.vy;
-    // приземление
     if (c.vy > 0 && catOnGround(c)){
       while (catOnGround(c) && isGroundAt(c.x, catFeetY(c) - 1)){
         c.y -= 0.25;
@@ -936,10 +949,8 @@ function stepCat(c){
     return;
   }
 
-  // === 3. СТОИМ НА ЗЕМЛЕ ===
   c.vy = 0;
 
-  // таймер смены поведения
   c.timer -= 1;
   if (c.timer <= 0){
     c.timer = 60 + ((Math.random() * 140) | 0);
@@ -951,34 +962,28 @@ function stepCat(c){
     if (Math.random() < 0.4) c.dir = -c.dir;
   }
 
-  // === ЛЕЖИТ ===
   if (c.state === 'lie'){
     if (Math.random() < 0.02) c.state = 'walk';
     return;
   }
 
-  // === СИДИТ ===
   if (c.state === 'sit'){
     if (Math.random() < 0.02) c.state = 'walk';
     return;
   }
 
-  // === ПРЫЖОК ===
   if (c.state === 'jump'){
     c.vy = -1.8;
     c.jumpFrames = 30;
     return;
   }
 
-  // === ХОДИТ ===
-  // смотрим, есть ли земля в точке чуть впереди
   const aheadX = c.x + c.dir * 0.5;
   const aheadGround = isGroundAt(aheadX, catFeetY(c));
 
   if (aheadGround){
     c.x = aheadX;
   } else {
-    // впереди нет земли — разворачиваемся (не падаем в яму)
     c.dir = -c.dir;
   }
 }
@@ -1217,7 +1222,6 @@ function drawCat(ctx, cx, cy, dir, size, variant, state, walkPhase){
   const isLie = state === 'lie';
   const isJump = state === 'jump';
 
-  // тень только на земле
   if (!isJump){
     ctx.fillStyle = 'rgba(0,0,0,0.08)';
     ctx.beginPath();
@@ -1232,7 +1236,6 @@ function drawCat(ctx, cx, cy, dir, size, variant, state, walkPhase){
   const bodyH = isLie ? Hh * 0.22 : Hh * 0.32;
   const headY = isLie ? -Hh * 0.05 : -Hh * 0.15;
 
-  // хвост
   ctx.save();
   ctx.translate(-L * 0.35, bodyY);
   ctx.rotate(tailSwing);
@@ -1245,7 +1248,6 @@ function drawCat(ctx, cx, cy, dir, size, variant, state, walkPhase){
   ctx.stroke();
   ctx.restore();
 
-  // тело
   const bodyGrd = ctx.createLinearGradient(0, bodyY - bodyH, 0, bodyY + bodyH);
   bodyGrd.addColorStop(0, P.body);
   bodyGrd.addColorStop(1, P.bodyDark);
@@ -1254,13 +1256,11 @@ function drawCat(ctx, cx, cy, dir, size, variant, state, walkPhase){
   ctx.ellipse(-L * 0.05, bodyY, bodyW, bodyH, 0, 0, Math.PI * 2);
   ctx.fill();
 
-  // грудка
   ctx.fillStyle = P.belly;
   ctx.beginPath();
   ctx.ellipse(-L * 0.05, bodyY + Hh * 0.07, bodyW * 0.5, bodyH * 0.7, 0, 0, Math.PI * 2);
   ctx.fill();
 
-  // полоски
   if (P.pattern === 'stripes'){
     ctx.strokeStyle = P.bodyDark;
     ctx.lineWidth = L * 0.05;
@@ -1273,7 +1273,6 @@ function drawCat(ctx, cx, cy, dir, size, variant, state, walkPhase){
     }
   }
 
-  // лапки
   ctx.fillStyle = P.bodyDark;
   ctx.beginPath();
   ctx.ellipse(-L * 0.25, Hh * 0.42, L * 0.08, Hh * 0.08, 0, 0, Math.PI * 2);
@@ -1282,7 +1281,6 @@ function drawCat(ctx, cx, cy, dir, size, variant, state, walkPhase){
   ctx.ellipse( L * 0.15, Hh * 0.42, L * 0.08, Hh * 0.08, 0, 0, Math.PI * 2);
   ctx.fill();
 
-  // голова
   const headX = L * 0.30;
   const headR = L * 0.28;
   ctx.fillStyle = P.body;
@@ -1290,7 +1288,6 @@ function drawCat(ctx, cx, cy, dir, size, variant, state, walkPhase){
   ctx.arc(headX, headY, headR, 0, Math.PI * 2);
   ctx.fill();
 
-  // ушки
   ctx.beginPath();
   ctx.moveTo(headX - headR * 0.7, headY - headR * 0.5);
   ctx.lineTo(headX - headR * 0.3, headY - headR * 1.25);
@@ -1304,7 +1301,6 @@ function drawCat(ctx, cx, cy, dir, size, variant, state, walkPhase){
   ctx.closePath();
   ctx.fill();
 
-  // внутренние ушки
   ctx.fillStyle = '#ffb3d9';
   ctx.beginPath();
   ctx.moveTo(headX - headR * 0.55, headY - headR * 0.6);
@@ -1319,7 +1315,6 @@ function drawCat(ctx, cx, cy, dir, size, variant, state, walkPhase){
   ctx.closePath();
   ctx.fill();
 
-  // глаза
   if (isLie || state === 'sit'){
     ctx.strokeStyle = '#1a1a2e';
     ctx.lineWidth = Math.max(1, L * 0.014);
@@ -1361,7 +1356,6 @@ function drawCat(ctx, cx, cy, dir, size, variant, state, walkPhase){
     ctx.fill();
   }
 
-  // носик
   ctx.fillStyle = P.nose;
   ctx.beginPath();
   ctx.moveTo(headX, headY + headR * 0.20);
@@ -1370,7 +1364,6 @@ function drawCat(ctx, cx, cy, dir, size, variant, state, walkPhase){
   ctx.closePath();
   ctx.fill();
 
-  // ротик
   ctx.strokeStyle = '#1a1a2e';
   ctx.lineWidth = Math.max(1, L * 0.010);
   ctx.lineCap = 'round';
@@ -1383,7 +1376,6 @@ function drawCat(ctx, cx, cy, dir, size, variant, state, walkPhase){
   ctx.quadraticCurveTo(headX + headR * 0.15, headY + headR * 0.50, headX + headR * 0.25, headY + headR * 0.35);
   ctx.stroke();
 
-  // усы
   ctx.strokeStyle = 'rgba(120,120,140,0.7)';
   ctx.lineWidth = Math.max(1, L * 0.008);
   for (let i = 0; i < 3; i++){
@@ -1398,7 +1390,6 @@ function drawCat(ctx, cx, cy, dir, size, variant, state, walkPhase){
     ctx.stroke();
   }
 
-  // бантик
   if (P.bow){
     ctx.fillStyle = '#ff5a8a';
     const bx = headX + headR * 0.6;
