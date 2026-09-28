@@ -1872,13 +1872,20 @@ function initTools() {
             window.initToolsClock();
         }
 
-        /* ============================================================
-           SPACE-SWITCH — кнопка «Орбиты», открывает spacewatch.html
+              /* ============================================================
+           SPACE-SWITCH — кнопка «Орбиты»
+           desktop → spacewatch.html
+           mobile  → spacewatch2.html
            ============================================================ */
         const spaceSwitch = document.getElementById('spaceSwitch');
         if (spaceSwitch) {
+            const IS_MOBILE_SPACE = window.matchMedia('(max-width: 768px)').matches;
+            const SPACE_URL = IS_MOBILE_SPACE
+                ? 'https://gramotinho.kick.sh/spacewatch2.html'
+                : 'https://gramotinho.kick.sh/spacewatch.html';
+
             spaceSwitch.addEventListener('click', () => {
-                window.open('spacewatch.html', '_blank');
+                window.open(SPACE_URL, '_blank', 'noopener');
             });
         }
     });
