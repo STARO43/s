@@ -1839,18 +1839,20 @@ html[data-theme="dark"] .reader.reader-alt .reader-content h4 { color: #2A1F0F; 
 }
 .syllable-item {
     position: relative;
-    display: inline-flex;
+    display: flex;
     align-items: baseline;
+    justify-content: flex-start;
     cursor: pointer;
     user-select: none;
     -webkit-tap-highlight-color: transparent;
-    font-size: clamp(2.4rem, 7.5vw, 6rem);
+    font-size: clamp(1.6rem, 3.6vw, 3rem);
     font-weight: 700;
-    letter-spacing: -0.04em;
+    letter-spacing: -0.03em;
     text-transform: uppercase;
     color: var(--text);
     padding: 0.02em 0;
     transition: color 0.2s ease;
+    min-width: 0;
 }
 .syllable-dot {
     position: relative;
@@ -2548,16 +2550,20 @@ html[data-theme="dark"] .clock-switch .switch-ring { border-color: rgba(221,224,
     .ibtn-caption { font-size: 0.4rem; letter-spacing: 0.1em; }
     .ibtn.underline::after { bottom: -5px; height: 1.5px; }
     .ctrl-sep { height: 24px; }
+   @media (max-width: 768px) {
+    ...
     .syllable-grid {
         display: grid;
-        grid-template-columns: 1fr 1fr 1fr;
-        column-gap: 0.4rem;
-        row-gap: 0.3rem;
+        grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
+        column-gap: 0.5rem;
+        row-gap: 0.35rem;
         padding: 1rem 4vw 90px;
         align-items: baseline;
     }
-    .syllable-item { font-size: clamp(1.1rem, 6.5vw, 1.7rem); line-height: 1.05; }
-    .syllable-sep { display: none; }
+    .syllable-item {
+        font-size: clamp(1.1rem, 5vw, 1.6rem);
+        line-height: 1.05;
+    }
 }
 @media (max-width: 768px) {
     .heroes-timeline { padding: 2rem 4vw 5rem; }
