@@ -1829,11 +1829,11 @@ html[data-theme="dark"] .reader.reader-alt .reader-content h4 { color: #2A1F0F; 
     max-width: 1300px;
     margin: 0 auto;
     padding: 1.6rem 5vw 140px;
-    display: flex;
-    flex-wrap: wrap;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    column-gap: 1.2rem;
+    row-gap: 0.4rem;
     align-items: baseline;
-    column-gap: 0;
-    row-gap: 0.1em;
     font-family: var(--font-display);
     line-height: 0.95;
 }
