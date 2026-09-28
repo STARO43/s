@@ -697,9 +697,8 @@ function initReading() {
             const frag = document.createDocumentFragment();
             items.forEach((syllable, idx) => {
                 const item = document.createElement('span');
-item.className = 'syllable-item';
-if (syllable.length === 2) item.classList.add('syllable-item--short');
-item.dataset.syllable = syllable;
+                item.className = 'syllable-item';
+                item.dataset.syllable = syllable;
                 if (learnedSet.has(syllable)) item.classList.add('learned');
 
                 const dot = document.createElement('span');

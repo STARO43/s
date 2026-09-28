@@ -1829,11 +1829,11 @@ html[data-theme="dark"] .reader.reader-alt .reader-content h4 { color: #2A1F0F; 
     max-width: 1300px;
     margin: 0 auto;
     padding: 1.6rem 5vw 140px;
-    display: grid;
-    grid-template-columns: repeat(12, minmax(0, 1fr));
-    column-gap: 0;
-    row-gap: 0.45em;
+    display: flex;
+    flex-wrap: wrap;
     align-items: baseline;
+    column-gap: 0;
+    row-gap: 0.1em;
     font-family: var(--font-display);
     line-height: 0.95;
 }
@@ -1841,9 +1841,6 @@ html[data-theme="dark"] .reader.reader-alt .reader-content h4 { color: #2A1F0F; 
     position: relative;
     display: inline-flex;
     align-items: baseline;
-    justify-content: center;
-    min-width: 0;
-    grid-column: span 3;
     cursor: pointer;
     user-select: none;
     -webkit-tap-highlight-color: transparent;
@@ -1854,9 +1851,6 @@ html[data-theme="dark"] .reader.reader-alt .reader-content h4 { color: #2A1F0F; 
     color: var(--text);
     padding: 0.02em 0;
     transition: color 0.2s ease;
-}
-.syllable-item--short {
-    grid-column: span 2;
 }
 .syllable-dot {
     position: relative;
