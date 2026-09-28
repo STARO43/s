@@ -582,7 +582,7 @@ function initHome() {
                 await sleep(120);
                 await typeLine('САЙТ НАВАЙБКОДИЛ @VNVAX. ПИШИТЕ ВАШИ ОТЗЫВЫ И ПРЕДЛОЖЕНИЯ.', { speed: 14 });
                 await typeLine('ВЫ МОЖЕТЕ ОКАЗАТЬ ПОМОЩЬ, СВЯЖИТЕСЬ СО МНОЙ.', { speed: 14 });
-                await typeLine('ИДЕЙ ОЧЕНЬ МНОГО. МАКСИМАЛЬНОЕ РАСПОСТРАНЕНИЕ ПРИВЕТСТВУЕТСЯ.', { speed: 14 });
+                await typeLine('МАКСИМАЛЬНОЕ РАСПОСТРАНЕНИЕ ПРИВЕТСТВУЕТСЯ.', { speed: 14 });
                 await sleep(180);
                 createInputLine();
                 return;
