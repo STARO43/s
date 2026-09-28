@@ -712,17 +712,10 @@ function initReading() {
                 txt.className = 'syllable-text';
                 txt.textContent = syllable;
 
-                item.appendChild(dot);
-                item.appendChild(txt);
-                item.addEventListener('click', () => handleSyllableClick(syllable, item));
-                frag.appendChild(item);
-
-                if (idx < items.length - 1) {
-                    const sep = document.createElement('span');
-                    sep.className = 'syllable-sep';
-                    sep.textContent = '·';
-                    frag.appendChild(sep);
-                }
+               item.appendChild(dot);
+item.appendChild(txt);
+item.addEventListener('click', () => handleSyllableClick(syllable, item));
+frag.appendChild(item);
             });
             grid.innerHTML = '';
             grid.appendChild(frag);
