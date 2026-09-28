@@ -77,39 +77,38 @@
         }
 
         /* ===== Часы: тактильный металлический циферблат ===== */
-        #clock {
-            position: fixed;
-            left: 50%;
-            bottom: 28px;
-            transform: translateX(-50%);
-            width: 210px;
-            height: 210px;
-            border-radius: 50%;
-            background:
-                radial-gradient(circle at 50% 28%, rgba(70,110,150,0.30) 0%, rgba(6,12,22,0.92) 62%, rgba(2,4,9,0.98) 100%);
-            border: 1px solid rgba(120,190,255,0.35);
-            box-shadow:
-                0 0 0 6px rgba(4,8,16,0.65),
-                0 0 0 7px rgba(90,150,210,0.18),
-                0 18px 50px rgba(0,0,0,0.85),
-                inset 0 0 42px rgba(70,140,220,0.10),
-                inset 0 2px 2px rgba(255,255,255,0.10);
-            z-index: 50;
-            touch-action: none;
-            cursor: crosshair;
-            transition: box-shadow 0.4s ease, transform 0.25s ease;
-            backdrop-filter: blur(2px);
-            -webkit-backdrop-filter: blur(2px);
-        }
-        #clock:hover {
-            box-shadow:
-                0 0 0 6px rgba(4,8,16,0.65),
-                0 0 0 7px rgba(120,200,255,0.35),
-                0 18px 55px rgba(0,0,0,0.9),
-                inset 0 0 55px rgba(90,170,255,0.16),
-                inset 0 2px 2px rgba(255,255,255,0.14);
-        }
-        #clock:active { transform: translateX(-50%) scale(1.015); }
+      #clock {
+    position: fixed;
+    right: 24px;
+    bottom: 28px;
+    width: 210px;
+    height: 210px;
+    border-radius: 50%;
+    background:
+        radial-gradient(circle at 50% 28%, rgba(70,110,150,0.30) 0%, rgba(6,12,22,0.92) 62%, rgba(2,4,9,0.98) 100%);
+    border: 1px solid rgba(120,190,255,0.35);
+    box-shadow:
+        0 0 0 6px rgba(4,8,16,0.65),
+        0 0 0 7px rgba(90,150,210,0.18),
+        0 18px 50px rgba(0,0,0,0.85),
+        inset 0 0 42px rgba(70,140,220,0.10),
+        inset 0 2px 2px rgba(255,255,255,0.10);
+    z-index: 50;
+    touch-action: none;
+    cursor: crosshair;
+    transition: box-shadow 0.4s ease, transform 0.25s ease;
+    backdrop-filter: blur(2px);
+    -webkit-backdrop-filter: blur(2px);
+}
+#clock:hover {
+    box-shadow:
+        0 0 0 6px rgba(4,8,16,0.65),
+        0 0 0 7px rgba(120,200,255,0.35),
+        0 18px 55px rgba(0,0,0,0.9),
+        inset 0 0 55px rgba(90,170,255,0.16),
+        inset 0 2px 2px rgba(255,255,255,0.14);
+}
+#clock:active { transform: scale(1.015); }
         #clock svg {
             position: absolute;
             inset: 0;
