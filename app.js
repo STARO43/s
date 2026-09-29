@@ -1965,7 +1965,7 @@ function initTools() {
                 : 'https://gramotinho.kick.sh/spacewatch.html';
 
             spaceSwitch.addEventListener('click', () => {
-                window.open(SPACE_URL, '_blank', 'noopener');
+                window.open(SPACE_URL, '_blank', 'noopener,noreferrer');
             });
         }
     });
