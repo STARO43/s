@@ -2,7 +2,9 @@
 <html lang="ru">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<meta name="theme-color" content="#fbfbfd" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#000000" media="(prefers-color-scheme: dark)">
 <title>Элементы</title>
 <style>
 :root{
@@ -16,6 +18,11 @@
   --accent:#0071e3;
   --accent-soft:rgba(0,113,227,.08);
   --canvas-bg:#f5f5f7;
+
+  --safe-top:    env(safe-area-inset-top, 0px);
+  --safe-right:  env(safe-area-inset-right, 0px);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+  --safe-left:   env(safe-area-inset-left, 0px);
 }
 [data-theme="dark"]{
   --bg:#000000;
@@ -30,16 +37,21 @@
   --canvas-bg:#0a0a0a;
 }
 *{box-sizing:border-box;}
-html,body{height:100%;margin:0;}
+html,body{
+  height:100%;margin:0;
+  overscroll-behavior:none;
+}
 body{
   background:var(--bg);color:var(--ink);
   font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Segoe UI',system-ui,sans-serif;
   font-size:13px;overflow:hidden;
   -webkit-user-select:none;user-select:none;
   -webkit-tap-highlight-color:transparent;
+  -webkit-touch-callout:none;
   letter-spacing:-.01em;
   transition:background .3s ease,color .3s ease;
 }
+button, input, a{ touch-action: manipulation; }
 #app{display:flex;height:100%;height:100dvh;}
 
 #creaturePanel{
@@ -48,6 +60,9 @@ body{
   border-right:1px solid var(--line);
   display:flex;flex-direction:column;
   padding:20px 12px;gap:10px;
+  padding-top:   calc(20px + var(--safe-top));
+  padding-left:  calc(12px + var(--safe-left));
+  padding-bottom:calc(20px + var(--safe-bottom));
   transition:background .3s ease,border-color .3s ease;
 }
 .creature-head{
@@ -77,6 +92,10 @@ body{
   flex:1;min-width:0;position:relative;
   display:flex;align-items:center;justify-content:center;
   padding:24px;
+  padding-top:   calc(24px + var(--safe-top));
+  padding-left:  calc(24px + var(--safe-left));
+  padding-right: calc(24px + var(--safe-right));
+  padding-bottom:calc(24px + var(--safe-bottom));
 }
 #canvasWrap{
   position:relative;
@@ -101,6 +120,9 @@ body{
   border-left:1px solid var(--line);
   display:flex;flex-direction:column;
   padding:22px 16px 16px;gap:20px;overflow-y:auto;
+  padding-top:   calc(22px + var(--safe-top));
+  padding-right: calc(16px + var(--safe-right));
+  padding-bottom:calc(16px + var(--safe-bottom));
   transition:background .3s ease,border-color .3s ease;
 }
 #panel::-webkit-scrollbar{width:0;}
@@ -170,7 +192,8 @@ button.btn.on{
 
 .theme-toggle{
   position:absolute;
-  top:22px;right:16px;
+  top:calc(22px + var(--safe-top));
+  right:calc(16px + var(--safe-right));
   width:32px;height:32px;
   display:flex;align-items:center;justify-content:center;
   background:transparent;border:0;
@@ -216,7 +239,9 @@ button.btn.on{
 }
 .exit-btn:active{transform:scale(.985);}
 
-@media (max-width:900px){
+/* ---------- Вертикальная раскладка: только портрет или очень узкий экран ---------- */
+@media (max-width:900px) and (orientation:portrait),
+       (max-width:600px){
   #app{flex-direction:column;}
   #creaturePanel{
     width:100%;height:auto;
@@ -224,6 +249,9 @@ button.btn.on{
     border-right:none;border-bottom:1px solid var(--line);
     padding:10px 12px;gap:6px;
     justify-content:center;
+    padding-top:   calc(10px + var(--safe-top));
+    padding-left:  calc(12px + var(--safe-left));
+    padding-right: calc(12px + var(--safe-right));
   }
   .creature-head{display:none;}
   .creature-btn{padding:6px 8px;}
@@ -231,14 +259,60 @@ button.btn.on{
   .creature-btn .lbl{font-size:10px;}
   #stage{padding:12px;flex:1 1 auto;min-height:0;}
   #panel{
-    width:100%;height:auto;max-height:40%;
+    width:100%;height:auto;max-height:42%;
     border-left:none;border-top:1px solid var(--line);
     padding:14px 12px 12px;gap:14px;
+    padding-bottom: calc(12px + var(--safe-bottom));
   }
   #palette{grid-template-columns:repeat(3,1fr);gap:3px;}
   .el{font-size:11px;padding:7px 8px;}
   .el .sw{width:9px;height:9px;}
-  .theme-toggle{top:14px;right:12px;}
+  .theme-toggle{
+    top:calc(10px + var(--safe-top));
+    right:calc(12px + var(--safe-right));
+  }
+}
+
+/* ---------- Телефон в ландшафте: три колонки, но компактнее ---------- */
+@media (max-width:900px) and (orientation:landscape) and (pointer:coarse){
+  #creaturePanel{width:88px;padding:12px 8px;}
+  .creature-btn svg{width:30px;height:30px;}
+  #panel{width:170px;padding:14px 10px;gap:14px;}
+  #palette{grid-template-columns:1fr 1fr;gap:3px;}
+  .el{font-size:11px;padding:6px 7px;}
+  .el .sw{width:9px;height:9px;}
+  #stage{padding:12px;}
+}
+
+/* ---------- Чистые тач-устройства: крупные цели, крупный слайдер ---------- */
+@media (pointer:coarse) and (hover:none){
+  button.btn, .exit-btn{
+    min-height:44px;
+    font-size:14px;
+    padding:10px 12px;
+  }
+  .creature-btn{
+    min-width:56px;
+    min-height:56px;
+    padding:8px 6px;
+  }
+  .el{
+    min-height:40px;
+    font-size:13px;
+  }
+  .el .sw{width:12px;height:12px;}
+  .theme-toggle{
+    width:44px;height:44px;
+  }
+  .theme-toggle svg{width:20px;height:20px;}
+
+  input[type=range]{ height:36px; }
+  input[type=range]::-webkit-slider-runnable-track{ height:4px; }
+  input[type=range]::-webkit-slider-thumb{
+    width:24px;height:24px;margin-top:-10px;
+  }
+  input[type=range]::-moz-range-track{ height:4px; }
+  input[type=range]::-moz-range-thumb{ width:24px;height:24px; }
 }
 </style>
 <script type="importmap">
@@ -334,6 +408,14 @@ button.btn.on{
 
 <script type="module">
 import * as THREE from 'three';
+
+/* ============================================================
+   ОПРЕДЕЛЕНИЕ УСТРОЙСТВА
+   ============================================================ */
+const IS_COARSE = window.matchMedia &&
+                 window.matchMedia('(pointer: coarse)').matches;
+const IS_TOUCH_ONLY = window.matchMedia &&
+                 window.matchMedia('(pointer: coarse) and (hover: none)').matches;
 
 /* ============================================================
    СЕТКА
@@ -547,26 +629,23 @@ function stepPowder(x, y, i, t){
       setCell(i + W, WATER); setCell(i, EMPTY); return;
     }
   } else if (t === SNOW){
-  // таяние от огня (как было)
-  if (x > 0 && type[i - 1] === FIRE){ setCell(i, WATER); return; }
-  if (x < W - 1 && type[i + 1] === FIRE){ setCell(i, WATER); return; }
-  if (y > 0 && type[i - W] === FIRE){ setCell(i, WATER); return; }
-  if (y < H - 1 && type[i + W] === FIRE){ setCell(i, WATER); return; }
+    if (x > 0 && type[i - 1] === FIRE){ setCell(i, WATER); return; }
+    if (x < W - 1 && type[i + 1] === FIRE){ setCell(i, WATER); return; }
+    if (y > 0 && type[i - W] === FIRE){ setCell(i, WATER); return; }
+    if (y < H - 1 && type[i + W] === FIRE){ setCell(i, WATER); return; }
 
-  // растворение в воде: если рядом вода — с некоторой вероятностью снег становится водой
-  let nearWater = false;
-  if (x > 0 && type[i - 1] === WATER) nearWater = true;
-  else if (x < W - 1 && type[i + 1] === WATER) nearWater = true;
-  else if (y > 0 && type[i - W] === WATER) nearWater = true;
-  else if (y < H - 1 && type[i + W] === WATER) nearWater = true;
+    let nearWater = false;
+    if (x > 0 && type[i - 1] === WATER) nearWater = true;
+    else if (x < W - 1 && type[i + 1] === WATER) nearWater = true;
+    else if (y > 0 && type[i - W] === WATER) nearWater = true;
+    else if (y < H - 1 && type[i + W] === WATER) nearWater = true;
 
-  if (nearWater && Math.random() < 0.08){ // скорость таяния
-    setCell(i, WATER);
-    return;
+    if (nearWater && Math.random() < 0.08){
+      setCell(i, WATER);
+      return;
+    }
   }
-}
-fallLikePowder(x, y, i, t);
- 
+  fallLikePowder(x, y, i, t);
 }
 
 function stepSeed(x, y, i){
@@ -1084,7 +1163,6 @@ const renderer = new THREE.WebGLRenderer({
   alpha: false,
   powerPreference: 'high-performance'
 });
-renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
 
 const simTex = new THREE.DataTexture(
   pixels, W, H,
@@ -1139,33 +1217,55 @@ scene.add(quad);
 
 let CSS_SIZE = 600;
 let PX_PER_CELL = 2;
+let DPR = 1;
+
+function computeDPR(){
+  const base = Math.min(window.devicePixelRatio || 1, IS_COARSE ? 1.5 : 2);
+  return base;
+}
 
 function resizeRenderer(){
   const stageEl = document.getElementById('stage');
   const wrapEl  = document.getElementById('canvasWrap');
-  const availW = stageEl.clientWidth - 48;
-  const availH = stageEl.clientHeight - 48;
+  const styles  = getComputedStyle(stageEl);
+  const padL = parseFloat(styles.paddingLeft)  || 0;
+  const padR = parseFloat(styles.paddingRight) || 0;
+  const padT = parseFloat(styles.paddingTop)   || 0;
+  const padB = parseFloat(styles.paddingBottom)|| 0;
+
+  const availW = Math.max(80, stageEl.clientWidth  - padL - padR);
+  const availH = Math.max(80, stageEl.clientHeight - padT - padB);
   const size = Math.max(160, Math.min(availW, availH, 900));
   CSS_SIZE = size;
   PX_PER_CELL = size / W;
 
-  const dpr = Math.min(window.devicePixelRatio || 1, 2);
-  renderer.setPixelRatio(dpr);
+  DPR = computeDPR();
+  renderer.setPixelRatio(DPR);
   renderer.setSize(size, size, false);
   glCanvas.style.width  = size + 'px';
   glCanvas.style.height = size + 'px';
   wrapEl.style.width  = size + 'px';
   wrapEl.style.height = size + 'px';
 
-  overlay.width  = size * dpr;
-  overlay.height = size * dpr;
+  overlay.width  = Math.round(size * DPR);
+  overlay.height = Math.round(size * DPR);
   overlay.style.width  = size + 'px';
   overlay.style.height = size + 'px';
-  octx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  octx.setTransform(DPR, 0, 0, DPR, 0, 0);
 }
 
-new ResizeObserver(resizeRenderer).observe(document.getElementById('stage'));
-window.addEventListener('resize', resizeRenderer);
+let resizeRaf = 0;
+function scheduleResize(){
+  if (resizeRaf) return;
+  resizeRaf = requestAnimationFrame(() => {
+    resizeRaf = 0;
+    resizeRenderer();
+  });
+}
+
+new ResizeObserver(scheduleResize).observe(document.getElementById('stage'));
+window.addEventListener('resize', scheduleResize);
+window.addEventListener('orientationchange', scheduleResize);
 
 function worldToPx(x, y){
   return [x * PX_PER_CELL, y * PX_PER_CELL];
@@ -1452,7 +1552,7 @@ const PALETTE = [
 
 let currentEl = SAND;
 let currentCreature = null;
-let brushSize = 7;
+let brushSize = IS_TOUCH_ONLY ? 14 : 7;
 let paused = false;
 
 const paletteEl = document.getElementById('palette');
@@ -1494,6 +1594,7 @@ document.querySelectorAll('.creature-btn').forEach(btn => {
 });
 
 const brushInput = document.getElementById('brush');
+brushInput.value = brushSize;
 brushInput.addEventListener('input', function(){
   brushSize = parseInt(brushInput.value, 10);
 });
@@ -1542,7 +1643,7 @@ try { savedTheme = localStorage.getItem('sandtable-theme') || 'light'; } catch(e
 applyTheme(savedTheme);
 
 /* ============================================================
-   РИСОВАНИЕ КИСТЬЮ
+   РИСОВАНИЕ КИСТЬЮ (multi-pointer)
    ============================================================ */
 function paintCell(cx, cy){
   if (currentCreature){
@@ -1572,9 +1673,7 @@ function paintCell(cx, cy){
   }
 }
 
-let drawing = false;
-let lastX = null;
-let lastY = null;
+const pointers = new Map();  // pointerId -> { x, y }
 
 function toGrid(e){
   const rect = glCanvas.getBoundingClientRect();
@@ -1586,45 +1685,62 @@ function toGrid(e){
   ];
 }
 
-function stroke(gx, gy){
-  if (lastX === null) paintCell(gx, gy);
-  else {
-    const dx = gx - lastX;
-    const dy = gy - lastY;
+function drawPointer(id, gx, gy){
+  const p = pointers.get(id);
+  if (!p) return;
+  if (p.x === null){
+    paintCell(gx, gy);
+  } else {
+    const dx = gx - p.x;
+    const dy = gy - p.y;
     const steps = Math.max(Math.abs(dx), Math.abs(dy), 1);
     for (let s = 1; s <= steps; s++){
       paintCell(
-        Math.round(lastX + dx * s / steps),
-        Math.round(lastY + dy * s / steps)
+        Math.round(p.x + dx * s / steps),
+        Math.round(p.y + dy * s / steps)
       );
     }
   }
-  lastX = gx;
-  lastY = gy;
+  p.x = gx;
+  p.y = gy;
 }
 
 glCanvas.addEventListener('pointerdown', function(e){
   e.preventDefault();
-  drawing = true;
-  lastX = null;
-  lastY = null;
+  pointers.set(e.pointerId, { x: null, y: null });
   try { glCanvas.setPointerCapture(e.pointerId); } catch(err){}
   const g = toGrid(e);
-  stroke(g[0], g[1]);
+  drawPointer(e.pointerId, g[0], g[1]);
 });
 
 glCanvas.addEventListener('pointermove', function(e){
-  if (!drawing) return;
+  if (!pointers.has(e.pointerId)) return;
   e.preventDefault();
   const g = toGrid(e);
-  stroke(g[0], g[1]);
+  drawPointer(e.pointerId, g[0], g[1]);
 });
 
-function endStroke(){ drawing = false; lastX = null; lastY = null; }
-glCanvas.addEventListener('pointerup', endStroke);
-glCanvas.addEventListener('pointercancel', endStroke);
+function endPointer(e){
+  pointers.delete(e.pointerId);
+}
+glCanvas.addEventListener('pointerup', endPointer);
+glCanvas.addEventListener('pointercancel', endPointer);
+glCanvas.addEventListener('lostpointercapture', endPointer);
 glCanvas.addEventListener('contextmenu', function(e){ e.preventDefault(); });
 
+/* Первый touchstart — увеличиваем стартовую кисть, если ещё не увеличена.
+   Это не трогает гибридные ноутбуки, пока пользователь не начнёт рисовать пальцем. */
+let touchBoostApplied = false;
+glCanvas.addEventListener('touchstart', function(){
+  if (touchBoostApplied) return;
+  touchBoostApplied = true;
+  if (brushSize < 12){
+    brushSize = 14;
+    brushInput.value = brushSize;
+  }
+}, { passive: true });
+
+/* Колесо — только для мыши/трекпада. На тач-устройствах бесполезно, но безвредно. */
 glCanvas.addEventListener('wheel', function(e){
   e.preventDefault();
   brushSize = Math.max(1, Math.min(40, brushSize + (e.deltaY < 0 ? 1 : -1)));
@@ -1644,6 +1760,7 @@ moved.fill(0);
 let lastT = performance.now();
 let simAcc = 0;
 const SIM_STEP = 1000 / 60;
+const MAX_ITERS = IS_COARSE ? 2 : 3;
 
 function loop(now){
   requestAnimationFrame(loop);
@@ -1653,12 +1770,12 @@ function loop(now){
   if (!paused){
     simAcc += dt;
     let iter = 0;
-    while (simAcc >= SIM_STEP && iter < 3){
+    while (simAcc >= SIM_STEP && iter < MAX_ITERS){
       simulate();
       simAcc -= SIM_STEP;
       iter++;
     }
-    if (iter === 3) simAcc = 0;
+    if (iter === MAX_ITERS) simAcc = 0;
   }
 
   fillPixels();
@@ -1671,6 +1788,12 @@ function loop(now){
 
 resizeRenderer();
 requestAnimationFrame(loop);
+
+/* Автопауза при уходе со вкладки — экономит батарею на мобильных */
+document.addEventListener('visibilitychange', function(){
+  lastT = performance.now();
+  simAcc = 0;
+});
 </script>
 </body>
 </html>
