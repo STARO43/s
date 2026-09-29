@@ -547,12 +547,26 @@ function stepPowder(x, y, i, t){
       setCell(i + W, WATER); setCell(i, EMPTY); return;
     }
   } else if (t === SNOW){
-    if (x > 0 && type[i - 1] === FIRE){ setCell(i, WATER); return; }
-    if (x < W - 1 && type[i + 1] === FIRE){ setCell(i, WATER); return; }
-    if (y > 0 && type[i - W] === FIRE){ setCell(i, WATER); return; }
-    if (y < H - 1 && type[i + W] === FIRE){ setCell(i, WATER); return; }
+  // таяние от огня (как было)
+  if (x > 0 && type[i - 1] === FIRE){ setCell(i, WATER); return; }
+  if (x < W - 1 && type[i + 1] === FIRE){ setCell(i, WATER); return; }
+  if (y > 0 && type[i - W] === FIRE){ setCell(i, WATER); return; }
+  if (y < H - 1 && type[i + W] === FIRE){ setCell(i, WATER); return; }
+
+  // растворение в воде: если рядом вода — с некоторой вероятностью снег становится водой
+  let nearWater = false;
+  if (x > 0 && type[i - 1] === WATER) nearWater = true;
+  else if (x < W - 1 && type[i + 1] === WATER) nearWater = true;
+  else if (y > 0 && type[i - W] === WATER) nearWater = true;
+  else if (y < H - 1 && type[i + W] === WATER) nearWater = true;
+
+  if (nearWater && Math.random() < 0.08){ // скорость таяния
+    setCell(i, WATER);
+    return;
   }
-  fallLikePowder(x, y, i, t);
+}
+fallLikePowder(x, y, i, t);
+ 
 }
 
 function stepSeed(x, y, i){
