@@ -315,13 +315,6 @@ button.btn.on{
   input[type=range]::-moz-range-thumb{ width:24px;height:24px; }
 }
 </style>
-<script type="importmap">
-{
-  "imports": {
-   "three": "./three.module.js"
-  }
-}
-</script>
 </head>
 <body data-theme="light">
 <div id="app">
@@ -407,7 +400,7 @@ button.btn.on{
 </div>
 
 <script type="module">
-import * as THREE from 'three';
+import * as THREE from './three.module.js';
 
 /* ============================================================
    ОПРЕДЕЛЕНИЕ УСТРОЙСТВА
