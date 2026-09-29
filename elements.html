@@ -239,7 +239,74 @@ button.btn.on{
 }
 .exit-btn:active{transform:scale(.985);}
 
-/* ---------- Вертикальная раскладка: только портрет или очень узкий экран ---------- */
+/* ---------- Модальное окно для кода ---------- */
+#modalBg{
+  position:fixed;inset:0;
+  background:rgba(0,0,0,.5);
+  display:none;align-items:center;justify-content:center;
+  z-index:10000;
+  padding:20px;
+  padding-top:   calc(20px + var(--safe-top));
+  padding-bottom:calc(20px + var(--safe-bottom));
+}
+#modalBg.open{display:flex;}
+#modalBox{
+  width:100%;max-width:520px;
+  background:var(--panel);
+  border-radius:12px;
+  padding:18px;
+  display:flex;flex-direction:column;gap:12px;
+  box-shadow:0 12px 40px rgba(0,0,0,.25);
+}
+#modalTitle{
+  font-size:14px;font-weight:600;color:var(--ink);
+}
+#modalInfo{
+  font-size:11px;color:var(--ink-mid);
+  line-height:1.4;
+}
+#modalInfo.warn{color:#d9534f;}
+#modalText{
+  width:100%;height:160px;
+  font-family:'SF Mono',Menlo,Consolas,monospace;
+  font-size:12px;
+  padding:10px;
+  border:1px solid var(--line-hi);
+  border-radius:7px;
+  background:var(--bg);
+  color:var(--ink);
+  resize:vertical;
+  -webkit-user-select:text;user-select:text;
+  word-break:break-all;
+}
+#modalRow{
+  display:flex;gap:8px;flex-wrap:wrap;
+}
+#modalRow button{
+  flex:1;min-width:100px;
+  padding:10px 12px;
+  font-size:13px;
+  border-radius:7px;
+  border:1px solid var(--line-hi);
+  background:transparent;color:var(--ink);
+  cursor:pointer;
+  font-family:inherit;
+}
+#modalRow button.primary{
+  background:var(--accent);color:#fff;border-color:transparent;
+}
+#modalRow button:hover{filter:brightness(1.05);}
+#toast{
+  position:fixed;left:50%;bottom:32px;transform:translateX(-50%);
+  background:rgba(0,0,0,.85);color:#fff;
+  padding:10px 16px;border-radius:20px;font-size:13px;
+  z-index:10001;pointer-events:none;
+  opacity:0;transition:opacity .25s ease;
+  max-width:80vw;text-align:center;
+}
+#toast.show{opacity:1;}
+
+/* ---------- Вертикальная раскладка ---------- */
 @media (max-width:900px) and (orientation:portrait),
        (max-width:600px){
   #app{flex-direction:column;}
@@ -272,8 +339,6 @@ button.btn.on{
     right:calc(12px + var(--safe-right));
   }
 }
-
-/* ---------- Телефон в ландшафте: три колонки, но компактнее ---------- */
 @media (max-width:900px) and (orientation:landscape) and (pointer:coarse){
   #creaturePanel{width:88px;padding:12px 8px;}
   .creature-btn svg{width:30px;height:30px;}
@@ -283,8 +348,6 @@ button.btn.on{
   .el .sw{width:9px;height:9px;}
   #stage{padding:12px;}
 }
-
-/* ---------- Чистые тач-устройства: крупные цели, крупный слайдер ---------- */
 @media (pointer:coarse) and (hover:none){
   button.btn, .exit-btn{
     min-height:44px;
@@ -301,11 +364,8 @@ button.btn.on{
     font-size:13px;
   }
   .el .sw{width:12px;height:12px;}
-  .theme-toggle{
-    width:44px;height:44px;
-  }
+  .theme-toggle{ width:44px;height:44px; }
   .theme-toggle svg{width:20px;height:20px;}
-
   input[type=range]{ height:36px; }
   input[type=range]::-webkit-slider-runnable-track{ height:4px; }
   input[type=range]::-webkit-slider-thumb{
@@ -385,6 +445,11 @@ button.btn.on{
       <button class="btn" id="clearBtn">Очистить</button>
     </div>
 
+    <div class="ctrl row">
+      <button class="btn" id="saveBtn">Сохранить</button>
+      <button class="btn" id="loadBtn">Загрузить</button>
+    </div>
+
     <a class="exit-btn" href="https://gramotinho.kick.sh/">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -398,6 +463,22 @@ button.btn.on{
     <div class="panel-foot">Грамотиньо. Элементы</div>
   </aside>
 </div>
+
+<!-- Модальное окно для кода -->
+<div id="modalBg">
+  <div id="modalBox">
+    <div id="modalTitle">Код сцены</div>
+    <div id="modalInfo"></div>
+    <textarea id="modalText" spellcheck="false" autocomplete="off"></textarea>
+    <div id="modalRow">
+      <button id="modalCopy">Копировать</button>
+      <button id="modalPaste">Вставить</button>
+      <button id="modalOk" class="primary">Готово</button>
+      <button id="modalCancel">Отмена</button>
+    </div>
+  </div>
+</div>
+<div id="toast"></div>
 
 <script type="module">
 import * as THREE from './three.module.js';
@@ -1643,7 +1724,7 @@ function paintCell(cx, cy){
     spawnCreature(currentCreature, cx + 0.5, cy + 0.5);
     return;
   }
-  if (!currentEl) return;
+ if (currentEl === null || currentEl === undefined) return;
 
   const t = currentEl;
   const r = brushSize;
@@ -1666,7 +1747,7 @@ function paintCell(cx, cy){
   }
 }
 
-const pointers = new Map();  // pointerId -> { x, y }
+const pointers = new Map();
 
 function toGrid(e){
   const rect = glCanvas.getBoundingClientRect();
@@ -1721,24 +1802,224 @@ glCanvas.addEventListener('pointercancel', endPointer);
 glCanvas.addEventListener('lostpointercapture', endPointer);
 glCanvas.addEventListener('contextmenu', function(e){ e.preventDefault(); });
 
-/* Первый touchstart — увеличиваем стартовую кисть, если ещё не увеличена.
-   Это не трогает гибридные ноутбуки, пока пользователь не начнёт рисовать пальцем. */
-let touchBoostApplied = false;
-glCanvas.addEventListener('touchstart', function(){
-  if (touchBoostApplied) return;
-  touchBoostApplied = true;
-  if (brushSize < 12){
-    brushSize = 14;
-    brushInput.value = brushSize;
-  }
-}, { passive: true });
-
-/* Колесо — только для мыши/трекпада. На тач-устройствах бесполезно, но безвредно. */
 glCanvas.addEventListener('wheel', function(e){
   e.preventDefault();
   brushSize = Math.max(1, Math.min(40, brushSize + (e.deltaY < 0 ? 1 : -1)));
   brushInput.value = brushSize;
 }, { passive: false });
+
+/* ============================================================
+   ЭКСПОРТ / ИМПОРТ СЦЕНЫ
+   Формат: RLE по ненулевым пробегам.
+   Поток байт: [opcode, ...]
+   opcode 0x00..0x0E — тип элемента, следом 2 байта длины (LE, 1..65535).
+   opcode 0xFF        — маркер "пропуск": 2 байта длины пустоты (LE).
+   Заголовок: "S1" + version(1 байт) + W(2) + H(2) — для проверки совместимости.
+   Итог: Base64.
+   ============================================================ */
+
+function encodeScene(){
+  const bytes = [];
+  // Заголовок
+  bytes.push(0x53, 0x31);              // "S1"
+  bytes.push(1);                        // версия
+  bytes.push(W & 0xff, (W >> 8) & 0xff);
+  bytes.push(H & 0xff, (H >> 8) & 0xff);
+
+  let i = 0;
+  let pendingEmpty = 0;
+  while (i < N){
+    const t = type[i];
+    if (t === EMPTY){
+      // Копим пустоту; зафиксируем, когда закончится
+      let run = 1;
+      while (i + run < N && type[i + run] === EMPTY && run < 65535) run++;
+      pendingEmpty += run;
+      i += run;
+      continue;
+    }
+    // Перед ненулевым пробегом сбрасываем накопленную пустоту
+    while (pendingEmpty > 0){
+      const chunk = Math.min(pendingEmpty, 65535);
+      bytes.push(0xFF);
+      bytes.push(chunk & 0xff, (chunk >> 8) & 0xff);
+      pendingEmpty -= chunk;
+    }
+    let run = 1;
+    while (i + run < N && type[i + run] === t && run < 65535) run++;
+    bytes.push(t);
+    bytes.push(run & 0xff, (run >> 8) & 0xff);
+    i += run;
+  }
+  // Хвост пустоты — не пишем, при распаковке остаток зальём EMPTY.
+
+  let bin = '';
+  for (let k = 0; k < bytes.length; k++) bin += String.fromCharCode(bytes[k]);
+  return btoa(bin);
+}
+
+function decodeScene(code){
+  try {
+    // Убираем возможные пробелы и переводы строк
+    const clean = code.replace(/\s+/g, '');
+    const bin = atob(clean);
+    if (bin.length < 7) return false;
+    // Проверка заголовка
+    if (bin.charCodeAt(0) !== 0x53 || bin.charCodeAt(1) !== 0x31) return false;
+    // const version = bin.charCodeAt(2);
+    const w = bin.charCodeAt(3) | (bin.charCodeAt(4) << 8);
+    const h = bin.charCodeAt(5) | (bin.charCodeAt(6) << 8);
+    if (w !== W || h !== H) return false;
+
+    // Очищаем сцену
+    type.fill(0);
+    life.fill(0);
+    moved.fill(0);
+    creatures.length = 0;
+
+    let pos = 0;
+    let p = 7;
+    while (p < bin.length){
+      const op = bin.charCodeAt(p++);
+      const lo = bin.charCodeAt(p++);
+      const hi = bin.charCodeAt(p++);
+      const run = lo | (hi << 8);
+      if (op === 0xFF){
+        // пропуск пустоты
+        for (let k = 0; k < run && pos < N; k++){ type[pos] = EMPTY; pos++; }
+      } else {
+        if (op >= NUM_EL) return false;
+        const t = op;
+        for (let k = 0; k < run && pos < N; k++){
+          type[pos] = t;
+          life[pos] = EL[t].life;
+          tint[pos] = (Math.random() * 16) | 0;
+          pos++;
+        }
+      }
+    }
+    // Остаток — пусто
+    while (pos < N){
+      type[pos] = EMPTY;
+      life[pos] = 0;
+      tint[pos] = (Math.random() * 16) | 0;
+      pos++;
+    }
+    return true;
+  } catch(e){
+    return false;
+  }
+}
+
+/* ============================================================
+   UI: модальное окно, тост
+   ============================================================ */
+const modalBg   = document.getElementById('modalBg');
+const modalTitle= document.getElementById('modalTitle');
+const modalInfo = document.getElementById('modalInfo');
+const modalText = document.getElementById('modalText');
+const toastEl   = document.getElementById('toast');
+
+let toastTimer = 0;
+function showToast(msg){
+  toastEl.textContent = msg;
+  toastEl.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => { toastEl.classList.remove('show'); }, 2400);
+}
+
+function openModal(mode){
+  modalBg.classList.add('open');
+  modalText.value = '';
+  if (mode === 'save'){
+    const code = encodeScene();
+    modalTitle.textContent = 'Код сцены';
+    modalText.value = code;
+    const len = code.length;
+    let info = 'Длина кода: ' + len + ' символов.';
+    if (len <= 4000){
+      info += ' Влезает в Telegram одним сообщением.';
+      modalInfo.classList.remove('warn');
+    } else {
+      info += ' Длинновато — Telegram разобьёт на несколько сообщений. ' +
+              'Чтобы сократить, уменьшите число разных элементов или сделайте картинку проще.';
+      modalInfo.classList.add('warn');
+    }
+    modalInfo.textContent = info;
+    // Попробуем сразу скопировать — но не навязчиво
+    setTimeout(() => {
+      try {
+        if (navigator.clipboard && navigator.clipboard.writeText){
+          navigator.clipboard.writeText(code).then(
+            () => showToast('Скопировано в буфер'),
+            () => {}
+          );
+        }
+      } catch(e){}
+    }, 100);
+  } else {
+    modalTitle.textContent = 'Загрузить сцену';
+    modalInfo.textContent = 'Вставьте код, полученный от друга, и нажмите «Готово».';
+    modalInfo.classList.remove('warn');
+    setTimeout(() => { modalText.focus(); }, 100);
+  }
+}
+
+function closeModal(){
+  modalBg.classList.remove('open');
+}
+
+document.getElementById('saveBtn').addEventListener('click', () => openModal('save'));
+document.getElementById('loadBtn').addEventListener('click', () => openModal('load'));
+
+document.getElementById('modalCancel').addEventListener('click', closeModal);
+modalBg.addEventListener('click', (e) => {
+  if (e.target === modalBg) closeModal();
+});
+
+document.getElementById('modalCopy').addEventListener('click', async () => {
+  const code = modalText.value;
+  if (!code) return;
+  try {
+    await navigator.clipboard.writeText(code);
+    showToast('Скопировано в буфер');
+  } catch(e){
+    // Фолбэк: выделяем текст, чтобы пользователь скопировал вручную
+    modalText.focus();
+    modalText.select();
+    showToast('Выделено — нажмите «Копировать» в меню');
+  }
+});
+
+document.getElementById('modalPaste').addEventListener('click', async () => {
+  try {
+    const txt = await navigator.clipboard.readText();
+    if (txt){
+      modalText.value = txt.trim();
+      showToast('Вставлено из буфера');
+    }
+  } catch(e){
+    modalText.focus();
+    showToast('Вставьте вручную: долгое нажатие → «Вставить»');
+  }
+});
+
+document.getElementById('modalOk').addEventListener('click', () => {
+  if (modalTitle.textContent === 'Код сцены'){
+    // Режим сохранения: просто закрыть
+    closeModal();
+    return;
+  }
+  const code = modalText.value.trim();
+  if (!code){ closeModal(); return; }
+  if (decodeScene(code)){
+    closeModal();
+    showToast('Сцена загружена');
+  } else {
+    modalInfo.textContent = 'Не удалось прочитать код. Проверьте, что скопирован целиком.';
+    modalInfo.classList.add('warn');
+  }
+});
 
 /* ============================================================
    СТАРТ
@@ -1782,7 +2063,6 @@ function loop(now){
 resizeRenderer();
 requestAnimationFrame(loop);
 
-/* Автопауза при уходе со вкладки — экономит батарею на мобильных */
 document.addEventListener('visibilitychange', function(){
   lastT = performance.now();
   simAcc = 0;
