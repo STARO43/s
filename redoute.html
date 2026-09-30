@@ -1,0 +1,3873 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<title>ПРОТИВОКОСМИЧЕСКАЯ ОБОРОНА · РЕДУТ</title>
+<style>
+    html, body {
+        margin: 0; padding: 0; overflow: hidden;
+        background: #000; height: 100%; width: 100%;
+        font-family: 'MS Sans Serif', 'Tahoma', 'Verdana', Arial, sans-serif;
+        font-size: 11px;
+        user-select: none; -webkit-user-select: none;
+        -webkit-tap-highlight-color: transparent;
+        touch-action: none; cursor: crosshair; color: #000;
+    }
+    canvas { display: block; touch-action: none; }
+    * { cursor: inherit; }
+    button, .btn98, .radio, .wbtn, #menuBar .m, .dropdown .item { cursor: pointer; }
+
+    /* 3D-слой */
+    #webglLayer {
+        position: fixed; inset: 0;
+        z-index: 1;
+        cursor: crosshair;
+    }
+
+    /* Тактический оверлей — поверх, резкий */
+    #tacticalLayer {
+        position: fixed; inset: 0;
+        z-index: 40;
+        pointer-events: none;
+    }
+
+    #titleBar {
+        position: fixed; top: 0; left: 0; right: 0; height: 24px;
+        background: linear-gradient(90deg, #000080 0%, #1084d0 100%);
+        display: flex; align-items: center; justify-content: space-between;
+        padding: 0 3px 0 4px; z-index: 60;
+        color: #fff; font-weight: bold; font-size: 11px; pointer-events: none;
+    }
+    #titleBar .left { display: flex; align-items: center; gap: 5px; }
+    #titleBar .ico {
+        width: 14px; height: 14px; background: #c0c0c0;
+        border: 1px solid #000; position: relative;
+    }
+    #titleBar .ico::before { content: ''; position: absolute; inset: 2px; background: #000080; }
+    #titleBar .win-btns { display: flex; gap: 2px; pointer-events: auto; }
+    #titleBar .wbtn {
+        width: 16px; height: 14px; background: #c0c0c0;
+        border-top: 1px solid #fff; border-left: 1px solid #fff;
+        border-right: 1px solid #000; border-bottom: 1px solid #000;
+        display: flex; align-items: center; justify-content: center;
+        color: #000; font-size: 9px; font-weight: bold; line-height: 1;
+    }
+    #titleBar .wbtn:active {
+        border-top: 1px solid #000; border-left: 1px solid #000;
+        border-right: 1px solid #fff; border-bottom: 1px solid #fff;
+    }
+    #menuBar {
+        position: fixed; top: 24px; left: 0; right: 0; height: 22px;
+        background: #c0c0c0; border-bottom: 1px solid #808080;
+        display: flex; align-items: center; padding: 0 2px;
+        z-index: 62; font-size: 11px; pointer-events: auto;
+    }
+    #menuBar .m { padding: 2px 7px; border: 1px solid transparent; }
+    #menuBar .m u { text-decoration: underline; }
+    #menuBar .m.open {
+        border-top: 1px solid #fff; border-left: 1px solid #fff;
+        border-right: 1px solid #404040; border-bottom: 1px solid #404040;
+    }
+    #menuBar .menuSep {
+        width: 1px; height: 16px; background: #808080;
+        margin: 0 6px;
+        box-shadow: 1px 0 0 #fff;
+    }
+    .menuBtn {
+        padding: 3px 12px; margin: 0 1px;
+        font-family: 'MS Sans Serif', Tahoma, sans-serif;
+        font-size: 11px; font-weight: bold; color: #000; background: #c0c0c0;
+        border-top: 2px solid #fff; border-left: 2px solid #fff;
+        border-right: 2px solid #404040; border-bottom: 2px solid #404040;
+        outline: none; cursor: pointer;
+        letter-spacing: 1px;
+    }
+    .menuBtn:active:not(:disabled) {
+        border-top: 2px solid #404040; border-left: 2px solid #404040;
+        border-right: 2px solid #fff; border-bottom: 2px solid #fff;
+    }
+    .menuBtn:disabled {
+        color: #808080; background: #a8a8a8;
+        pointer-events: none;
+        border-top: 2px solid #b0b0b0; border-left: 2px solid #b0b0b0;
+        border-right: 2px solid #808080; border-bottom: 2px solid #808080;
+    }
+    .dropdown {
+        position: fixed; top: 46px; background: #c0c0c0;
+        border-top: 2px solid #fff; border-left: 2px solid #fff;
+        border-right: 2px solid #404040; border-bottom: 2px solid #404040;
+        z-index: 70; display: none; padding: 2px 0; min-width: 260px;
+        font-size: 11px; box-shadow: 2px 2px 0 rgba(0,0,0,0.4);
+    }
+    .dropdown.open { display: block; }
+    .dropdown .item { padding: 4px 20px 4px 24px; color: #000; white-space: nowrap; position: relative; }
+    .dropdown .item:hover { background: #000080; color: #fff; }
+    .dropdown .item.checked::before {
+        content: '✓'; position: absolute; left: 8px; color: #000080;
+    }
+    .dropdown .item.checked:hover::before { color: #fff; }
+    .dropdown .sep {
+        height: 0; margin: 3px 2px;
+        border-top: 1px solid #808080;
+        border-bottom: 1px solid #fff;
+    }
+
+    #radarWrap { position: fixed; top: 52px; left: 12px; z-index: 55; pointer-events: none; }
+    #radarOuter {
+        padding: 3px; background: #c0c0c0;
+        border-top: 2px solid #fff; border-left: 2px solid #fff;
+        border-right: 2px solid #404040; border-bottom: 2px solid #404040;
+        position: relative;
+    }
+    #radarInner {
+        width: 240px; height: 240px; background: #000;
+        border-top: 2px solid #404040; border-left: 2px solid #404040;
+        border-right: 2px solid #fff; border-bottom: 2px solid #fff;
+        position: relative; overflow: hidden;
+    }
+    #radarCanvas { width: 100%; height: 100%; display: block; }
+    #radarLabel { text-align: center; font-size: 10px; color: #000; padding-top: 2px; background: #c0c0c0; }
+
+    /* маленькая круглая кнопка трассировки на РЛС */
+    #rlsFocusBtn {
+        position: absolute;
+        bottom: 22px; right: 8px;
+        width: 26px; height: 26px; padding: 0;
+        border-radius: 50%;
+        background: #c0c0c0;
+        border-top: 2px solid #fff;
+        border-left: 2px solid #fff;
+        border-right: 2px solid #404040;
+        border-bottom: 2px solid #404040;
+        font-family: 'MS Sans Serif', Tahoma, sans-serif;
+        font-size: 14px;
+        line-height: 1;
+        font-weight: bold;
+        color: #000;
+        cursor: pointer;
+        pointer-events: auto;
+        display: flex; align-items: center; justify-content: center;
+        outline: none;
+        z-index: 5;
+        box-shadow: 0 0 0 1px rgba(0,0,0,0.15);
+    }
+    #rlsFocusBtn:active {
+        border-top: 2px solid #404040; border-left: 2px solid #404040;
+        border-right: 2px solid #fff; border-bottom: 2px solid #fff;
+    }
+    #rlsFocusBtn.focusActive {
+        background: #00ff44; color: #000;
+        border-top: 2px solid #404040; border-left: 2px solid #404040;
+        border-right: 2px solid #fff; border-bottom: 2px solid #fff;
+        box-shadow: 0 0 10px #00ff44;
+    }
+
+    #logOuter {
+        position: fixed; top: 52px; right: 12px; width: 320px; z-index: 55;
+        pointer-events: none;
+        opacity: 0.82;
+    }
+    #logTitle {
+        background: linear-gradient(90deg, #000080 0%, #1084d0 100%);
+        color: #fff; font-size: 11px; font-weight: bold; padding: 2px 6px;
+    }
+    #log {
+        max-height: calc(100% - 130px); padding: 6px 8px;
+        font-size: 11px; line-height: 1.45; color: #000;
+        overflow: hidden; background: #fff;
+        border-top: 2px solid #404040; border-left: 2px solid #404040;
+        border-right: 2px solid #fff; border-bottom: 2px solid #fff;
+        font-family: 'Courier New', monospace; margin: 2px;
+    }
+    .log-entry { display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; opacity: 0; animation: logIn 0.2s forwards; }
+    .log-entry .t { color: #808080; margin-right: 6px; }
+    .log-entry.ok   { color: #008000; }
+    .log-entry.warn { color: #808000; }
+    .log-entry.err  { color: #c00000; font-weight: bold; }
+    .log-entry.info { color: #000080; }
+    @keyframes logIn { from { opacity: 0; } to { opacity: 1; } }
+
+    #hud {
+        position: fixed; top: 52px; left: 50%; transform: translateX(-50%);
+        z-index: 55; display: flex; gap: 6px; pointer-events: none;
+        align-items: stretch;
+    }
+    #hud .panel {
+        padding: 4px 9px; background: #c0c0c0;
+        border-top: 2px solid #fff; border-left: 2px solid #fff;
+        border-right: 2px solid #404040; border-bottom: 2px solid #404040;
+        text-align: center; min-width: 88px;
+        display: flex; flex-direction: column; justify-content: center;
+    }
+    #hud .panel.asuPanel { min-width: 250px; }
+    #hud .lbl { font-size: 9px; color: #000; margin-bottom: 3px; letter-spacing: 1px; }
+    #hud .asuRow { display: flex; gap: 4px; justify-content: center; }
+    #hud .asuBtn {
+        padding: 5px 10px; font-family: 'MS Sans Serif', Tahoma, sans-serif;
+        font-size: 10px; color: #000; background: #c0c0c0;
+        border-top: 2px solid #fff; border-left: 2px solid #fff;
+        border-right: 2px solid #404040; border-bottom: 2px solid #404040;
+        outline: none; cursor: pointer; pointer-events: auto;
+        font-weight: bold; letter-spacing: 1px;
+        min-width: 105px;
+    }
+    #hud .asuBtn.active {
+        background: #00ff66; color: #000; font-weight: bold;
+        border-top: 2px solid #404040; border-left: 2px solid #404040;
+        border-right: 2px solid #fff; border-bottom: 2px solid #fff;
+    }
+    #hud .asuBtn:active {
+        border-top: 2px solid #404040; border-left: 2px solid #404040;
+        border-right: 2px solid #fff; border-bottom: 2px solid #fff;
+    }
+
+    .btn98 {
+        padding: 6px 10px; font-family: 'MS Sans Serif', Tahoma, sans-serif;
+        font-size: 11px; color: #000; background: #c0c0c0;
+        border-top: 2px solid #fff; border-left: 2px solid #fff;
+        border-right: 2px solid #404040; border-bottom: 2px solid #404040;
+        outline: none; pointer-events: auto;
+    }
+    .btn98:active {
+        border-top: 2px solid #404040; border-left: 2px solid #404040;
+        border-right: 2px solid #fff; border-bottom: 2px solid #fff;
+    }
+
+    #economyTimerBottom {
+        position: fixed; bottom: 30px; left: 12px;
+        z-index: 56;
+        padding: 6px 12px; background: #800000; color: #ffdd88;
+        border-top: 2px solid #fff; border-left: 2px solid #fff;
+        border-right: 2px solid #404040; border-bottom: 2px solid #404040;
+        font-family: 'Courier New', monospace; font-weight: bold;
+        font-size: 12px; letter-spacing: 1px;
+        display: none;
+    }
+
+    #pauseBadge {
+        position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
+        z-index: 80; display: none;
+        padding: 20px 40px;
+        background: rgba(192, 192, 192, 0.95);
+        border-top: 3px solid #fff; border-left: 3px solid #fff;
+        border-right: 3px solid #404040; border-bottom: 3px solid #404040;
+        color: #800000; font-family: 'Courier New', monospace;
+        font-weight: bold; font-size: 26px; letter-spacing: 6px;
+        box-shadow: 0 0 40px rgba(0,0,0,0.7);
+        pointer-events: none;
+    }
+    #pauseBadge.open { display: block; }
+    #pauseBadge .sub {
+        display: block; font-size: 11px; letter-spacing: 2px;
+        color: #404040; margin-top: 8px; text-align: center;
+        font-family: 'MS Sans Serif', sans-serif;
+    }
+
+    #bottomBar {
+        position: fixed; bottom: 0; left: 0; right: 0; height: 22px;
+        background: #c0c0c0; border-top: 1px solid #fff;
+        display: flex; align-items: center; padding: 0 4px;
+        z-index: 60; gap: 4px; font-size: 11px; pointer-events: none;
+    }
+    #bottomBar .cell {
+        height: 16px; padding: 0 6px;
+        border-top: 1px solid #808080; border-left: 1px solid #808080;
+        border-right: 1px solid #fff; border-bottom: 1px solid #fff;
+        display: flex; align-items: center; background: #c0c0c0;
+    }
+    #bottomBar .grow { flex: 1; }
+    #bottomBar .val { font-family: 'Courier New', monospace; margin-left: 5px; font-weight: bold; }
+    #bottomBar .val.low  { color: #c00000; }
+    #bottomBar .val.warn { color: #806000; }
+    #bottomBar .val.ok   { color: #008000; }
+
+    #overlay {
+        position: fixed; inset: 0; display: flex; align-items: center; justify-content: center;
+        background: rgba(0, 128, 128, 0.6);
+        z-index: 90; padding: 20px; box-sizing: border-box;
+        visibility: visible;
+        transition: opacity 0.2s, visibility 0s;
+        pointer-events: auto;
+    }
+    #overlay.hidden {
+        opacity: 0; visibility: hidden; pointer-events: none;
+        transition: opacity 0.2s, visibility 0s 0.2s;
+    }
+    #overlay .win {
+        width: 100%; max-width: 640px; background: #c0c0c0;
+        border-top: 2px solid #fff; border-left: 2px solid #fff;
+        border-right: 2px solid #404040; border-bottom: 2px solid #404040;
+        padding: 3px; box-shadow: 4px 4px 12px rgba(0,0,0,0.5);
+    }
+    #overlay .win-head {
+        height: 20px; background: linear-gradient(90deg, #000080 0%, #1084d0 100%);
+        color: #fff; display: flex; align-items: center; justify-content: space-between;
+        padding: 0 2px 0 4px; font-weight: bold; font-size: 11px;
+    }
+    #overlay .win-head .title { display: flex; align-items: center; gap: 5px; }
+    #overlay .win-head .ico {
+        width: 14px; height: 14px; background: #c0c0c0;
+        border: 1px solid #fff; border-bottom-color: #404040; border-right-color: #404040;
+        position: relative;
+    }
+    #overlay .win-head .ico::before { content: ''; position: absolute; inset: 3px; background: #000080; }
+    #overlay .win-head .btns { display: flex; gap: 2px; pointer-events: auto; }
+    #overlay .win-head .b {
+        width: 16px; height: 14px; background: #c0c0c0;
+        border-top: 1px solid #fff; border-left: 1px solid #fff;
+        border-right: 1px solid #404040; border-bottom: 1px solid #404040;
+        display: flex; align-items: center; justify-content: center;
+        color: #000; font-size: 10px; font-weight: bold; line-height: 1;
+    }
+    #overlay .win-body { padding: 12px 16px 16px; }
+    fieldset {
+        border-top: 1px solid #808080; border-left: 1px solid #808080;
+        border-right: 1px solid #fff; border-bottom: 1px solid #fff;
+        padding: 8px 12px 12px; margin: 0 0 12px 0; background: #c0c0c0;
+    }
+    fieldset legend { padding: 0 5px; font-size: 11px; color: #000; background: #c0c0c0; }
+    #overlay h1 { margin: 6px 0 2px; font-size: 16px; font-weight: bold; color: #000080; }
+    #overlay h1 .sub {
+        display: block; font-size: 12px; color: #000;
+        margin-top: 3px; font-weight: normal; font-style: italic;
+    }
+    .mode-row { display: flex; gap: 18px; margin: 4px 0 6px 0; }
+    .radio { display: flex; align-items: center; gap: 6px; font-size: 11px; color: #000; }
+    .radio input { display: none; }
+    .radio .box {
+        width: 13px; height: 13px; background: #fff;
+        border-top: 1px solid #404040; border-left: 1px solid #404040;
+        border-right: 1px solid #fff; border-bottom: 1px solid #fff;
+        position: relative; flex-shrink: 0;
+    }
+    .radio input:checked + .box::after { content: ''; position: absolute; inset: 3px; background: #000; }
+    .radio .lbl { line-height: 1.2; }
+    .radio .lbl small { display: block; color: #404040; font-size: 10px; }
+    .brief { font-size: 11px; line-height: 1.6; color: #000; }
+    .brief .row { display: flex; margin-bottom: 4px; }
+    .brief .k { min-width: 110px; color: #000080; font-weight: bold; }
+    .brief .v { color: #000; }
+
+    #resultBox {
+        display: none; margin: 0 0 10px; padding: 8px 12px; background: #c0c0c0;
+        border-top: 2px solid #404040; border-left: 2px solid #404040;
+        border-right: 2px solid #fff; border-bottom: 2px solid #fff;
+    }
+    #resultTitle { font-size: 11px; font-weight: bold; color: #800000; margin-bottom: 6px; }
+    #resultScore {
+        font-size: 32px; font-weight: bold; color: #000080;
+        font-family: 'Courier New', monospace; line-height: 1;
+        background: #fff; border-top: 1px solid #404040; border-left: 1px solid #404040;
+        border-right: 1px solid #fff; border-bottom: 1px solid #fff;
+        display: inline-block; padding: 4px 14px;
+    }
+    #resultSub { font-size: 10px; color: #404040; margin-top: 4px; }
+    #resultInfo {
+        margin-top: 8px; font-size: 11px; color: #000;
+        font-family: 'Courier New', monospace; line-height: 1.5;
+    }
+    #err {
+        position: fixed; inset: 0; display: none;
+        align-items: center; justify-content: center;
+        color: #fff; font-size: 14px; text-align: center; padding: 20px;
+        z-index: 200; background: #000080;
+    }
+    #modal {
+        position: fixed; inset: 0; display: none;
+        align-items: center; justify-content: center;
+        background: rgba(0, 0, 0, 0.3); z-index: 300;
+    }
+    #modal.open { display: flex; }
+    #modal .mw {
+        min-width: 320px; max-width: 640px; background: #c0c0c0;
+        border-top: 2px solid #fff; border-left: 2px solid #fff;
+        border-right: 2px solid #404040; border-bottom: 2px solid #404040;
+        padding: 3px; box-shadow: 3px 3px 12px rgba(0,0,0,0.4);
+    }
+    #modal .mh {
+        height: 18px; background: linear-gradient(90deg, #000080 0%, #1084d0 100%);
+        color: #fff; font-weight: bold; font-size: 11px;
+        display: flex; align-items: center; justify-content: space-between;
+        padding: 0 2px 0 4px;
+    }
+    #modal .mh .b {
+        width: 16px; height: 14px; background: #c0c0c0;
+        border-top: 1px solid #fff; border-left: 1px solid #fff;
+        border-right: 1px solid #404040; border-bottom: 1px solid #404040;
+        display: flex; align-items: center; justify-content: center;
+        color: #000; font-size: 10px; font-weight: bold;
+    }
+    #modal .mb { padding: 14px 16px 12px; font-size: 11px; color: #000; }
+    #modal .mb .msg { display: flex; gap: 12px; align-items: flex-start; margin-bottom: 16px; }
+    #modal .mb .ic {
+        width: 32px; height: 32px; background: #ffffcc; border: 1px solid #000;
+        border-radius: 50%; display: flex; align-items: center; justify-content: center;
+        font-size: 20px; font-weight: bold; color: #000080; flex-shrink: 0;
+    }
+    #modal .mb .txt { line-height: 1.5; }
+    #modal .mfoot { display: flex; justify-content: center; gap: 8px; }
+
+    #modal .mw.doc { max-width: 720px; }
+    #modal .mw.doc .mb {
+        max-height: 70vh; overflow-y: auto;
+        padding: 16px 20px;
+        background: #ffffff;
+        margin: 3px;
+        border-top: 2px solid #404040; border-left: 2px solid #404040;
+        border-right: 2px solid #fff; border-bottom: 2px solid #fff;
+        font-family: 'Courier New', monospace;
+        font-size: 12px;
+        line-height: 1.6;
+    }
+    #modal .doc h2 {
+        font-family: 'MS Sans Serif', Tahoma, sans-serif;
+        font-size: 14px;
+        color: #000080;
+        margin: 16px 0 8px;
+        padding-bottom: 4px;
+        border-bottom: 1px solid #c0c0c0;
+    }
+    #modal .doc h2:first-child { margin-top: 0; }
+    #modal .doc h3 {
+        font-family: 'MS Sans Serif', Tahoma, sans-serif;
+        font-size: 12px;
+        color: #800000;
+        margin: 12px 0 6px;
+    }
+    #modal .doc p { margin: 6px 0; }
+    #modal .doc .ttx {
+        width: 100%; border-collapse: collapse; margin: 8px 0 14px; font-size: 11px;
+    }
+    #modal .doc .ttx th {
+        background: #c0c0c0; border: 1px solid #808080;
+        padding: 4px 8px; text-align: left;
+        font-family: 'MS Sans Serif', Tahoma, sans-serif; color: #000;
+    }
+    #modal .doc .ttx td {
+        border: 1px solid #c0c0c0; padding: 3px 8px; background: #f5f5f5;
+    }
+    #modal .doc .highlight { background: #ffffcc; padding: 0 3px; }
+
+    @media (max-width: 1200px) {
+        #hud { gap: 4px; }
+        #hud .panel { padding: 3px 6px; min-width: 70px; }
+        #hud .panel.asuPanel { min-width: 200px; }
+        #hud .asuBtn { padding: 4px 7px; font-size: 9px; min-width: 88px; }
+        #logOuter { width: 220px; }
+        #log { font-size: 10px; }
+        #radarInner { width: 180px; height: 180px; }
+    }
+    @media (max-width: 900px) {
+        #hud .panel.asuPanel { min-width: 160px; }
+        #hud .asuBtn { padding: 4px 5px; font-size: 8px; min-width: 70px; }
+        #logOuter { width: 160px; }
+    }
+</style>
+</head>
+<body>
+
+<div id="titleBar">
+    <div class="left">
+        <div class="ico"></div>
+        <span>ВОЗДУШНО-КОСМИЧЕСКАЯ ОБОРОНА · РЕДУТ</span>
+    </div>
+    <div class="win-btns">
+        <div class="wbtn" id="tMin">_</div>
+        <div class="wbtn" id="tMax">□</div>
+        <div class="wbtn" id="tClose">×</div>
+    </div>
+</div>
+
+<div id="menuBar">
+    <div class="m" data-menu="file"><u>Ф</u>айл</div>
+    <div class="m" data-menu="view"><u>В</u>ид</div>
+    <div class="m" data-menu="help"><u>С</u>правка</div>
+    <div class="menuSep"></div>
+    <button class="menuBtn" id="econSaveBtn" title="Перераспределение производства в ремонт щита">РЕМ. 1/2</button>
+    <button class="menuBtn" id="econSacrificeBtn" title="Полная остановка производства ради щита">РЕМ. ПОЛ.</button>
+</div>
+
+<div class="dropdown" id="drop-file" style="left: 2px;">
+    <div class="item" data-action="send">Отправить другу</div>
+    <div class="item" data-action="restart">Заново</div>
+    <div class="sep"></div>
+    <div class="item" data-action="exit">Выход</div>
+</div>
+<div class="dropdown" id="drop-view" style="left: 52px;">
+    <div class="item" data-action="far">Дальний космос</div>
+    <div class="item" data-action="moon">Орбита Земли</div>
+    <div class="item" data-action="orbit">Орбита Земли-2</div>
+    <div class="sep"></div>
+    <div class="item" data-action="mode-battle" id="ddBattle">Режим боевой (без индикации)</div>
+    <div class="item checked" data-action="mode-tactical" id="ddTactical">Режим тактический (с индикацией)</div>
+</div>
+<div class="dropdown" id="drop-help" style="left: 102px;">
+    <div class="item" data-action="weapons">Вооружение</div>
+    <div class="item" data-action="about">О системе</div>
+</div>
+
+<div id="radarWrap">
+    <div id="radarOuter">
+        <div id="radarInner">
+            <canvas id="radarCanvas" width="480" height="480"></canvas>
+        </div>
+        <div id="radarLabel">РЛС "НЕБО" · КРУГОВОЙ ОБЗОР 360°</div>
+        <button id="rlsFocusBtn" title="ТРАССИРОВКА">◎</button>
+    </div>
+</div>
+
+<div id="hud">
+    <div class="panel asuPanel">
+        <div class="lbl">РЕЖИМ АСУ</div>
+        <div class="asuRow">
+            <button class="asuBtn active" id="asuAimed">ЦЕЛЕН.</button>
+            <button class="asuBtn" id="asuVolley">ЗАЛП.</button>
+        </div>
+    </div>
+</div>
+
+<div id="economyTimerBottom">—</div>
+
+<div id="pauseBadge">ПАУЗА<span class="sub">ПРОБЕЛ — ПРОДОЛЖИТЬ</span></div>
+
+<div id="logOuter">
+    <div style="padding: 2px; background: #c0c0c0; border-top: 2px solid #fff; border-left: 2px solid #fff; border-right: 2px solid #404040; border-bottom: 2px solid #404040;">
+        <div id="logTitle">ЖУРНАЛ БОЕВЫХ ДЕЙСТВИЙ</div>
+        <div id="log"></div>
+    </div>
+</div>
+
+<div id="bottomBar">
+    <div class="cell">ГОТОВ</div>
+    <div class="cell grow" id="statusLabel">СИСТЕМА БОЕВАЯ ГОТОВНОСТЬ</div>
+    <div class="cell">ЗУР<span class="val" id="rocketsValue">50/50</span></div>
+    <div class="cell">ДТ<span class="val" id="torpedoesValue">10/10</span></div>
+    <div class="cell">ТБР<span class="val" id="shortTorpedoesValue">3/3</span></div>
+    <div class="cell">UPTIME: <span class="val" id="clockLabel">00:00:00</span></div>
+</div>
+
+<div id="overlay">
+    <div class="win">
+        <div class="win-head">
+            <div class="title">
+                <div class="ico"></div>
+                <span>КОСМИЧЕСКАЯ ОБОРОНА · РЕДУТ</span>
+            </div>
+            <div class="btns">
+                <div class="b">_</div>
+                <div class="b">□</div>
+                <div class="b" id="ovClose">×</div>
+            </div>
+        </div>
+        <div class="win-body">
+            <h1>"РЕДУТ"
+                <span class="sub">КОСМИЧЕСКАЯ ОБОРОНА ЗЕМЛИ</span>
+            </h1>
+
+            <fieldset style="margin-top: 12px;">
+                <legend>Режим боевой работы</legend>
+                <div class="mode-row">
+                    <label class="radio">
+                        <input type="radio" name="mode" id="modeEasy" value="easy" checked>
+                        <span class="box"></span>
+                        <span class="lbl">Лёгкий
+                            <small>сектор 120° · дежурные силы АСУ</small>
+                        </span>
+                    </label>
+                    <label class="radio">
+                        <input type="radio" name="mode" id="modeHard" value="hard">
+                        <span class="box"></span>
+                        <span class="lbl">Сложный
+                            <small>круговой обзор 360°</small>
+                        </span>
+                    </label>
+                </div>
+            </fieldset>
+
+            <fieldset>
+                <legend>Боевая задача</legend>
+                <div class="brief">
+                    <div class="row"><span class="k">Задача:</span><span class="v">Не допустить прорыва космических объектов к Земле и Луне</span></div>
+                    <div class="row"><span class="k">Средства:</span><span class="v">Противокосмический ракетный комплекс "С-1000"</span></div>
+                    <div class="row"><span class="k">Боекомплект:</span><span class="v">Ядерная космическая ракета "Стрела" · кинетическая торпеда "Предел"</span></div>
+                    <div class="row"><span class="k">Ремонт:</span><span class="v">Перераспределение производственных мощностей</span></div>
+                    <div class="row"><span class="k">ПАУЗА:</span><span class="v">ПРОБЕЛ</span></div>
+                </div>
+            </fieldset>
+
+            <div id="resultBox">
+                <div id="resultTitle">БОЕВОЙ РАСЧЁТ ОКОНЧЕН</div>
+                <div id="resultScore">0</div>
+                <div id="resultSub">ПЕРЕХВАТОВ</div>
+                <div id="resultInfo"></div>
+            </div>
+
+            <button id="startBtn" class="btn98" style="min-width: 200px; padding: 8px 20px; box-shadow: 1px 1px 0 #000; font-weight: bold;">ЗАСТУПИТЬ НА ДЕЖУРСТВО</button>
+        </div>
+    </div>
+</div>
+
+<div id="modal">
+    <div class="mw" id="modalWindow">
+        <div class="mh">
+            <span id="modalTitle">Сообщение</span>
+            <div class="b" id="modalClose">×</div>
+        </div>
+        <div class="mb" id="modalBody">
+            <div class="msg" id="modalMsg">
+                <div class="ic" id="modalIcon">i</div>
+                <div class="txt" id="modalText">Текст</div>
+            </div>
+            <div class="mfoot" id="modalFoot">
+                <button class="btn98" id="modalOk" style="padding: 4px 14px;">OK</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="err">НЕ УДАЛОСЬ ЗАПУСТИТЬ 3D-ГРАФИКУ.<br>ПРОВЕРЬТЕ, ЧТО WEBGL ВКЛЮЧЁН.</div>
+
+<script src="https://unpkg.com/three@0.126.0/build/three.min.js"></script>
+<script src="https://unpkg.com/three@0.126.0/examples/js/shaders/CopyShader.js"></script>
+<script src="https://unpkg.com/three@0.126.0/examples/js/shaders/LuminosityHighPassShader.js"></script>
+<script src="https://unpkg.com/three@0.126.0/examples/js/postprocessing/EffectComposer.js"></script>
+<script src="https://unpkg.com/three@0.126.0/examples/js/postprocessing/RenderPass.js"></script>
+<script src="https://unpkg.com/three@0.126.0/examples/js/postprocessing/ShaderPass.js"></script>
+<script src="https://unpkg.com/three@0.126.0/examples/js/postprocessing/UnrealBloomPass.js"></script>
+
+<script>
+window.addEventListener('DOMContentLoaded', function () {
+    'use strict';
+
+    if (typeof THREE === 'undefined') {
+        var e1 = document.getElementById('err');
+        e1.style.display = 'flex';
+        e1.innerHTML = 'НЕ УДАЛОСЬ ЗАГРУЗИТЬ THREE.JS.';
+        return;
+    }
+    try {
+        var testCanvas = document.createElement('canvas');
+        var gl = testCanvas.getContext('webgl') || testCanvas.getContext('experimental-webgl');
+        if (!gl) throw new Error('no webgl');
+    } catch (e) {
+        document.getElementById('err').style.display = 'flex';
+        return;
+    }
+
+    var DEG = Math.PI / 180;
+    var EARTH_RADIUS_WORLD = 0.6371;
+
+    var SUN_RADIUS = 69.634;
+    var SUN_DISTANCE = 14960.0;
+    var SUN_POS = new THREE.Vector3(SUN_DISTANCE, 0, 0);
+
+    var METEOR_SPAWN_MIN = 90.0;
+    var METEOR_SPAWN_MAX = 160.0;
+    var METEOR_DESPAWN   = 400.0;
+    var EARTH_HIT        = 0.9;
+    var MOON_HIT         = 0.30;
+
+    var DOME_LENGTH = 40.0;
+    var SECTOR_EASY_DEG = 120;
+
+    var GHOST_LIFE_SEC = 3.0;
+    var TRACE_LIFE_SEC = 3.0;
+
+    var TAC_GREEN     = '#4a7a4a';
+    var TAC_GREEN_TXT = '#6a9a6a';
+
+    var GAME = {
+        baseHP: 100,
+        hpLossPerMiss: 15,
+        camDistDefault: 12.0,
+        camDistMin: 2.5,
+        camDistMax: 200.0,
+        cometBaseSpeed: 4.0,
+        rocketSpeedStart: 4.0,
+        rocketSpeedMax: 28.0,
+        rocketAccelTime: 1.5,
+        torpedoMul: 0.8,
+        baseInterval: 3.0,
+        minInterval: 1.6,
+        missChanceBase: 0.4,
+        missChanceMin: 0.12,
+        rocketLifeSec: 15,
+        torpedoLifeSec: 25,
+        nearMissRadius: 2.5,
+        mode: 'easy',
+        displayMode: 'tactical',
+        weaponFailChance: 0.03,
+        moonTargetChance: 0.28,
+        moonHitsToDisable: 3
+    };
+
+    var MOON_POS = new THREE.Vector3(EARTH_RADIUS_WORLD * 60, 0, 0);
+
+    var inventory = {
+        rockets: 50, rocketsMax: 50, rocketReplenishInterval: 3.5, rocketTimer: 0,
+        torpedoes: 10, torpedoesMax: 10, torpedoReloadTime: 3.0, torpedoReloadTimer: 0,
+        shortTorpedoes: 3, shortTorpedoesMax: 3, shortTorpedoReloadTime: 4.0, shortTorpedoReloadTimer: 0
+    };
+
+    var economy = {
+        active: null, timer: 0, duration: 60,
+        saveShieldBonus: 15, sacrificeShieldBonus: 30
+    };
+
+    var asuMode = 'aimed';
+    var wave = { intensity: 1.0, timer: 0, durationMin: 20, durationMax: 35 };
+    var paused = false;
+
+    var asuQueue = [];
+    var asuNextShotTimer = 0;
+
+    var moonBase = {
+        hp: GAME.moonHitsToDisable,
+        hpMax: GAME.moonHitsToDisable,
+        disabled: false
+    };
+
+    var scene = new THREE.Scene();
+    scene.background = new THREE.Color(0x000002);
+
+    var camera = new THREE.PerspectiveCamera(48, window.innerWidth / window.innerHeight, 0.1, 5000000);
+
+    var renderer = new THREE.WebGLRenderer({
+        antialias: true, powerPreference: 'high-performance', alpha: false,
+        logarithmicDepthBuffer: true
+    });
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    renderer.toneMapping = THREE.ACESFilmicToneMapping;
+    renderer.toneMappingExposure = 0.95;
+    renderer.outputEncoding = THREE.sRGBEncoding;
+    renderer.shadowMap.enabled = false;
+    renderer.physicallyCorrectLights = true;
+    renderer.domElement.id = 'webglLayer';
+    document.body.appendChild(renderer.domElement);
+    renderer.domElement.style.cursor = 'crosshair';
+
+    var composer = null;
+    var bloomPass = null;
+    try {
+        composer = new THREE.EffectComposer(renderer);
+        composer.setSize(window.innerWidth, window.innerHeight);
+        composer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+        composer.addPass(new THREE.RenderPass(scene, camera));
+        bloomPass = new THREE.UnrealBloomPass(
+            new THREE.Vector2(window.innerWidth, window.innerHeight),
+            0.85, 0.85, 0.75
+        );
+        composer.addPass(bloomPass);
+    } catch (e) { composer = null; }
+
+    var earthGroup = new THREE.Group();
+    scene.add(earthGroup);
+
+    var camTheta = 0;
+    var camPhi = Math.PI / 2 - 0.25;
+    var camDist = GAME.camDistDefault;
+    var focusTarget = null, focusBlend = 0, cameraShake = 0;
+
+    var ghostMarks = [];
+    var traceMarks = [];
+
+    var sunLight = new THREE.DirectionalLight(0xfff2d8, 2.6);
+    sunLight.position.copy(SUN_POS);
+    sunLight.target.position.set(0, 0, 0);
+    scene.add(sunLight);
+    scene.add(sunLight.target);
+    scene.add(new THREE.AmbientLight(0x0a1220, 0.10));
+    scene.add(new THREE.HemisphereLight(0x18243a, 0x000000, 0.08));
+
+    var texLoader = new THREE.TextureLoader();
+    texLoader.setCrossOrigin('anonymous');
+
+    function makeSoftGlowTexture() {
+        var c = document.createElement('canvas'); c.width = c.height = 256;
+        var ctx = c.getContext('2d');
+        var g = ctx.createRadialGradient(128, 128, 0, 128, 128, 128);
+        g.addColorStop(0.0, 'rgba(255,255,255,1)');
+        g.addColorStop(0.10, 'rgba(255,250,235,0.9)');
+        g.addColorStop(0.30, 'rgba(255,215,150,0.45)');
+        g.addColorStop(0.65, 'rgba(255,140,40,0.10)');
+        g.addColorStop(1.0, 'rgba(255,40,0,0)');
+        ctx.fillStyle = g; ctx.fillRect(0, 0, 256, 256);
+        return new THREE.CanvasTexture(c);
+    }
+    var softGlowTex = makeSoftGlowTexture();
+
+    function makeAtmoGlowTexture() {
+        var c = document.createElement('canvas'); c.width = c.height = 512;
+        var ctx = c.getContext('2d');
+        var g = ctx.createRadialGradient(256, 256, 0, 256, 256, 256);
+        g.addColorStop(0.0, 'rgba(200,220,255,0)');
+        g.addColorStop(0.48, 'rgba(180,215,255,0.42)');
+        g.addColorStop(0.72, 'rgba(110,170,255,0.14)');
+        g.addColorStop(1.0, 'rgba(50,100,200,0)');
+        ctx.fillStyle = g; ctx.fillRect(0, 0, 512, 512);
+        return new THREE.CanvasTexture(c);
+    }
+
+    function makeFireballTexture() {
+        var S = 256;
+        var c = document.createElement('canvas'); c.width = c.height = S;
+        var ctx = c.getContext('2d');
+        var g = ctx.createRadialGradient(S/2, S/2, 0, S/2, S/2, S/2 * 0.6);
+        g.addColorStop(0.00, 'rgba(255,255,250,1)');
+        g.addColorStop(0.20, 'rgba(255,245,200,1)');
+        g.addColorStop(0.50, 'rgba(255,190,80,0.92)');
+        g.addColorStop(0.78, 'rgba(255,100,20,0.55)');
+        g.addColorStop(1.00, 'rgba(160,25,5,0)');
+        ctx.fillStyle = g; ctx.fillRect(0, 0, S, S);
+        return new THREE.CanvasTexture(c);
+    }
+    var fireballTex = makeFireballTexture();
+
+    function makePuffTexture() {
+        var S = 128;
+        var c = document.createElement('canvas'); c.width = c.height = S;
+        var ctx = c.getContext('2d');
+        ctx.clearRect(0, 0, S, S);
+        for (var i = 0; i < 8; i++) {
+            var cx = S/2 + (Math.random() - 0.5) * S * 0.4;
+            var cy = S/2 + (Math.random() - 0.5) * S * 0.4;
+            var rr = S * (0.12 + Math.random() * 0.18);
+            var g = ctx.createRadialGradient(cx, cy, 0, cx, cy, rr);
+            g.addColorStop(0.0, 'rgba(255,255,255,0.85)');
+            g.addColorStop(0.5, 'rgba(255,255,255,0.35)');
+            g.addColorStop(1.0, 'rgba(255,255,255,0)');
+            ctx.fillStyle = g;
+            ctx.beginPath(); ctx.arc(cx, cy, rr, 0, Math.PI * 2); ctx.fill();
+        }
+        return new THREE.CanvasTexture(c);
+    }
+    var puffTex = makePuffTexture();
+
+    function makeShardTexture() {
+        var S = 64;
+        var c = document.createElement('canvas'); c.width = c.height = S;
+        var ctx = c.getContext('2d');
+        ctx.clearRect(0, 0, S, S);
+        ctx.fillStyle = '#3a2a1a';
+        ctx.beginPath();
+        for (var i = 0; i < 5; i++) {
+            var ang = (i / 5) * Math.PI * 2 - Math.PI / 2;
+            var r = 18 + Math.random() * 8;
+            var px = S/2 + Math.cos(ang) * r;
+            var py = S/2 + Math.sin(ang) * r;
+            if (i === 0) ctx.moveTo(px, py); else ctx.lineTo(px, py);
+        }
+        ctx.closePath();
+        ctx.fill();
+        ctx.strokeStyle = 'rgba(255,180,80,0.9)';
+        ctx.lineWidth = 2;
+        ctx.stroke();
+        return new THREE.CanvasTexture(c);
+    }
+    var shardTex = makeShardTexture();
+
+    // ===== СОЛНЦЕ =====
+    var sunUniforms = { uTime: { value: 0 } };
+    var sunMaterial = new THREE.ShaderMaterial({
+        uniforms: sunUniforms,
+        vertexShader: 'varying vec3 vPos;\nvoid main(){ vPos = position; gl_Position = projectionMatrix * modelViewMatrix * vec4(position,1.0); }',
+        fragmentShader: [
+            'uniform float uTime;',
+            'varying vec3 vPos;',
+            'float hash(vec2 p){ return fract(sin(dot(p,vec2(127.1,311.7)))*43758.5453123); }',
+            'float noise(vec2 p){ vec2 i=floor(p); vec2 f=fract(p); f=f*f*(3.0-2.0*f); return mix(mix(hash(i),hash(i+vec2(1,0)),f.x),mix(hash(i+vec2(0,1)),hash(i+vec2(1,1)),f.x),f.y); }',
+            'float fbm(vec2 p){ float v=0.0,a=0.5; for(int i=0;i<6;i++){ v+=a*noise(p); p*=2.0; a*=0.5; } return v; }',
+            'void main(){',
+            '  vec3 n = normalize(vPos);',
+            '  float lon = atan(n.z, n.x); float lat = asin(clamp(n.y,-1.0,1.0));',
+            '  vec2 uv = vec2(lon, lat) * 4.0;',
+            '  float t = uTime * 0.35;',
+            '  float f1 = fbm(uv*2.0 + vec2(t,-t*0.6));',
+            '  float f2 = fbm(uv*4.0 - vec2(t*0.7,t*0.4));',
+            '  float f3 = fbm(uv*8.0 + vec2(t*1.2,t*0.9));',
+            '  float f = f1*0.5 + f2*0.3 + f3*0.2;',
+            '  vec3 c1=vec3(0.60,0.10,0.02); vec3 c2=vec3(1.0,0.35,0.05); vec3 c3=vec3(1.0,0.72,0.25); vec3 c4=vec3(1.0,0.95,0.75); vec3 c5=vec3(1.0,1.0,0.98);',
+            '  vec3 col = mix(c1,c2,smoothstep(0.20,0.45,f));',
+            '  col = mix(col,c3,smoothstep(0.40,0.62,f));',
+            '  col = mix(col,c4,smoothstep(0.58,0.78,f));',
+            '  col = mix(col,c5,smoothstep(0.75,0.92,f));',
+            '  col *= 6.0;',
+            '  gl_FragColor = vec4(col,1.0);',
+            '}'
+        ].join('\n')
+    });
+    var sunMesh = new THREE.Mesh(new THREE.SphereGeometry(SUN_RADIUS, 64, 48), sunMaterial);
+    sunMesh.position.copy(SUN_POS);
+    scene.add(sunMesh);
+
+    function makeSunGlowSprite(scale, color, opacity) {
+        var s = new THREE.Sprite(new THREE.SpriteMaterial({
+            map: makeSoftGlowTexture(), color: color,
+            blending: THREE.AdditiveBlending, depthWrite: false, transparent: true, opacity: opacity
+        }));
+        s.position.copy(SUN_POS);
+        s.scale.set(scale, scale, 1);
+        scene.add(s);
+        return s;
+    }
+    var sunCorona = makeSunGlowSprite(SUN_RADIUS * 10, 0xffddaa, 1.0);
+    var sunHalo = makeSunGlowSprite(SUN_RADIUS * 28, 0xffaa55, 0.30);
+    var sunHalo2 = makeSunGlowSprite(SUN_RADIUS * 80, 0xff8844, 0.10);
+
+    // ===== ЗЕМЛЯ =====
+    var earthMaterial = new THREE.MeshStandardMaterial({
+        color: 0xffffff, roughness: 0.82, metalness: 0.02,
+        emissive: new THREE.Color(0x000105), emissiveIntensity: 0.15
+    });
+    var earthMesh = new THREE.Mesh(new THREE.SphereGeometry(EARTH_RADIUS_WORLD, 256, 192), earthMaterial);
+    earthGroup.add(earthMesh);
+
+    function loadTexture(url, fallbackColor, onLoad, encoding) {
+        texLoader.load(url,
+            function (tex) {
+                tex.encoding = encoding || THREE.sRGBEncoding;
+                tex.anisotropy = 16;
+                tex.minFilter = THREE.LinearMipMapLinearFilter;
+                tex.magFilter = THREE.LinearFilter;
+                onLoad(tex);
+            },
+            undefined,
+            function () {
+                var c = document.createElement('canvas');
+                c.width = c.height = 512;
+                var ctx = c.getContext('2d');
+                ctx.fillStyle = fallbackColor;
+                ctx.fillRect(0, 0, 512, 512);
+                onLoad(new THREE.CanvasTexture(c));
+            });
+    }
+
+    loadTexture('https://threejs.org/examples/textures/planets/earth_atmos_2048.jpg', '#2a4a7a', function (t) {
+        earthMaterial.map = t; earthMaterial.needsUpdate = true;
+    }, THREE.sRGBEncoding);
+
+    loadTexture('https://threejs.org/examples/textures/planets/earth_normal_2048.jpg', '#8080ff', function (t) {
+        earthMaterial.normalMap = t;
+        earthMaterial.normalScale = new THREE.Vector2(1.0, 1.0);
+        earthMaterial.needsUpdate = true;
+    }, THREE.LinearEncoding);
+
+    loadTexture('https://threejs.org/examples/textures/planets/earth_specular_2048.jpg', '#000000', function (t) {
+        earthMaterial.roughnessMap = t;
+        earthMaterial.roughness = 0.75;
+        earthMaterial.needsUpdate = true;
+    }, THREE.LinearEncoding);
+
+    var cloudMaterial = new THREE.MeshStandardMaterial({
+        color: 0xffffff, transparent: true, opacity: 0.55,
+        depthWrite: false, side: THREE.FrontSide,
+        roughness: 1.0, metalness: 0.0, blending: THREE.NormalBlending
+    });
+    var cloudMesh = new THREE.Mesh(new THREE.SphereGeometry(EARTH_RADIUS_WORLD * 1.011, 192, 144), cloudMaterial);
+    earthGroup.add(cloudMesh);
+    loadTexture('https://threejs.org/examples/textures/planets/earth_clouds_1024.png', '#ffffff', function (t) {
+        cloudMaterial.alphaMap = t;
+        cloudMaterial.map = t;
+        cloudMaterial.needsUpdate = true;
+    }, THREE.sRGBEncoding);
+
+    var atmoTex = makeAtmoGlowTexture();
+    var atmoSprite1 = new THREE.Sprite(new THREE.SpriteMaterial({
+        map: atmoTex, color: 0x88baff,
+        blending: THREE.AdditiveBlending, depthWrite: false, transparent: true, opacity: 0.55
+    }));
+    atmoSprite1.scale.set(EARTH_RADIUS_WORLD * 2.4, EARTH_RADIUS_WORLD * 2.4, 1);
+    earthGroup.add(atmoSprite1);
+
+    // ===== ЛУНА =====
+    var moonMaterial = new THREE.MeshStandardMaterial({
+        color: 0xffffff, roughness: 0.92, metalness: 0.02,
+        emissive: new THREE.Color(0x080808), emissiveIntensity: 0.08
+    });
+    var moonMesh = new THREE.Mesh(new THREE.SphereGeometry(0.1737, 96, 64), moonMaterial);
+    moonMesh.position.copy(MOON_POS);
+    scene.add(moonMesh);
+    loadTexture('https://threejs.org/examples/textures/planets/moon_1024.jpg', '#888888', function (t) {
+        moonMaterial.map = t; moonMaterial.needsUpdate = true;
+    }, THREE.sRGBEncoding);
+
+    var moonBaseGroup = new THREE.Group();
+    moonBaseGroup.position.copy(MOON_POS);
+    var baseDome = new THREE.Mesh(
+        new THREE.SphereGeometry(0.09, 24, 16, 0, Math.PI * 2, 0, Math.PI / 2),
+        new THREE.MeshStandardMaterial({ color: 0xb8b8b8, roughness: 0.7, metalness: 0.15 })
+    );
+    baseDome.position.y = 0.02;
+    moonBaseGroup.add(baseDome);
+    var antenna1 = new THREE.Mesh(
+        new THREE.CylinderGeometry(0.004, 0.004, 0.15, 6),
+        new THREE.MeshStandardMaterial({ color: 0xcccccc, metalness: 0.5 })
+    );
+    antenna1.position.set(0.06, 0.09, 0);
+    moonBaseGroup.add(antenna1);
+    var antennaTop = new THREE.Mesh(
+        new THREE.SphereGeometry(0.008, 8, 6),
+        new THREE.MeshBasicMaterial({ color: 0xff3333 })
+    );
+    antennaTop.position.set(0.06, 0.17, 0);
+    moonBaseGroup.add(antennaTop);
+    scene.add(moonBaseGroup);
+
+    var moonDamageMarker = new THREE.Sprite(new THREE.SpriteMaterial({
+        map: softGlowTex, color: 0xff0000,
+        blending: THREE.AdditiveBlending, depthWrite: false, transparent: true, opacity: 0
+    }));
+    moonDamageMarker.position.copy(MOON_POS);
+    moonDamageMarker.scale.set(0.8, 0.8, 1);
+    scene.add(moonDamageMarker);
+
+    // ===== ЗВЁЗДЫ =====
+    (function createStars() {
+        var count = 12000;
+        var geo = new THREE.BufferGeometry();
+        var pos = new Float32Array(count * 3);
+        var col = new Float32Array(count * 3);
+        for (var i = 0; i < count; i++) {
+            var r = 400000 + Math.random() * 400000;
+            var t = Math.random() * Math.PI * 2;
+            var p = Math.acos(Math.random() * 2 - 1);
+            pos[i * 3]     = r * Math.sin(p) * Math.cos(t);
+            pos[i * 3 + 1] = r * Math.sin(p) * Math.sin(t);
+            pos[i * 3 + 2] = r * Math.cos(p);
+            var roll = Math.random();
+            var cr, cg, cb;
+            if (roll < 0.06) { cr = 1.0; cg = 0.72; cb = 0.55; }
+            else if (roll < 0.16) { cr = 1.0; cg = 0.85; cb = 0.68; }
+            else if (roll < 0.55) { cr = 1.0; cg = 0.97; cb = 0.92; }
+            else if (roll < 0.85) { cr = 1.0; cg = 1.0; cb = 1.0; }
+            else { cr = 0.78; cg = 0.88; cb = 1.0; }
+            var bright = 0.45 + Math.random() * 0.55;
+            col[i * 3]     = cr * bright;
+            col[i * 3 + 1] = cg * bright;
+            col[i * 3 + 2] = cb * bright;
+        }
+        geo.setAttribute('position', new THREE.BufferAttribute(pos, 3));
+        geo.setAttribute('color', new THREE.BufferAttribute(col, 3));
+        var mat = new THREE.PointsMaterial({
+            size: 1.9, vertexColors: true, transparent: true, opacity: 0.95,
+            blending: THREE.AdditiveBlending, depthWrite: false,
+            sizeAttenuation: false, map: softGlowTex
+        });
+        var stars = new THREE.Points(geo, mat);
+        stars.frustumCulled = false;
+        scene.add(stars);
+    })();
+
+    // ===== КУПОЛ =====
+    var SECTOR_DIR = new THREE.Vector3(1, 0, 0);
+    var SECTOR_HALF_ANGLE_RAD = SECTOR_EASY_DEG * DEG / 2;
+    var DOME_RADIUS_AT_END = Math.tan(SECTOR_HALF_ANGLE_RAD) * DOME_LENGTH;
+
+    var domeConeGeo = new THREE.ConeGeometry(DOME_RADIUS_AT_END, DOME_LENGTH, 48, 1, true);
+    domeConeGeo.translate(0, -DOME_LENGTH / 2, 0);
+    domeConeGeo.rotateX(Math.PI);
+
+    var domeMat = new THREE.MeshBasicMaterial({
+        color: 0x00ff77, transparent: true, opacity: 0.03,
+        side: THREE.DoubleSide, depthWrite: false, blending: THREE.AdditiveBlending
+    });
+    var domeMesh = new THREE.Mesh(domeConeGeo, domeMat);
+    scene.add(domeMesh);
+
+    var edgeGeo = new THREE.BufferGeometry();
+    var edgeVerts = [];
+    for (var i = 0; i < 4; i++) {
+        var a = (i / 4) * Math.PI * 2;
+        edgeVerts.push(0, 0, 0);
+        edgeVerts.push(Math.cos(a) * DOME_RADIUS_AT_END, DOME_LENGTH, Math.sin(a) * DOME_RADIUS_AT_END);
+    }
+    edgeGeo.setAttribute('position', new THREE.BufferAttribute(new Float32Array(edgeVerts), 3));
+    var edgeMat = new THREE.LineBasicMaterial({
+        color: 0x00ff77, transparent: true, opacity: 0.22,
+        depthWrite: false, blending: THREE.AdditiveBlending
+    });
+    var edgeLines = new THREE.LineSegments(edgeGeo, edgeMat);
+    scene.add(edgeLines);
+
+    var ringLines = [];
+    [0.3, 0.6, 0.9].forEach(function (fraction) {
+        var radius = DOME_RADIUS_AT_END * fraction;
+        var y = DOME_LENGTH * fraction;
+        var pts = [];
+        for (var k = 0; k <= 32; k++) {
+            var ang = (k / 32) * Math.PI * 2;
+            pts.push(new THREE.Vector3(Math.cos(ang) * radius, y, Math.sin(ang) * radius));
+        }
+        var line = new THREE.Line(
+            new THREE.BufferGeometry().setFromPoints(pts),
+            new THREE.LineBasicMaterial({ color: 0x00ff77, transparent: true, opacity: 0.12,
+                depthWrite: false, blending: THREE.AdditiveBlending })
+        );
+        scene.add(line);
+        ringLines.push(line);
+    });
+
+    function orientDome() {
+        var q = new THREE.Quaternion().setFromUnitVectors(new THREE.Vector3(0, 1, 0), SECTOR_DIR);
+        domeMesh.setRotationFromQuaternion(q);
+        edgeLines.setRotationFromQuaternion(q);
+        ringLines.forEach(function (l) { l.setRotationFromQuaternion(q); });
+    }
+    orientDome();
+
+    function applyDisplayMode() {
+        var isTactical = (GAME.displayMode === 'tactical');
+        var showDomeSector = isTactical && (GAME.mode === 'easy');
+        domeMesh.visible = showDomeSector;
+        edgeLines.visible = showDomeSector;
+        ringLines.forEach(function (l) { l.visible = showDomeSector; });
+        projectiles.forEach(function (p) {
+            if (p.trajectory) p.trajectory.visible = isTactical;
+        });
+    }
+
+    // ===== МЕТЕОРЫ =====
+    var meteors = [];
+    var meteorsGroup = new THREE.Group();
+    scene.add(meteorsGroup);
+    var UP_VEC = new THREE.Vector3(0, 1, 0);
+
+    function makeMeteorSurfaceTexture() {
+        var S = 512;
+        var c = document.createElement('canvas'); c.width = c.height = S;
+        var ctx = c.getContext('2d');
+        ctx.fillStyle = '#1c1610';
+        ctx.fillRect(0, 0, S, S);
+        for (var i = 0; i < 500; i++) {
+            var x = Math.random() * S, y = Math.random() * S, r = 3 + Math.random() * 30;
+            var shade = 20 + Math.floor(Math.random() * 45);
+            ctx.fillStyle = 'rgb(' + shade + ',' + Math.floor(shade*0.85) + ',' + Math.floor(shade*0.7) + ')';
+            ctx.beginPath(); ctx.arc(x, y, r, 0, Math.PI * 2); ctx.fill();
+        }
+        for (var j = 0; j < 3000; j++) {
+            var x2 = Math.random() * S, y2 = Math.random() * S;
+            var s2 = 1 + Math.random() * 3;
+            var shade2 = 15 + Math.floor(Math.random() * 60);
+            ctx.fillStyle = 'rgba(' + shade2 + ',' + Math.floor(shade2*0.8) + ',' + Math.floor(shade2*0.6) + ',' + (0.4 + Math.random() * 0.5) + ')';
+            ctx.beginPath(); ctx.arc(x2, y2, s2, 0, Math.PI * 2); ctx.fill();
+        }
+        for (var k = 0; k < 200; k++) {
+            var x3 = Math.random() * S, y3 = Math.random() * S;
+            var r3 = 0.8 + Math.random() * 2;
+            var bright = 90 + Math.floor(Math.random() * 80);
+            ctx.fillStyle = 'rgba(' + bright + ',' + Math.floor(bright*0.75) + ',' + Math.floor(bright*0.55) + ',0.9)';
+            ctx.beginPath(); ctx.arc(x3, y3, r3, 0, Math.PI * 2); ctx.fill();
+        }
+        var tex = new THREE.CanvasTexture(c);
+        tex.anisotropy = 8;
+        return tex;
+    }
+    var meteorAlbedoTex = makeMeteorSurfaceTexture();
+
+    function makeMeteorBumpTexture() {
+        var S = 512;
+        var c = document.createElement('canvas'); c.width = c.height = S;
+        var ctx = c.getContext('2d');
+        ctx.fillStyle = '#404040';
+        ctx.fillRect(0, 0, S, S);
+        for (var i = 0; i < 2500; i++) {
+            var x = Math.random() * S, y = Math.random() * S;
+            var r = 2 + Math.random() * 18;
+            var shade = 60 + Math.floor(Math.random() * 140);
+            var g = ctx.createRadialGradient(x, y, 0, x, y, r);
+            g.addColorStop(0, 'rgba(' + shade + ',' + shade + ',' + shade + ',0.7)');
+            g.addColorStop(1, 'rgba(64,64,64,0)');
+            ctx.fillStyle = g;
+            ctx.beginPath(); ctx.arc(x, y, r, 0, Math.PI * 2); ctx.fill();
+        }
+        return new THREE.CanvasTexture(c);
+    }
+    var meteorBumpTex = makeMeteorBumpTexture();
+
+    function makeMeteorTrail(coreColor, midColor, tailColor, length, scale) {
+        var group = new THREE.Group();
+        var sprites = [];
+        for (var i = 0; i < 22; i++) {
+            var t = i / 21;
+            var col = t < 0.15 ? coreColor : (t < 0.5 ? midColor : tailColor);
+            var sprite = new THREE.Sprite(new THREE.SpriteMaterial({
+                map: softGlowTex, color: col,
+                blending: THREE.AdditiveBlending, depthWrite: false, transparent: true,
+                opacity: Math.pow(1 - t, 1.8) * 0.9
+            }));
+            sprite.position.y = -t * length;
+            var w = (1.2 * scale) * Math.pow(1 - t, 1.2) + 0.15 * scale;
+            sprite.scale.set(w, w * (2.5 + t * 4), 1);
+            sprite.userData = { baseOpacity: sprite.material.opacity, t: t, phase: Math.random() * Math.PI * 2 };
+            group.add(sprite); sprites.push(sprite);
+        }
+        return { group: group, sprites: sprites, length: length };
+    }
+
+    var METEOR_TYPES = {
+        small:  { scale: 0.35, hp: 1 },
+        medium: { scale: 0.65, hp: 2 },
+        large:  { scale: 1.05, hp: 4 }
+    };
+
+    var HEAD_SPHERE_FACTOR = 0.35;
+    var HEAD_SPHERE_DIVISOR = 3;
+    var HEAD_GLOW_FACTOR = 0.35;
+
+    function createMeteorMesh(scale) {
+        var group = new THREE.Group();
+        var sphereRadius = (HEAD_SPHERE_FACTOR * scale) / HEAD_SPHERE_DIVISOR;
+        var head = new THREE.Mesh(
+            new THREE.IcosahedronGeometry(sphereRadius, 3),
+            new THREE.MeshStandardMaterial({
+                map: meteorAlbedoTex,
+                bumpMap: meteorBumpTex,
+                bumpScale: 0.02,
+                color: 0xa89078,
+                roughness: 0.88,
+                metalness: 0.08,
+                emissive: 0xff3300,
+                emissiveIntensity: 0.55
+            })
+        );
+        group.add(head);
+
+        var glowRadius = HEAD_GLOW_FACTOR * scale;
+        var coreGlow = new THREE.Sprite(new THREE.SpriteMaterial({
+            map: fireballTex, color: 0xffaa55,
+            blending: THREE.AdditiveBlending, depthWrite: false, transparent: true, opacity: 0.9
+        }));
+        coreGlow.scale.set(glowRadius * 6, glowRadius * 6, 1);
+        group.add(coreGlow);
+
+        var trail = makeMeteorTrail(
+            new THREE.Color(0xfff0cc), new THREE.Color(0xff9933), new THREE.Color(0x551100),
+            10 * scale, scale
+        );
+        group.add(trail.group);
+        group.userData = {
+            head: head, coreGlow: coreGlow, trail: trail,
+            trailLen: 10 * scale, speed: 1, pulseSeed: Math.random() * 10, baseScale: scale,
+            glowRadius: glowRadius
+        };
+        return group;
+    }
+
+    function spawnMeteor() {
+        var roll = Math.random();
+        var type = 'small';
+        var inten = wave.intensity;
+        if (inten > 1.2 && roll > 0.85) type = 'large';
+        else if (inten > 0.9 && roll > 0.6) type = 'medium';
+        else if (roll > 0.75) type = 'medium';
+
+        var typeData = METEOR_TYPES[type];
+        var m = createMeteorMesh(typeData.scale);
+
+        var theta = Math.random() * Math.PI * 2;
+        var phi = Math.acos(2 * Math.random() - 1);
+        var spawnDir = new THREE.Vector3(
+            Math.sin(phi) * Math.cos(theta), Math.sin(phi) * Math.sin(theta), Math.cos(phi)
+        );
+        var spawnR = Math.max(61, METEOR_SPAWN_MIN + Math.random() * (METEOR_SPAWN_MAX - METEOR_SPAWN_MIN));
+        var spawnPos = spawnDir.clone().multiplyScalar(spawnR);
+
+        var speed = GAME.cometBaseSpeed + (inten - 1) * 1.5;
+        if (type === 'large') speed *= 0.75;
+        else if (type === 'medium') speed *= 0.9;
+        speed *= (0.9 + Math.random() * 0.2);
+        speed = Math.max(2.0, speed);
+
+        var willTargetMoon = !moonBase.disabled && (Math.random() < GAME.moonTargetChance);
+        var targetPoint = willTargetMoon ? MOON_POS.clone() : new THREE.Vector3(0, 0, 0);
+
+        var missChance = Math.max(GAME.missChanceMin, GAME.missChanceBase - (inten - 1) * 0.15);
+        var willMiss = willTargetMoon ? (Math.random() < missChance * 0.5) : (Math.random() < missChance);
+
+        var baseDir = new THREE.Vector3().subVectors(targetPoint, spawnPos).normalize();
+        var perp1 = new THREE.Vector3().crossVectors(baseDir, UP_VEC);
+        if (perp1.lengthSq() < 0.0001) perp1.set(1, 0, 0);
+        perp1.normalize();
+        var perp2 = new THREE.Vector3().crossVectors(baseDir, perp1).normalize();
+
+        var offset;
+        if (willMiss) {
+            offset = willTargetMoon
+                ? 1.0 + Math.random() * 0.8
+                : EARTH_RADIUS_WORLD * (1.8 + Math.random() * 1.6);
+        } else {
+            offset = willTargetMoon
+                ? (Math.random() - 0.5) * 0.15
+                : (Math.random() - 0.5) * EARTH_RADIUS_WORLD * 0.9;
+        }
+
+        var ang = Math.random() * Math.PI * 2;
+        var aimOffsetVec = perp1.clone().multiplyScalar(Math.cos(ang) * offset)
+            .add(perp2.clone().multiplyScalar(Math.sin(ang) * offset));
+        var aimPoint = targetPoint.clone().add(aimOffsetVec);
+        var moveDir = new THREE.Vector3().subVectors(aimPoint, spawnPos).normalize();
+
+        m.position.copy(spawnPos);
+        m.quaternion.setFromUnitVectors(UP_VEC, moveDir);
+
+        m.userData.speed = speed;
+        m.userData.moveDir = moveDir.clone();
+        m.userData.willMiss = willMiss;
+        m.userData.targetMoon = willTargetMoon;
+        m.userData.alive = true;
+        m.userData.spawnPos = spawnPos.clone();
+        m.userData.designation = 'TGT' + (Math.floor(Math.random() * 900) + 100);
+        m.userData.type = type;
+        m.userData.hpLeft = typeData.hp;
+        m.userData.damaged = false;
+
+        meteorsGroup.add(m);
+        meteors.push(m);
+
+        m.scale.set(0.01, 0.01, 0.01);
+        var appearStart = performance.now();
+        (function appearAnim() {
+            var t = (performance.now() - appearStart) / 220;
+            if (t >= 1) { m.scale.set(1, 1, 1); return; }
+            var s = 0.01 + 0.99 * (1 - Math.pow(1 - t, 3));
+            m.scale.set(s, s, s);
+            requestAnimationFrame(appearAnim);
+        })();
+
+        var typeLabel = type === 'small' ? 'М' : (type === 'medium' ? 'С' : 'К');
+        var targetLabel = willTargetMoon ? 'ЛУНА' : 'ЗЕМЛЯ';
+        logLine('warn', 'ОБНАРУЖЕНА ' + m.userData.designation + ' [' + typeLabel + '] → ' + targetLabel + ' · R=' + spawnR.toFixed(0) + ' · v=' + speed.toFixed(1));
+        return m;
+    }
+
+    function disposeGroup(g) {
+        g.traverse(function (obj) {
+            if (obj.geometry) obj.geometry.dispose();
+            if (obj.material) {
+                if (Array.isArray(obj.material)) obj.material.forEach(function (m) { m.dispose(); });
+                else obj.material.dispose();
+            }
+        });
+    }
+
+    // ===== ВЗРЫВЫ =====
+    function makeNoiseCircleTexture(innerColor, midColor, outerColor, noiseAmount) {
+        var S = 256;
+        var c = document.createElement('canvas'); c.width = c.height = S;
+        var ctx = c.getContext('2d');
+        var g = ctx.createRadialGradient(S/2, S/2, 0, S/2, S/2, S/2);
+        g.addColorStop(0.0, innerColor);
+        g.addColorStop(0.4, midColor);
+        g.addColorStop(1.0, outerColor);
+        ctx.fillStyle = g; ctx.fillRect(0, 0, S, S);
+        var img = ctx.getImageData(0, 0, S, S);
+        for (var i = 0; i < img.data.length; i += 4) {
+            var n = (Math.random() - 0.5) * noiseAmount;
+            img.data[i]   = Math.min(255, Math.max(0, img.data[i]   + n));
+            img.data[i+1] = Math.min(255, Math.max(0, img.data[i+1] + n));
+            img.data[i+2] = Math.min(255, Math.max(0, img.data[i+2] + n));
+        }
+        ctx.putImageData(img, 0, 0);
+        return new THREE.CanvasTexture(c);
+    }
+    var noiseFireTex = makeNoiseCircleTexture('rgba(255,255,240,1)', 'rgba(255,160,60,0.7)', 'rgba(180,20,0,0)', 60);
+
+    var activeEffects = [];
+    function registerEffect(fn) { activeEffects.push({ update: fn }); }
+
+    function explosionPlasma(pos, scaleRef) {
+        var baseMul = 0.9 + scaleRef * 0.5;
+        var layers = [];
+        var layerColors = [0xfff8e0, 0xffcc55, 0xff8833, 0xff4422, 0xaa2211];
+        for (var i = 0; i < 5; i++) {
+            var s = new THREE.Sprite(new THREE.SpriteMaterial({
+                map: i < 2 ? fireballTex : noiseFireTex,
+                color: layerColors[i],
+                blending: THREE.AdditiveBlending, depthWrite: false, transparent: true,
+                opacity: 0.95 - i * 0.1
+            }));
+            s.position.copy(pos);
+            s.scale.set(0.3 * baseMul, 0.3 * baseMul, 1);
+            scene.add(s);
+            layers.push({ sprite: s, delay: i * 0.06, maxScale: (6 - i * 0.6) * baseMul });
+        }
+        var startTime = performance.now();
+        registerEffect(function () {
+            var t = (performance.now() - startTime) / 1000;
+            if (t >= 1) { layers.forEach(function (l) { scene.remove(l.sprite); l.sprite.material.dispose(); }); return false; }
+            layers.forEach(function (l, idx) {
+                var lt = Math.max(0, t - l.delay) / (1 - l.delay);
+                var expandT = Math.min(1, lt / 0.4);
+                var shrinkT = lt < 0.4 ? 0 : (lt - 0.4) / 0.6;
+                var s = expandT - shrinkT * 0.5;
+                var sc = 0.3 * baseMul + (l.maxScale - 0.3 * baseMul) * s;
+                l.sprite.scale.set(sc, sc, 1);
+                var fade = lt < 0.5 ? 1 : 1 - (lt - 0.5) / 0.5;
+                l.sprite.material.opacity = Math.max(0, fade * (0.95 - idx * 0.1));
+            });
+            return true;
+        });
+    }
+
+    function explosionMushroom(pos, scaleRef) {
+        var baseMul = 0.9 + scaleRef * 0.5;
+        var flash = new THREE.Sprite(new THREE.SpriteMaterial({
+            map: fireballTex, color: 0xffffff,
+            blending: THREE.AdditiveBlending, depthWrite: false, transparent: true
+        }));
+        flash.position.copy(pos);
+        flash.scale.set(0.4 * baseMul, 0.4 * baseMul, 1);
+        scene.add(flash);
+        var columns = [];
+        for (var i = 0; i < 12; i++) {
+            var s = new THREE.Sprite(new THREE.SpriteMaterial({
+                map: noiseFireTex,
+                color: new THREE.Color().setHSL(0.02 + Math.random()*0.06, 1, 0.5),
+                blending: THREE.AdditiveBlending, depthWrite: false, transparent: true, opacity: 0.9
+            }));
+            s.position.copy(pos);
+            s.scale.set(0.5 * baseMul, 0.5 * baseMul, 1);
+            scene.add(s);
+            columns.push({ sprite: s,
+                vx: (Math.random() - 0.5) * 0.06, vy: 0.06 + Math.random() * 0.09,
+                vz: (Math.random() - 0.5) * 0.06, delay: i * 0.02 });
+        }
+        var ring = new THREE.Sprite(new THREE.SpriteMaterial({
+            map: fireballTex, color: 0xffddaa,
+            blending: THREE.AdditiveBlending, depthWrite: false, transparent: true, opacity: 1
+        }));
+        ring.position.copy(pos); ring.position.y -= 0.5;
+        ring.scale.set(0.3 * baseMul, 0.3 * baseMul, 1);
+        scene.add(ring);
+        var startTime = performance.now();
+        registerEffect(function () {
+            var t = (performance.now() - startTime) / 2000;
+            if (t >= 1) {
+                scene.remove(flash); flash.material.dispose();
+                scene.remove(ring); ring.material.dispose();
+                columns.forEach(function (c) { scene.remove(c.sprite); c.sprite.material.dispose(); });
+                return false;
+            }
+            var fs = 0.4 * baseMul + Math.min(1, t * 8) * 5 * baseMul;
+            flash.scale.set(fs, fs, 1);
+            flash.material.opacity = Math.max(0, 1 - t * 4);
+            var rs = 0.3 * baseMul + t * 8 * baseMul;
+            ring.scale.set(rs, rs * 0.4, 1);
+            ring.material.opacity = Math.max(0, 1 - t * 1.6);
+            columns.forEach(function (c) {
+                var ct = Math.max(0, t - c.delay) / (1 - c.delay);
+                if (ct <= 0) { c.sprite.material.opacity = 0; return; }
+                c.sprite.position.x += c.vx; c.sprite.position.y += c.vy; c.sprite.position.z += c.vz;
+                c.vy *= 0.98;
+                var sc = (0.5 + ct * 1.8) * baseMul;
+                c.sprite.scale.set(sc, sc * 1.6, 1);
+                c.sprite.material.opacity = Math.max(0, 0.9 * (1 - ct));
+                c.sprite.material.color.setHSL(0.02 + (1 - ct) * 0.08, 1, 0.35 + (1 - ct) * 0.35);
+            });
+            return true;
+        });
+    }
+
+    function explosionEmbers(pos, scaleRef) {
+        var baseMul = 0.9 + scaleRef * 0.5;
+        var heads = [];
+        for (var i = 0; i < 24; i++) {
+            var s = new THREE.Sprite(new THREE.SpriteMaterial({
+                map: fireballTex, color: 0xffffff,
+                blending: THREE.AdditiveBlending, depthWrite: false, transparent: true
+            }));
+            s.position.copy(pos);
+            var sz = (0.15 + Math.random() * 0.12) * baseMul;
+            s.scale.set(sz, sz, 1);
+            scene.add(s);
+            var theta = Math.random() * Math.PI * 2;
+            var phi = Math.acos(2 * Math.random() - 1);
+            var sp = 3 + Math.random() * 5;
+            var vel = new THREE.Vector3(
+                Math.sin(phi) * Math.cos(theta) * sp,
+                Math.sin(phi) * Math.sin(theta) * sp,
+                Math.cos(phi) * sp
+            );
+            heads.push({ sprite: s, vel: vel,
+                baseColor: new THREE.Color().setHSL(0.03 + Math.random()*0.08, 1, 0.65 + Math.random()*0.3) });
+        }
+        var flash = new THREE.Sprite(new THREE.SpriteMaterial({
+            map: fireballTex, color: 0xffffff,
+            blending: THREE.AdditiveBlending, depthWrite: false, transparent: true
+        }));
+        flash.position.copy(pos);
+        flash.scale.set(0.4 * baseMul, 0.4 * baseMul, 1);
+        scene.add(flash);
+        var startTime = performance.now();
+        registerEffect(function () {
+            var t = (performance.now() - startTime) / 1600;
+            if (t >= 1) {
+                heads.forEach(function (h) { scene.remove(h.sprite); h.sprite.material.dispose(); });
+                scene.remove(flash); flash.material.dispose();
+                return false;
+            }
+            heads.forEach(function (h) {
+                h.vel.multiplyScalar(0.97);
+                h.sprite.position.x += h.vel.x * 0.03;
+                h.sprite.position.y += h.vel.y * 0.03;
+                h.sprite.position.z += h.vel.z * 0.03;
+                h.sprite.material.opacity = Math.max(0, 1 - t * 1.1);
+                var r = h.baseColor.r, g = h.baseColor.g * (1 - t * 0.8), b = h.baseColor.b * (1 - t * 0.9);
+                h.sprite.material.color.setRGB(r, Math.max(0.1, g), Math.max(0.02, b));
+            });
+            var fs = 0.4 * baseMul + Math.min(1, t * 8) * 4 * baseMul;
+            flash.scale.set(fs, fs, 1);
+            flash.material.opacity = Math.max(0, 1 - t * 4);
+            return true;
+        });
+    }
+
+    function explosionCombo(pos, scaleRef) {
+        var baseMul = 0.9 + scaleRef * 0.5;
+        var flash = new THREE.Sprite(new THREE.SpriteMaterial({
+            map: fireballTex, color: 0xffffff,
+            blending: THREE.AdditiveBlending, depthWrite: false, transparent: true
+        }));
+        flash.position.copy(pos);
+        flash.scale.set(0.5 * baseMul, 0.5 * baseMul, 1);
+        scene.add(flash);
+        var ring = new THREE.Sprite(new THREE.SpriteMaterial({
+            map: fireballTex, color: 0xffe0a0,
+            blending: THREE.AdditiveBlending, depthWrite: false, transparent: true
+        }));
+        ring.position.copy(pos);
+        ring.scale.set(0.5 * baseMul, 0.5 * baseMul, 1);
+        scene.add(ring);
+        var sparkCount = 60;
+        var sparkGeo = new THREE.BufferGeometry();
+        var sparkPos = new Float32Array(sparkCount * 3);
+        var sparkVel = [];
+        for (var i = 0; i < sparkCount; i++) {
+            sparkPos[i*3] = 0; sparkPos[i*3+1] = 0; sparkPos[i*3+2] = 0;
+            var theta = Math.random() * Math.PI * 2;
+            var phi = Math.acos(2 * Math.random() - 1);
+            var sp = 3 + Math.random() * 6;
+            sparkVel.push(new THREE.Vector3(
+                Math.sin(phi) * Math.cos(theta) * sp,
+                Math.sin(phi) * Math.sin(theta) * sp,
+                Math.cos(phi) * sp
+            ));
+        }
+        sparkGeo.setAttribute('position', new THREE.BufferAttribute(sparkPos, 3));
+        var sparkMat = new THREE.PointsMaterial({
+            size: 0.14 * baseMul, map: fireballTex, color: 0xffddaa,
+            transparent: true, opacity: 1, blending: THREE.AdditiveBlending,
+            depthWrite: false, sizeAttenuation: true
+        });
+        var sparks = new THREE.Points(sparkGeo, sparkMat);
+        sparks.position.copy(pos);
+        scene.add(sparks);
+        var shards = [];
+        for (var k = 0; k < 10; k++) {
+            var size = (0.05 + Math.random() * 0.1) * baseMul;
+            var sh = new THREE.Mesh(
+                new THREE.IcosahedronGeometry(size, 0),
+                new THREE.MeshStandardMaterial({ map: shardTex, color: 0x4a3a2a,
+                    emissive: 0xff7733, emissiveIntensity: 1.0, roughness: 0.6, metalness: 0.2 })
+            );
+            sh.position.copy(pos);
+            var th = Math.random() * Math.PI * 2;
+            var ph = Math.acos(2 * Math.random() - 1);
+            var sv = 2 + Math.random() * 3.5;
+            var sv3 = new THREE.Vector3(
+                Math.sin(ph) * Math.cos(th) * sv,
+                Math.sin(ph) * Math.sin(th) * sv,
+                Math.cos(ph) * sv
+            );
+            var av = new THREE.Vector3((Math.random()-0.5)*8, (Math.random()-0.5)*8, (Math.random()-0.5)*8);
+            scene.add(sh);
+            shards.push({ mesh: sh, vel: sv3, av: av });
+        }
+        var startTime = performance.now();
+        registerEffect(function () {
+            var t = (performance.now() - startTime) / 1800;
+            if (t >= 1) {
+                scene.remove(flash); flash.material.dispose();
+                scene.remove(ring); ring.material.dispose();
+                scene.remove(sparks); sparkGeo.dispose(); sparkMat.dispose();
+                shards.forEach(function (s) { scene.remove(s.mesh); s.mesh.geometry.dispose(); s.mesh.material.dispose(); });
+                return false;
+            }
+            var fs = 0.5 * baseMul + Math.min(1, t * 6) * 5 * baseMul;
+            flash.scale.set(fs, fs, 1);
+            flash.material.opacity = Math.max(0, 1 - t * 3);
+            var rs = 0.5 * baseMul + t * 10 * baseMul;
+            ring.scale.set(rs, rs, 1);
+            ring.material.opacity = Math.max(0, 1 - t * 1.5);
+            var pa = sparkGeo.attributes.position.array;
+            for (var i = 0; i < sparkCount; i++) {
+                var v = sparkVel[i]; v.multiplyScalar(0.97);
+                pa[i*3] += v.x * 0.03; pa[i*3+1] += v.y * 0.03; pa[i*3+2] += v.z * 0.03;
+            }
+            sparkGeo.attributes.position.needsUpdate = true;
+            sparkMat.opacity = Math.max(0, 1 - t * t);
+            shards.forEach(function (s) {
+                s.vel.multiplyScalar(0.98);
+                s.mesh.position.x += s.vel.x * 0.03;
+                s.mesh.position.y += s.vel.y * 0.03;
+                s.mesh.position.z += s.vel.z * 0.03;
+                s.mesh.rotation.x += s.av.x * 0.03;
+                s.mesh.rotation.y += s.av.y * 0.03;
+                s.mesh.rotation.z += s.av.z * 0.03;
+                var cool = Math.max(0, 1 - t * 1.2);
+                s.mesh.material.emissive.setRGB(1.0 * cool, 0.45 * cool, 0.12 * cool);
+            });
+            return true;
+        });
+    }
+
+    function createFireball(pos, scaleRef, bigBlast) {
+        if (bigBlast) {
+            if (Math.random() < 0.5) explosionPlasma(pos, scaleRef);
+            else explosionMushroom(pos, scaleRef);
+        } else {
+            if (Math.random() < 0.5) explosionCombo(pos, scaleRef);
+            else explosionEmbers(pos, scaleRef);
+        }
+    }
+
+    function createRealShards(pos, scaleRef, count, isBig) {
+        for (var i = 0; i < count; i++) {
+            var shardSize = (isBig ? 0.08 : 0.05) * (0.7 + Math.random() * 0.8) * (0.8 + scaleRef * 0.6);
+            var shard = new THREE.Mesh(
+                new THREE.IcosahedronGeometry(shardSize, 0),
+                new THREE.MeshStandardMaterial({ map: shardTex, color: 0x4a3a2a, emissive: 0xff5522,
+                    emissiveIntensity: 0.9, roughness: 0.85, metalness: 0.05 })
+            );
+            shard.position.copy(pos);
+            var theta = Math.random() * Math.PI * 2;
+            var phi = Math.acos(2 * Math.random() - 1);
+            var speed = (isBig ? 4.5 : 3.0) * (0.4 + Math.random() * 0.9);
+            var vel = new THREE.Vector3(
+                Math.sin(phi) * Math.cos(theta) * speed,
+                Math.sin(phi) * Math.sin(theta) * speed,
+                Math.cos(phi) * speed
+            );
+            var av = new THREE.Vector3((Math.random() - 0.5) * 8, (Math.random() - 0.5) * 8, (Math.random() - 0.5) * 8);
+            scene.add(shard);
+            (function (s, v, a) {
+                var startTime = performance.now();
+                var duration = 1400 + Math.random() * 800;
+                (function anim() {
+                    var t = (performance.now() - startTime) / duration;
+                    if (t >= 1) { scene.remove(s); s.geometry.dispose(); s.material.dispose(); return; }
+                    var sf = 1 - t * 0.4;
+                    s.position.addScaledVector(v, 0.016 * sf);
+                    s.rotation.x += a.x * 0.016 * sf;
+                    s.rotation.y += a.y * 0.016 * sf;
+                    s.rotation.z += a.z * 0.016 * sf;
+                    var cool = Math.max(0, 1 - t * 1.3);
+                    s.material.emissive.setRGB(1.0 * cool, 0.35 * cool, 0.08 * cool);
+                    s.material.color.setRGB(0.3 + 0.15 * cool, 0.22 + 0.1 * cool, 0.15);
+                    requestAnimationFrame(anim);
+                })();
+            })(shard, vel, av);
+        }
+    }
+
+    function createHotSparks(pos, scaleRef, count) {
+        var geo = new THREE.BufferGeometry();
+        var positions = new Float32Array(count * 3);
+        var velocities = [];
+        var lifetimes = [];
+        for (var i = 0; i < count; i++) {
+            positions[i*3] = 0; positions[i*3+1] = 0; positions[i*3+2] = 0;
+            var theta = Math.random() * Math.PI * 2;
+            var phi = Math.acos(Math.random() * 2 - 1);
+            var speed = 3 + Math.random() * 6;
+            velocities.push(new THREE.Vector3(
+                Math.sin(phi) * Math.cos(theta) * speed,
+                Math.sin(phi) * Math.sin(theta) * speed,
+                Math.cos(phi) * speed
+            ));
+            lifetimes.push(400 + Math.random() * 500);
+        }
+        geo.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+        var mat = new THREE.PointsMaterial({
+            color: 0xffdd66, size: 0.08, map: fireballTex,
+            transparent: true, opacity: 1, blending: THREE.AdditiveBlending,
+            depthWrite: false, sizeAttenuation: true
+        });
+        var points = new THREE.Points(geo, mat);
+        points.position.copy(pos);
+        scene.add(points);
+        var startTime = performance.now();
+        (function animSparks() {
+            var elapsed = performance.now() - startTime;
+            var oT = elapsed / 900;
+            if (oT >= 1) { scene.remove(points); geo.dispose(); mat.dispose(); return; }
+            var pa = geo.attributes.position;
+            for (var i = 0; i < count; i++) {
+                var v = velocities[i];
+                var t = elapsed / lifetimes[i];
+                var sf = Math.max(0, 1 - t);
+                pa.array[i*3]     = v.x * elapsed / 1000 * sf;
+                pa.array[i*3 + 1] = v.y * elapsed / 1000 * sf;
+                pa.array[i*3 + 2] = v.z * elapsed / 1000 * sf;
+            }
+            pa.needsUpdate = true;
+            mat.opacity = 1 - oT;
+            mat.color.setRGB(1.0, Math.max(0.3, 0.8 * (1 - oT)), Math.max(0.05, 0.3 * (1 - oT)));
+            requestAnimationFrame(animSparks);
+        })();
+    }
+
+    function createSmokeCloud(pos, scaleRef, bigBlast) {
+        var count = bigBlast ? 8 : 6;
+        for (var i = 0; i < count; i++) {
+            var sprite = new THREE.Sprite(new THREE.SpriteMaterial({
+                map: puffTex, color: 0x666666,
+                blending: THREE.NormalBlending, depthWrite: false, transparent: true, opacity: 0.7
+            }));
+            var size = (0.8 + Math.random() * 0.6) * (0.8 + scaleRef * 0.5);
+            sprite.scale.set(size, size, 1);
+            sprite.position.copy(pos);
+            sprite.position.x += (Math.random() - 0.5) * size * 0.6;
+            sprite.position.y += (Math.random() - 0.5) * size * 0.6;
+            sprite.position.z += (Math.random() - 0.5) * size * 0.6;
+            scene.add(sprite);
+            var vel = new THREE.Vector3((Math.random() - 0.5) * 0.5, (Math.random() - 0.5) * 0.5, (Math.random() - 0.5) * 0.5);
+            (function (sp, v) {
+                var startTime = performance.now();
+                var duration = 2200 + Math.random() * 800;
+                var startSize = sp.scale.x;
+                (function anim() {
+                    var t = (performance.now() - startTime) / duration;
+                    if (t >= 1) { scene.remove(sp); sp.material.dispose(); return; }
+                    sp.position.addScaledVector(v, 0.016);
+                    var sc = startSize * (1 + t * 1.4);
+                    sp.scale.set(sc, sc, 1);
+                    sp.material.opacity = 0.7 * (1 - t) * (1 - t);
+                    sp.material.color.setRGB(0.55 - t * 0.35, 0.45 - t * 0.30, 0.35 - t * 0.25);
+                    requestAnimationFrame(anim);
+                })();
+            })(sprite, vel);
+        }
+    }
+
+    function createSmallImpact(pos, color) {
+        var sprite = new THREE.Sprite(new THREE.SpriteMaterial({
+            map: fireballTex, color: color,
+            blending: THREE.AdditiveBlending, depthWrite: false, transparent: true, opacity: 1
+        }));
+        sprite.position.copy(pos);
+        sprite.scale.set(0.5, 0.5, 1);
+        scene.add(sprite);
+        var startTime = performance.now();
+        (function anim() {
+            var t = (performance.now() - startTime) / 300;
+            if (t >= 1) { scene.remove(sprite); sprite.material.dispose(); return; }
+            var s = 0.5 + t * 1.5;
+            sprite.scale.set(s, s, 1);
+            sprite.material.opacity = 1 - t;
+            requestAnimationFrame(anim);
+        })();
+    }
+
+    // ===== ТРАЕКТОРИИ =====
+    var TRAJ_MAX_POINTS = 60;
+
+    function createTrajectoryLine() {
+        var geo = new THREE.BufferGeometry();
+        var positions = new Float32Array(TRAJ_MAX_POINTS * 3);
+        for (var i = 0; i < TRAJ_MAX_POINTS * 3; i++) positions[i] = 0;
+        geo.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+        geo.setDrawRange(0, 0);
+        var mat = new THREE.LineBasicMaterial({
+            color: 0xffffff,
+            transparent: true,
+            opacity: 0.65,
+            depthWrite: false,
+            blending: THREE.AdditiveBlending
+        });
+        var line = new THREE.Line(geo, mat);
+        line.userData = { count: 0 };
+        line.frustumCulled = false;
+        scene.add(line);
+        return line;
+    }
+
+    function updateTrajectoryLine(line, pos) {
+        var attr = line.geometry.attributes.position;
+        var data = line.userData;
+        if (data.count < TRAJ_MAX_POINTS) {
+            attr.array[data.count * 3]     = pos.x;
+            attr.array[data.count * 3 + 1] = pos.y;
+            attr.array[data.count * 3 + 2] = pos.z;
+            data.count++;
+            line.geometry.setDrawRange(0, data.count);
+            attr.needsUpdate = true;
+            line.geometry.computeBoundingSphere();
+        } else {
+            for (var i = 0; i < (TRAJ_MAX_POINTS - 1) * 3; i++) {
+                attr.array[i] = attr.array[i + 3];
+            }
+            attr.array[(TRAJ_MAX_POINTS - 1) * 3]     = pos.x;
+            attr.array[(TRAJ_MAX_POINTS - 1) * 3 + 1] = pos.y;
+            attr.array[(TRAJ_MAX_POINTS - 1) * 3 + 2] = pos.z;
+            attr.needsUpdate = true;
+        }
+    }
+
+    function removeTrajectoryLine(line) {
+        scene.remove(line);
+        line.geometry.dispose();
+        line.material.dispose();
+    }
+
+    // ===== РАКЕТЫ =====
+    var projectiles = [];
+    var projectilesGroup = new THREE.Group();
+    scene.add(projectilesGroup);
+    var ROCKET_SCALE = 0.03;
+
+    function createRocketMesh() {
+        var g = new THREE.Group();
+        var s1 = new THREE.Mesh(
+            new THREE.CylinderGeometry(0.22, 0.24, 0.7, 16),
+            new THREE.MeshStandardMaterial({ color: 0xcccccc, roughness: 0.6, metalness: 0.35 })
+        );
+        g.add(s1);
+        var sk = new THREE.Mesh(
+            new THREE.CylinderGeometry(0.24, 0.3, 0.14, 16),
+            new THREE.MeshStandardMaterial({ color: 0x555555, roughness: 0.7, metalness: 0.4 })
+        );
+        sk.position.y = -0.42; g.add(sk);
+        var s2 = new THREE.Mesh(
+            new THREE.CylinderGeometry(0.16, 0.22, 0.55, 16),
+            new THREE.MeshStandardMaterial({ color: 0xe0e0e0, roughness: 0.5, metalness: 0.4 })
+        );
+        s2.position.y = 0.62; g.add(s2);
+        var s3 = new THREE.Mesh(
+            new THREE.CylinderGeometry(0.13, 0.16, 0.38, 16),
+            new THREE.MeshStandardMaterial({ color: 0xff9933, roughness: 0.6, metalness: 0.3 })
+        );
+        s3.position.y = 1.08; g.add(s3);
+        var nose = new THREE.Mesh(
+            new THREE.ConeGeometry(0.13, 0.32, 16),
+            new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.4, metalness: 0.3 })
+        );
+        nose.position.y = 1.42; g.add(nose);
+        var plume = new THREE.Sprite(new THREE.SpriteMaterial({
+            map: fireballTex, color: 0xffcc66,
+            blending: THREE.AdditiveBlending, depthWrite: false, transparent: true, opacity: 1
+        }));
+        plume.scale.set(0.5, 1.2, 1);
+        plume.position.y = -0.7;
+        g.add(plume);
+        g.scale.setScalar(ROCKET_SCALE);
+        g.userData = { stage1: s1, stage2: s2, stage3: s3, plume: plume, isTorpedo: false };
+        return g;
+    }
+
+    function createTorpedoMesh() {
+        var g = new THREE.Group();
+        var s1 = new THREE.Mesh(
+            new THREE.CylinderGeometry(0.16, 0.2, 0.55, 16),
+            new THREE.MeshStandardMaterial({ color: 0x99ccee, roughness: 0.5, metalness: 0.5 })
+        );
+        g.add(s1);
+        var s2 = new THREE.Mesh(
+            new THREE.CylinderGeometry(0.14, 0.16, 0.4, 16),
+            new THREE.MeshStandardMaterial({ color: 0x77bbee, roughness: 0.5, metalness: 0.5 })
+        );
+        s2.position.y = 0.48; g.add(s2);
+        var nose = new THREE.Mesh(
+            new THREE.ConeGeometry(0.14, 0.35, 16),
+            new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.4, metalness: 0.3 })
+        );
+        nose.position.y = 0.86; g.add(nose);
+        var plume = new THREE.Sprite(new THREE.SpriteMaterial({
+            map: fireballTex, color: 0x88ddff,
+            blending: THREE.AdditiveBlending, depthWrite: false, transparent: true, opacity: 1
+        }));
+        plume.scale.set(0.4, 0.9, 1);
+        plume.position.y = -0.5;
+        g.add(plume);
+        g.scale.setScalar(ROCKET_SCALE);
+        g.userData = { stage1: s1, stage2: s2, plume: plume, isTorpedo: true };
+        return g;
+    }
+
+    function createLaunchSmoke(pos) {
+        for (var i = 0; i < 2; i++) {
+            var sprite = new THREE.Sprite(new THREE.SpriteMaterial({
+                map: puffTex, color: 0xcccccc,
+                blending: THREE.NormalBlending, depthWrite: false, transparent: true, opacity: 0.4
+            }));
+            var size = 0.15 + Math.random() * 0.15;
+            sprite.scale.set(size, size, 1);
+            sprite.position.copy(pos);
+            sprite.position.x += (Math.random() - 0.5) * 0.15;
+            sprite.position.z += (Math.random() - 0.5) * 0.15;
+            scene.add(sprite);
+            var vel = new THREE.Vector3((Math.random() - 0.5) * 0.2, -0.3 - Math.random() * 0.3, (Math.random() - 0.5) * 0.2);
+            (function (sp, v) {
+                var startTime = performance.now();
+                var duration = 800 + Math.random() * 400;
+                var startSize = sp.scale.x;
+                (function anim() {
+                    var t = (performance.now() - startTime) / duration;
+                    if (t >= 1) { scene.remove(sp); sp.material.dispose(); return; }
+                    sp.position.addScaledVector(v, 0.016);
+                    var sc = startSize * (1 + t * 1.2);
+                    sp.scale.set(sc, sc, 1);
+                    sp.material.opacity = 0.4 * (1 - t);
+                    requestAnimationFrame(anim);
+                })();
+            })(sprite, vel);
+        }
+    }
+
+    var FORWARD_VEC = new THREE.Vector3(0, 1, 0);
+
+    function tryConsumeRocket() {
+        if (inventory.rockets <= 0) return false;
+        inventory.rockets--;
+        return true;
+    }
+    function tryConsumeTorpedo() {
+        if (inventory.torpedoes <= 0) return false;
+        if (inventory.torpedoReloadTimer > 0) return false;
+        inventory.torpedoes--;
+        inventory.torpedoReloadTimer = inventory.torpedoReloadTime;
+        return true;
+    }
+    function tryConsumeShortTorpedo() {
+        if (inventory.shortTorpedoes <= 0) return false;
+        if (inventory.shortTorpedoReloadTimer > 0) return false;
+        inventory.shortTorpedoes--;
+        inventory.shortTorpedoReloadTimer = inventory.shortTorpedoReloadTime;
+        return true;
+    }
+
+    function handleWeaponFailure(p) {
+        if (Math.random() < GAME.weaponFailChance) {
+            var isMiss = Math.random() < 0.5;
+            if (isMiss) {
+                var randomDir = new THREE.Vector3(
+                    (Math.random() - 0.5) * 2,
+                    (Math.random() - 0.5) * 2,
+                    (Math.random() - 0.5) * 2
+                ).normalize();
+                p.moveDir = randomDir;
+                p.missedCourse = true;
+                logLine('err', (p.isTorpedo ? 'ТОРПЕДА' : 'ЯПР') + ' · сбой наведения — уход с курса');
+            } else {
+                logLine('err', (p.isTorpedo ? 'ТОРПЕДА' : 'ЯПР') + ' · отказ БЧ — боеприпас не взорвался');
+            }
+            return true;
+        }
+        return false;
+    }
+
+    function launchMissile(originPos, targetMeteor, isTorpedo) {
+        var mesh = isTorpedo ? createTorpedoMesh() : createRocketMesh();
+        var actualOrigin = originPos.clone();
+        var initDir = new THREE.Vector3(0, 1, 0);
+        if (targetMeteor && targetMeteor.userData.alive !== false) {
+            initDir = new THREE.Vector3().subVectors(targetMeteor.position, actualOrigin).normalize();
+        }
+        if (!isTorpedo && actualOrigin.lengthSq() < 0.01) {
+            actualOrigin.copy(initDir).multiplyScalar(EARTH_RADIUS_WORLD * 1.05);
+        }
+        mesh.position.copy(actualOrigin);
+        mesh.quaternion.setFromUnitVectors(FORWARD_VEC, initDir);
+        projectilesGroup.add(mesh);
+        var torpedoMax = GAME.rocketSpeedMax * GAME.torpedoMul;
+
+        var trajectory = createTrajectoryLine();
+        trajectory.visible = (GAME.displayMode === 'tactical');
+        updateTrajectoryLine(trajectory, actualOrigin);
+
+        var proj = {
+            mesh: mesh, target: targetMeteor, startPos: actualOrigin.clone(),
+            phase: 'flight', flightTimer: 0,
+            speed: GAME.rocketSpeedStart,
+            maxSpeed: isTorpedo ? torpedoMax : GAME.rocketSpeedMax,
+            accelTime: GAME.rocketAccelTime,
+            lifeLeft: isTorpedo ? GAME.torpedoLifeSec : GAME.rocketLifeSec,
+            isTorpedo: isTorpedo, isShortTorpedo: false, alive: true,
+            stage1Dropped: false, stage2Dropped: false, smokeTimer: 0,
+            moveDir: null, missedCourse: false, failed: false,
+            trajectory: trajectory, trajectoryTimer: 0
+        };
+        projectiles.push(proj);
+        createLaunchSmoke(actualOrigin);
+    }
+
+    function launchShortTorpedo(originPos, targetMeteor) {
+        var mesh = createTorpedoMesh();
+        var actualOrigin = originPos.clone();
+        var initDir = new THREE.Vector3(0, 1, 0);
+        if (targetMeteor && targetMeteor.userData.alive !== false) {
+            initDir = new THREE.Vector3().subVectors(targetMeteor.position, actualOrigin).normalize();
+        }
+        mesh.position.copy(actualOrigin);
+        mesh.quaternion.setFromUnitVectors(FORWARD_VEC, initDir);
+        projectilesGroup.add(mesh);
+        var torpedoMax = GAME.rocketSpeedMax * GAME.torpedoMul;
+
+        var trajectory = createTrajectoryLine();
+        trajectory.visible = (GAME.displayMode === 'tactical');
+        updateTrajectoryLine(trajectory, actualOrigin);
+
+        var proj = {
+            mesh: mesh, target: targetMeteor, startPos: actualOrigin.clone(),
+            phase: 'flight', flightTimer: 0,
+            speed: GAME.rocketSpeedStart,
+            maxSpeed: torpedoMax,
+            accelTime: GAME.rocketAccelTime,
+            lifeLeft: GAME.torpedoLifeSec,
+            isTorpedo: true, isShortTorpedo: true, alive: true,
+            stage1Dropped: false, stage2Dropped: false, smokeTimer: 0,
+            moveDir: null, missedCourse: false, failed: false,
+            trajectory: trajectory, trajectoryTimer: 0
+        };
+        projectiles.push(proj);
+        createLaunchSmoke(actualOrigin);
+        return mesh;
+    }
+
+    function dropStage(worldPos, size, color) {
+        var geo = new THREE.CylinderGeometry(size * 0.4, size * 0.5, size * 1.2, 8);
+        var mat = new THREE.MeshStandardMaterial({ color: color, roughness: 0.7, metalness: 0.3 });
+        var mesh = new THREE.Mesh(geo, mat);
+        mesh.position.copy(worldPos);
+        scene.add(mesh);
+        var velocity = new THREE.Vector3((Math.random() - 0.5) * 0.3, -0.4 - Math.random() * 0.5, (Math.random() - 0.5) * 0.3);
+        var av = new THREE.Vector3((Math.random() - 0.5) * 5, (Math.random() - 0.5) * 5, (Math.random() - 0.5) * 5);
+        var startTime = performance.now();
+        (function animDrop() {
+            var t = (performance.now() - startTime) / 5000;
+            if (t >= 1) { scene.remove(mesh); geo.dispose(); mat.dispose(); return; }
+            mesh.position.addScaledVector(velocity, 0.016);
+            mesh.rotation.x += av.x * 0.016;
+            mesh.rotation.y += av.y * 0.016;
+            mesh.rotation.z += av.z * 0.016;
+            if (t > 0.4) { mat.transparent = true; mat.opacity = 1 - (t - 0.4) / 0.6; }
+            requestAnimationFrame(animDrop);
+        })();
+    }
+
+    function updateProjectiles(dt) {
+        for (var i = projectiles.length - 1; i >= 0; i--) {
+            var p = projectiles[i];
+            if (!p.alive) { projectiles.splice(i, 1); continue; }
+
+            if (!p.failed && p.flightTimer === 0) {
+                if (handleWeaponFailure(p)) {
+                    p.failed = true;
+                }
+            }
+
+            p.lifeLeft -= dt;
+            if (p.lifeLeft <= 0) {
+                projectilesGroup.remove(p.mesh); disposeGroup(p.mesh);
+                if (p.trajectory) removeTrajectoryLine(p.trajectory);
+                projectiles.splice(i, 1);
+                continue;
+            }
+            p.flightTimer += dt;
+            p.speed = GAME.rocketSpeedStart + (p.maxSpeed - GAME.rocketSpeedStart) * Math.min(1, p.flightTimer / p.accelTime);
+
+            var targetAlive = p.target && p.target.userData.alive !== false;
+            var destPos;
+            if (p.failed) {
+                var fwd0 = new THREE.Vector3(0, 1, 0).applyQuaternion(p.mesh.quaternion).normalize();
+                destPos = p.mesh.position.clone().add(fwd0.multiplyScalar(300));
+            } else if (targetAlive) {
+                destPos = p.target.position;
+            } else {
+                var fwd = new THREE.Vector3(0, 1, 0).applyQuaternion(p.mesh.quaternion).normalize();
+                destPos = p.mesh.position.clone().add(fwd.multiplyScalar(200));
+            }
+            var dir = new THREE.Vector3().subVectors(destPos, p.mesh.position);
+            var dist = dir.length();
+
+            if (!p.failed && targetAlive) {
+                var hitDist = p.isTorpedo ? 3.5 : 2.5;
+                if (dist < hitDist) {
+                    shatterMeteor(p.target, p.isTorpedo);
+                    projectilesGroup.remove(p.mesh); disposeGroup(p.mesh);
+                    if (p.trajectory) removeTrajectoryLine(p.trajectory);
+                    projectiles.splice(i, 1);
+                    continue;
+                }
+                if (!p.isTorpedo && dist < GAME.nearMissRadius && !p.target.userData.damaged) {
+                    shatterMeteor(p.target, false);
+                    projectilesGroup.remove(p.mesh); disposeGroup(p.mesh);
+                    if (p.trajectory) removeTrajectoryLine(p.trajectory);
+                    projectiles.splice(i, 1);
+                    continue;
+                }
+            }
+            if (dist < 0.5 && !targetAlive) {
+                projectilesGroup.remove(p.mesh); disposeGroup(p.mesh);
+                if (p.trajectory) removeTrajectoryLine(p.trajectory);
+                projectiles.splice(i, 1);
+                continue;
+            }
+            dir.normalize();
+            p.mesh.position.addScaledVector(dir, p.speed * dt);
+            p.mesh.quaternion.setFromUnitVectors(FORWARD_VEC, dir);
+
+            if (p.trajectory) {
+                p.trajectoryTimer += dt;
+                if (p.trajectoryTimer > 0.04) {
+                    p.trajectoryTimer = 0;
+                    updateTrajectoryLine(p.trajectory, p.mesh.position);
+                    var trajPulse = 0.55 + Math.sin(performance.now() * 0.006) * 0.20;
+                    p.trajectory.material.opacity = trajPulse;
+                }
+            }
+
+            var pulse = 0.9 + Math.sin(performance.now() * 0.03 + i) * 0.15;
+            if (p.mesh.userData.plume) {
+                var bs = p.isTorpedo ? 0.4 : 0.5;
+                p.mesh.userData.plume.scale.set(bs * pulse, bs * 2.4 * pulse, 1);
+            }
+            if (!p.stage1Dropped && p.flightTimer >= 0.6) {
+                p.stage1Dropped = true;
+                if (p.mesh.userData.stage1) p.mesh.userData.stage1.visible = false;
+                dropStage(p.mesh.position.clone(), 0.02, 0xaaaaaa);
+            }
+            if (!p.stage2Dropped && p.flightTimer >= 1.2) {
+                p.stage2Dropped = true;
+                if (p.mesh.userData.stage2) p.mesh.userData.stage2.visible = false;
+                dropStage(p.mesh.position.clone(), 0.014, 0xdddddd);
+            }
+            if (p.flightTimer < 0.8) {
+                p.smokeTimer += dt;
+                if (p.smokeTimer > 0.2) {
+                    p.smokeTimer = 0;
+                    var sprite = new THREE.Sprite(new THREE.SpriteMaterial({
+                        map: puffTex, color: 0xbbbbbb,
+                        blending: THREE.NormalBlending, depthWrite: false, transparent: true, opacity: 0.35
+                    }));
+                    var sz = 0.12 + Math.random() * 0.1;
+                    sprite.scale.set(sz, sz, 1);
+                    sprite.position.copy(p.mesh.position);
+                    scene.add(sprite);
+                    (function (sp) {
+                        var startTime = performance.now();
+                        var duration = 900;
+                        var startSize = sp.scale.x;
+                        (function anim() {
+                            var t = (performance.now() - startTime) / duration;
+                            if (t >= 1) { scene.remove(sp); sp.material.dispose(); return; }
+                            var sc = startSize * (1 + t * 1.5);
+                            sp.scale.set(sc, sc, 1);
+                            sp.material.opacity = 0.35 * (1 - t);
+                            requestAnimationFrame(anim);
+                        })();
+                    })(sprite);
+                }
+            }
+            if (p.mesh.position.distanceTo(p.startPos) > METEOR_DESPAWN * 1.2) {
+                projectilesGroup.remove(p.mesh); disposeGroup(p.mesh);
+                if (p.trajectory) removeTrajectoryLine(p.trajectory);
+                projectiles.splice(i, 1);
+            }
+        }
+    }
+
+    // ===== ДОСТАВКА =====
+    function getEarthLaunchPad() {
+        return new THREE.Vector3().subVectors(MOON_POS, new THREE.Vector3(0,0,0)).normalize()
+            .multiplyScalar(EARTH_RADIUS_WORLD * 1.25);
+    }
+    function getMoonDockPad() {
+        return MOON_POS.clone().addScaledVector(
+            new THREE.Vector3().subVectors(new THREE.Vector3(0,0,0), MOON_POS).normalize(), 0.28
+        );
+    }
+
+    var supply = {
+        rockets: [], batchTimer: 0, batchInterval: 32,
+        stagger: 0.55, spawnTimer: 0, batchActive: false,
+        toSpawn: 0, totalPerBatch: 5
+    };
+
+    function spawnSupplyRocket() {
+        var mesh = createRocketMesh();
+        var startPos = getEarthLaunchPad();
+        startPos.x += (Math.random() - 0.5) * 0.15;
+        startPos.y += (Math.random() - 0.5) * 0.15;
+        startPos.z += (Math.random() - 0.5) * 0.15;
+        mesh.position.copy(startPos);
+        var dest = getMoonDockPad();
+        mesh.quaternion.setFromUnitVectors(FORWARD_VEC, new THREE.Vector3().subVectors(dest, startPos).normalize());
+        scene.add(mesh);
+        supply.rockets.push({
+            mesh: mesh, speed: 1.8, target: dest.clone(),
+            phase: 'cruise', dissolveTimer: 0, dissolveDuration: 1.4,
+            stage1Dropped: false, stage2Dropped: false, baseScale: ROCKET_SCALE
+        });
+    }
+
+    function updateSupply(dt) {
+        if (!game.playing) return;
+        var supplyBlocked = (economy.active === 'sacrifice') || moonBase.disabled;
+        if (!supply.batchActive && !supplyBlocked) {
+            supply.batchTimer += dt;
+            if (supply.batchTimer >= supply.batchInterval) {
+                supply.batchTimer = 0;
+                supply.batchActive = true;
+                supply.toSpawn = supply.totalPerBatch;
+                supply.spawnTimer = 0;
+                logLine('info', 'СНАБЖЕНИЕ · отправка 5 транспортных ракет на Луну');
+            }
+        } else if (!supplyBlocked) {
+            if (supply.toSpawn > 0) {
+                supply.spawnTimer -= dt;
+                if (supply.spawnTimer <= 0) {
+                    spawnSupplyRocket();
+                    supply.toSpawn--;
+                    supply.spawnTimer = supply.stagger;
+                }
+            }
+            if (supply.toSpawn === 0 && supply.rockets.length === 0) supply.batchActive = false;
+        }
+        for (var i = supply.rockets.length - 1; i >= 0; i--) {
+            var r = supply.rockets[i];
+            var mesh = r.mesh;
+            if (r.phase === 'cruise') {
+                var distToMoon = mesh.position.distanceTo(MOON_POS);
+                if (distToMoon < 0.4) {
+                    r.phase = 'dissolve';
+                    r.dissolveTimer = 0;
+                    if (!moonBase.disabled && inventory.torpedoes < inventory.torpedoesMax) {
+                        inventory.torpedoes++;
+                        logLine('ok', 'СНАБЖЕНИЕ · +1 торпеда на лунной базе (' + inventory.torpedoes + '/' + inventory.torpedoesMax + ')');
+                    } else if (moonBase.disabled) {
+                        logLine('warn', 'СНАБЖЕНИЕ · лунная база выведена из строя — приём невозможен');
+                    } else {
+                        logLine('warn', 'СНАБЖЕНИЕ · склад на Луне полон');
+                    }
+                    updateHUD();
+                    continue;
+                }
+                var dir = new THREE.Vector3().subVectors(r.target, mesh.position).normalize();
+                mesh.position.addScaledVector(dir, r.speed * dt);
+                mesh.quaternion.setFromUnitVectors(FORWARD_VEC, dir);
+                if (mesh.userData.plume) {
+                    var pulse = 0.9 + Math.sin(performance.now() * 0.03 + i) * 0.15;
+                    mesh.userData.plume.scale.set(0.5 * pulse, 1.2 * pulse, 1);
+                }
+                var distFromEarth = mesh.position.length();
+                if (!r.stage1Dropped && distFromEarth > 3) {
+                    r.stage1Dropped = true;
+                    if (mesh.userData.stage1) mesh.userData.stage1.visible = false;
+                    if (mesh.userData.plume) mesh.userData.plume.position.y = -0.5;
+                }
+                if (!r.stage2Dropped && distFromEarth > 8) {
+                    r.stage2Dropped = true;
+                    if (mesh.userData.stage2) mesh.userData.stage2.visible = false;
+                }
+            } else if (r.phase === 'dissolve') {
+                r.dissolveTimer += dt;
+                var t = r.dissolveTimer / r.dissolveDuration;
+                if (t >= 1) {
+                    scene.remove(mesh);
+                    mesh.traverse(function (obj) {
+                        if (obj.geometry) obj.geometry.dispose();
+                        if (obj.material) obj.material.dispose();
+                    });
+                    supply.rockets.splice(i, 1);
+                    continue;
+                }
+                var dir2 = new THREE.Vector3().subVectors(r.target, mesh.position).normalize();
+                mesh.position.addScaledVector(dir2, r.speed * dt * 0.4);
+                mesh.quaternion.setFromUnitVectors(FORWARD_VEC, dir2);
+                var s = r.baseScale * (1 - t * 0.4);
+                mesh.scale.setScalar(s);
+                var opacity = 1 - t;
+                mesh.traverse(function (obj) {
+                    if (obj.material) {
+                        obj.material.transparent = true;
+                        obj.material.opacity = opacity;
+                    }
+                });
+            }
+        }
+    }
+
+    // ===== ИГРА =====
+    var game = {
+        playing: false, over: false,
+        score: 0, hp: GAME.baseHP, level: 1,
+        elapsed: 0, spawnTimer: 1.5, hitFlash: 0,
+        destroyed: 0, escaped: 0, launched: 0
+    };
+
+    var rocketsValueEl = document.getElementById('rocketsValue');
+    var torpedoesValueEl = document.getElementById('torpedoesValue');
+    var shortTorpedoesValueEl = document.getElementById('shortTorpedoesValue');
+    var overlayEl = document.getElementById('overlay');
+    var startBtn = document.getElementById('startBtn');
+    var resultBox = document.getElementById('resultBox');
+    var resultScoreEl = document.getElementById('resultScore');
+    var resultInfoEl = document.getElementById('resultInfo');
+    var logEl = document.getElementById('log');
+    var clockLabel = document.getElementById('clockLabel');
+    var statusLabel = document.getElementById('statusLabel');
+    var modeEasy = document.getElementById('modeEasy');
+    var modeHard = document.getElementById('modeHard');
+    var ddBattle = document.getElementById('ddBattle');
+    var ddTactical = document.getElementById('ddTactical');
+    var econSaveBtn = document.getElementById('econSaveBtn');
+    var econSacrificeBtn = document.getElementById('econSacrificeBtn');
+    var economyTimerBottomEl = document.getElementById('economyTimerBottom');
+    var asuAimed = document.getElementById('asuAimed');
+    var asuVolley = document.getElementById('asuVolley');
+    var rlsFocusBtn = document.getElementById('rlsFocusBtn');
+    var pauseBadgeEl = document.getElementById('pauseBadge');
+
+    function startGameHandler(e) {
+        if (e) { e.stopPropagation(); e.preventDefault(); }
+        if (game.playing) return;
+        startGame();
+    }
+    startBtn.addEventListener('mousedown', function (e) { e.stopPropagation(); });
+    startBtn.addEventListener('click', startGameHandler);
+    startBtn.addEventListener('touchstart', function (e) { e.stopPropagation(); }, { passive: true });
+    startBtn.addEventListener('touchend', function (e) {
+        e.stopPropagation();
+        e.preventDefault();
+        startGameHandler(null);
+    });
+
+    function getProductionMultiplier() {
+        var m = 1.0;
+        if (economy.active === 'save') m *= 0.5;
+        else if (economy.active === 'sacrifice') return 0;
+        return m;
+    }
+
+    function updateHUD() {
+        rocketsValueEl.textContent = inventory.rockets + '/' + inventory.rocketsMax;
+        rocketsValueEl.classList.remove('low', 'warn', 'ok');
+        var rp = inventory.rockets / inventory.rocketsMax;
+        if (rp <= 0.15) rocketsValueEl.classList.add('low');
+        else if (rp <= 0.4) rocketsValueEl.classList.add('warn');
+        else rocketsValueEl.classList.add('ok');
+
+        var tText = inventory.torpedoes + '/' + inventory.torpedoesMax;
+        if (inventory.torpedoReloadTimer > 0) tText = inventory.torpedoes + ' (' + inventory.torpedoReloadTimer.toFixed(1) + 's)';
+        if (moonBase.disabled) tText = 'БАЗА ВЫВЕДЕНА';
+        torpedoesValueEl.textContent = tText;
+        torpedoesValueEl.classList.remove('low', 'warn', 'ok');
+        if (moonBase.disabled) torpedoesValueEl.classList.add('low');
+        else if (inventory.torpedoes <= 0) torpedoesValueEl.classList.add('low');
+        else if (inventory.torpedoes <= 3) torpedoesValueEl.classList.add('warn');
+        else torpedoesValueEl.classList.add('ok');
+
+        var stText = inventory.shortTorpedoes + '/' + inventory.shortTorpedoesMax;
+        if (inventory.shortTorpedoReloadTimer > 0) stText = inventory.shortTorpedoes + ' (' + inventory.shortTorpedoReloadTimer.toFixed(1) + 's)';
+        if (moonBase.disabled) stText = 'БАЗА ВЫВЕДЕНА';
+        shortTorpedoesValueEl.textContent = stText;
+        shortTorpedoesValueEl.classList.remove('low', 'warn', 'ok');
+        if (moonBase.disabled) shortTorpedoesValueEl.classList.add('low');
+        else if (inventory.shortTorpedoes <= 0) shortTorpedoesValueEl.classList.add('low');
+        else if (inventory.shortTorpedoes <= 1) shortTorpedoesValueEl.classList.add('warn');
+        else shortTorpedoesValueEl.classList.add('ok');
+
+        if (economy.active) {
+            economyTimerBottomEl.style.display = 'block';
+            var mm = Math.floor(economy.timer / 60);
+            var ss = Math.floor(economy.timer % 60);
+            var prefix = (economy.active === 'save' ? 'РЕМ. 1/2 ' : 'РЕМ. ПОЛ. ');
+            if (economy.active === 'sacrifice') prefix = 'РЕМ. ПОЛ. (ЛБ) ';
+            economyTimerBottomEl.textContent = prefix +
+                (mm < 10 ? '0' : '') + mm + ':' + (ss < 10 ? '0' : '') + ss;
+        } else {
+            economyTimerBottomEl.style.display = 'none';
+        }
+        if (economy.active) {
+            econSaveBtn.disabled = true;
+            econSacrificeBtn.disabled = true;
+        } else {
+            econSaveBtn.disabled = false;
+            econSacrificeBtn.disabled = false;
+        }
+    }
+
+    var logEntries = [];
+    function logLine(kind, text) {
+        var now = new Date();
+        var t = String(now.getHours()).padStart(2, '0') + ':' +
+                String(now.getMinutes()).padStart(2, '0') + ':' +
+                String(now.getSeconds()).padStart(2, '0');
+        var el = document.createElement('span');
+        el.className = 'log-entry ' + (kind || '');
+        el.innerHTML = '<span class="t">' + t + '</span>' + text;
+        logEl.appendChild(el);
+        logEntries.push(el);
+        while (logEntries.length > 30) {
+            var old = logEntries.shift();
+            if (old.parentNode) old.parentNode.removeChild(old);
+        }
+        logEl.scrollTop = logEl.scrollHeight;
+    }
+
+    var modalEl = document.getElementById('modal');
+    var modalWindowEl = document.getElementById('modalWindow');
+    var modalTitleEl = document.getElementById('modalTitle');
+    var modalMsgEl = document.getElementById('modalMsg');
+    var modalTextEl = document.getElementById('modalText');
+    var modalBodyEl = document.getElementById('modalBody');
+    var modalFootEl = document.getElementById('modalFoot');
+    var modalIconEl = document.getElementById('modalIcon');
+
+    function showModal(title, text, icon) {
+        modalTitleEl.textContent = title;
+        modalWindowEl.classList.remove('doc');
+        modalMsgEl.style.display = 'flex';
+        modalFootEl.style.display = 'flex';
+        var existingDoc = modalBodyEl.querySelector('.doc-content');
+        if (existingDoc) existingDoc.remove();
+        modalTextEl.innerHTML = text;
+        modalIconEl.textContent = icon || 'i';
+        modalEl.classList.add('open');
+    }
+    function showDocModal(title, html) {
+        modalTitleEl.textContent = title;
+        modalWindowEl.classList.add('doc');
+        modalMsgEl.style.display = 'none';
+        modalFootEl.style.display = 'flex';
+        var existingDoc = modalBodyEl.querySelector('.doc-content');
+        if (existingDoc) existingDoc.remove();
+        var docDiv = document.createElement('div');
+        docDiv.className = 'doc-content';
+        docDiv.innerHTML = html;
+        modalBodyEl.insertBefore(docDiv, modalMsgEl);
+        modalEl.classList.add('open');
+    }
+    function closeModal() {
+        modalEl.classList.remove('open');
+        var existingDoc = modalBodyEl.querySelector('.doc-content');
+        if (existingDoc) existingDoc.remove();
+        modalWindowEl.classList.remove('doc');
+        modalMsgEl.style.display = 'flex';
+        modalFootEl.style.display = 'flex';
+    }
+    document.getElementById('modalClose').addEventListener('click', closeModal);
+    document.getElementById('modalOk').addEventListener('click', closeModal);
+    modalEl.addEventListener('click', function (e) { if (e.target === modalEl) closeModal(); });
+
+    var menuItems = document.querySelectorAll('#menuBar .m');
+    var allDrops = [document.getElementById('drop-file'), document.getElementById('drop-view'), document.getElementById('drop-help')];
+
+    function closeAllDropdowns() {
+        allDrops.forEach(function (d) { if (d) d.classList.remove('open'); });
+        menuItems.forEach(function (mi) { mi.classList.remove('open'); });
+    }
+    menuItems.forEach(function (mi) {
+        mi.addEventListener('click', function (e) {
+            e.stopPropagation();
+            var name = mi.getAttribute('data-menu');
+            var wasOpen = mi.classList.contains('open');
+            closeAllDropdowns();
+            if (wasOpen) return;
+            mi.classList.add('open');
+            var dd = document.getElementById('drop-' + name);
+            if (dd) dd.classList.add('open');
+        });
+    });
+    document.addEventListener('click', function () { closeAllDropdowns(); });
+    allDrops.forEach(function (dd) {
+        if (dd) dd.addEventListener('click', function (e) { e.stopPropagation(); });
+    });
+
+    var WEAPONS_HTML =
+        '<h2>§1. ИСТОРИЧЕСКАЯ СПРАВКА</h2>' +
+        '<p>Земля подвергается метеоритному обстрелу из дальнего космоса.</p>' +
+        '<p>Создана постоянно действующая система противокосмической обороны. Проект получил название <b>"РЕДУТ"</b>.</p>' +
+
+        '<h2>§2. РАКЕТНЫЙ КОМПЛЕКС С-1000</h2>' +
+        '<h3>Изделие 77Н6 · "СТРЕЛА"</h3>' +
+        '<p>Ядерная противокосмическая ракета класса "земля–космос". Двухступенчатая. Стартовая масса — 84 тонны.</p>' +
+        '<table class="ttx">' +
+        '<tr><th>Параметр</th><th>Значение</th></tr>' +
+        '<tr><td>Длина</td><td>27.4 м</td></tr>' +
+        '<tr><td>Мощность БЧ</td><td>1 Мт</td></tr>' +
+        '<tr><td>Максимальная скорость</td><td>28 у.е./с</td></tr>' +
+        '<tr><td>Максимум на складе</td><td>30 единиц</td></tr>' +
+        '<tr><td>Пополнение</td><td>+1 каждые 3.5 сек</td></tr>' +
+        '<tr><td>Надёжность</td><td>97% (3% отказ БЧ или сбой наведения)</td></tr>' +
+        '</table>' +
+
+        '<h2>§3. ЛУННЫЙ КОМПЛЕКС "ПРЕДЕЛ"</h2>' +
+        '<p>Кинетическая торпеда типа "луна–космос".</p>' +
+        '<table class="ttx">' +
+        '<tr><th>Параметр</th><th>Значение</th></tr>' +
+        '<tr><td>Мощность БЧ</td><td>5 Мт</td></tr>' +
+        '<tr><td>Максимальная скорость</td><td>22.4 у.е./с</td></tr>' +
+        '<tr><td>Максимум на складе Луны</td><td>10 единиц</td></tr>' +
+        '<tr><td>Время перезарядки ТПУ</td><td>3.0 сек</td></tr>' +
+        '<tr><td>Надёжность</td><td>97% (3% отказ БЧ или сбой наведения)</td></tr>' +
+        '</table>' +
+
+        '<h2>§4. ЛУННАЯ БАЗА</h2>' +
+        '<p>По статистике около 28% космических объектов нацелены на лунную базу.</p>' +
+
+        '<h2>§5. ПЕРЕРАСПРЕДЕЛЕНИЕ ПРОИЗВОДСТВА</h2>' +
+        '<table class="ttx">' +
+        '<tr><th>Режим</th><th>Эффект щита</th><th>Производство</th><th>Длительность</th></tr>' +
+        '<tr><td>РЕМ. 1/2</td><td>+15%</td><td>-50% скорости</td><td>1 мин</td></tr>' +
+        '<tr><td>РЕМ. ПОЛ.</td><td>+30%</td><td>полная остановка</td><td>1 мин</td></tr>' +
+        '</table>' +
+
+        '<h2>§6. РЕЖИМ АСУ</h2>' +
+        '<p>ЦЕЛЕНАПРАВЛЕННЫЙ — АСУ отслеживает все цели вне сектора оператора и стреляет по каждой через равные интервалы (~2.5 с), с риском промаха ~20%. ЗАЛПОВЫЙ — очередь обрабатывается быстрее (~0.8 с между пусками), промахов нет.</p>' +
+
+        '<h2>§7. ТРАССИРОВКА</h2>' +
+        '<p>Круглая кнопка <b>◎</b> в правом нижнем углу окна РЛС. Нажми — активируется. Затем кликни по цели на экране. Если попал — от цели на 3 секунды отрисуется тонкая белая пунктирная линия траектории.</p>' +
+
+        '<h2>§8. ПАУЗА</h2>' +
+        '<p>Клавиша <b>ПРОБЕЛ</b> — пауза / продолжение боя.</p>' +
+
+        '<h2>§9. КЛАССИФИКАЦИЯ ЦЕЛЕЙ</h2>' +
+        '<table class="ttx">' +
+        '<tr><th>Класс</th><th>Требуется ЯПР</th><th>Требуется торпед</th></tr>' +
+        '<tr><td>М — малая</td><td>1 попадание</td><td>1 попадание</td></tr>' +
+        '<tr><td>С — средняя</td><td>2 попадания</td><td>1 попадание</td></tr>' +
+        '<tr><td>К — крупная</td><td>4 попадания</td><td>1 попадание</td></tr>' +
+        '</table>';
+
+    function doMenuAction(action) {
+        closeAllDropdowns();
+        if (action === 'send') {
+            var url = 'https://gramotinho.kick.sh/redoute.html';
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(url).then(function () {
+                    showModal('Отправить другу', 'Ссылка скопирована в буфер обмена:<br><br><b>' + url + '</b>', '✓');
+                }).catch(function () {
+                    showModal('Отправить другу', 'Ссылка:<br><br><b>' + url + '</b>', 'i');
+                });
+            } else {
+                showModal('Отправить другу', 'Ссылка:<br><br><b>' + url + '</b>', 'i');
+            }
+        } else if (action === 'restart') {
+            restartToMenu();
+        } else if (action === 'exit') {
+            window.location.href = 'https://gramotinho.kick.sh/';
+        } else if (action === 'far') {
+            camDist = GAME.camDistMax;
+            focusTarget = null;
+            logLine('info', 'камера: дальний космос');
+        } else if (action === 'moon') {
+            camTheta = 0; camPhi = Math.PI / 2; camDist = GAME.camDistMax;
+            focusTarget = null;
+            logLine('info', 'камера: вид с Луны');
+        } else if (action === 'orbit') {
+            camDist = GAME.camDistDefault;
+            focusTarget = null;
+            logLine('info', 'камера: орбита Земли');
+        } else if (action === 'about') {
+            showModal('О системе', 'Добро пожаловать на портал "Грамотиньо"', 'i');
+        } else if (action === 'weapons') {
+            showDocModal('СПРАВКА · ВООРУЖЕНИЕ', WEAPONS_HTML);
+        } else if (action === 'mode-battle') {
+            GAME.displayMode = 'battle';
+            ddBattle.classList.add('checked');
+            ddTactical.classList.remove('checked');
+            applyDisplayMode();
+            logLine('info', 'режим отображения: БОЕВОЙ');
+        } else if (action === 'mode-tactical') {
+            GAME.displayMode = 'tactical';
+            ddTactical.classList.add('checked');
+            ddBattle.classList.remove('checked');
+            applyDisplayMode();
+            logLine('info', 'режим отображения: ТАКТИЧЕСКИЙ');
+        }
+    }
+
+    allDrops.forEach(function (dd) {
+        if (!dd) return;
+        dd.querySelectorAll('.item').forEach(function (item) {
+            item.addEventListener('click', function (e) {
+                e.stopPropagation();
+                doMenuAction(item.getAttribute('data-action'));
+            });
+        });
+    });
+
+    document.getElementById('tClose').addEventListener('click', function () {
+        window.location.href = 'https://gramotinho.kick.sh/';
+    });
+    document.getElementById('ovClose').addEventListener('click', function () {
+        window.location.href = 'https://gramotinho.kick.sh/';
+    });
+    document.getElementById('tMin').addEventListener('click', function () {
+        showModal('Свернуть окно', 'Окно свёрнуто. Нажмите OK для возврата.', 'i');
+    });
+    document.getElementById('tMax').addEventListener('click', function () {
+        showModal('Развернуть окно', 'Окно уже развёрнуто на весь экран.', 'i');
+    });
+
+    function startEconomy(mode) {
+        if (economy.active) return;
+        if (!game.playing) return;
+        if (mode === 'save') {
+            game.hp = Math.min(GAME.baseHP, game.hp + economy.saveShieldBonus);
+            economy.active = 'save';
+            economy.timer = economy.duration;
+            logLine('ok', 'РЕМ. 1/2 · щит +' + economy.saveShieldBonus + '%, производство -50% на 1 мин');
+        } else if (mode === 'sacrifice') {
+            if (moonBase.disabled) {
+                var cost = Math.round(GAME.baseHP * 0.30);
+                game.hp = Math.max(0, game.hp - cost);
+                logLine('err', 'РЕМ. ПОЛ. · ЛУНА · списано ' + cost + '% щита Земли на восстановление');
+                moonBase.disabled = false;
+                moonBase.hp = moonBase.hpMax;
+                moonDamageMarker.material.opacity = 0;
+                inventory.torpedoes = Math.min(inventory.torpedoesMax, inventory.torpedoes + 2);
+                logLine('ok', 'ЛУНА восстановлена · снабжение возобновлено');
+                if (game.hp <= 0) { endGame(); return; }
+            } else {
+                game.hp = Math.min(GAME.baseHP, game.hp + economy.sacrificeShieldBonus);
+                logLine('warn', 'РЕМ. ПОЛ. · щит +' + economy.sacrificeShieldBonus + '%, производство остановлено на 1 мин');
+            }
+            economy.active = 'sacrifice';
+            economy.timer = economy.duration;
+        }
+        updateHUD();
+    }
+    econSaveBtn.addEventListener('click', function (e) { e.stopPropagation(); startEconomy('save'); });
+    econSacrificeBtn.addEventListener('click', function (e) { e.stopPropagation(); startEconomy('sacrifice'); });
+
+    var rlsFocusActive = false;
+    function setRlsFocus(on) {
+        rlsFocusActive = !!on;
+        if (rlsFocusActive) rlsFocusBtn.classList.add('focusActive');
+        else rlsFocusBtn.classList.remove('focusActive');
+    }
+    rlsFocusBtn.addEventListener('click', function (e) {
+        e.stopPropagation();
+        if (!game.playing) {
+            logLine('warn', 'ТРАССИРОВКА · боевой расчёт не активен');
+            return;
+        }
+        setRlsFocus(!rlsFocusActive);
+        logLine('info', rlsFocusActive ? 'ТРАССИРОВКА · АКТИВНА, ткни в цель' : 'ТРАССИРОВКА · ОТКЛЮЧЕНА');
+    });
+
+    asuAimed.addEventListener('click', function () {
+        asuMode = 'aimed';
+        asuAimed.classList.add('active');
+        asuVolley.classList.remove('active');
+        logLine('info', 'АСУ · ПРИЦЕЛЬНЫЙ');
+    });
+    asuVolley.addEventListener('click', function () {
+        asuMode = 'volley';
+        asuVolley.classList.add('active');
+        asuAimed.classList.remove('active');
+        logLine('info', 'АСУ · ШКВАЛЬНЫЙ');
+    });
+
+    modeEasy.addEventListener('change', function () {
+        if (modeEasy.checked) {
+            GAME.mode = 'easy';
+            applyDisplayMode();
+            orientDome();
+            updateHUD();
+        }
+    });
+    modeHard.addEventListener('change', function () {
+        if (modeHard.checked) {
+            GAME.mode = 'hard';
+            applyDisplayMode();
+            updateHUD();
+        }
+    });
+
+    function clearWorld() {
+        while (meteors.length > 0) { var m = meteors.pop(); meteorsGroup.remove(m); disposeGroup(m); }
+        while (projectiles.length > 0) {
+            var p = projectiles.pop();
+            projectilesGroup.remove(p.mesh); disposeGroup(p.mesh);
+            if (p.trajectory) removeTrajectoryLine(p.trajectory);
+        }
+        while (supply.rockets.length > 0) {
+            var sr = supply.rockets.pop();
+            scene.remove(sr.mesh);
+            sr.mesh.traverse(function (obj) {
+                if (obj.geometry) obj.geometry.dispose();
+                if (obj.material) obj.material.dispose();
+            });
+        }
+        ghostMarks.length = 0;
+        traceMarks.length = 0;
+        asuQueue.length = 0;
+        asuNextShotTimer = 0;
+        moonBase.hp = moonBase.hpMax;
+        moonBase.disabled = false;
+        moonDamageMarker.material.opacity = 0;
+    }
+
+    function startGame() {
+        clearWorld();
+        supply.batchTimer = 0;
+        supply.batchActive = false;
+        supply.toSpawn = 0;
+        logEl.innerHTML = '';
+        logEntries.length = 0;
+        setRlsFocus(false);
+        setPaused(false);
+
+        inventory.rockets = 50;
+        inventory.rocketTimer = 0;
+        inventory.torpedoes = 10;
+        inventory.torpedoReloadTimer = 0;
+        inventory.shortTorpedoes = 3;
+        inventory.shortTorpedoReloadTimer = 0;
+
+        economy.active = null;
+        economy.timer = 0;
+
+        wave.intensity = 1.0;
+        wave.timer = 15 + Math.random() * 10;
+
+        game.playing = true; game.over = false;
+        game.score = 0; game.hp = GAME.baseHP; game.level = 1;
+        game.elapsed = 0; game.spawnTimer = 1.0; game.hitFlash = 0;
+        game.destroyed = 0; game.escaped = 0; game.launched = 0;
+        focusTarget = null;
+        updateHUD();
+        overlayEl.classList.add('hidden');
+        resultBox.style.display = 'none';
+        startBtn.textContent = 'ЗАСТУПИТЬ НА ДЕЖУРСТВО';
+        statusLabel.textContent = GAME.mode === 'easy' ? 'БОЕВОЙ РЕЖИМ · СЕКТОР 120°' : 'БОЕВОЙ РЕЖИМ · КРУГ 360°';
+        logLine('ok', 'БОЕВОЙ РАСЧЁТ ПРИНЯЛ ДЕЖУРСТВО');
+        logLine('info', 'склад: ' + inventory.rockets + ' ЯПР, ' + inventory.torpedoes + ' ТП, ' + inventory.shortTorpedoes + ' КТ-Б.');
+        logLine('info', 'АСУ: ' + (asuMode === 'aimed' ? 'прицельный' : 'шквальный'));
+        logLine('info', 'ТРАССИРОВКА: кнопка на РЛС · ПАУЗА: ПРОБЕЛ');
+        applyDisplayMode();
+    }
+
+    function endGame() {
+        game.playing = false; game.over = true;
+        setRlsFocus(false);
+        setPaused(false);
+        overlayEl.classList.remove('hidden');
+        resultBox.style.display = 'block';
+        resultScoreEl.textContent = String(game.score).padStart(2, '0');
+        var accuracy = game.launched > 0 ? Math.round(game.destroyed / game.launched * 100) : 0;
+        resultInfoEl.innerHTML =
+            'уничтожено: ' + game.destroyed + '<br>' +
+            'прилётов:  ' + game.escaped + '<br>' +
+            'пусков:    ' + game.launched + '<br>' +
+            'эффективность: ' + accuracy + '%';
+        startBtn.textContent = 'ЗАСТУПИТЬ НА ДЕЖУРСТВО';
+        statusLabel.textContent = 'БОЕВОЙ РАСЧЁТ ОКОНЧЕН · ОЖИДАНИЕ';
+        logLine('err', 'БОЕВОЙ РАСЧЁТ ОКОНЧЕН · ЩИТ КРИТИЧЕН');
+    }
+
+    function restartToMenu() {
+        if (game.playing) {
+            game.playing = false;
+            game.over = false;
+        }
+        clearWorld();
+        setRlsFocus(false);
+        setPaused(false);
+        economy.active = null;
+        economy.timer = 0;
+        logEl.innerHTML = '';
+        logEntries.length = 0;
+        focusTarget = null;
+        resultBox.style.display = 'none';
+        overlayEl.classList.remove('hidden');
+        startBtn.textContent = 'ЗАСТУПИТЬ НА ДЕЖУРСТВО';
+        statusLabel.textContent = 'СИСТЕМА В НОРМЕ';
+        logLine('info', 'СИСТЕМА ГОТОВА К НОВОМУ БОЕВОМУ РАСЧЁТУ');
+        updateHUD();
+    }
+
+    function setPaused(on) {
+        paused = !!on;
+        if (paused && game.playing) {
+            pauseBadgeEl.classList.add('open');
+            statusLabel.textContent = 'ПАУЗА · ПРОБЕЛ — ПРОДОЛЖИТЬ';
+        } else {
+            pauseBadgeEl.classList.remove('open');
+            if (game.playing) {
+                statusLabel.textContent = GAME.mode === 'easy' ? 'БОЕВОЙ РЕЖИМ · СЕКТОР 120°' : 'БОЕВОЙ РЕЖИМ · КРУГ 360°';
+            }
+        }
+    }
+
+    window.addEventListener('keydown', function (e) {
+        if (e.code === 'Space' || e.key === ' ' || e.keyCode === 32) {
+            var tag = e.target && e.target.tagName;
+            if (tag === 'INPUT' || tag === 'TEXTAREA') return;
+            e.preventDefault();
+            if (!game.playing) return;
+            setPaused(!paused);
+        }
+    });
+
+    function rerollWave() {
+        wave.intensity = 0.55 + Math.random() * 1.2;
+        wave.timer = wave.durationMin + Math.random() * (wave.durationMax - wave.durationMin);
+        game.level = Math.max(1, Math.round(wave.intensity * 5));
+        logLine('warn', 'смена обстановки · интенсивность ' +
+            (wave.intensity < 0.9 ? 'НИЗКАЯ' : (wave.intensity < 1.3 ? 'СРЕДНЯЯ' : 'ВЫСОКАЯ')));
+        updateHUD();
+    }
+
+    function onMoonHit(m) {
+        var worldPos = m.position.clone();
+        createFireball(worldPos, m.userData.baseScale, false);
+        createRealShards(worldPos, m.userData.baseScale, 6, false);
+        createHotSparks(worldPos, m.userData.baseScale, 14);
+        createSmokeCloud(worldPos, m.userData.baseScale, false);
+        var desig = m.userData.designation;
+        var idx = meteors.indexOf(m);
+        if (idx >= 0) meteors.splice(idx, 1);
+        for (var q = asuQueue.length - 1; q >= 0; q--) if (asuQueue[q] === m) asuQueue.splice(q, 1);
+        meteorsGroup.remove(m); disposeGroup(m);
+        cameraShake = 0.4;
+
+        if (moonBase.disabled) {
+            logLine('err', 'Луна · повторное попадание · ' + desig);
+            return;
+        }
+        moonBase.hp -= 1;
+        var hpLeft = Math.max(0, moonBase.hp);
+        logLine('err', 'ЛУНА · ' + desig + ' · попадание по Луне (' + hpLeft + '/' + moonBase.hpMax + ')');
+
+        moonDamageMarker.material.opacity = 0.9;
+
+        if (moonBase.hp <= 0) {
+            moonBase.disabled = true;
+            logLine('err', '!!! ЛУННАЯ БАЗА ВЫВЕДЕНА ИЗ СТРОЯ !!!');
+            logLine('warn', 'СНАБЖЕНИЕ ПРЕКРАЩЕНО · РЕМОНТ ТРЕБУЕТ 30% ЩИТА ЗЕМЛИ');
+            updateHUD();
+        }
+    }
+
+    function shatterMeteor(m, bigBlast) {
+        if (m.userData.alive === false) return;
+        if (!bigBlast) {
+            m.userData.hpLeft -= 1;
+            var type = m.userData.type;
+            if ((type === 'medium' || type === 'large') && m.userData.hpLeft > 0) {
+                createSmallImpact(m.position.clone(), 0xffaa44);
+                m.userData.damaged = true;
+                m.userData.speed *= 0.85;
+                var ro = new THREE.Vector3((Math.random() - 0.5) * 2, (Math.random() - 0.5) * 2, (Math.random() - 0.5) * 2).normalize();
+                m.userData.moveDir.addScaledVector(ro, 0.15).normalize();
+                logLine('warn', m.userData.designation + ' · попадание, осталось ' + m.userData.hpLeft);
+                return;
+            }
+        }
+        m.userData.alive = false;
+        var worldPos = m.position.clone();
+        var scaleRef = m.userData.baseScale;
+        var isLarge = (m.userData.type === 'large');
+        ghostMarks.push({ pos: worldPos.clone(), designation: m.userData.designation, type: m.userData.type,
+            spawnTime: performance.now(), lifeSec: GHOST_LIFE_SEC });
+        createFireball(worldPos, scaleRef, bigBlast);
+        createRealShards(worldPos, scaleRef, bigBlast ? 14 : 9, bigBlast);
+        createHotSparks(worldPos, scaleRef, bigBlast ? 30 : 18);
+        createSmokeCloud(worldPos, scaleRef, bigBlast);
+        if (bigBlast && isLarge) cameraShake = 0.5;
+        else if (bigBlast) cameraShake = 0.25;
+        meteorsGroup.remove(m);
+        disposeGroup(m);
+        var idx = meteors.indexOf(m);
+        if (idx >= 0) meteors.splice(idx, 1);
+        for (var q = asuQueue.length - 1; q >= 0; q--) if (asuQueue[q] === m) asuQueue.splice(q, 1);
+        game.score++;
+        game.destroyed++;
+        updateHUD();
+        logLine('ok', 'ЦЕЛЬ ' + m.userData.designation + ' · ' + (bigBlast ? '"Предел"' : '"Стрела"') + ' · ПОРАЖЕНА');
+    }
+
+    function onEarthHit(m) {
+        var worldPos = m.position.clone();
+        ghostMarks.push({ pos: worldPos.clone(), designation: m.userData.designation, type: m.userData.type,
+            spawnTime: performance.now(), lifeSec: GHOST_LIFE_SEC });
+        createFireball(worldPos, m.userData.baseScale, false);
+        createRealShards(worldPos, m.userData.baseScale, 8, false);
+        createHotSparks(worldPos, m.userData.baseScale, 16);
+        createSmokeCloud(worldPos, m.userData.baseScale, false);
+        var desig = m.userData.designation;
+        var idx = meteors.indexOf(m);
+        if (idx >= 0) meteors.splice(idx, 1);
+        for (var q = asuQueue.length - 1; q >= 0; q--) if (asuQueue[q] === m) asuQueue.splice(q, 1);
+        meteorsGroup.remove(m); disposeGroup(m);
+        game.hp -= GAME.hpLossPerMiss;
+        if (game.hp < 0) game.hp = 0;
+        game.escaped++;
+        game.hitFlash = 1.0;
+        cameraShake = 0.7;
+        updateHUD();
+        logLine('err', 'ПРИЛЁТ · ' + desig + ' · ЩИТ -' + GAME.hpLossPerMiss + '%');
+        if (game.hp <= 0) endGame();
+    }
+
+    var pickRaycaster = new THREE.Raycaster();
+    var pickNdc = new THREE.Vector2();
+    function pickMeteor(clientX, clientY) {
+        if (meteors.length === 0) return null;
+        pickNdc.x = (clientX / window.innerWidth) * 2 - 1;
+        pickNdc.y = -(clientY / window.innerHeight) * 2 + 1;
+        pickRaycaster.setFromCamera(pickNdc, camera);
+        var best = null, bestDist = Infinity;
+        for (var i = 0; i < meteors.length; i++) {
+            var m = meteors[i];
+            var dToRay = pickRaycaster.ray.distanceToPoint(m.position);
+            var dToCam = m.position.distanceTo(camera.position);
+            var fovRad = camera.fov * DEG;
+            var br = 0.045;
+            if (m.userData.type === 'medium') br = 0.055;
+            if (m.userData.type === 'large') br = 0.07;
+            var hr = Math.max(1.5, Math.min(25, dToCam * br * fovRad));
+            if (dToRay < hr && dToCam < bestDist) { bestDist = dToCam; best = m; }
+        }
+        return best;
+    }
+
+    function isInOperatorSector(worldPos) {
+        if (GAME.mode === 'hard') return true;
+        var toTarget = worldPos.clone().normalize();
+        var angle = Math.acos(Math.max(-1, Math.min(1, SECTOR_DIR.dot(toTarget)))) * 180 / Math.PI;
+        return angle < SECTOR_EASY_DEG / 2;
+    }
+
+    // ===== ВВОД =====
+    var isRotating = false, lastRotX = 0, lastRotY = 0;
+    var dragHappened = false;
+
+    function onPointerDown(e) {
+        if (e.target && e.target.closest && (
+            e.target.closest('button') || e.target.closest('.radio') ||
+            e.target.closest('#menuBar') || e.target.closest('.dropdown') ||
+            e.target.closest('#titleBar') || e.target.closest('#modal') ||
+            e.target.closest('#hud')
+        )) return;
+        var p = e.touches ? e.touches[0] : e;
+        isRotating = true;
+        dragHappened = false;
+        lastRotX = p.clientX;
+        lastRotY = p.clientY;
+    }
+    function onPointerMove(e) {
+        if (!isRotating) return;
+        var p = e.touches ? e.touches[0] : e;
+        var dx = p.clientX - lastRotX;
+        var dy = p.clientY - lastRotY;
+        if (Math.abs(dx) + Math.abs(dy) > 6) dragHappened = true;
+        lastRotX = p.clientX;
+        lastRotY = p.clientY;
+        camTheta -= dx * 0.005;
+        camPhi -= dy * 0.005;
+        camPhi = Math.max(0.15, Math.min(Math.PI - 0.15, camPhi));
+        if (focusTarget) focusTarget = null;
+    }
+            function onPointerUp(e) {
+        var wasRotating = isRotating;
+        isRotating = false;
+        if (!wasRotating) return;
+        if (dragHappened) return;
+        var p = e.changedTouches ? e.changedTouches[0] : e;
+        if (!p) return;
+        if (e.target && e.target.closest && (
+            e.target.closest('button') || e.target.closest('.radio') ||
+            e.target.closest('#menuBar') || e.target.closest('.dropdown') ||
+            e.target.closest('#titleBar') || e.target.closest('#modal') ||
+            e.target.closest('#hud')
+        )) return;
+        if (!game.playing || paused) return;
+        var target = pickMeteor(p.clientX, p.clientY);
+
+        // ——— Режим ТРАССИРОВКА ———
+        if (rlsFocusActive) {
+            if (target && target.userData.alive !== false) {
+                traceMarks.push({
+                    pos: target.position.clone(),
+                    moveDir: target.userData.moveDir.clone(),
+                    speed: target.userData.speed,
+                    designation: target.userData.designation,
+                    spawnTime: performance.now(),
+                    lifeSec: TRACE_LIFE_SEC
+                });
+                logLine('ok', 'ТРАССИРОВКА · трасса построена: ' + target.userData.designation);
+                setRlsFocus(false);
+            } else {
+                logLine('warn', 'ТРАССИРОВКА · цель под курсором не обнаружена');
+            }
+            return;
+        }
+
+        // ——— Обычный клик по цели ———
+        if (!target || target.userData.alive === false) return;
+
+        if (GAME.mode === 'easy' && !isInOperatorSector(target.position)) {
+            logLine('warn', 'ЦЕЛЬ ' + target.userData.designation + ' · ВНЕ СЕКТОРА');
+            return;
+        }
+
+        var distToEarth = target.position.length();
+        var inNearZone = distToEarth < 60;
+
+        if (inNearZone) {
+            // ——— БЛИЖНЯЯ ЗОНА → Луна КТ-Б, fallback: Земля ЯПР ———
+            if (!moonBase.disabled && inventory.shortTorpedoes > 0 && inventory.shortTorpedoReloadTimer <= 0) {
+                if (tryConsumeShortTorpedo()) {
+                    game.launched++;
+                    logLine('ok', 'ЛУНА · КТ-Б "Предел-Б" · ' + target.userData.designation +
+                        ' (КТ-Б: ' + inventory.shortTorpedoes + ')');
+                    launchShortTorpedo(MOON_POS.clone(), target);
+                    updateHUD();
+                    return;
+                }
+            }
+            // Fallback — Земля ЯПР
+            if (inventory.rockets > 0 && tryConsumeRocket()) {
+                game.launched++;
+                logLine('ok', 'ЗЕМЛЯ · ЯПР "Стрела" (fallback) · ' + target.userData.designation +
+                    ' (ЯПР: ' + inventory.rockets + ')');
+                launchMissile(new THREE.Vector3(0, 0, 0), target, false);
+                updateHUD();
+                return;
+            }
+            logLine('err', 'ОТКАЗ · нет КТ-Б на Луне и нет ЯПР на Земле');
+        } else {
+            // ——— ДАЛЬНЯЯ ЗОНА → Луна дальнобойной, fallback: Земля ЯПР ———
+            if (!moonBase.disabled && inventory.torpedoes > 0 && inventory.torpedoReloadTimer <= 0) {
+                if (tryConsumeTorpedo()) {
+                    game.launched++;
+                    logLine('ok', 'ЛУНА · торпеда "Предел" · ' + target.userData.designation +
+                        ' (ТП: ' + inventory.torpedoes + ')');
+                    launchMissile(MOON_POS.clone(), target, true);
+                    updateHUD();
+                    return;
+                }
+            }
+            // Fallback — Земля ЯПР
+            if (inventory.rockets > 0 && tryConsumeRocket()) {
+                game.launched++;
+                logLine('ok', 'ЗЕМЛЯ · ЯПР "Стрела" (fallback) · ' + target.userData.designation +
+                    ' (ЯПР: ' + inventory.rockets + ')');
+                launchMissile(new THREE.Vector3(0, 0, 0), target, false);
+                updateHUD();
+                return;
+            }
+            logLine('err', 'ОТКАЗ · нет торпед на Луне и нет ЯПР на Земле');
+        }
+    }
+
+      
+
+    function onWheel(e) {
+        e.preventDefault();
+        var delta = e.deltaY > 0 ? 1 : -1;
+        camDist *= (1 + delta * 0.12);
+        camDist = Math.max(GAME.camDistMin, Math.min(GAME.camDistMax, camDist));
+        if (focusTarget) focusTarget = null;
+    }
+
+    var pinchDist = 0;
+    function onTouchStartPinch(e) {
+        if (e.touches.length === 2) {
+            var dx = e.touches[0].clientX - e.touches[1].clientX;
+            var dy = e.touches[0].clientY - e.touches[1].clientY;
+            pinchDist = Math.hypot(dx, dy);
+            isRotating = false;
+        }
+    }
+    function onTouchMovePinch(e) {
+        if (e.touches.length === 2 && pinchDist > 0) {
+            e.preventDefault();
+            var dx = e.touches[0].clientX - e.touches[1].clientX;
+            var dy = e.touches[0].clientY - e.touches[1].clientY;
+            var nd = Math.hypot(dx, dy);
+            var sc = pinchDist / nd;
+            pinchDist = nd;
+            camDist *= sc;
+            camDist = Math.max(GAME.camDistMin, Math.min(GAME.camDistMax, camDist));
+        }
+    }
+    function onTouchEndPinch(e) { if (e.touches.length < 2) pinchDist = 0; }
+
+    renderer.domElement.addEventListener('mousedown', onPointerDown);
+    window.addEventListener('mousemove', onPointerMove);
+    window.addEventListener('mouseup', onPointerUp);
+    renderer.domElement.addEventListener('wheel', onWheel, { passive: false });
+    renderer.domElement.addEventListener('touchstart', onPointerDown, { passive: true });
+    renderer.domElement.addEventListener('touchmove', onPointerMove, { passive: true });
+    renderer.domElement.addEventListener('touchend', onPointerUp);
+    renderer.domElement.addEventListener('touchstart', onTouchStartPinch, { passive: true });
+    renderer.domElement.addEventListener('touchmove', onTouchMovePinch, { passive: false });
+    renderer.domElement.addEventListener('touchend', onTouchEndPinch);
+
+    // ===== РЛС =====
+    var radarCanvas = document.getElementById('radarCanvas');
+    var radarCtx = radarCanvas.getContext('2d');
+    var RADAR_SIZE = 480;
+    var RADAR_CENTER = RADAR_SIZE / 2;
+    var RADAR_MAX_RANGE = METEOR_SPAWN_MAX * 1.15;
+    var radarSweepAngle = -Math.PI / 2;
+
+    radarCanvas.addEventListener('mousemove', function (e) {
+        if (!game.playing) return;
+        var rect = radarCanvas.getBoundingClientRect();
+        var mx = e.clientX - rect.left;
+        var my = e.clientY - rect.top;
+        var lx = (mx / rect.width) * RADAR_SIZE - RADAR_CENTER;
+        var ly = (my / rect.height) * RADAR_SIZE - RADAR_CENTER;
+        if (Math.hypot(lx, ly) > RADAR_CENTER * 0.95) { focusTarget = null; return; }
+        var nearest = null, nd = 30;
+        for (var i = 0; i < meteors.length; i++) {
+            var m = meteors[i];
+            var a = Math.atan2(m.position.z, m.position.x);
+            var dist = Math.sqrt(m.position.x * m.position.x + m.position.z * m.position.z);
+            var r = Math.min((dist / RADAR_MAX_RANGE) * RADAR_CENTER * 0.92, RADAR_CENTER * 0.92);
+            var px = Math.cos(a) * r;
+            var py = Math.sin(a) * r;
+            var d = Math.hypot(px - lx, py - ly);
+            if (d < nd) { nd = d; nearest = m; }
+        }
+        focusTarget = nearest;
+    });
+    radarCanvas.addEventListener('mouseleave', function () { focusTarget = null; });
+
+    function compassLabel(angleDeg) {
+        var a = ((angleDeg % 360) + 360) % 360;
+        if (a < 22.5 || a >= 337.5) return 'В';
+        if (a < 67.5) return 'ЮВ';
+        if (a < 112.5) return 'Ю';
+        if (a < 157.5) return 'ЮЗ';
+        if (a < 202.5) return 'З';
+        if (a < 247.5) return 'СЗ';
+        if (a < 292.5) return 'С';
+        return 'СВ';
+    }
+
+    function drawRadar() {
+        var ctx = radarCtx;
+        ctx.clearRect(0, 0, RADAR_SIZE, RADAR_SIZE);
+
+        var bg = ctx.createRadialGradient(RADAR_CENTER, RADAR_CENTER, 0, RADAR_CENTER, RADAR_CENTER, RADAR_CENTER);
+        bg.addColorStop(0, '#052010');
+        bg.addColorStop(1, '#001005');
+        ctx.fillStyle = bg;
+        ctx.beginPath();
+        ctx.arc(RADAR_CENTER, RADAR_CENTER, RADAR_CENTER - 2, 0, Math.PI * 2);
+        ctx.fill();
+
+        ctx.save();
+        ctx.translate(RADAR_CENTER, RADAR_CENTER);
+
+        ctx.strokeStyle = 'rgba(60, 140, 80, 0.55)';
+        ctx.lineWidth = 1;
+        for (var i = 1; i <= 4; i++) {
+            ctx.beginPath();
+            ctx.arc(0, 0, (RADAR_CENTER * 0.92) * (i / 4), 0, Math.PI * 2);
+            ctx.stroke();
+        }
+        ctx.fillStyle = 'rgba(90, 160, 100, 0.7)';
+        ctx.font = '9px "Courier New", monospace';
+        ctx.textAlign = 'left';
+        for (var rr = 1; rr <= 4; rr++) {
+            var rR = (RADAR_CENTER * 0.92) * (rr / 4);
+            ctx.fillText((RADAR_MAX_RANGE * (rr/4)).toFixed(0), 3, -rR + 3);
+        }
+
+        ctx.strokeStyle = 'rgba(60, 140, 80, 0.22)';
+        for (var a = 0; a < 360; a += 30) {
+            var rad = a * DEG;
+            ctx.beginPath();
+            ctx.moveTo(0, 0);
+            ctx.lineTo(Math.cos(rad) * RADAR_CENTER * 0.92, Math.sin(rad) * RADAR_CENTER * 0.92);
+            ctx.stroke();
+        }
+
+        if (GAME.mode === 'easy') {
+            var sa = Math.atan2(SECTOR_DIR.z, SECTOR_DIR.x);
+            var half = SECTOR_EASY_DEG * DEG / 2;
+            ctx.fillStyle = 'rgba(0, 255, 100, 0.10)';
+            ctx.beginPath();
+            ctx.moveTo(0, 0);
+            ctx.arc(0, 0, RADAR_CENTER * 0.92, sa - half, sa + half);
+            ctx.closePath();
+            ctx.fill();
+            ctx.strokeStyle = 'rgba(0, 255, 100, 0.7)';
+            ctx.lineWidth = 1.5;
+            ctx.stroke();
+
+            ctx.fillStyle = 'rgba(0, 255, 100, 0.85)';
+            ctx.font = 'bold 10px "Courier New", monospace';
+            ctx.textAlign = 'center';
+            var labelR = RADAR_CENTER * 0.78;
+            ctx.fillText('СЕКТОР ОПЕРАТОРА 120°', Math.cos(sa) * labelR, Math.sin(sa) * labelR);
+        }
+
+        ctx.font = 'bold 11px "Courier New", monospace';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        var dirs = [
+            { a: 270, t: 'С' },
+            { a: 0,   t: 'В' },
+            { a: 90,  t: 'Ю' },
+            { a: 180, t: 'З' }
+        ];
+        for (var d = 0; d < dirs.length; d++) {
+            var rad2 = dirs[d].a * DEG;
+            var rEdge = RADAR_CENTER * 0.98;
+            ctx.fillStyle = 'rgba(120, 200, 130, 0.95)';
+            ctx.fillText(dirs[d].t, Math.cos(rad2) * rEdge, Math.sin(rad2) * rEdge);
+        }
+
+        var camAzimuth = Math.atan2(camera.position.z, camera.position.x);
+        var camFovRad = (camera.fov > 0 ? camera.fov : 48) * DEG;
+        ctx.fillStyle = 'rgba(255, 200, 0, 0.10)';
+        ctx.beginPath();
+        ctx.moveTo(0, 0);
+        ctx.arc(0, 0, RADAR_CENTER * 0.92, camAzimuth - camFovRad / 2, camAzimuth + camFovRad / 2);
+        ctx.closePath();
+        ctx.fill();
+        ctx.strokeStyle = 'rgba(255, 200, 0, 0.5)';
+        ctx.lineWidth = 1;
+        ctx.stroke();
+
+        ctx.strokeStyle = 'rgba(255, 200, 0, 0.75)';
+        ctx.lineWidth = 1.5;
+        ctx.beginPath();
+        ctx.moveTo(0, 0);
+        ctx.lineTo(Math.cos(camAzimuth) * RADAR_CENTER * 0.92, Math.sin(camAzimuth) * RADAR_CENTER * 0.92);
+        ctx.stroke();
+
+        var camMarkerR = RADAR_CENTER * 0.92;
+        var cmx = Math.cos(camAzimuth) * camMarkerR;
+        var cmy = Math.sin(camAzimuth) * camMarkerR;
+        ctx.save();
+        ctx.translate(cmx, cmy);
+        ctx.rotate(camAzimuth + Math.PI);
+        ctx.fillStyle = '#ffcc00';
+        ctx.beginPath();
+        ctx.moveTo(0, -7);
+        ctx.lineTo(6, 8);
+        ctx.lineTo(-6, 8);
+        ctx.closePath();
+        ctx.fill();
+        ctx.strokeStyle = '#000';
+        ctx.lineWidth = 1;
+        ctx.stroke();
+        ctx.restore();
+
+        var camLabelR = RADAR_CENTER * 0.78;
+        ctx.fillStyle = 'rgba(255, 200, 0, 0.95)';
+        ctx.font = 'bold 9px "Courier New", monospace';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText('КАМЕРА',
+            Math.cos(camAzimuth) * camLabelR,
+            Math.sin(camAzimuth) * camLabelR - 12);
+        ctx.fillText(compassLabel(camAzimuth / DEG),
+            Math.cos(camAzimuth) * camLabelR,
+            Math.sin(camAzimuth) * camLabelR + 2);
+
+        radarSweepAngle += 0.9 * 0.016;
+        if (radarSweepAngle > Math.PI * 2) radarSweepAngle -= Math.PI * 2;
+        var sweepGrad = ctx.createLinearGradient(
+            Math.cos(radarSweepAngle - 0.5) * RADAR_CENTER * 0.92,
+            Math.sin(radarSweepAngle - 0.5) * RADAR_CENTER * 0.92,
+            Math.cos(radarSweepAngle) * RADAR_CENTER * 0.92,
+            Math.sin(radarSweepAngle) * RADAR_CENTER * 0.92
+        );
+        sweepGrad.addColorStop(0, 'rgba(0, 255, 100, 0)');
+        sweepGrad.addColorStop(1, 'rgba(0, 255, 100, 0.55)');
+        ctx.fillStyle = sweepGrad;
+        ctx.beginPath();
+        ctx.moveTo(0, 0);
+        ctx.arc(0, 0, RADAR_CENTER * 0.92, radarSweepAngle - 0.5, radarSweepAngle);
+        ctx.closePath();
+        ctx.fill();
+
+        ctx.strokeStyle = 'rgba(0, 255, 100, 0.9)';
+        ctx.lineWidth = 1.5;
+        ctx.beginPath();
+        ctx.moveTo(0, 0);
+        ctx.lineTo(Math.cos(radarSweepAngle) * RADAR_CENTER * 0.92, Math.sin(radarSweepAngle) * RADAR_CENTER * 0.92);
+        ctx.stroke();
+
+        ctx.fillStyle = '#00aaff';
+        ctx.beginPath();
+        ctx.arc(0, 0, 6, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.strokeStyle = 'rgba(150, 220, 255, 0.9)';
+        ctx.lineWidth = 1.5;
+        ctx.stroke();
+
+        var moonAz = Math.atan2(MOON_POS.z, MOON_POS.x);
+        var moonDist = Math.sqrt(MOON_POS.x * MOON_POS.x + MOON_POS.z * MOON_POS.z);
+        var moonR = Math.min((moonDist / RADAR_MAX_RANGE) * RADAR_CENTER * 0.92, RADAR_CENTER * 0.92);
+        var moonPx = Math.cos(moonAz) * moonR;
+        var moonPy = Math.sin(moonAz) * moonR;
+        ctx.fillStyle = moonBase.disabled ? '#ff5555' : '#cccccc';
+        ctx.beginPath();
+        ctx.arc(moonPx, moonPy, 5, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.strokeStyle = moonBase.disabled ? '#ff0000' : '#ffffff';
+        ctx.lineWidth = 1.5;
+        ctx.stroke();
+        ctx.fillStyle = moonBase.disabled ? 'rgba(255, 120, 120, 0.95)' : 'rgba(200, 220, 255, 0.9)';
+        ctx.font = 'bold 9px "Courier New", monospace';
+        ctx.textAlign = 'left';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(moonBase.disabled ? 'ЛУНА·ВЫВЕДЕНА' : 'ЛУНА', moonPx + 8, moonPy);
+
+        for (var i = 0; i < meteors.length; i++) {
+            var m = meteors[i];
+            var az = Math.atan2(m.position.z, m.position.x);
+            var dist = Math.sqrt(m.position.x * m.position.x + m.position.z * m.position.z);
+            var r = Math.min((dist / RADAR_MAX_RANGE) * RADAR_CENTER * 0.92, RADAR_CENTER * 0.92);
+            var px = Math.cos(az) * r;
+            var py = Math.sin(az) * r;
+
+            var inSector = (GAME.mode === 'hard') || isInOperatorSector(m.position);
+            var baseColor;
+            if (m.userData.type === 'large') baseColor = inSector ? '#ff2200' : '#663311';
+            else if (m.userData.type === 'medium') baseColor = inSector ? '#ff6600' : '#884422';
+            else baseColor = inSector ? '#ffb000' : '#996633';
+            if (m.userData.damaged) baseColor = '#ff00cc';
+
+            var mvAz = Math.atan2(m.userData.moveDir.z, m.userData.moveDir.x);
+            ctx.strokeStyle = baseColor;
+            ctx.lineWidth = 1.3;
+            ctx.beginPath();
+            ctx.moveTo(px, py);
+            ctx.lineTo(px + Math.cos(mvAz) * 8, py + Math.sin(mvAz) * 8);
+            ctx.stroke();
+
+            ctx.fillStyle = baseColor;
+            ctx.beginPath();
+            ctx.arc(px, py, 4, 0, Math.PI * 2);
+            ctx.fill();
+
+            if (m === focusTarget) {
+                ctx.strokeStyle = '#ffffff';
+                ctx.lineWidth = 1.5;
+                ctx.beginPath();
+                ctx.arc(px, py, 10, 0, Math.PI * 2);
+                ctx.stroke();
+                ctx.fillStyle = '#ffffff';
+                ctx.font = 'bold 9px "Courier New", monospace';
+                ctx.textAlign = 'left';
+                ctx.fillText(m.userData.designation, px + 14, py - 4);
+            }
+        }
+
+        for (var j = 0; j < projectiles.length; j++) {
+            var pr = projectiles[j];
+            var pAz = Math.atan2(pr.mesh.position.z, pr.mesh.position.x);
+            var pDist = Math.sqrt(pr.mesh.position.x * pr.mesh.position.x + pr.mesh.position.z * pr.mesh.position.z);
+            var prR = Math.min((pDist / RADAR_MAX_RANGE) * RADAR_CENTER * 0.92, RADAR_CENTER * 0.92);
+            var ppx = Math.cos(pAz) * prR;
+            var ppy = Math.sin(pAz) * prR;
+            ctx.fillStyle = pr.isTorpedo ? '#66ccff' : '#ffdd66';
+            ctx.beginPath();
+            ctx.arc(ppx, ppy, 2.5, 0, Math.PI * 2);
+            ctx.fill();
+        }
+
+        for (var k = 0; k < supply.rockets.length; k++) {
+            var sr = supply.rockets[k].mesh;
+            var sAz = Math.atan2(sr.position.z, sr.position.x);
+            var sDist = Math.sqrt(sr.position.x * sr.position.x + sr.position.z * sr.position.z);
+            var sR = Math.min((sDist / RADAR_MAX_RANGE) * RADAR_CENTER * 0.92, RADAR_CENTER * 0.92);
+            ctx.fillStyle = '#66ff88';
+            ctx.fillRect(Math.cos(sAz) * sR - 2, Math.sin(sAz) * sR - 2, 4, 4);
+        }
+
+        var sunAz = Math.atan2(SUN_POS.z, SUN_POS.x);
+        ctx.save();
+        ctx.rotate(sunAz);
+        ctx.fillStyle = 'rgba(255, 200, 80, 0.9)';
+        ctx.beginPath();
+        ctx.moveTo(RADAR_CENTER * 0.96, 0);
+        ctx.lineTo(RADAR_CENTER * 0.90, -6);
+        ctx.lineTo(RADAR_CENTER * 0.90, 6);
+        ctx.closePath();
+        ctx.fill();
+        ctx.restore();
+
+        ctx.restore();
+
+        ctx.strokeStyle = 'rgba(0, 255, 100, 0.9)';
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.arc(RADAR_CENTER, RADAR_CENTER, RADAR_CENTER - 2, 0, Math.PI * 2);
+        ctx.stroke();
+
+        ctx.fillStyle = 'rgba(0, 255, 100, 0.95)';
+        ctx.font = 'bold 11px "Courier New", monospace';
+        ctx.textAlign = 'left';
+        ctx.textBaseline = 'top';
+        ctx.fillText('КРУГОВОЙ ОБЗОР 360°', 10, 6);
+
+        ctx.font = 'bold 10px "Courier New", monospace';
+        ctx.textBaseline = 'bottom';
+        ctx.fillStyle = 'rgba(150, 255, 180, 0.9)';
+        ctx.fillText('R МАКС: ' + RADAR_MAX_RANGE.toFixed(0) + ' ЕД', 10, RADAR_SIZE - 8);
+        ctx.textAlign = 'right';
+        ctx.fillStyle = focusTarget ? '#ffffff' : 'rgba(120, 200, 130, 0.6)';
+        ctx.fillText(focusTarget ? 'ЦЕЛЬ: ' + focusTarget.userData.designation : 'СКАНИРОВАНИЕ...', RADAR_SIZE - 10, RADAR_SIZE - 8);
+
+        var elevDeg = 90 - (camPhi / DEG);
+        ctx.textAlign = 'center';
+        ctx.fillStyle = 'rgba(255, 200, 0, 0.9)';
+        ctx.font = 'bold 9px "Courier New", monospace';
+        ctx.fillText('КАМЕРА: ' + elevDeg.toFixed(0) + '° ВЫС / ' + compassLabel(camAzimuth / DEG), RADAR_CENTER, 20);
+    }
+
+    // ===== ТАКТИЧЕСКИЙ ОВЕРЛЕЙ =====
+    var tacticalCanvas = document.createElement('canvas');
+    tacticalCanvas.id = 'tacticalLayer';
+    document.body.appendChild(tacticalCanvas);
+    var tacticalCtx = tacticalCanvas.getContext('2d');
+
+    function resizeTacticalCanvas() {
+        var dpr = window.devicePixelRatio || 1;
+        tacticalCanvas.width = Math.floor(window.innerWidth * dpr);
+        tacticalCanvas.height = Math.floor(window.innerHeight * dpr);
+        tacticalCanvas.style.width = window.innerWidth + 'px';
+        tacticalCanvas.style.height = window.innerHeight + 'px';
+        tacticalCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    }
+    resizeTacticalCanvas();
+
+    var projected = new THREE.Vector3();
+    function projectPoint(pos) {
+        projected.copy(pos);
+        projected.project(camera);
+        return {
+            x: (projected.x * 0.5 + 0.5) * window.innerWidth,
+            y: (-projected.y * 0.5 + 0.5) * window.innerHeight,
+            visible: projected.z > -1 && projected.z < 1
+        };
+    }
+
+    function drawSmallBrackets(ctx, x, y, w, h, color, jitter) {
+        ctx.strokeStyle = color;
+        ctx.lineWidth = 1;
+        var j = jitter || 0.6;
+        var arm = Math.min(w, h) * 0.35;
+        ctx.beginPath();
+        ctx.moveTo(x + (Math.random()-0.5)*j, y + arm);
+        ctx.lineTo(x + (Math.random()-0.5)*j, y + (Math.random()-0.5)*j);
+        ctx.lineTo(x + arm + (Math.random()-0.5)*j, y + (Math.random()-0.5)*j);
+        ctx.stroke();
+        ctx.beginPath();
+        ctx.moveTo(x + w - arm + (Math.random()-0.5)*j, y + (Math.random()-0.5)*j);
+        ctx.lineTo(x + w + (Math.random()-0.5)*j, y + (Math.random()-0.5)*j);
+        ctx.lineTo(x + w + (Math.random()-0.5)*j, y + arm);
+        ctx.stroke();
+        ctx.beginPath();
+        ctx.moveTo(x + (Math.random()-0.5)*j, y + h - arm);
+        ctx.lineTo(x + (Math.random()-0.5)*j, y + h + (Math.random()-0.5)*j);
+        ctx.lineTo(x + arm + (Math.random()-0.5)*j, y + h + (Math.random()-0.5)*j);
+        ctx.stroke();
+        ctx.beginPath();
+        ctx.moveTo(x + w - arm + (Math.random()-0.5)*j, y + h + (Math.random()-0.5)*j);
+        ctx.lineTo(x + w + (Math.random()-0.5)*j, y + h + (Math.random()-0.5)*j);
+        ctx.lineTo(x + w + (Math.random()-0.5)*j, y + h - arm);
+        ctx.stroke();
+    }
+
+    function drawTraceDashed(ctx, pos, moveDir, speed, alpha) {
+        if (!pos || !moveDir) return;
+        var stepSec = 2.0;
+        var numSteps = 24;
+        var pts = [];
+        for (var i = 0; i <= numSteps; i++) {
+            var p = pos.clone().addScaledVector(moveDir, speed * stepSec * i);
+            var proj = projectPoint(p);
+            if (!proj.visible) break;
+            pts.push(proj);
+        }
+        if (pts.length < 2) return;
+        ctx.save();
+        ctx.globalAlpha = alpha;
+        ctx.strokeStyle = 'rgba(255,255,255,0.9)';
+        ctx.lineWidth = 1;
+        ctx.setLineDash([4, 4]);
+        ctx.beginPath();
+        ctx.moveTo(pts[0].x, pts[0].y);
+        for (var j = 1; j < pts.length; j++) ctx.lineTo(pts[j].x, pts[j].y);
+        ctx.stroke();
+        ctx.restore();
+    }
+
+    var TAC_BOX_W = 8;
+    var TAC_BOX_H = 8;
+
+    function drawMeteorMark(ctx, m, isGhost, ghostAlpha) {
+        var p = projectPoint(m.position);
+        if (!p.visible) return;
+        if (p.x < -100 || p.x > window.innerWidth + 100) return;
+        if (p.y < -100 || p.y > window.innerHeight + 100) return;
+        var boxW = TAC_BOX_W, boxH = TAC_BOX_H;
+        var bx = p.x - boxW / 2;
+        var by = p.y - boxH / 2;
+        var color;
+        if (isGhost) color = 'rgba(74, 122, 74, ' + (ghostAlpha * 0.7).toFixed(2) + ')';
+        else color = TAC_GREEN;
+        drawSmallBrackets(ctx, bx, by, boxW, boxH, color, 0.5);
+        var speed = m.userData.speed;
+        var dist = m.position.length();
+        var timeToEarth = dist / Math.max(0.1, speed);
+        ctx.font = '7px "Courier New", monospace';
+        ctx.fillStyle = isGhost ? color : TAC_GREEN_TXT;
+        ctx.textAlign = 'left';
+        var tx = bx + boxW + 3;
+        ctx.fillText(m.userData.designation, tx, by + 4);
+        ctx.fillText('v' + speed.toFixed(1) + ' T' + timeToEarth.toFixed(1), tx, by + 12);
+    }
+
+    function drawTacticalOverlay() {
+        tacticalCtx.clearRect(0, 0, window.innerWidth, window.innerHeight);
+        if (GAME.displayMode !== 'tactical') return;
+
+        for (var i = 0; i < meteors.length; i++) drawMeteorMark(tacticalCtx, meteors[i], false, 1.0);
+        var nowMs = performance.now();
+        for (var g = 0; g < ghostMarks.length; g++) {
+            var ghost = ghostMarks[g];
+            var alpha = Math.max(0, 1 - (nowMs - ghost.spawnTime) / 1000 / ghost.lifeSec);
+            var pseudo = {
+                position: ghost.pos,
+                userData: { type: ghost.type, speed: 0, moveDir: new THREE.Vector3(0, 0, -1), damaged: true, designation: ghost.designation }
+            };
+            drawMeteorMark(tacticalCtx, pseudo, true, alpha);
+        }
+        for (var t = 0; t < traceMarks.length; t++) {
+            var tm = traceMarks[t];
+            var age = (nowMs - tm.spawnTime) / 1000;
+            var alpha2 = Math.max(0, 1 - age / tm.lifeSec);
+            if (alpha2 <= 0) continue;
+            drawTraceDashed(tacticalCtx, tm.pos, tm.moveDir, tm.speed, alpha2 * 0.95);
+        }
+        var moonP = projectPoint(MOON_POS);
+        if (moonP.visible && moonP.x > -200 && moonP.x < window.innerWidth + 200) {
+            var bx2 = moonP.x - 9, by2 = moonP.y - 9;
+            drawSmallBrackets(tacticalCtx, bx2, by2, 18, 18, moonBase.disabled ? '#ff5555' : TAC_GREEN, 0.5);
+            tacticalCtx.fillStyle = moonBase.disabled ? '#ff5555' : TAC_GREEN_TXT;
+            tacticalCtx.font = '8px "Courier New", monospace';
+            tacticalCtx.textAlign = 'left';
+            tacticalCtx.fillText(moonBase.disabled ? 'ЛУНА·ВЫВЕДЕНА' : 'ЛУНА', bx2 + 22, by2 + 5);
+            tacticalCtx.fillText('ТП:' + (moonBase.disabled ? '—' : inventory.torpedoes), bx2 + 22, by2 + 13);
+        }
+        for (var k = 0; k < supply.rockets.length; k++) {
+            var sr = supply.rockets[k];
+            var shP = projectPoint(sr.mesh.position);
+            if (!shP.visible) continue;
+            if (shP.x < -50 || shP.x > window.innerWidth + 50) continue;
+            tacticalCtx.strokeStyle = TAC_GREEN;
+            tacticalCtx.lineWidth = 1;
+            tacticalCtx.strokeRect(shP.x - 2, shP.y - 2, 4, 4);
+        }
+        for (var j = 0; j < projectiles.length; j++) {
+            var pr = projectiles[j];
+            var pp = projectPoint(pr.mesh.position);
+            if (!pp.visible) continue;
+            tacticalCtx.strokeStyle = pr.failed ? '#ff4040' : TAC_GREEN;
+            tacticalCtx.lineWidth = 1;
+            tacticalCtx.strokeRect(pp.x - 2, pp.y - 2, 4, 4);
+        }
+    }
+
+    // ==== АСУ ====
+    function asuEnqueueTarget(target) {
+        if (!target || target.userData.alive === false) return;
+        for (var i = 0; i < asuQueue.length; i++) {
+            if (asuQueue[i] === target) return;
+        }
+        asuQueue.push(target);
+    }
+    
+    function isTargetEngaged(t) {
+    for (var i = 0; i < projectiles.length; i++) {
+        if (projectiles[i].target === t && projectiles[i].alive) return true;
+    }
+    return false;
+}
+
+  function asuTick(dt) {
+    if (!game.playing || paused) return;
+    if (GAME.mode !== 'easy') return;
+
+    // чистим очередь: мёртвые + уже обстрелянные цели
+    for (var i = asuQueue.length - 1; i >= 0; i--) {
+        var t = asuQueue[i];
+        if (!t || t.userData.alive === false || meteors.indexOf(t) < 0) {
+            asuQueue.splice(i, 1);
+            continue;
+        }
+        if (isTargetEngaged(t)) {          // ← НОВОЕ
+            asuQueue.splice(i, 1);
+        }
+    }
+
+    if (asuQueue.length === 0) {
+        asuNextShotTimer = 0;
+        return;
+    }
+
+    asuNextShotTimer -= dt;
+    if (asuNextShotTimer > 0) return;
+
+    var target = asuQueue[0];
+    var bestDist = target.position.length();
+    for (var k = 1; k < asuQueue.length; k++) {
+        var d = asuQueue[k].position.length();
+        if (d < bestDist) { bestDist = d; target = asuQueue[k]; }
+    }
+
+    if (!target || target.userData.alive === false) return;
+    if (inventory.rockets <= 0) {
+        asuNextShotTimer = 1.5;
+        return;
+    }
+
+    if (asuMode === 'aimed' && Math.random() < 0.22) {
+        logLine('warn', 'АСУ · цель ' + target.userData.designation + ' упущена (прицельный)');
+        // в прицельном промах = цель отброшена, чтобы не долбить её вечно
+        var mi = asuQueue.indexOf(target);       // ← НОВОЕ
+        if (mi >= 0) asuQueue.splice(mi, 1);
+        asuNextShotTimer = 2.5;
+        return;
+    }
+
+    inventory.rockets--;
+    launchMissile(new THREE.Vector3(0, 0, 0), target, false);
+    game.launched++;
+
+    // снимаем с очереди сразу после пуска
+    var qi = asuQueue.indexOf(target);           // ← НОВОЕ
+    if (qi >= 0) asuQueue.splice(qi, 1);
+
+    logLine('ok', 'АСУ · пуск · ' + target.userData.designation + ' (ЯПР: ' + inventory.rockets + ')');
+    updateHUD();
+
+    asuNextShotTimer = asuMode === 'aimed' ? 2.5 : 0.8;
+}
+
+    function updateMeteors(dt) {
+        wave.timer -= dt;
+        if (wave.timer <= 0) rerollWave();
+        for (var i = meteors.length - 1; i >= 0; i--) {
+            var m = meteors[i];
+            if (m.userData.alive === false) continue;
+            m.position.addScaledVector(m.userData.moveDir, m.userData.speed * dt);
+            m.quaternion.setFromUnitVectors(UP_VEC, m.userData.moveDir);
+
+            if (m.userData.targetMoon && !m.userData.willMiss) {
+                var dToMoon = m.position.distanceTo(MOON_POS);
+                if (dToMoon < MOON_HIT) { onMoonHit(m); continue; }
+            }
+
+            var distSq = m.position.lengthSq();
+            if (distSq < EARTH_HIT * EARTH_HIT) { onEarthHit(m); continue; }
+            if (distSq > METEOR_DESPAWN * METEOR_DESPAWN) {
+                var desig = m.userData.designation;
+                var idx = meteors.indexOf(m);
+                if (idx >= 0) meteors.splice(idx, 1);
+                for (var q = asuQueue.length - 1; q >= 0; q--) if (asuQueue[q] === m) asuQueue.splice(q, 1);
+                meteorsGroup.remove(m); disposeGroup(m);
+                logLine('info', 'ЦЕЛЬ ' + desig + ' · УШЛА ИЗ ЗОНЫ ОБЗОРА');
+                continue;
+            }
+            var ud = m.userData;
+            var now = performance.now();
+            ud.head.rotation.x += dt * 2.5;
+            ud.head.rotation.y += dt * 2.0;
+            var pulse = 0.85 + Math.sin(now * 0.008 + ud.pulseSeed) * 0.15;
+            var glowR = ud.glowRadius;
+            ud.coreGlow.scale.set(glowR * 6 * pulse, glowR * 6 * pulse, 1);
+            var emissivePulse = 0.5 + Math.sin(now * 0.02 + ud.pulseSeed) * 0.15;
+            if (ud.head.material) {
+                ud.head.material.emissiveIntensity = emissivePulse;
+            }
+            var flickerBase = 0.9 + Math.sin(now * 0.005 + ud.pulseSeed) * 0.1;
+            for (var s = 0; s < ud.trail.sprites.length; s++) {
+                var sp = ud.trail.sprites[s];
+                var spd = sp.userData;
+                var waveF = 0.82 + Math.sin(now * 0.004 + spd.phase + spd.t * 6) * 0.18;
+                sp.material.opacity = spd.baseOpacity * flickerBase * waveF;
+            }
+        }
+        var nowMs = performance.now();
+        for (var g = ghostMarks.length - 1; g >= 0; g--) {
+            var ghost = ghostMarks[g];
+            if ((nowMs - ghost.spawnTime) / 1000 > ghost.lifeSec) ghostMarks.splice(g, 1);
+        }
+        for (var t = traceMarks.length - 1; t >= 0; t--) {
+            var tm = traceMarks[t];
+            if ((nowMs - tm.spawnTime) / 1000 > tm.lifeSec) traceMarks.splice(t, 1);
+        }
+
+        if (game.playing) {
+            game.spawnTimer -= dt;
+            if (game.spawnTimer <= 0) {
+                var baseInt = Math.max(GAME.minInterval, GAME.baseInterval / Math.max(0.4, wave.intensity));
+                game.spawnTimer = baseInt * (0.8 + Math.random() * 0.4);
+                var mete = spawnMeteor();
+
+                if (GAME.mode === 'easy' && !isInOperatorSector(mete.position)) {
+                    asuEnqueueTarget(mete);
+                }
+            }
+        }
+    }
+
+    var lastTime = performance.now();
+
+    function tick(now) {
+        var dtRaw = (now - lastTime) / 1000;
+        lastTime = now;
+        if (dtRaw > 0.1) dtRaw = 0.1;
+        var dt = paused ? 0 : dtRaw;
+
+        earthMesh.rotation.y += dt * 0.045;
+        cloudMesh.rotation.y += dt * 0.058;
+        moonMesh.rotation.y += dt * 0.015;
+
+        if (moonBase.disabled) {
+            moonDamageMarker.material.opacity = 0.6 + Math.sin(now * 0.005) * 0.35;
+            moonDamageMarker.scale.set(0.9 + Math.sin(now * 0.003) * 0.15, 0.9 + Math.sin(now * 0.003) * 0.15, 1);
+        } else if (moonBase.hp < moonBase.hpMax) {
+            moonDamageMarker.material.opacity = 0.25;
+            moonDamageMarker.scale.set(0.6, 0.6, 1);
+        }
+
+        sunUniforms.uTime.value += dtRaw * (paused ? 0.15 : 1);
+        var sunPulse = 1.0 + Math.sin(now * 0.0015) * 0.04;
+        sunCorona.scale.set(SUN_RADIUS * 10 * sunPulse, SUN_RADIUS * 10 * sunPulse, 1);
+        sunHalo.scale.set(SUN_RADIUS * 28 * sunPulse, SUN_RADIUS * 28 * sunPulse, 1);
+        sunHalo2.scale.set(SUN_RADIUS * 80 * sunPulse, SUN_RADIUS * 80 * sunPulse, 1);
+
+        var earthWorldPos = new THREE.Vector3().setFromMatrixPosition(earthGroup.matrixWorld);
+        var sunDir = new THREE.Vector3().subVectors(SUN_POS, earthWorldPos).normalize();
+        sunLight.position.copy(earthWorldPos).addScaledVector(sunDir, 150);
+        sunLight.target.position.copy(earthWorldPos);
+        sunLight.target.updateMatrixWorld();
+
+        if (game.playing && !paused) {
+            game.elapsed += dt;
+            var productionMul = getProductionMultiplier();
+            if (productionMul > 0) {
+                inventory.rocketTimer += dt * productionMul;
+                if (inventory.rocketTimer >= inventory.rocketReplenishInterval) {
+                    inventory.rocketTimer -= inventory.rocketReplenishInterval;
+                    if (inventory.rockets < inventory.rocketsMax) {
+                        inventory.rockets++;
+                        updateHUD();
+                    }
+                }
+            }
+            if (economy.active) {
+                economy.timer -= dt;
+                if (economy.timer <= 0) {
+                    logLine('ok', economy.active === 'save' ?
+                        'РЕМ. 1/2 ЗАВЕРШЁН · ПРОИЗВОДСТВО ВОССТАНОВЛЕНО' :
+                        'РЕМ. ПОЛ. ЗАВЕРШЁН · ПРОИЗВОДСТВО ВОССТАНОВЛЕНО');
+                    economy.active = null;
+                    economy.timer = 0;
+                }
+            }
+            if (inventory.torpedoReloadTimer > 0) {
+                inventory.torpedoReloadTimer = Math.max(0, inventory.torpedoReloadTimer - dt);
+            }
+            if (inventory.shortTorpedoReloadTimer > 0) {
+                inventory.shortTorpedoReloadTimer = Math.max(0, inventory.shortTorpedoReloadTimer - dt);
+            }
+            updateSupply(dt);
+            updateHUD();
+        }
+
+        if (!paused) {
+            updateMeteors(dt);
+            asuTick(dt);
+            updateProjectiles(dt);
+        }
+        for (var ei = activeEffects.length - 1; ei >= 0; ei--) {
+            var alive = activeEffects[ei].update();
+            if (alive === false) activeEffects.splice(ei, 1);
+        }
+
+        game.hitFlash = Math.max(0, game.hitFlash - dt * 1.8);
+
+        var shakeX = 0, shakeY = 0;
+        if (cameraShake > 0.001) {
+            shakeX = (Math.random() - 0.5) * cameraShake * 0.5;
+            shakeY = (Math.random() - 0.5) * cameraShake * 0.5;
+            cameraShake = Math.max(0, cameraShake - dt * 1.2);
+        }
+
+        var camX = camDist * Math.sin(camPhi) * Math.sin(camTheta);
+        var camY = camDist * Math.cos(camPhi);
+        var camZ = camDist * Math.sin(camPhi) * Math.cos(camTheta);
+        camera.position.set(camX + shakeX, camY + shakeY, camZ);
+
+        if (focusTarget && focusTarget.userData.alive !== false) {
+            focusBlend = Math.min(1, focusBlend + dtRaw * 3);
+            var mixed = new THREE.Vector3(0,0,0).lerp(focusTarget.position, focusBlend * 0.6);
+            camera.lookAt(mixed);
+        } else {
+            focusBlend = Math.max(0, focusBlend - dtRaw * 3);
+            camera.lookAt(0, 0, 0);
+        }
+
+        var domePulse = 0.5 + Math.sin(now * 0.0015) * 0.2;
+        domeMat.opacity = 0.015 + domePulse * 0.025;
+        edgeMat.opacity = 0.16 + domePulse * 0.10;
+        ringLines.forEach(function (l) {
+            l.material.opacity = 0.08 + domePulse * 0.06;
+        });
+
+        if (composer) composer.render();
+        else renderer.render(scene, camera);
+        drawRadar();
+        drawTacticalOverlay();
+
+        var now2 = new Date();
+        clockLabel.textContent = String(now2.getHours()).padStart(2, '0') + ':' +
+            String(now2.getMinutes()).padStart(2, '0') + ':' + String(now2.getSeconds()).padStart(2, '0');
+
+        requestAnimationFrame(tick);
+    }
+
+    window.addEventListener('resize', function () {
+        camera.aspect = window.innerWidth / window.innerHeight;
+        camera.updateProjectionMatrix();
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        if (composer) composer.setSize(window.innerWidth, window.innerHeight);
+        if (bloomPass) bloomPass.setSize(window.innerWidth, window.innerHeight);
+        resizeTacticalCanvas();
+    });
+
+    applyDisplayMode();
+    updateHUD();
+    logLine('ok', 'СИСТЕМА ПРОТИВОКОСМИЧЕСКОЙ ОБОРОНЫ "РЕДУТ" ИНИЦИАЛИЗИРОВАНА');
+    logLine('ok', 'РЛС "НЕБО": КАЛИБРОВКА ЗАВЕРШЕНА');
+    logLine('info', 'ПРОБЕЛ — ПАУЗА · ТРАССИРОВКА — КНОПКА НА РЛС');
+    logLine('info', 'ОЖИДАНИЕ БОЕВОГО ПРИКАЗА');
+
+    requestAnimationFrame(tick);
+});
+</script>
+</body>
+</html>
