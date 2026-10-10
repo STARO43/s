@@ -1570,12 +1570,7 @@ function initReading() {
         if (examBtn)      examBtn.addEventListener('click', () => openQD('quiz'));
         if (dictationBtn) dictationBtn.addEventListener('click', () => openQD('dict'));
 
-               const slovoBtn = document.getElementById('slovoBtn');
-        if (slovoBtn) {
-            slovoBtn.addEventListener('click', () => {
-                window.location.href = 'https://gramotinho.kick.sh/slovo.html';
-            });
-        }
+      
 
         function bindCaptionDoubleTap(captionEl, mode){
             if (!captionEl) return;
