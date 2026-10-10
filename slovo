@@ -1,0 +1,1032 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Слово</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@200;300;400&display=swap" rel="stylesheet">
+<style>
+    html, body {
+        margin: 0; padding: 0;
+        width: 100%; height: 100%;
+        overflow: hidden;
+        background: #000;
+        font-family: 'Segoe UI', sans-serif;
+        -webkit-text-size-adjust: 100%;
+    }
+    canvas { display: block; position: absolute; inset: 0; }
+
+    /* ===== Экран сложности ===== */
+    #difficultyScreen {
+        position: absolute;
+        inset: 0;
+        z-index: 30;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 26px;
+        background: #000;
+        transition: opacity 0.5s ease;
+    }
+    #difficultyScreen.hidden {
+        opacity: 0;
+        pointer-events: none;
+    }
+    #difficultyScreen h1 {
+        font-family: 'Manrope', 'Segoe UI', sans-serif;
+        font-weight: 200;
+        font-size: 26px;
+        letter-spacing: 0.35em;
+        text-indent: 0.35em;
+        color: rgba(255,255,255,0.85);
+        text-transform: uppercase;
+        margin: 0 0 10px 0;
+        text-align: center;
+    }
+    .diff-wrap {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 14px;
+        width: 280px;
+        max-width: calc(100vw - 60px);
+        background: rgba(255,255,255,0.04);
+        padding: 18px 20px;
+        border-radius: 18px;
+        border: 1px solid rgba(255,255,255,0.08);
+        backdrop-filter: blur(14px);
+        -webkit-backdrop-filter: blur(14px);
+        box-shadow: 0 8px 40px rgba(0,0,0,0.5);
+    }
+    .diff-label {
+        font-family: 'Manrope', 'Segoe UI', sans-serif;
+        font-weight: 300;
+        font-size: 12px;
+        letter-spacing: 0.3em;
+        text-indent: 0.3em;
+        color: rgba(255,255,255,0.45);
+        text-transform: uppercase;
+        user-select: none;
+    }
+    #difficulty {
+        position: relative;
+        display: flex;
+        align-items: center;
+        width: 220px;
+        height: 34px;
+        border-radius: 17px;
+        background: rgba(0,0,0,0.35);
+        border: 1px solid rgba(255,255,255,0.10);
+        padding: 3px;
+        box-sizing: border-box;
+        user-select: none;
+    }
+    #difficulty .slider {
+        position: absolute;
+        top: 3px; left: 3px;
+        width: calc((100% - 6px) / 3);
+        height: calc(100% - 6px);
+        border-radius: 14px;
+        background: linear-gradient(180deg, rgba(120,220,255,0.95), rgba(90,180,255,0.85));
+        box-shadow: 0 0 16px rgba(120,220,255,0.5);
+        transition: transform 0.28s cubic-bezier(.4,.0,.2,1);
+        pointer-events: none;
+    }
+    #difficulty[data-pos="0"] .slider { transform: translateX(0); }
+    #difficulty[data-pos="1"] .slider { transform: translateX(100%); }
+    #difficulty[data-pos="2"] .slider { transform: translateX(200%); }
+    #difficulty .seg {
+        flex: 1;
+        height: 100%;
+        border: none;
+        background: transparent;
+        cursor: pointer;
+        position: relative;
+        z-index: 1;
+        padding: 0;
+        display: flex; align-items: center; justify-content: center;
+        font-family: 'Manrope', 'Segoe UI', sans-serif;
+        font-weight: 300;
+        font-size: 12px;
+        letter-spacing: 0.05em;
+        color: rgba(255,255,255,0.7);
+        transition: color 0.25s;
+    }
+    #difficulty .seg.active { color: rgba(10,20,30,0.9); font-weight: 400; }
+    .diff-hint {
+        font-family: 'Manrope', 'Segoe UI', sans-serif;
+        font-weight: 200;
+        font-size: 11px;
+        letter-spacing: 0.15em;
+        color: rgba(255,255,255,0.35);
+        min-height: 14px;
+    }
+    #startBtn {
+        margin-top: 6px;
+        padding: 13px 34px;
+        border-radius: 13px;
+        border: 1px solid rgba(120,220,255,0.4);
+        background: rgba(120,220,255,0.10);
+        color: rgba(255,255,255,0.9);
+        font-family: 'Manrope', 'Segoe UI', sans-serif;
+        font-weight: 300;
+        font-size: 14px;
+        letter-spacing: 0.2em;
+        text-transform: uppercase;
+        cursor: pointer;
+        transition: background 0.25s, box-shadow 0.25s, transform 0.15s;
+    }
+    #startBtn:hover {
+        background: rgba(120,220,255,0.22);
+        box-shadow: 0 0 30px rgba(120,220,255,0.3);
+    }
+    #startBtn:active { transform: scale(0.97); }
+
+    /* ===== UI ввода ===== */
+    #ui {
+        position: absolute;
+        top: 22px; left: 50%;
+        transform: translateX(-50%);
+        z-index: 10;
+        display: flex; flex-direction: column; gap: 14px;
+        align-items: center;
+        background: rgba(255,255,255,0.04);
+        padding: 18px 20px;
+        border-radius: 18px;
+        border: 1px solid rgba(255,255,255,0.08);
+        backdrop-filter: blur(14px);
+        -webkit-backdrop-filter: blur(14px);
+        box-shadow: 0 8px 40px rgba(0,0,0,0.5);
+        transition: opacity 0.6s ease;
+        max-width: calc(100vw - 28px);
+    }
+    #ui.hidden { opacity: 0; pointer-events: none; }
+
+    .term-row {
+        display: flex; align-items: center;
+        gap: 8px;
+        background: rgba(0,0,0,0.35);
+        border: 1px solid rgba(255,255,255,0.10);
+        border-radius: 12px;
+        padding: 10px 16px;
+        width: 280px;
+        max-width: calc(100vw - 80px);
+        transition: border-color 0.25s, box-shadow 0.25s;
+    }
+    .term-row:focus-within {
+        border-color: rgba(120,220,255,0.55);
+        box-shadow: 0 0 0 3px rgba(120,220,255,0.10);
+    }
+    .term-prompt {
+        color: rgba(255,255,255,0.45);
+        font-size: 20px;
+        font-weight: 300;
+        user-select: none;
+    }
+    #wordInput {
+        flex: 1;
+        font-size: 20px;
+        padding: 0;
+        border: none;
+        background: transparent;
+        color: #fff;
+        outline: none;
+        min-width: 0;
+        letter-spacing: 6px;
+        text-transform: uppercase;
+        font-family: 'Segoe UI', Arial, sans-serif;
+        font-weight: 500;
+        caret-color: rgba(120,220,255,0.9);
+    }
+    #wordInput::placeholder {
+        color: rgba(255,255,255,0.22);
+        letter-spacing: 3px;
+        font-weight: 400;
+    }
+
+    #goBtn {
+        width: 46px; height: 46px;
+        border-radius: 50%;
+        border: 1px solid rgba(255,255,255,0.14);
+        background: rgba(255,255,255,0.06);
+        color: rgba(255,255,255,0.9);
+        cursor: pointer;
+        display: flex; align-items: center; justify-content: center;
+        transition: background 0.2s, transform 0.15s, box-shadow 0.2s;
+        padding: 0;
+    }
+    #goBtn svg { margin-left: 3px; }
+    #goBtn:hover {
+        background: rgba(120,220,255,0.18);
+        box-shadow: 0 0 24px rgba(120,220,255,0.25);
+    }
+    #goBtn:active { transform: scale(0.94); }
+
+    #speed {
+        position: relative;
+        display: flex;
+        align-items: center;
+        width: 160px;
+        height: 30px;
+        border-radius: 15px;
+        background: rgba(0,0,0,0.35);
+        border: 1px solid rgba(255,255,255,0.10);
+        padding: 3px;
+        box-sizing: border-box;
+        user-select: none;
+    }
+    #speed .slider {
+        position: absolute;
+        top: 3px; left: 3px;
+        width: calc((100% - 6px) / 3);
+        height: calc(100% - 6px);
+        border-radius: 12px;
+        background: linear-gradient(180deg, rgba(120,220,255,0.95), rgba(90,180,255,0.85));
+        box-shadow: 0 0 16px rgba(120,220,255,0.5);
+        transition: transform 0.28s cubic-bezier(.4,.0,.2,1);
+        pointer-events: none;
+    }
+    #speed[data-pos="0"] .slider { transform: translateX(0); }
+    #speed[data-pos="1"] .slider { transform: translateX(100%); }
+    #speed[data-pos="2"] .slider { transform: translateX(200%); }
+    #speed .seg {
+        flex: 1;
+        height: 100%;
+        border: none;
+        background: transparent;
+        cursor: pointer;
+        position: relative;
+        z-index: 1;
+        padding: 0;
+        display: flex; align-items: center; justify-content: center;
+    }
+    #speed .seg::after {
+        content: '';
+        display: block;
+        height: 3px;
+        border-radius: 2px;
+        background: rgba(255,255,255,0.35);
+        transition: background 0.25s;
+    }
+    #speed .seg[data-speed="slow"]::after   { width: 8px;  }
+    #speed .seg[data-speed="normal"]::after { width: 14px; }
+    #speed .seg[data-speed="fast"]::after   { width: 20px; }
+    #speed .seg.active::after { background: rgba(10,20,30,0.85); }
+
+    #hint {
+        position: absolute; bottom: 36px; left: 50%;
+        transform: translateX(-50%) translateY(8px);
+        z-index: 10;
+        font-family: 'Manrope', 'Segoe UI', sans-serif;
+        font-weight: 200;
+        font-size: 13px;
+        letter-spacing: 0.55em;
+        text-indent: 0.55em;
+        color: rgba(255,255,255,0.55);
+        text-transform: uppercase;
+        opacity: 0;
+        transition: opacity 1s ease, transform 1s ease;
+        white-space: nowrap;
+        user-select: none;
+        text-shadow: 0 0 20px rgba(255,255,255,0.15);
+        pointer-events: none;
+    }
+    #hint.show {
+        opacity: 1;
+        transform: translateX(-50%) translateY(0);
+        animation: hintPulse 2.6s ease-in-out infinite;
+    }
+    @keyframes hintPulse {
+        0%, 100% { opacity: 0.55; }
+        50%      { opacity: 1; }
+    }
+
+    #counter {
+        position: absolute;
+        bottom: 30px;
+        left: 50%;
+        transform: translateX(-50%);
+        z-index: 12;
+        font-family: 'Manrope', 'Segoe UI', sans-serif;
+        font-weight: 200;
+        font-size: 13px;
+        letter-spacing: 0.3em;
+        text-indent: 0.3em;
+        color: rgba(255,255,255,0.45);
+        text-transform: uppercase;
+        user-select: none;
+        pointer-events: none;
+        transition: opacity 0.5s ease;
+        white-space: nowrap;
+    }
+    #counter .num {
+        color: rgba(120,220,255,0.85);
+        font-weight: 400;
+    }
+    #counter.hidden { opacity: 0; }
+
+    /* ===== Оверлей ошибки (огонь) ===== */
+    #errorScreen {
+        position: absolute;
+        inset: 0;
+        z-index: 35;
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.4s ease;
+        cursor: pointer;
+    }
+    #errorScreen.show {
+        opacity: 1;
+        pointer-events: auto;
+    }
+    #errorScreen canvas {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+    }
+
+    /* ===== Оверлей победы (песок "УРА") ===== */
+    #winScreen {
+        position: absolute;
+        inset: 0;
+        z-index: 39;
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.6s ease;
+    }
+    #winScreen.show {
+        opacity: 1;
+        pointer-events: auto;
+    }
+    #winScreen canvas {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+    }
+
+    /* Кнопка выхода снизу — символьный стиль */
+    #exitBtn {
+        position: absolute;
+        bottom: 22px;
+        left: 50%;
+        transform: translateX(-50%);
+        z-index: 1;
+        padding: 8px 18px;
+        border: 1px solid rgba(255,255,255,0.35);
+        background: rgba(0,0,0,0.5);
+        color: rgba(255,255,255,0.9);
+        font-family: 'Courier New', monospace;
+        font-weight: 700;
+        font-size: 14px;
+        letter-spacing: 0.15em;
+        cursor: pointer;
+        user-select: none;
+        transition: background 0.2s, color 0.2s, border-color 0.2s;
+    }
+    #exitBtn:hover {
+        background: rgba(255,255,255,0.1);
+        border-color: rgba(255,255,255,0.7);
+    }
+    #exitBtn:active {
+        transform: translateX(-50%) scale(0.96);
+    }
+
+    @media (max-width: 600px) {
+        #ui { padding: 14px 16px; gap: 12px; }
+        .term-row { width: 220px; padding: 8px 14px; }
+        .term-prompt { font-size: 18px; }
+        #wordInput { font-size: 18px; letter-spacing: 5px; }
+        #goBtn { width: 42px; height: 42px; }
+        #speed { width: 140px; height: 28px; }
+        #hint { font-size: 11px; letter-spacing: 0.45em; bottom: 28px; }
+        #counter { font-size: 11px; letter-spacing: 0.25em; bottom: 24px; }
+        #difficultyScreen h1 { font-size: 20px; }
+        .diff-wrap { width: 240px; padding: 14px 16px; }
+        #difficulty { width: 190px; height: 32px; }
+        #exitBtn { font-size: 12px; padding: 7px 14px; }
+    }
+</style>
+</head>
+<body>
+<canvas id="canvas"></canvas>
+
+<div id="difficultyScreen">
+    <h1>Слово</h1>
+    <div class="diff-wrap">
+        <span class="diff-label">Сложность</span>
+        <div id="difficulty" data-pos="2">
+            <div class="slider"></div>
+            <button class="seg" data-count="5"  data-pos="0">5</button>
+            <button class="seg" data-count="10" data-pos="1">10</button>
+            <button class="seg" data-count="15" data-pos="2">15</button>
+        </div>
+        <span class="diff-hint" id="diffHint">15 слов</span>
+        <button id="startBtn">Начать</button>
+    </div>
+</div>
+
+<div id="ui" class="hidden">
+    <div class="term-row" id="termRow">
+        <span class="term-prompt">›</span>
+        <input id="wordInput" type="text" maxlength="15" value="" placeholder="СЛОВО" autocomplete="off" spellcheck="false">
+    </div>
+    <button id="goBtn" aria-label="Показать">
+        <svg width="16" height="18" viewBox="0 0 16 18" fill="currentColor">
+            <path d="M0 0 L16 9 L0 18 Z"/>
+        </svg>
+    </button>
+    <div id="speed" data-pos="2">
+        <div class="slider"></div>
+        <button class="seg" data-speed="slow"   aria-label="Медленно"></button>
+        <button class="seg" data-speed="normal" aria-label="Средне"></button>
+        <button class="seg" data-speed="fast"   aria-label="Как сейчас"></button>
+    </div>
+</div>
+
+<div id="hint">для продолжения тап</div>
+<div id="counter" class="hidden">Введено: <span class="num" id="counterNum">0</span> / <span class="num" id="counterTotal">15</span></div>
+
+<div id="errorScreen">
+    <canvas id="errorEffectCanvas"></canvas>
+</div>
+
+<div id="winScreen">
+    <canvas id="winEffectCanvas"></canvas>
+    <button id="exitBtn">[ ВЫЙТИ ]</button>
+</div>
+
+<script src="dict.js"></script>
+
+<script>
+if (typeof DICT_RAW === 'undefined') {
+    document.body.innerHTML =
+        '<div style="color:#fff;font-family:sans-serif;padding:40px;line-height:1.6">' +
+        '<h2>dict.js not loaded</h2>' +
+        '<p>Put dict.js next to this HTML file.</p>' +
+        '</div>';
+    throw new Error('DICT_RAW not loaded');
+}
+
+const DICTIONARY = new Set(DICT_RAW.split(','));
+console.log('words:', DICTIONARY.size);
+</script>
+
+<script type="module">
+import { createFlameEffect, createSandEffect } from './win-effects.js';
+
+const canvas = document.getElementById('canvas');
+const ctx = canvas.getContext('2d');
+const input = document.getElementById('wordInput');
+const goBtn = document.getElementById('goBtn');
+const uiBox = document.getElementById('ui');
+const hint = document.getElementById('hint');
+const speedBox = document.getElementById('speed');
+const termRow = document.getElementById('termRow');
+const counterEl = document.getElementById('counter');
+const counterNum = document.getElementById('counterNum');
+const counterTotal = document.getElementById('counterTotal');
+const difficultyScreen = document.getElementById('difficultyScreen');
+const difficultyBox = document.getElementById('difficulty');
+const diffHint = document.getElementById('diffHint');
+const startBtn = document.getElementById('startBtn');
+
+const winScreen = document.getElementById('winScreen');
+const winEffectCanvas = document.getElementById('winEffectCanvas');
+const errorScreen = document.getElementById('errorScreen');
+const errorEffectCanvas = document.getElementById('errorEffectCanvas');
+const exitBtn = document.getElementById('exitBtn');
+
+let winEffect = null;
+let errorEffect = null;
+
+let wordsRequired = 15;
+let wordsDone = 0;
+let lastWord = '';
+
+const BASE_APPEAR = 1400;
+const BASE_HOLD   = 500;
+const BASE_SHRINK = 950;
+
+const SPEED_MULT = { slow: 1.8, normal: 1.35, fast: 1.0 };
+const SPEED_POS  = { slow: 0,   normal: 1,    fast: 2   };
+
+let APPEAR_DURATION = BASE_APPEAR;
+let HOLD_BIG        = BASE_HOLD;
+let SHRINK_DURATION = BASE_SHRINK;
+
+function applySpeed(name) {
+    const m = SPEED_MULT[name] || 1.0;
+    APPEAR_DURATION = Math.round(BASE_APPEAR * m);
+    HOLD_BIG        = Math.round(BASE_HOLD   * m);
+    SHRINK_DURATION = Math.round(BASE_SHRINK * m);
+    speedBox.dataset.pos = SPEED_POS[name] ?? 2;
+    [...speedBox.querySelectorAll('.seg')].forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.speed === name);
+    });
+}
+
+function applyDifficulty(count) {
+    wordsRequired = count;
+    const pos = count === 5 ? 0 : (count === 10 ? 1 : 2);
+    difficultyBox.dataset.pos = pos;
+    [...difficultyBox.querySelectorAll('.seg')].forEach(btn => {
+        btn.classList.toggle('active', parseInt(btn.dataset.count, 10) === count);
+    });
+    diffHint.textContent = count + ' слов';
+    updateCounter();
+}
+
+const BIG_HEIGHT_RATIO = 0.95;
+const DOT_ZONE_RATIO   = 0.22;
+
+const FINAL_ALPHA_BASE = 0.55;
+const FINAL_ALPHA_AMP  = 0.22;
+const FINAL_PULSE_MS   = 2400;
+
+let letters = [];
+let word = '';
+let animationStart = 0;
+let animationActive = false;
+let animationEnded = false;
+
+let viewW = 0, viewH = 0, dpr = 1;
+
+const offCanvas = document.createElement('canvas');
+const offCtx = offCanvas.getContext('2d');
+
+const DOTTED_MAP = { 'Ё': 'Е', 'Й': 'И' };
+
+function resizeCanvas() {
+    dpr = window.devicePixelRatio || 1;
+    viewW = window.innerWidth;
+    viewH = window.innerHeight;
+    canvas.width  = Math.floor(viewW * dpr);
+    canvas.height = Math.floor(viewH * dpr);
+    canvas.style.width  = viewW + 'px';
+    canvas.style.height = viewH + 'px';
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+}
+
+function drawGlyphToOffscreen(char, size) {
+    offCanvas.width  = size;
+    offCanvas.height = size;
+    offCtx.clearRect(0, 0, size, size);
+    offCtx.fillStyle = '#fff';
+    offCtx.textAlign = 'center';
+    offCtx.textBaseline = 'middle';
+
+    const baseChar = DOTTED_MAP[char] || char;
+    const isYo = (char === 'Ё');
+    const isYi = (char === 'Й');
+    const hasMark = isYo || isYi;
+
+    const dotZone = hasMark ? size * DOT_ZONE_RATIO : 0;
+    const availH  = size - dotZone;
+
+    let fontSize = Math.floor(availH * 0.95);
+    offCtx.font = `bold ${fontSize}px 'Segoe UI', Arial, sans-serif`;
+    const m = offCtx.measureText(baseChar);
+    const maxW = size * 0.85;
+    if (m.width > maxW) {
+        fontSize = Math.floor(fontSize * (maxW / m.width));
+        offCtx.font = `bold ${fontSize}px 'Segoe UI', Arial, sans-serif`;
+    }
+
+    const baseY = dotZone + availH / 2;
+    offCtx.fillText(baseChar, size / 2, baseY);
+
+    if (isYo) {
+        const dotR  = Math.max(2.5, size * 0.055);
+        const dotY  = dotZone * 0.55;
+        const dotDx = size * 0.15;
+        offCtx.beginPath();
+        offCtx.arc(size / 2 - dotDx, dotY, dotR, 0, Math.PI * 2);
+        offCtx.fill();
+        offCtx.beginPath();
+        offCtx.arc(size / 2 + dotDx, dotY, dotR, 0, Math.PI * 2);
+        offCtx.fill();
+    } else if (isYi) {
+        const strokeW = Math.max(2.5, size * 0.06);
+        const len     = size * 0.22;
+        const cx      = size * 0.58;
+        const cy      = dotZone * 0.55;
+        const x1 = cx - len / 2;
+        const x2 = cx + len / 2;
+        offCtx.lineCap = 'round';
+        offCtx.lineWidth = strokeW;
+        offCtx.beginPath();
+        offCtx.moveTo(x1, cy);
+        offCtx.lineTo(x2, cy);
+        offCtx.strokeStyle = '#fff';
+        offCtx.stroke();
+    }
+}
+
+function sampleLetterPoints(char, size, step) {
+    drawGlyphToOffscreen(char, size);
+    const img = offCtx.getImageData(0, 0, size, size).data;
+    const points = [];
+    const r = Math.max(1, Math.floor(step * 0.45));
+
+    for (let y = 0; y < size; y += step) {
+        for (let x = 0; x < size; x += step) {
+            let hit = false;
+            for (let dy = -r; dy <= r && !hit; dy += r) {
+                for (let dx = -r; dx <= r; dx += r) {
+                    const px = Math.floor(x + dx);
+                    const py = Math.floor(y + dy);
+                    if (px < 0 || py < 0 || px >= size || py >= size) continue;
+                    const idx = (py * size + px) * 4 + 3;
+                    if (img[idx] > 40) { hit = true; break; }
+                }
+            }
+            if (hit) {
+                const nx = x / size;
+                const ny = y / size;
+                const delay = ny * 0.7 + nx * 0.3;
+                points.push({ x, y, delay });
+            }
+        }
+    }
+    return points;
+}
+
+function calcSmallSizeBig(bigSize) {
+    const base = bigSize * 0.025;
+    const clamped = Math.max(10, Math.min(28, base));
+    return Math.max(8, Math.round(clamped));
+}
+
+function calcSmallSizeSmall(finalSize) {
+    const base = finalSize * 0.07;
+    const clamped = Math.max(3, Math.min(8, base));
+    return Math.max(3, Math.round(clamped));
+}
+
+function buildLetterData(char, bigSize, smallSize, originX, originY, targetX, targetY) {
+    const smallBig   = calcSmallSizeBig(bigSize);
+    const smallSmall = calcSmallSizeSmall(smallSize);
+
+    const bigPoints   = sampleLetterPoints(char, bigSize,   smallBig);
+    const smallPoints = sampleLetterPoints(char, smallSize, smallSmall);
+
+    return {
+        char,
+        bigPoints, smallPoints,
+        bigSize, smallSize,
+        stepBig: smallBig,
+        stepSmall: smallSmall,
+        originX, originY,
+        targetX, targetY
+    };
+}
+
+function buildWord(text) {
+    const chars = text.split('');
+    letters = [];
+    if (chars.length === 0) return;
+
+    const padding = Math.max(8, viewW * 0.03);
+    const gapRatio = 0.10;
+
+    const maxByWidth  = (viewW - 2 * padding) / (chars.length + (chars.length - 1) * gapRatio);
+    const maxByHeight = viewH * 0.30;
+    const finalSize   = Math.max(36, Math.floor(Math.min(maxByWidth, maxByHeight)));
+
+    const gap = finalSize * gapRatio;
+    const totalWidth = chars.length * finalSize + (chars.length - 1) * gap;
+    const startX = (viewW - totalWidth) / 2;
+    const finalY = viewH * 0.72;
+
+    const bigSize = Math.floor(Math.min(viewW, viewH) * BIG_HEIGHT_RATIO);
+
+    chars.forEach((ch, i) => {
+        const targetX = startX + i * (finalSize + gap) + finalSize / 2;
+        const targetY = finalY;
+        letters.push(buildLetterData(
+            ch,
+            bigSize, finalSize,
+            viewW / 2, viewH / 2,
+            targetX, targetY
+        ));
+    });
+}
+
+function easeOutCubic(t) { return 1 - Math.pow(1 - t, 3); }
+function easeInOutCubic(t) {
+    return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+}
+
+function drawBigFromPoints(L, cx, cy, progress) {
+    const size = L.bigSize;
+    const step = L.stepBig;
+
+    ctx.font = `bold ${step}px 'Segoe UI', Arial, sans-serif`;
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+
+    for (const pt of L.bigPoints) {
+        const pointStart = Math.min(0.85, pt.delay);
+        const localRaw = (progress - pointStart) / Math.max(0.0001, 1 - pointStart);
+        const local = Math.max(0, Math.min(1, localRaw));
+        if (local <= 0) continue;
+
+        const eased = easeOutCubic(local);
+        const alpha = eased;
+        const scale = 0.5 + eased * 0.5;
+        const offsetY = (1 - eased) * 10;
+
+        const px = cx - size / 2 + pt.x;
+        const py = cy - size / 2 + pt.y + offsetY;
+
+        ctx.globalAlpha = alpha;
+        ctx.save();
+        ctx.translate(px, py);
+        ctx.scale(scale, scale);
+        ctx.fillStyle = '#fff';
+        ctx.fillText(L.char, 0, 0);
+        ctx.restore();
+    }
+    ctx.globalAlpha = 1;
+}
+
+function drawShrinking(L, progress, alpha) {
+    const t = easeInOutCubic(progress);
+
+    const cx = L.originX + (L.targetX - L.originX) * t;
+    const cy = L.originY + (L.targetY - L.originY) * t;
+    const currentSize = L.bigSize + (L.smallSize - L.bigSize) * t;
+    const stepSize = L.stepBig + (L.stepSmall - L.stepBig) * t;
+
+    const scaleFactor = currentSize / L.bigSize;
+
+    ctx.font = `bold ${stepSize}px 'Segoe UI', Arial, sans-serif`;
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.globalAlpha = alpha;
+
+    for (const pt of L.bigPoints) {
+        const px = cx - currentSize / 2 + pt.x * scaleFactor;
+        const py = cy - currentSize / 2 + pt.y * scaleFactor;
+        ctx.fillStyle = '#fff';
+        ctx.fillText(L.char, px, py);
+    }
+    ctx.globalAlpha = 1;
+}
+
+function drawFinalLetter(L, alpha) {
+    const size = L.smallSize;
+    const step = L.stepSmall;
+
+    ctx.font = `bold ${step}px 'Segoe UI', Arial, sans-serif`;
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.globalAlpha = alpha;
+
+    for (const pt of L.smallPoints) {
+        const px = L.targetX - size / 2 + pt.x;
+        const py = L.targetY - size / 2 + pt.y;
+        ctx.fillStyle = '#fff';
+        ctx.fillText(L.char, px, py);
+    }
+    ctx.globalAlpha = 1;
+}
+
+function render(now) {
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    ctx.fillStyle = '#000';
+    ctx.fillRect(0, 0, viewW, viewH);
+
+    if (letters.length === 0) {
+        requestAnimationFrame(render);
+        return;
+    }
+
+    if (!animationActive && !animationEnded) {
+        requestAnimationFrame(render);
+        return;
+    }
+
+    const elapsed = animationActive ? (now - animationStart) : Infinity;
+    const perLetter = APPEAR_DURATION + HOLD_BIG + SHRINK_DURATION;
+
+    const pulse = FINAL_ALPHA_BASE +
+        FINAL_ALPHA_AMP * (0.5 + 0.5 * Math.sin(now / FINAL_PULSE_MS * Math.PI * 2));
+
+    for (let i = 0; i < letters.length; i++) {
+        const L = letters[i];
+        const letterStart = i * perLetter;
+        const appearEnd   = letterStart + APPEAR_DURATION;
+        const holdEnd     = appearEnd   + HOLD_BIG;
+        const shrinkEnd   = holdEnd     + SHRINK_DURATION;
+
+        if (elapsed >= shrinkEnd) {
+            drawFinalLetter(L, pulse);
+        } else if (elapsed >= holdEnd) {
+            const p = (elapsed - holdEnd) / SHRINK_DURATION;
+            drawShrinking(L, p, 1);
+        } else if (elapsed >= appearEnd) {
+            drawBigFromPoints(L, L.originX, L.originY, 1);
+        } else if (elapsed >= letterStart) {
+            const p = (elapsed - letterStart) / APPEAR_DURATION;
+            drawBigFromPoints(L, L.originX, L.originY, p);
+        }
+    }
+
+    if (animationActive && elapsed > letters.length * perLetter) {
+        animationActive = false;
+        animationEnded = true;
+        hint.classList.add('show');
+    }
+
+    requestAnimationFrame(render);
+}
+
+function startAnimation() {
+    animationStart = performance.now();
+    animationActive = true;
+    animationEnded = false;
+    hint.classList.remove('show');
+}
+
+function clearWord() {
+    letters = [];
+    animationActive = false;
+    animationEnded = false;
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    ctx.fillStyle = '#000';
+    ctx.fillRect(0, 0, viewW, viewH);
+}
+
+function updateCounter() {
+    counterNum.textContent = wordsDone;
+    counterTotal.textContent = wordsRequired;
+}
+
+function showUI() {
+    uiBox.classList.remove('hidden');
+    counterEl.classList.remove('hidden');
+    hint.classList.remove('show');
+    input.focus();
+    input.select();
+}
+
+function hideUI() {
+    uiBox.classList.add('hidden');
+    counterEl.classList.add('hidden');
+    hint.classList.remove('show');
+}
+
+/* ===== Оверлеи ===== */
+
+function showWinScreen() {
+    winScreen.classList.add('show');
+    if (winEffect) winEffect.stop();
+    winEffect = createSandEffect(winEffectCanvas);
+    winEffect.start();
+}
+
+function hideWinScreen() {
+    winScreen.classList.remove('show');
+    if (winEffect) { winEffect.stop(); winEffect = null; }
+}
+
+function showErrorScreen() {
+    errorScreen.classList.add('show');
+    if (errorEffect) errorEffect.stop();
+    errorEffect = createFlameEffect(errorEffectCanvas);
+    errorEffect.start();
+}
+
+function hideErrorScreen() {
+    errorScreen.classList.remove('show');
+    if (errorEffect) { errorEffect.stop(); errorEffect = null; }
+}
+
+/* ===== Логика игры ===== */
+
+function applyWord() {
+    const raw = (input.value || '').toUpperCase().replace(/[^А-ЯЁA-Z]/g, '');
+    if (raw.length === 0) {
+        return;
+    }
+
+    const lower = raw.toLowerCase();
+
+    // нельзя одно и то же слово подряд
+    if (lower === lastWord) {
+        input.value = '';
+        return;
+    }
+
+    if (!DICTIONARY.has(lower)) {
+        input.value = '';
+        hideUI();
+        showErrorScreen();
+        return;
+    }
+
+    // запомнили последнее слово
+    lastWord = lower;
+
+    word = raw;
+    input.value = '';
+
+    hideUI();
+    resizeCanvas();
+    buildWord(word);
+    startAnimation();
+
+    wordsDone++;
+    updateCounter();
+}
+
+function nextWordOrWin() {
+    if (wordsDone >= wordsRequired) {
+        showWinScreen();
+    } else {
+        showUI();
+    }
+}
+
+function resetGame() {
+    wordsDone = 0;
+    lastWord = '';
+    updateCounter();
+    clearWord();
+    hideWinScreen();
+    hideErrorScreen();
+    hideUI();
+    difficultyScreen.classList.remove('hidden');
+}
+
+/* ===== События ===== */
+
+difficultyBox.addEventListener('click', e => {
+    const btn = e.target.closest('.seg');
+    if (!btn) return;
+    applyDifficulty(parseInt(btn.dataset.count, 10));
+});
+
+startBtn.addEventListener('click', () => {
+    difficultyScreen.classList.add('hidden');
+    clearWord();
+    hideWinScreen();
+    hideErrorScreen();
+    showUI();
+});
+
+goBtn.addEventListener('click', applyWord);
+input.addEventListener('keydown', e => { if (e.key === 'Enter') applyWord(); });
+
+canvas.addEventListener('click', () => {
+    if (animationEnded) {
+        clearWord();
+        nextWordOrWin();
+    } else if (!animationActive) {
+        showUI();
+    }
+});
+
+speedBox.addEventListener('click', e => {
+    const btn = e.target.closest('.seg');
+    if (!btn) return;
+    applySpeed(btn.dataset.speed);
+});
+
+// огонь: тап → новая игра
+errorScreen.addEventListener('click', () => {
+    hideErrorScreen();
+    resetGame();
+});
+
+// победа: тап по экрану НЕ начинает новую игру.
+// Только кнопка [ ВЫЙТИ ].
+exitBtn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    hideWinScreen();
+    resetGame();
+});
+
+let resizeTimer = null;
+window.addEventListener('resize', () => {
+    clearTimeout(resizeTimer);
+    resizeTimer = setTimeout(() => {
+        resizeCanvas();
+        if (letters.length > 0) buildWord(word);
+    }, 150);
+});
+
+applySpeed('fast');
+applyDifficulty(15);
+resizeCanvas();
+updateCounter();
+requestAnimationFrame(render);
+</script>
+</body>
+</html>
