@@ -1,0 +1,1056 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#f7f0dd">
+<title>Вайбиньо</title>
+<style>
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent;margin:0;padding:0}
+html,body{height:100%;overflow:hidden;overscroll-behavior:none;touch-action:none;-webkit-user-select:none;user-select:none}
+
+:root{
+  --paper:#f7f0dd;
+  --ink:#3d3529;
+  --ink-soft:rgba(61,53,41,.35);
+  --ui-bg:rgba(247,240,221,.28);
+  --ui-border:rgba(61,53,41,.1);
+  --swatch:#e9c878;
+  --line:#3d3529;
+}
+html,body{background:var(--paper);transition:background 1.6s ease}
+
+canvas{
+  display:block;position:fixed;inset:0;width:100%;height:100%;
+  touch-action:none;cursor:default;
+}
+
+/* ============================================================
+   БАЗА ДЛЯ ВСЕХ КРУГЛЫХ КНОПОК
+   Прозрачный фон с лёгким блюром
+   ============================================================ */
+.circ-btn{
+  position:fixed;
+  width:52px;height:52px;border-radius:100px;
+  background:var(--ui-bg);
+  border:.5px solid var(--ui-border);
+  backdrop-filter:blur(14px) saturate(140%);
+  -webkit-backdrop-filter:blur(14px) saturate(140%);
+  display:flex;align-items:center;justify-content:center;
+  cursor:pointer;z-index:10;
+  padding:0;font-family:inherit;
+  transition:
+    transform .4s cubic-bezier(.25,.1,.25,1),
+    background 1.6s ease,
+    border-color 1.6s ease;
+  -webkit-user-select:none;user-select:none;
+  color:var(--ink);
+  box-shadow:0 2px 12px rgba(61,53,41,.04);
+}
+.circ-btn:active{transform:scale(.92)}
+
+/* ============================================================
+   ПЕРЕКЛЮЧАТЕЛЬ ФОНОВ — слева вверху
+   Кнопка-«закрашенный холст»
+   ============================================================ */
+#palette{
+  top:max(14px,env(safe-area-inset-top));
+  left:max(14px,env(safe-area-inset-left));
+}
+#palette svg{
+  width:34px;height:34px;
+  display:block;
+  overflow:visible;
+  animation:paletteMorph 6s ease-in-out infinite;
+}
+@keyframes paletteMorph{
+  0%,100%{transform:scale(1)}
+  50%{transform:scale(1.04)}
+}
+#palette .fill{
+  transform-origin:center;
+  animation:fillWobble 5s ease-in-out infinite;
+}
+@keyframes fillWobble{
+  0%,100%{transform:scale(1) rotate(0)}
+  50%{transform:scale(1.02) rotate(.5deg)}
+}
+#palette.press svg{
+  animation:paletteSplash .9s cubic-bezier(.34,1.4,.64,1);
+}
+@keyframes paletteSplash{
+  0%{transform:scale(1)}
+  40%{transform:scale(1.15)}
+  100%{transform:scale(1)}
+}
+
+/* ============================================================
+   ПЕРЕКЛЮЧАТЕЛЬ РАЗДЕЛОВ — по центру вверху
+   ============================================================ */
+#boy{
+  top:max(14px,env(safe-area-inset-top));
+  left:50%;
+  margin-left:-26px;
+}
+#boy .face{
+  font-size:26px;line-height:1;
+  display:inline-block;
+  transform-origin:center bottom;
+  opacity:.75;
+  animation:boySway 5s ease-in-out infinite;
+}
+@keyframes boySway{
+  0%,100%{transform:rotate(-3deg)}
+  50%{transform:rotate(3deg)}
+}
+
+/* ============================================================
+   ПЕРЕКЛЮЧАТЕЛЬ ТЕМЫ — справа вверху
+   ============================================================ */
+#theme{
+  top:max(14px,env(safe-area-inset-top));
+  right:max(14px,env(safe-area-inset-right));
+}
+#theme .bulb{
+  font-size:22px;line-height:1;
+  display:inline-block;
+  transition:transform .6s cubic-bezier(.34,1.56,.64,1),filter .6s ease;
+}
+:root:not(.night) #theme .bulb{
+  filter:drop-shadow(0 0 7px rgba(255,205,90,.8)) saturate(1.1) brightness(1.05);
+  transform:rotate(0deg) scale(1.05);
+}
+:root.night #theme .bulb{
+  filter:grayscale(1) opacity(.4);
+  transform:rotate(-8deg);
+}
+
+/* ============================================================
+   СПИРАЛЬ — кнопка очистки дублей
+   Вдвое меньше, появляется снизу по центру.
+   НЕ прозрачная — с лёгкой бумажной подложкой, чтобы
+   читалась поверх смайлов.
+   ============================================================ */
+#clear-btn{
+  position:fixed;
+  bottom:max(36px,env(safe-area-inset-bottom));
+  left:50%;
+  width:38px;height:38px;
+  margin-left:-19px;
+  border:.5px solid var(--ui-border);
+  background:var(--ui-bg);
+  backdrop-filter:blur(10px) saturate(140%);
+  -webkit-backdrop-filter:blur(10px) saturate(140%);
+  border-radius:100px;
+  padding:0;font-family:inherit;
+  cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  color:var(--line);
+  opacity:0;pointer-events:none;
+  transform:translateY(24px) scale(.85);
+  transition:
+    opacity .9s cubic-bezier(.25,.1,.25,1),
+    transform .9s cubic-bezier(.34,1.2,.64,1),
+    background 1.6s ease,
+    border-color 1.6s ease;
+  -webkit-user-select:none;user-select:none;
+  z-index:12;
+  box-shadow:0 4px 14px rgba(61,53,41,.06);
+}
+#clear-btn.visible{
+  opacity:1;pointer-events:auto;
+  transform:translateY(0) scale(1);
+}
+#clear-btn:active{
+  transform:translateY(0) scale(.9);
+}
+#clear-btn svg{
+  width:100%;height:100%;
+  display:block;
+  overflow:visible;
+}
+#clear-btn svg path{
+  fill:none;
+  stroke:currentColor;
+  stroke-linecap:round;
+  stroke-linejoin:round;
+  stroke-width:1.6;
+  vector-effect:non-scaling-stroke;
+  opacity:.6;
+  transform-origin:center;
+  transform-box:fill-box;
+  animation:spiralRotate 32s linear infinite;
+}
+@keyframes spiralRotate{
+  from{transform:rotate(0)}
+  to{transform:rotate(360deg)}
+}
+#clear-btn.press svg path{
+  animation:spiralWhip 1s cubic-bezier(.5,0,.3,1) forwards;
+}
+@keyframes spiralWhip{
+  0%{transform:rotate(0);opacity:.6}
+  60%{opacity:.75}
+  100%{transform:rotate(540deg);opacity:0}
+}
+
+/* ============================================================
+   ЭКРАН ЗАВЕРШЕНИЯ
+   ============================================================ */
+#end{
+  position:fixed;inset:0;z-index:100;background:var(--paper);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:20px;padding:32px;opacity:0;pointer-events:none;
+  transition:opacity 1.6s cubic-bezier(.25,.1,.25,1),background 1.6s ease;
+}
+#end.visible{opacity:1;pointer-events:auto}
+#end-row{display:flex;align-items:center;gap:18px}
+#end-icon{font-size:44px;line-height:1;opacity:.7}
+#end-time{
+  font-size:56px;font-weight:200;letter-spacing:-2px;
+  color:var(--ink);font-variant-numeric:tabular-nums;
+  font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display",Georgia,sans-serif;
+}
+#end-platform{
+  font-size:26px;line-height:1;
+  opacity:.55;
+  filter:saturate(.6) brightness(.9);
+}
+#end-restart{
+  margin-top:20px;border:none;background:transparent;
+  color:var(--ink-soft);
+  padding:12px;border-radius:100px;cursor:pointer;
+  border:1px solid var(--ink-soft);opacity:.5;
+  transition:opacity .8s ease, transform .3s ease;
+  display:flex;align-items:center;justify-content:center;
+  width:48px;height:48px;
+}
+#end-restart:active{opacity:1;transform:scale(.92)}
+#end-restart svg{width:20px;height:20px}
+
+@media(max-width:400px){
+  #boy .face{font-size:22px}
+  #boy{margin-left:-23px;width:46px;height:46px}
+  .circ-btn{width:46px;height:46px}
+  #clear-btn{width:34px;height:34px;margin-left:-17px}
+  #end-time{font-size:44px;letter-spacing:-1px}
+  #end-icon{font-size:36px}
+  #end-platform{font-size:22px}
+}
+</style>
+</head>
+<body>
+<canvas id="field"></canvas>
+
+<!-- Переключатель фонов — «закрашенный холст» слева вверху -->
+<button id="palette" class="circ-btn" aria-label="Сменить фон">
+  <svg viewBox="0 0 40 40">
+    <!-- Холст -->
+    <rect x="7" y="9" width="26" height="22" rx="1.5"
+          fill="var(--paper)" stroke="currentColor" stroke-width="1.1"
+          opacity=".9"/>
+    <!-- Полная заливка с неровными краями -->
+    <path class="fill" d="M9 12 Q20 10 31 12 Q32 20 31 28 Q20 30 9 28 Q8 20 9 12 Z"
+          fill="var(--swatch)" opacity=".9"/>
+    <!-- Текстура -->
+    <path d="M10 16 Q20 14 30 16" stroke="currentColor" stroke-width=".6"
+          fill="none" opacity=".28"/>
+    <path d="M11 22 Q20 24 29 22" stroke="currentColor" stroke-width=".6"
+          fill="none" opacity=".28"/>
+  </svg>
+</button>
+
+<!-- Переключатель разделов — по центру вверху -->
+<button id="boy" class="circ-btn" aria-label="Сменить раздел">
+  <span class="face">🌿</span>
+</button>
+
+<!-- Переключатель темы — справа вверху -->
+<button id="theme" class="circ-btn" aria-label="Сменить тему">
+  <span class="bulb">💡</span>
+</button>
+
+<!-- Спираль — кнопка очистки дублей снизу по центру -->
+<button id="clear-btn" aria-label="Очистить дубли">
+  <svg viewBox="0 0 100 100" preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg">
+    <path id="spiral-path" d=""/>
+  </svg>
+</button>
+
+<div id="end">
+  <div id="end-row">
+    <div id="end-icon"></div>
+    <div id="end-time">0:00</div>
+    <div id="end-platform">🖥️</div>
+  </div>
+
+  <button id="end-restart" aria-label="Начать заново">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
+      <path d="M18 6L6 18M6 6l12 12"/>
+    </svg>
+  </button>
+</div>
+
+<script>
+'use strict';
+
+/* ============================================================
+   ГЕНЕРАЦИЯ СПИРАЛИ
+   ============================================================ */
+function makeSpiralPath(cx, cy, a, b, turns){
+  const steps = 360;
+  const maxTheta = turns * 2 * Math.PI;
+  let d = '';
+  for(let i = 0; i <= steps; i++){
+    const theta = (i / steps) * maxTheta;
+    const r = a + b * theta;
+    const x = cx + r * Math.cos(theta);
+    const y = cy + r * Math.sin(theta);
+    d += (i === 0 ? 'M' : 'L') + x.toFixed(2) + ' ' + y.toFixed(2);
+    if(i < steps) d += ' ';
+  }
+  return d;
+}
+
+/* ============================================================
+   ШЕСТЬ ТЕМ
+   ============================================================ */
+const LIGHT_THEMES = [
+  {
+    id:'honey', paper:'#f7f0dd',
+    warmTop:'rgba(255,235,180,0.55)',
+    warmMid:'rgba(250,225,190,0.28)',
+    vignette:'rgba(220,195,155,0.22)',
+    ink:'#3d3529', inkSoft:'rgba(61,53,41,.35)',
+    uiBg:'rgba(247,240,221,.28)', uiBorder:'rgba(61,53,41,.1)',
+    swatch:'#e9c878'
+  },
+  {
+    id:'rose', paper:'#f5e6dd',
+    warmTop:'rgba(255,205,180,0.55)',
+    warmMid:'rgba(250,200,180,0.28)',
+    vignette:'rgba(220,170,150,0.22)',
+    ink:'#4a3630', inkSoft:'rgba(74,54,48,.35)',
+    uiBg:'rgba(245,230,221,.28)', uiBorder:'rgba(74,54,48,.1)',
+    swatch:'#e8a890'
+  },
+  {
+    id:'tea', paper:'#e9ecdd',
+    warmTop:'rgba(220,235,190,0.55)',
+    warmMid:'rgba(210,225,180,0.28)',
+    vignette:'rgba(180,200,160,0.22)',
+    ink:'#333d30', inkSoft:'rgba(51,61,48,.35)',
+    uiBg:'rgba(233,236,221,.28)', uiBorder:'rgba(51,61,48,.1)',
+    swatch:'#b8c890'
+  }
+];
+const DARK_THEMES = [
+  {
+    id:'night', paper:'#1a1814',
+    coolTop:'rgba(60,58,52,0.3)',
+    ink:'#e8e0d0', inkSoft:'rgba(232,224,208,.3)',
+    uiBg:'rgba(26,24,20,.32)', uiBorder:'rgba(232,224,208,.1)',
+    swatch:'#8a7a60'
+  },
+  {
+    id:'dusk', paper:'#16161f',
+    coolTop:'rgba(70,70,110,0.4)',
+    ink:'#dcdce8', inkSoft:'rgba(220,220,232,.3)',
+    uiBg:'rgba(22,22,31,.32)', uiBorder:'rgba(220,220,232,.1)',
+    swatch:'#6060a0'
+  },
+  {
+    id:'moss', paper:'#131a14',
+    coolTop:'rgba(45,65,50,0.4)',
+    ink:'#d8e0d4', inkSoft:'rgba(216,224,212,.3)',
+    uiBg:'rgba(19,26,20,.32)', uiBorder:'rgba(216,224,212,.1)',
+    swatch:'#4a6a50'
+  }
+];
+
+/* ===== РАЗДЕЛЫ ===== */
+const ORDER = ['home', 'wild', 'sea', 'pets', 'cozy'];
+const CATS = {
+  home:['🌿','🍃','🌱','🌸','🌼','🪻','🌾','🍀','🌺','🌻','🪷','🌷'],
+  wild:['🐻','🦊','🐰','🌲','🌳','🍂','🍁','🦔','🐿️','🦌','🦉','🍄'],
+  sea:['🐋','🐬','🌊','🫧','🐚','🪸','🐠','🦭','🐙','🪼','💧','🐟'],
+  pets:['🐱','🐶','🐦','🐠','🐢','🦜','🐴','🐑','🐷',
+        '🐮','🦃','🪿','🐝','🐔','🐓'],
+  cozy:['📖','📚','✏️','🖊️','💻','☕','🥐','🪴','🎧','📓',
+        '📱','📷','⏰']
+};
+const MODE_ICON = {
+  home:'🌿', wild:'🦔', sea:'🐟', pets:'🐔', cozy:'☕'
+};
+const PENTA = [130.81,146.83,164.81,196.00,220.00,261.63,293.66,329.63,392.00,440.00];
+
+/* ===== СПРАЙТЫ ===== */
+const spriteCache = new Map();
+function getSprite(emoji){
+  let c = spriteCache.get(emoji);
+  if(c) return c;
+  c = document.createElement('canvas');
+  c.width = c.height = 96;
+  const x = c.getContext('2d');
+  x.font = '76px "Apple Color Emoji","Segoe UI Emoji","Noto Color Emoji",sans-serif';
+  x.textAlign = 'center';
+  x.textBaseline = 'middle';
+  x.globalAlpha = 0.75;
+  x.fillText(emoji, 48, 50);
+  spriteCache.set(emoji, c);
+  return c;
+}
+
+/* ===== ТЕКСТУРА БУМАГИ ===== */
+let noiseTileLight = null;
+let noiseTileDark  = null;
+
+function makeNoiseTile(light, grainRGB){
+  const size = 96;
+  const tile = document.createElement('canvas');
+  tile.width = tile.height = size;
+  const tctx = tile.getContext('2d');
+  const img = tctx.createImageData(size, size);
+  const d = img.data;
+  const [baseR, baseG, baseB] = grainRGB;
+  const alpha = light ? 16 : 12;
+  for(let i = 0; i < d.length; i += 4){
+    const shift = (Math.random() * 60) | 0;
+    d[i]   = baseR + shift;
+    d[i+1] = baseG + shift;
+    d[i+2] = baseB + shift;
+    d[i+3] = alpha;
+  }
+  tctx.putImageData(img, 0, 0);
+  return tile;
+}
+
+function getNoiseTile(light, grainRGB){
+  const key = (light ? 'L' : 'D') + grainRGB.join(',');
+  if(light){
+    if(!noiseTileLight || noiseTileLight._key !== key){
+      noiseTileLight = makeNoiseTile(true, grainRGB);
+      noiseTileLight._key = key;
+    }
+    return noiseTileLight;
+  } else {
+    if(!noiseTileDark || noiseTileDark._key !== key){
+      noiseTileDark = makeNoiseTile(false, grainRGB);
+      noiseTileDark._key = key;
+    }
+    return noiseTileDark;
+  }
+}
+
+/* ===== СОСТОЯНИЕ ===== */
+let canvas, ctx, paperCanvas;
+let W, H, CELL, OX, OY, GRID;
+let grid, currentCat = 'home';
+let night = false;
+let lightIdx = 0;
+let darkIdx = 0;
+let audioCtx = null, locked = false, animating = false;
+let animPhase = null, needsDraw = true;
+let startTime = 0, gameActive = false;
+let popAnims = new Map();
+let lastHover = -1;
+let DPR = Math.min(devicePixelRatio || 1, 2);
+const IS_MOBILE = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent) || matchMedia('(pointer:coarse)').matches;
+
+let clearBtn = null;
+let clearBtnBusy = false;
+
+/* ============================================================
+   СОХРАНЕНИЕ
+   ============================================================ */
+function loadState(){
+  try{
+    const raw = localStorage.getItem('vibinio');
+    if(!raw) return;
+    const s = JSON.parse(raw);
+    if(typeof s.night === 'boolean') night = s.night;
+    if(typeof s.lightIdx === 'number' && s.lightIdx >= 0 && s.lightIdx < LIGHT_THEMES.length) lightIdx = s.lightIdx;
+    if(typeof s.darkIdx === 'number' && s.darkIdx >= 0 && s.darkIdx < DARK_THEMES.length) darkIdx = s.darkIdx;
+  }catch(e){}
+}
+function saveState(){
+  try{
+    localStorage.setItem('vibinio', JSON.stringify({night, lightIdx, darkIdx}));
+  }catch(e){}
+}
+
+/* ============================================================
+   ПРИМЕНЕНИЕ ТЕМЫ
+   ============================================================ */
+function currentTheme(){
+  return night ? DARK_THEMES[darkIdx] : LIGHT_THEMES[lightIdx];
+}
+
+function applyTheme(){
+  const t = currentTheme();
+  const root = document.documentElement;
+  root.classList.toggle('night', night);
+
+  root.style.setProperty('--paper',      t.paper);
+  root.style.setProperty('--ink',        t.ink);
+  root.style.setProperty('--ink-soft',   t.inkSoft);
+  root.style.setProperty('--ui-bg',      t.uiBg);
+  root.style.setProperty('--ui-border',  t.uiBorder);
+  root.style.setProperty('--swatch',     t.swatch);
+  root.style.setProperty('--line',       t.ink);
+
+  const meta = document.querySelector('meta[name="theme-color"]');
+  if(meta) meta.setAttribute('content', t.paper);
+
+  buildPaper();
+  needsDraw = true;
+}
+
+/* ============================================================
+   ИНИЦИАЛИЗАЦИЯ
+   ============================================================ */
+function init(){
+  canvas = document.getElementById('field');
+  ctx = canvas.getContext('2d', {alpha:false});
+  clearBtn = document.getElementById('clear-btn');
+
+  const spiral = document.getElementById('spiral-path');
+  if(spiral) spiral.setAttribute('d', makeSpiralPath(50, 50, 1, 1.02, 6));
+
+  const plat = document.getElementById('end-platform');
+  if(plat) plat.textContent = IS_MOBILE ? '📱' : '🖥️';
+
+  loadState();
+  resize();
+  buildPaper();
+  bindEvents();
+  updateBoyFace();
+  applyTheme();
+  startGame();
+  raf();
+}
+
+function resize(){
+  W = innerWidth; H = innerHeight;
+  DPR = Math.min(devicePixelRatio || 1, IS_MOBILE ? 1.5 : 2);
+  canvas.width = Math.floor(W * DPR);
+  canvas.height = Math.floor(H * DPR);
+  canvas.style.width = W + 'px';
+  canvas.style.height = H + 'px';
+  ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
+
+  GRID = IS_MOBILE ? 5 : 10;
+
+  const padTop = Math.max(84, H * 0.12);
+  const padBot = Math.max(90, H * 0.15);
+  const availH = H - padTop - padBot;
+  const availW = W - 40;
+  CELL = Math.min(availW / GRID, availH / GRID);
+  OX = (W - CELL * GRID) / 2;
+  OY = padTop + (availH - CELL * GRID) / 2;
+
+  grid = Array.from({length:GRID}, () => Array(GRID).fill(null));
+}
+
+/* ============================================================
+   БУМАГА
+   ============================================================ */
+function buildPaper(){
+  paperCanvas = document.createElement('canvas');
+  paperCanvas.width = Math.floor(W * DPR);
+  paperCanvas.height = Math.floor(H * DPR);
+  const p = paperCanvas.getContext('2d', {alpha:false});
+  p.setTransform(DPR, 0, 0, DPR, 0, 0);
+
+  const t = currentTheme();
+
+  p.fillStyle = t.paper;
+  p.fillRect(0, 0, W, H);
+
+  if(!night){
+    if(t.warmTop){
+      const warmTop = p.createRadialGradient(
+        W*0.5, H*0.12, 0,
+        W*0.5, H*0.12, Math.max(W,H)*0.85
+      );
+      warmTop.addColorStop(0, t.warmTop);
+      warmTop.addColorStop(0.55, t.warmMid || 'rgba(255,225,165,0.15)');
+      warmTop.addColorStop(1, 'rgba(0,0,0,0)');
+      p.fillStyle = warmTop;
+      p.fillRect(0, 0, W, H);
+    }
+    if(t.vignette){
+      const vignette = p.createRadialGradient(
+        W*0.5, H*0.55, Math.min(W,H)*0.45,
+        W*0.5, H*0.55, Math.max(W,H)*0.8
+      );
+      vignette.addColorStop(0, 'rgba(0,0,0,0)');
+      vignette.addColorStop(1, t.vignette);
+      p.fillStyle = vignette;
+      p.fillRect(0, 0, W, H);
+    }
+  } else {
+    if(t.coolTop){
+      const coolTop = p.createRadialGradient(
+        W*0.5, H*0.2, 0,
+        W*0.5, H*0.2, Math.max(W,H)*0.75
+      );
+      coolTop.addColorStop(0, t.coolTop);
+      coolTop.addColorStop(1, 'rgba(0,0,0,0)');
+      p.fillStyle = coolTop;
+      p.fillRect(0, 0, W, H);
+    }
+  }
+
+  const grainRGB = night ? [190,180,165] : [130,100,65];
+  const tile = getNoiseTile(!night, grainRGB);
+  const pattern = p.createPattern(tile, 'repeat');
+  if(pattern){
+    p.fillStyle = pattern;
+    p.fillRect(0, 0, W, H);
+  }
+
+  const grainCount = IS_MOBILE ? 300 : 700;
+  for(let i = 0; i < grainCount; i++){
+    const x = Math.random() * W;
+    const y = Math.random() * H;
+    const a = Math.random() * 0.04;
+    p.fillStyle = night
+      ? `rgba(232,224,208,${a})`
+      : `rgba(130,100,65,${a})`;
+    p.fillRect(x, y, 1.5, 1.5);
+  }
+}
+
+/* ===== СОБЫТИЯ ===== */
+function bindEvents(){
+  canvas.addEventListener('mousemove', onMove);
+  canvas.addEventListener('mousedown', onDown);
+  canvas.addEventListener('touchstart', onTouch, {passive:false});
+  clearBtn.addEventListener('click', onClearClick);
+  document.getElementById('theme').addEventListener('click', toggleTheme);
+  document.getElementById('palette').addEventListener('click', cycleBackground);
+  document.getElementById('boy').addEventListener('click', cycleCat);
+  document.getElementById('end-restart').addEventListener('click', closeEnd);
+  addEventListener('resize', () => { resize(); buildPaper(); needsDraw = true; });
+
+  ['gesturestart','gesturechange','gestureend'].forEach(e =>
+    document.addEventListener(e, ev => ev.preventDefault())
+  );
+  document.addEventListener('touchmove', e => { if(e.touches.length > 1) e.preventDefault(); }, {passive:false});
+  document.addEventListener('contextmenu', e => e.preventDefault());
+}
+
+/* ===== ИГРА ===== */
+function startGame(){
+  for(let r = 0; r < GRID; r++)
+    for(let c = 0; c < GRID; c++)
+      grid[r][c] = null;
+  popAnims.clear();
+  locked = false;
+  animating = false;
+  animPhase = null;
+  startTime = performance.now();
+  gameActive = true;
+  lastHover = -1;
+  clearBtnBusy = false;
+  clearBtn.classList.remove('visible', 'press');
+  updateUI();
+  needsDraw = true;
+}
+
+function onTouch(e){
+  e.preventDefault();
+  const t = e.touches[0];
+  if(t) tap(t.clientX, t.clientY);
+}
+function onDown(e){ tap(e.clientX, e.clientY); }
+
+function onMove(e){
+  if(IS_MOBILE || !gameActive || locked || animating) return;
+  const col = Math.floor((e.clientX - OX) / CELL);
+  const row = Math.floor((e.clientY - OY) / CELL);
+  if(col < 0 || col >= GRID || row < 0 || row >= GRID) return;
+  const idx = row * GRID + col;
+  if(idx === lastHover) return;
+  lastHover = idx;
+  if(grid[row][col]) return;
+  if(!audioCtx) initAudio();
+  const pool = CATS[currentCat];
+  const emoji = pool[(Math.random() * pool.length) | 0];
+  grid[row][col] = emoji;
+  popAnims.set(idx, {t: performance.now(), dur: 900});
+  playNote(emoji);
+  checkFull();
+  if(!animating) needsDraw = true;
+}
+
+function tap(cx, cy){
+  if(!gameActive || locked || animating) return;
+  const col = Math.floor((cx - OX) / CELL);
+  const row = Math.floor((cy - OY) / CELL);
+  if(col < 0 || col >= GRID || row < 0 || row >= GRID) return;
+  if(!audioCtx) initAudio();
+
+  const pool = CATS[currentCat];
+  const emoji = pool[(Math.random() * pool.length) | 0];
+  const idx = row * GRID + col;
+
+  if(IS_MOBILE){
+    grid[row][col] = emoji;
+    popAnims.set(idx, {t: performance.now(), dur: 900});
+    playNote(emoji);
+    checkFull();
+    if(!animating) needsDraw = true;
+  } else {
+    if(!grid[row][col]) return;
+    grid[row][col] = emoji;
+    popAnims.set(idx, {t: performance.now(), dur: 900});
+    playNote(emoji);
+    needsDraw = true;
+  }
+}
+
+/* ===== РАЗДЕЛЫ ===== */
+function cycleCat(){
+  if(animating) return;
+  const i = ORDER.indexOf(currentCat);
+  currentCat = ORDER[(i + 1) % ORDER.length];
+  updateBoyFace();
+  startGame();
+}
+
+function updateBoyFace(){
+  const face = document.querySelector('#boy .face');
+  if(face) face.textContent = MODE_ICON[currentCat];
+}
+
+function checkFull(){
+  for(let r = 0; r < GRID; r++)
+    for(let c = 0; c < GRID; c++)
+      if(!grid[r][c]) return;
+  locked = true;
+  updateUI();
+}
+
+function updateUI(){
+  if(locked && gameActive){
+    clearBtn.classList.add('visible');
+  } else {
+    clearBtn.classList.remove('visible');
+  }
+}
+
+/* ============================================================
+   НАЖАТИЕ КНОПКИ ОЧИСТКИ
+   ============================================================ */
+function onClearClick(e){
+  e.preventDefault();
+  if(!gameActive || !locked || animating) return;
+  if(clearBtnBusy) return;
+  clearBtnBusy = true;
+
+  clearBtn.classList.add('press');
+  setTimeout(() => {
+    clearBtn.classList.remove('press');
+    clearBtnBusy = false;
+  }, 1100);
+
+  applyClear();
+}
+
+function applyClear(){
+  if(!gameActive || !locked || animating) return;
+
+  const toRemove = new Set();
+
+  for(let c = 0; c < GRID; c++){
+    let s = 0;
+    while(s < GRID){
+      const v = grid[s][c];
+      if(!v){ s++; continue; }
+      let e = s + 1;
+      while(e < GRID && grid[e][c] === v) e++;
+      if(e - s >= 2) for(let r = s; r < e; r++) toRemove.add(r * GRID + c);
+      s = e;
+    }
+  }
+
+  for(let r = 0; r < GRID; r++){
+    let s = 0;
+    while(s < GRID){
+      const v = grid[r][s];
+      if(!v){ s++; continue; }
+      let e = s + 1;
+      while(e < GRID && grid[r][e] === v) e++;
+      if(e - s >= 2) for(let c = s; c < e; c++) toRemove.add(r * GRID + c);
+      s = e;
+    }
+  }
+
+  if(toRemove.size === 0){
+    locked = false;
+    updateUI();
+    showEnd();
+    return;
+  }
+
+  animating = true;
+  const now = performance.now();
+  const removed = [];
+  toRemove.forEach(idx => {
+    const r = Math.floor(idx / GRID), c = idx % GRID;
+    removed.push({row:r, col:c, emoji:grid[r][c], idx});
+    grid[r][c] = null;
+    popAnims.delete(idx);
+  });
+
+  const finalGrid = Array.from({length:GRID}, () => Array(GRID).fill(null));
+  for(let c = 0; c < GRID; c++){
+    const existing = [];
+    for(let r = 0; r < GRID; r++) if(grid[r][c]) existing.push(grid[r][c]);
+    for(let i = 0; i < existing.length; i++)
+      finalGrid[GRID - existing.length + i][c] = existing[i];
+  }
+
+  const fallers = [];
+  for(let c = 0; c < GRID; c++){
+    const existing = [];
+    for(let r = 0; r < GRID; r++)
+      if(grid[r][c]) existing.push({row:r, emoji:grid[r][c]});
+    const n = existing.length;
+    for(let i = 0; i < n; i++){
+      const fromRow = existing[i].row;
+      const toRow = GRID - n + i;
+      if(fromRow !== toRow)
+        fallers.push({fromRow, toRow, col:c, emoji:existing[i].emoji});
+    }
+  }
+
+  for(let r = 0; r < GRID; r++)
+    for(let c = 0; c < GRID; c++)
+      grid[r][c] = finalGrid[r][c];
+
+  playDissolve();
+  animPhase = {start: now, removed, fallers, fadeDur: 1100, fallDur: 1300, delay: 500};
+}
+
+/* ===== АНИМАЦИЯ ===== */
+function raf(){
+  if(animating && animPhase){
+    const elapsed = performance.now() - animPhase.start;
+    const fallT = Math.max(0, Math.min((elapsed - animPhase.delay) / animPhase.fallDur, 1));
+    const fe = fallT < 0.5
+      ? 8 * fallT * fallT * fallT * fallT
+      : 1 - Math.pow(-2 * fallT + 2, 4) / 2;
+    drawFrame(fe, elapsed);
+
+    if(elapsed > animPhase.delay + animPhase.fallDur + 120){
+      animating = false;
+      animPhase = null;
+      popAnims.clear();
+      checkFull();
+      const empty = grid.some(row => row.some(cell => !cell));
+      if(empty) locked = false;
+      updateUI();
+      needsDraw = true;
+    }
+  } else {
+    let anyPop = false;
+    const now = performance.now();
+    popAnims.forEach(a => { if(now - a.t < a.dur) anyPop = true; });
+    if(anyPop || needsDraw){
+      renderStatic(now);
+      needsDraw = false;
+      if(!anyPop) popAnims.clear();
+    }
+  }
+  requestAnimationFrame(raf);
+}
+
+/* ===== ОТРИСОВКА ===== */
+function drawSprite(emoji, x, y, scale, alpha, bleed){
+  const sp = getSprite(emoji);
+  const size = CELL * 0.82 * scale;
+  const half = size / 2;
+
+  ctx.globalAlpha = alpha;
+
+  if(bleed > 0){
+    ctx.globalAlpha = alpha * bleed * 0.25;
+    const bSize = size * (1 + bleed * 0.35);
+    ctx.drawImage(sp, x - bSize/2, y - bSize/2, bSize, bSize);
+  }
+
+  ctx.globalAlpha = alpha;
+  ctx.drawImage(sp, x - half, y - half, size, size);
+  ctx.globalAlpha = 1;
+}
+
+function renderStatic(now){
+  ctx.drawImage(paperCanvas, 0, 0, W, H);
+
+  for(let r = 0; r < GRID; r++){
+    for(let c = 0; c < GRID; c++){
+      if(!grid[r][c]) continue;
+      const key = r * GRID + c;
+      const x = OX + c * CELL + CELL / 2;
+      const y = OY + r * CELL + CELL / 2;
+      const pop = popAnims.get(key);
+
+      if(pop){
+        const t = Math.min((now - pop.t) / pop.dur, 1);
+        if(t < 1){
+          const e = 1 - Math.pow(1 - t, 3);
+          const scale = 0.6 + 0.4 * e;
+          const alpha = e * 0.75;
+          const bleed = (1 - t) * 0.8;
+          drawSprite(grid[r][c], x, y, scale, alpha, bleed);
+          continue;
+        }
+        popAnims.delete(key);
+      }
+      drawSprite(grid[r][c], x, y, 1, 0.75, 0);
+    }
+  }
+}
+
+function drawFrame(fallEased, elapsed){
+  ctx.drawImage(paperCanvas, 0, 0, W, H);
+
+  const fallingSet = new Set();
+  animPhase.fallers.forEach(f => fallingSet.add(f.toRow * GRID + f.col));
+
+  animPhase.removed.forEach(cell => {
+    const t = Math.min(elapsed / animPhase.fadeDur, 1);
+    const e = 1 - Math.pow(1 - t, 2);
+    const scale = 1 - e * 0.7;
+    const alpha = (1 - e) * 0.75;
+    const bleed = e * 1.5;
+    if(alpha <= 0.01) return;
+    const x = OX + cell.col * CELL + CELL / 2;
+    const y = OY + cell.row * CELL + CELL / 2;
+    drawSprite(cell.emoji, x, y, Math.max(scale, 0.01), alpha, bleed);
+  });
+
+  for(let r = 0; r < GRID; r++){
+    for(let c = 0; c < GRID; c++){
+      if(fallingSet.has(r * GRID + c)) continue;
+      if(grid[r][c])
+        drawSprite(grid[r][c], OX + c * CELL + CELL/2, OY + r * CELL + CELL/2, 1, 0.75, 0);
+    }
+  }
+
+  animPhase.fallers.forEach(f => {
+    const y = f.fromRow * CELL + (f.toRow - f.fromRow) * CELL * fallEased;
+    drawSprite(f.emoji, OX + f.col * CELL + CELL/2, OY + y + CELL/2, 1, 0.75, 0);
+  });
+}
+
+/* ===== ЗАВЕРШЕНИЕ ===== */
+function showEnd(){
+  gameActive = false;
+  clearBtn.classList.remove('visible', 'press');
+  const elapsed = performance.now() - startTime;
+  const sec = Math.floor(elapsed / 1000);
+  const m = Math.floor(sec / 60);
+  const s = sec % 60;
+  document.getElementById('end-time').textContent = `${m}:${String(s).padStart(2,'0')}`;
+  document.getElementById('end-icon').textContent = MODE_ICON[currentCat] || '🌿';
+  document.getElementById('end').classList.add('visible');
+}
+
+function closeEnd(){
+  document.getElementById('end').classList.remove('visible');
+  currentCat = 'home';
+  updateBoyFace();
+  startGame();
+}
+
+/* ===== ТЕМА / ФОН ===== */
+function toggleTheme(){
+  night = !night;
+  saveState();
+  applyTheme();
+}
+
+function cycleBackground(){
+  const btn = document.getElementById('palette');
+  btn.classList.add('press');
+  setTimeout(() => btn.classList.remove('press'), 900);
+
+  if(night){
+    darkIdx = (darkIdx + 1) % DARK_THEMES.length;
+  } else {
+    lightIdx = (lightIdx + 1) % LIGHT_THEMES.length;
+  }
+  saveState();
+  applyTheme();
+}
+
+/* ===== ЗВУК ===== */
+function initAudio(){
+  try{
+    const AC = window.AudioContext || window.webkitAudioContext;
+    if(AC) audioCtx = new AC();
+  }catch(e){}
+}
+
+function playNote(emoji){
+  if(!audioCtx) return;
+  if(audioCtx.state === 'suspended') audioCtx.resume();
+
+  let hash = 0;
+  for(let i = 0; i < emoji.length; i++)
+    hash = (hash * 31 + emoji.charCodeAt(i)) | 0;
+
+  let freq = PENTA[Math.abs(hash) % PENTA.length];
+  if(currentCat === 'cozy') freq *= 0.94;
+
+  const osc = audioCtx.createOscillator();
+  const gain = audioCtx.createGain();
+  osc.type = 'sine';
+  osc.frequency.value = freq;
+
+  const now = audioCtx.currentTime;
+  gain.gain.setValueAtTime(0, now);
+  gain.gain.linearRampToValueAtTime(0.025, now + 0.06);
+  gain.gain.exponentialRampToValueAtTime(0.001, now + 2.2);
+
+  osc.connect(gain).connect(audioCtx.destination);
+  osc.start(now);
+  osc.stop(now + 2.2);
+}
+
+function playDissolve(){
+  if(!audioCtx) return;
+  if(audioCtx.state === 'suspended') audioCtx.resume();
+
+  const c = audioCtx, now = c.currentTime;
+
+  const o = c.createOscillator(), g = c.createGain();
+  o.type = 'sine';
+  o.frequency.setValueAtTime(180, now);
+  o.frequency.exponentialRampToValueAtTime(90, now + 1.0);
+  g.gain.setValueAtTime(0, now);
+  g.gain.linearRampToValueAtTime(0.018, now + 0.1);
+  g.gain.exponentialRampToValueAtTime(0.0001, now + 1.4);
+  o.connect(g).connect(c.destination);
+  o.start(now); o.stop(now + 1.5);
+
+  const o2 = c.createOscillator(), g2 = c.createGain();
+  o2.type = 'sine';
+  o2.frequency.setValueAtTime(520, now);
+  o2.frequency.exponentialRampToValueAtTime(780, now + 0.6);
+  g2.gain.setValueAtTime(0, now);
+  g2.gain.linearRampToValueAtTime(0.012, now + 0.15);
+  g2.gain.exponentialRampToValueAtTime(0.0001, now + 1.0);
+  o2.connect(g2).connect(c.destination);
+  o2.start(now); o2.stop(now + 1.1);
+}
+
+addEventListener('DOMContentLoaded', init);
+</script>
+</body>
+</html>
