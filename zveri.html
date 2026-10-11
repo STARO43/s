@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="theme-color" content="#000000">
-<title>Зверинья</title>
+<title>Зверьё моё</title>
 <style>
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;margin:0;padding:0;-webkit-font-smoothing:antialiased}
 html,body{height:100%;overflow:hidden;overscroll-behavior:none;background:var(--bg);transition:background .4s ease}
@@ -15,7 +15,6 @@ html,body{height:100%;overflow:hidden;overscroll-behavior:none;background:var(--
 --ui-bg:rgba(28,28,30,.72);
 --ui-border:rgba(255,255,255,.08);
 --ui-active:rgba(255,255,255,.12);
---tab-inactive:rgba(255,255,255,.35);
 }
 :root.light{
 --bg:#f2f2f7;
@@ -23,7 +22,6 @@ html,body{height:100%;overflow:hidden;overscroll-behavior:none;background:var(--
 --ui-bg:rgba(255,255,255,.78);
 --ui-border:rgba(0,0,0,.06);
 --ui-active:rgba(0,0,0,.08);
---tab-inactive:rgba(0,0,0,.35);
 }
 canvas{display:block;position:fixed;inset:0;width:100%;height:100%;touch-action:none;cursor:pointer}
 canvas.locked{cursor:default}
@@ -99,9 +97,12 @@ home:['🐱','🐶','🐷','🐮','🐰','🐔','🐴','🦃','🐤','🦆','�
 wild:['🐻','🦊','🐺','🐗','🦌','🦔','🐸','🐍','🦉','🦅','🐼','🐯','🦁','🐵','🦇','🐀'],
 sea:['🐙','🦑','🦐','🦞','🦀','🐡','🐠','🐬','🐳','🐋','🦈','🐊','🦭','🐚','🪼','🐢']
 };
-const GRID=10;
 const DPR=Math.min(window.devicePixelRatio||1,2);
 const PENT=[261.63,293.66,329.63,392.00,440.00,523.25,587.33,659.25,783.99,880.00];
+
+// На мобильных 5 на 5, на десктопе 10 на 10
+const IS_MOBILE=/iPhone|iPad|iPod|Android/i.test(navigator.userAgent)||window.matchMedia('(pointer:coarse)').matches;
+const GRID=IS_MOBILE?5:10;
 
 let canvas,ctx,bgCanvas;
 let W=0,H=0,CELL=0,OX=0,OY=0;
@@ -113,15 +114,8 @@ let animPhase=null;
 let lastCell=-1;
 let needsRender=true;
 
-// ============ ОПТИМИЗАЦИЯ ============
-// 1. Один requestAnimationFrame на всё, никаких вложенных
-// 2. Рендер только при изменениях (needsRender)
-// 3. Кэш эмодзи-спрайтов: рендерим каждый эмодзи один раз в offscreen canvas, потом drawImage
-// 4. Кэш фона
-// 5. Кэш "стоит на месте" состояния — если ничего не анимируется, не трогаем canvas
-
-const EMOJI_CACHE=new Map();      // animal -> offscreen canvas
-const EMOJI_SIZE=128;             // рисуем эмодзи в большом разрешении один раз
+const EMOJI_CACHE=new Map();
+const EMOJI_SIZE=128;
 
 function getEmojiSprite(animal){
 let c=EMOJI_CACHE.get(animal);
@@ -175,7 +169,6 @@ bgCanvas=document.createElement('canvas');
 bgCanvas.width=Math.floor(W*DPR);bgCanvas.height=Math.floor(H*DPR);
 const b=bgCanvas.getContext('2d',{alpha:false});
 b.setTransform(DPR,0,0,DPR,0,0);
-// Apple-стиль: чистый ровный фон без цветных пятен
 b.fillStyle=currentTheme==='dark'?'#000':'#f2f2f7';
 b.fillRect(0,0,W,H);
 }
@@ -287,7 +280,6 @@ playRemoveSound();
 animPhase={start:now,removed,fallers,elasticD:380,fallD:400,fallDelay:200};
 }
 
-// ============ ELASTIC EASING ============
 function elasticOut(t){
 if(t<=0)return 0;
 if(t>=1)return 1;
@@ -296,7 +288,6 @@ const t1=t-1;
 return 1+(c+1)*t1*t1*t1+c*t1*t1;
 }
 
-// ============ ЕДИНЫЙ RAF-ЦИКЛ ============
 function rafLoop(){
 if(isAnimating&&animPhase){
 const elapsed=performance.now()-animPhase.start;
@@ -312,7 +303,6 @@ updateUI();
 requestStaticRender();
 }
 }else{
-// статичный рендер — только если popAnims не пуст (т.е. есть анимация появления)
 if(popAnims.size>0){
 const now=performance.now();
 let anyActive=false;
@@ -329,7 +319,6 @@ requestAnimationFrame(rafLoop);
 
 function requestStaticRender(){needsRender=true}
 
-// ============ РЕНДЕР ============
 function drawSprite(animal,x,y,scale,alpha,glow){
 const sp=getEmojiSprite(animal);
 const size=CELL*.86*scale;
@@ -381,13 +370,11 @@ ctx.drawImage(bgCanvas,0,0,W,H);
 const fallingSet=new Set();
 for(let i=0;i<animPhase.fallers.length;i++)fallingSet.add(animPhase.fallers[i].toRow*GRID+animPhase.fallers[i].col);
 
-// elastic-исчезновение
 if(animPhase.removed.length){
 for(let i=0;i<animPhase.removed.length;i++){
 const cell=animPhase.removed[i];
 const t=Math.min(elapsed/animPhase.elasticD,1);
 const eased=elasticOut(t);
-// elastic-in: сначала слегка раздувается, потом сжимается в 0
 const scale=t<.5?(1+eased*.3):(1-eased)*2;
 const alpha=Math.max(0,1-t*1.3);
 if(alpha<=0||scale<=0)continue;
@@ -397,7 +384,6 @@ drawSprite(cell.animal,x,y,Math.max(scale,.01),alpha,0);
 }
 }
 
-// стоящие
 for(let r=0;r<GRID;r++){
 for(let c=0;c<GRID;c++){
 const idx=r*GRID+c;
@@ -406,7 +392,6 @@ if(grid[r][c])drawSprite(grid[r][c],OX+c*CELL+CELL/2,OY+r*CELL+CELL/2,1,1,0);
 }
 }
 
-// падающие
 if(animPhase.fallers.length){
 for(let i=0;i<animPhase.fallers.length;i++){
 const f=animPhase.fallers[i];
@@ -416,7 +401,6 @@ drawSprite(f.animal,OX+f.col*CELL+CELL/2,OY+y+CELL/2,1,1,0);
 }
 }
 
-// ============ АУДИО ============
 function initAudio(){
 try{const AC=window.AudioContext||window.webkitAudioContext;if(AC)audioCtx=new AC()}catch(e){}
 }
