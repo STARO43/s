@@ -4,20 +4,18 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="theme-color" content="#f7f0dd">
+<meta name="theme-color" content="#e8ecd8">
 <title>Вайбиньо</title>
 <style>
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;margin:0;padding:0}
 html,body{height:100%;overflow:hidden;overscroll-behavior:none;touch-action:none;-webkit-user-select:none;user-select:none}
 
 :root{
-  --paper:#f7f0dd;
-  --ink:#3d3529;
-  --ink-soft:rgba(61,53,41,.35);
-  --ui-bg:rgba(247,240,221,.28);
-  --ui-border:rgba(61,53,41,.1);
-  --swatch:#e9c878;
-  --line:#3d3529;
+  --paper:#e8ecd8;
+  --ink:#3d4a2a;
+  --ink-soft:rgba(61,74,42,.35);
+  --ui-border:rgba(61,74,42,.1);
+  --line:#3d4a2a;
 }
 html,body{background:var(--paper);transition:background 1.6s ease}
 
@@ -40,38 +38,6 @@ canvas{
 }
 .circ-btn:active{transform:scale(.9)}
 
-#palette{
-  left:max(14px,env(safe-area-inset-left));
-  width:60px;height:60px;
-}
-#palette svg{
-  width:44px;height:44px;
-  display:block;
-  overflow:visible;
-  animation:paletteMorph 6s ease-in-out infinite;
-  filter:drop-shadow(0 1px 3px rgba(61,53,41,.08));
-}
-@keyframes paletteMorph{
-  0%,100%{transform:scale(1)}
-  50%{transform:scale(1.04)}
-}
-#palette .fill{
-  transform-origin:center;
-  animation:fillWobble 5s ease-in-out infinite;
-}
-@keyframes fillWobble{
-  0%,100%{transform:scale(1) rotate(0)}
-  50%{transform:scale(1.02) rotate(.5deg)}
-}
-#palette.press svg{
-  animation:paletteSplash .9s cubic-bezier(.34,1.4,.64,1);
-}
-@keyframes paletteSplash{
-  0%{transform:scale(1)}
-  40%{transform:scale(1.15)}
-  100%{transform:scale(1)}
-}
-
 #boy{
   left:50%;
   width:84px;height:84px;
@@ -82,33 +48,14 @@ canvas{
   display:block;
   animation:boySway 5s ease-in-out infinite;
   transform-origin:center bottom;
-  opacity:.6;
-  filter:saturate(.5) brightness(.98) contrast(.92);
+  opacity:.78;
+  filter:saturate(.6) brightness(.98) contrast(.92);
   -webkit-user-drag:none;
   user-select:none;
 }
 @keyframes boySway{
   0%,100%{transform:rotate(-3deg)}
   50%{transform:rotate(3deg)}
-}
-
-#theme{
-  right:max(14px,env(safe-area-inset-right));
-  width:60px;height:60px;
-}
-#theme .bulb{
-  font-size:34px;line-height:1;
-  display:inline-block;
-  transition:transform .6s cubic-bezier(.34,1.56,.64,1),filter .6s ease;
-  opacity:.7;
-}
-:root:not(.night) #theme .bulb{
-  filter:drop-shadow(0 0 8px rgba(255,205,90,.55)) saturate(.9) brightness(1);
-  transform:rotate(0deg) scale(1.05);
-}
-:root.night #theme .bulb{
-  filter:grayscale(1) opacity(.4);
-  transform:rotate(-8deg);
 }
 
 #clear-btn{
@@ -172,8 +119,8 @@ canvas{
 #end-icon{width:56px;height:56px;display:flex;align-items:center;justify-content:center}
 #end-icon img{
   width:48px;height:48px;display:block;
-  filter:saturate(.55) brightness(.98) contrast(.92);
-  opacity:.75;
+  filter:saturate(.6) brightness(.98) contrast(.92);
+  opacity:.8;
 }
 #end-time{
   font-size:56px;font-weight:200;letter-spacing:-2px;
@@ -184,7 +131,7 @@ canvas{
   -webkit-user-select:none;
   -webkit-tap-highlight-color:transparent;
 }
-#end-platform{font-size:26px;line-height:1;opacity:.5;filter:saturate(.55) brightness(.95)}
+#end-platform{font-size:26px;line-height:1;opacity:.55;filter:saturate(.55) brightness(.95)}
 
 #end-stats{
   display:flex;
@@ -198,23 +145,21 @@ canvas{
   display:flex;align-items:center;gap:8px;
   color:var(--ink-soft);
   font-size:18px;font-weight:300;letter-spacing:.5px;
-  opacity:.7;
+  opacity:.75;
 }
 .stat svg{
   width:20px;height:20px;display:block;
   color:var(--ink-soft);stroke:currentColor;stroke-width:1.6;fill:none;
   stroke-linecap:round;stroke-linejoin:round;opacity:.85;
 }
-.stat .spin{
-  animation:statSpin 8s linear infinite;
-}
+.stat .spin{animation:statSpin 8s linear infinite}
 @keyframes statSpin{
   0%{transform:rotate(0)}
   100%{transform:rotate(360deg)}
 }
 .stat .count{
   font-variant-numeric:tabular-nums;
-  color:var(--ink);opacity:.75;font-weight:400;
+  color:var(--ink);opacity:.8;font-weight:400;
 }
 
 #end-restart{
@@ -229,13 +174,17 @@ canvas{
 #end-restart svg{width:20px;height:20px}
 
 @media(max-width:500px){
-  #boy{width:104px;height:104px;margin-left:-52px}
-  #boy img{width:80px;height:80px}
-  #clear-btn{width:104px;height:104px;margin-left:-52px}
-  #palette{width:44px;height:44px}
-  #palette svg{width:30px;height:30px}
-  #theme{width:44px;height:44px}
-  #theme .bulb{font-size:22px}
+  #boy{
+    width:104px;height:104px;
+    margin-left:-52px;
+  }
+  #boy img{
+    width:80px;height:80px;
+  }
+  #clear-btn{
+    width:104px;height:104px;
+    margin-left:-52px;
+  }
 
   #end-time{font-size:44px;letter-spacing:-1px}
   #end-icon{width:44px;height:44px}
@@ -250,26 +199,8 @@ canvas{
 <body>
 <canvas id="field"></canvas>
 
-<button id="palette" class="circ-btn" aria-label="Сменить фон">
-  <svg viewBox="0 0 40 40">
-    <rect x="7" y="9" width="26" height="22" rx="1.5"
-          fill="var(--paper)" stroke="currentColor" stroke-width="1.1"
-          opacity=".85"/>
-    <path class="fill" d="M9 12 Q20 10 31 12 Q32 20 31 28 Q20 30 9 28 Q8 20 9 12 Z"
-          fill="var(--swatch)" opacity=".85"/>
-    <path d="M10 16 Q20 14 30 16" stroke="currentColor" stroke-width=".6"
-          fill="none" opacity=".28"/>
-    <path d="M11 22 Q20 24 29 22" stroke="currentColor" stroke-width=".6"
-          fill="none" opacity=".28"/>
-  </svg>
-</button>
-
 <button id="boy" class="circ-btn" aria-label="Сменить раздел">
   <img id="boy-img" src="" alt="">
-</button>
-
-<button id="theme" class="circ-btn" aria-label="Сменить тему">
-  <span class="bulb">💡</span>
 </button>
 
 <button id="clear-btn" aria-label="Очистить дубли">
@@ -341,30 +272,36 @@ function getEmojiImage(hex){
    ============================================================ */
 const FULL_POOL = {
   home: [
-    '1F33F', '1F331', '1F340', '1F33E', '1F338', '1F33C', '1F337', '1F33B',
-    '1F33A', '1F339', '1F342', '1F341', '1F98B', '1F41E', '1F997', '1F426'
+    '1F33F','1F331','1F340','1F33E','1F338','1F33C','1F337','1F33B',
+    '1F33A','1F339','1F341','1F98B','1F41E','1F997','1F426'
   ],
   wild: [
-    '1F43B', '1F98A', '1F43A', '1F98C', '1F994', '1F407',
-    '1F439', '1F43F', '1F985', '1F332', '1F333', '1F344', '1FAD0', '1F341',
-    '1F41C'
+    '1F332','1F333','1F344','1F41C','1FAB2','1F98C','1F986','1F994',
+    '1F43F','1F407','1F9A8','1F9A1','1F9A2','1F40D','1F40C','1F401','1F9AB'
   ],
   sea: [
-    '1F433', '1F42C', '1F9AD', '1F419', '1F420', '1F41F', '1F980', '1F99E',
-    '1FAB8', '1FABC'
+    '1F433','1F42C','1F420','1F9AD','1F419','1F980','1F990','1FABC',
+    '1F422','1F988'
   ],
-  pets: [
-    '1F431', '1F436', '1F99C', '1F986', '1F424', '1F414', '1F983', '1F404',
-    '1F403', '1F402', '1F437', '1F40F', '1F40E', '1F422', '1F41D'
+  faces: [
+    '1F98A','1F43A','1F43B','1F43C','1F439','1F430','1F431','1F436',
+    '1F437','1F42E','1F42D','1F438'
   ],
-  cozy: [
-    '1F4DA', '1F4D5', '1F4F0', '270F', '1F58A', '1F4CE', '1F4CC', '1F4CF',
-    '2702', '1F4BB', '1F5A5', '1F4F1', '1F4FB', '1F3A7', '1F4F7', '2615',
-    '1F375', '1F950', '1F370', '1F36B', '1F36D', '1FAB4', '231A', '23F0',
-    '1F570'
+  food: [
+    '1F34E','1F34F','1F350','1F34A','1F34B','1F34C','1F349','1F347',
+    '1F353','1F352','1FAD1'
   ],
-  poop:  ['1F4A9'],
-  panda: ['1F43C']
+  poop: ['1F4A9','1F9FB']
+};
+
+/* ============================================================
+   ОБЯЗАТЕЛЬНЫЕ ЭМОДЗИ
+   Луг — все цветы
+   Лес — оба дерева + гриб
+   ============================================================ */
+const ALWAYS = {
+  home: ['1F338','1F33C','1F337','1F33B','1F33A','1F339'],
+  wild: ['1F332','1F333','1F344']   // оба дерева + грибочек
 };
 
 /* ============================================================
@@ -374,8 +311,8 @@ const CATS = {
   home: [],
   wild: [],
   sea:  [],
-  pets: [],
-  cozy: []
+  faces: [],
+  food: []
 };
 
 let easterMode = null;
@@ -393,9 +330,18 @@ function shuffle(arr){
 
 function pickRandomPool(cat){
   const full = FULL_POOL[cat] || [];
-  const shuffled = shuffle(full);
-  const n = Math.min(POOL_SIZE, shuffled.length);
-  CATS[cat] = shuffled.slice(0, n);
+  const always = ALWAYS[cat] || [];
+  const selected = new Set(always);
+
+  const rest = full.filter(hex => !selected.has(hex));
+  const shuffledRest = shuffle(rest);
+
+  for(const hex of shuffledRest){
+    if(selected.size >= POOL_SIZE) break;
+    selected.add(hex);
+  }
+
+  CATS[cat] = Array.from(selected);
   return CATS[cat];
 }
 
@@ -429,81 +375,136 @@ function makeSpiralPath(cx, cy, a, b, turns){
 }
 
 /* ============================================================
-   ПОРЯДОК И ИКОНКИ
+   ПОРЯДОК РЕЖИМОВ
    ============================================================ */
-const ORDER = ['home', 'wild', 'sea', 'pets', 'cozy'];
+const ORDER = ['home', 'wild', 'sea', 'faces', 'food'];
 
 const MODE_ICON_HEX = {
-  home:'1F33F', wild:'1F994', sea:'1F420', pets:'1F431', cozy:'2615'
+  home:  '1F33F',
+  wild:  '1F332',
+  sea:   '1F420',
+  faces: '1F431',
+  food:  '1F34E'
 };
 
 const END_ICON_HEX = {
-  home:'1F33F', wild:'1F43B', sea:'1F433', pets:'1F431', cozy:'1F4DA'
+  home:  '1F33F',
+  wild:  '1F344',
+  sea:   '1F433',
+  faces: '1F431',
+  food:  '1F34E'
 };
 
-const PENTA = [130.81,146.83,164.81,196.00,220.00,261.63,293.66,329.63,392.00,440.00];
+/* ============================================================
+   ПАЛИТРЫ — «дорогие» и вайбовые
+   ============================================================
+   Принцип:
+   · base — основной средний тон (в серединке экрана)
+   · horizon — тепло-холодный переход чуть выше центра,
+                даёт ощущение глубины, как в утреннем свете
+   · sky — светлый верхний отсвет (как будто свет падает сверху)
+   · ground — тёмное основание снизу (утяжеляет, но не глушит)
+   · bloom — тёплый мягкий отсвет с одной стороны
+                (имитация света от окна — «дорогой» эффект)
+   · vignette — мягкая тень по краям
+   Все тона — пастельные, слегка пыльные, с приглушённой насыщенностью.
+   ============================================================ */
+const THEMES = {
+  home: {
+    base:         '#e6ecd2',  // пыльно-зелёный
+    horizon:      '#f0eed8',  // тёплый кремовый горизонт
+    sky:          '#f8f4dc',  // светлый солнечный верх
+    ground:       '#b8c99a',  // мятно-травяной низ
+    bloom:        'rgba(255,240,200,0.35)',  // тёплый боковой отсвет
+    vignette:     'rgba(90,120,60,0.14)',
+    ink:          '#3e4a2c',
+    inkSoft:      'rgba(62,74,44,.38)',
+    grain:        [110,140,80]
+  },
+  wild: {
+    base:         '#e5d4bb',  // тёплое дерево
+    horizon:      '#efe0c5',
+    sky:          '#f5ead0',
+    ground:       '#a8895f',  // кедровый низ
+    bloom:        'rgba(255,215,160,0.32)',
+    vignette:     'rgba(90,60,30,0.16)',
+    ink:          '#4a3826',
+    inkSoft:      'rgba(74,56,38,.38)',
+    grain:        [120,90,55]
+  },
+  sea: {
+    base:         '#d6e4ea',  // пыльно-голубой
+    horizon:      '#e6eef2',
+    sky:          '#f0f6f8',
+    ground:       '#8fb2c4',  // глубинный синевато-серый
+    bloom:        'rgba(210,235,245,0.4)',
+    vignette:     'rgba(60,90,110,0.16)',
+    ink:          '#2d3f4a',
+    inkSoft:      'rgba(45,63,74,.38)',
+    grain:        [80,110,130]
+  },
+  faces: {
+    base:         '#ecdde0',  // пыльно-розовый
+    horizon:      '#f4e6e6',
+    sky:          '#f9f0ee',
+    ground:       '#cca8ad',  // пудрово-розовый низ
+    bloom:        'rgba(255,225,225,0.4)',
+    vignette:     'rgba(140,100,110,0.15)',
+    ink:          '#4a3238',
+    inkSoft:      'rgba(74,50,56,.38)',
+    grain:        [150,110,120]
+  },
+  food: {
+    base:         '#f0e4c4',  // тёплый цитрус
+    horizon:      '#f6e8c8',
+    sky:          '#fbf2d6',
+    ground:       '#d4b578',  // приглушённый охристый
+    bloom:        'rgba(255,240,190,0.45)',
+    vignette:     'rgba(150,120,70,0.15)',
+    ink:          '#4a3c1c',
+    inkSoft:      'rgba(74,60,28,.38)',
+    grain:        [150,120,70]
+  },
+  poop: {
+    base:         '#1a1814',
+    horizon:      '#1e1c18',
+    sky:          '#252220',
+    ground:       '#0f0d0a',
+    bloom:        'rgba(70,60,45,0.25)',
+    vignette:     'rgba(0,0,0,0.5)',
+    ink:          '#e8e0d0',
+    inkSoft:      'rgba(232,224,208,.3)',
+    grain:        [190,180,165]
+  }
+};
+
+function currentThemeKey(){
+  if(easterMode) return 'poop';
+  return currentCat;
+}
+
+function applyTheme(){
+  const t = THEMES[currentThemeKey()] || THEMES.home;
+  const root = document.documentElement;
+
+  root.style.setProperty('--paper',     t.base);
+  root.style.setProperty('--ink',       t.ink);
+  root.style.setProperty('--ink-soft',  t.inkSoft);
+  root.style.setProperty('--line',      t.ink);
+
+  const meta = document.querySelector('meta[name="theme-color"]');
+  if(meta) meta.setAttribute('content', t.base);
+
+  buildPaper();
+  needsDraw = true;
+}
 
 /* ============================================================
-   ТЕМЫ
+   ТЕКСТУРА
    ============================================================ */
-const LIGHT_THEMES = [
-  {
-    id:'honey', paper:'#f7f0dd',
-    warmTop:'rgba(255,235,180,0.55)',
-    warmMid:'rgba(250,225,190,0.28)',
-    vignette:'rgba(220,195,155,0.22)',
-    ink:'#3d3529', inkSoft:'rgba(61,53,41,.35)',
-    uiBg:'rgba(247,240,221,.85)', uiBorder:'rgba(61,53,41,.08)',
-    swatch:'#e9c878'
-  },
-  {
-    id:'rose', paper:'#f5e6dd',
-    warmTop:'rgba(255,205,180,0.55)',
-    warmMid:'rgba(250,200,180,0.28)',
-    vignette:'rgba(220,170,150,0.22)',
-    ink:'#4a3630', inkSoft:'rgba(74,54,48,.35)',
-    uiBg:'rgba(245,230,221,.85)', uiBorder:'rgba(74,54,48,.08)',
-    swatch:'#e8a890'
-  },
-  {
-    id:'tea', paper:'#e9ecdd',
-    warmTop:'rgba(220,235,190,0.55)',
-    warmMid:'rgba(210,225,180,0.28)',
-    vignette:'rgba(180,200,160,0.22)',
-    ink:'#333d30', inkSoft:'rgba(51,61,48,.35)',
-    uiBg:'rgba(233,236,221,.85)', uiBorder:'rgba(51,61,48,.08)',
-    swatch:'#b8c890'
-  }
-];
-const DARK_THEMES = [
-  {
-    id:'night', paper:'#1a1814',
-    coolTop:'rgba(60,58,52,0.3)',
-    ink:'#e8e0d0', inkSoft:'rgba(232,224,208,.3)',
-    uiBg:'rgba(26,24,20,.85)', uiBorder:'rgba(232,224,208,.08)',
-    swatch:'#8a7a60'
-  },
-  {
-    id:'dusk', paper:'#16161f',
-    coolTop:'rgba(70,70,110,0.4)',
-    ink:'#dcdce8', inkSoft:'rgba(220,220,232,.3)',
-    uiBg:'rgba(22,22,31,.85)', uiBorder:'rgba(220,220,232,.08)',
-    swatch:'#6060a0'
-  },
-  {
-    id:'moss', paper:'#131a14',
-    coolTop:'rgba(45,65,50,0.4)',
-    ink:'#d8e0d4', inkSoft:'rgba(216,224,212,.3)',
-    uiBg:'rgba(19,26,20,.85)', uiBorder:'rgba(216,224,212,.08)',
-    swatch:'#4a6a50'
-  }
-];
+let noiseTileCache = new Map();
 
-/* ===== ТЕКСТУРА БУМАГИ ===== */
-let noiseTileLight = null;
-let noiseTileDark  = null;
-
-function makeNoiseTile(light, grainRGB){
+function makeNoiseTile(grainRGB, isDark){
   const size = 96;
   const tile = document.createElement('canvas');
   tile.width = tile.height = size;
@@ -511,7 +512,7 @@ function makeNoiseTile(light, grainRGB){
   const img = tctx.createImageData(size, size);
   const d = img.data;
   const [baseR, baseG, baseB] = grainRGB;
-  const alpha = light ? 16 : 12;
+  const alpha = isDark ? 12 : 18;
   for(let i = 0; i < d.length; i += 4){
     const shift = (Math.random() * 60) | 0;
     d[i]   = baseR + shift;
@@ -522,30 +523,18 @@ function makeNoiseTile(light, grainRGB){
   tctx.putImageData(img, 0, 0);
   return tile;
 }
-function getNoiseTile(light, grainRGB){
-  const key = (light ? 'L' : 'D') + grainRGB.join(',');
-  if(light){
-    if(!noiseTileLight || noiseTileLight._key !== key){
-      noiseTileLight = makeNoiseTile(true, grainRGB);
-      noiseTileLight._key = key;
-    }
-    return noiseTileLight;
-  } else {
-    if(!noiseTileDark || noiseTileDark._key !== key){
-      noiseTileDark = makeNoiseTile(false, grainRGB);
-      noiseTileDark._key = key;
-    }
-    return noiseTileDark;
+function getNoiseTile(grainRGB, isDark){
+  const key = grainRGB.join(',') + (isDark ? 'D' : 'L');
+  if(!noiseTileCache.has(key)){
+    noiseTileCache.set(key, makeNoiseTile(grainRGB, isDark));
   }
+  return noiseTileCache.get(key);
 }
 
 /* ===== СОСТОЯНИЕ ===== */
 let canvas, ctx, paperCanvas;
 let W, H, CELL, OX, OY, GRID_X, GRID_Y;
 let grid, currentCat = 'home';
-let night = false;
-let lightIdx = 0;
-let darkIdx = 0;
 let audioCtx = null, locked = false, animating = false;
 let animPhase = null, needsDraw = true;
 let startTime = 0, gameActive = false;
@@ -556,7 +545,7 @@ let manualCount = 0;
 let DPR = Math.min(devicePixelRatio || 1, 2);
 const IS_MOBILE = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent) || matchMedia('(pointer:coarse)').matches;
 
-const EMOJI_ALPHA = 0.55;
+const EMOJI_ALPHA = 0.62;
 
 const POP_DURATION = IS_MOBILE ? 380 : 900;
 const POP_EASE_OUT = IS_MOBILE
@@ -573,52 +562,6 @@ let lastPaintedIdx = -1;
 const paintedDuringSwipe = new Set();
 
 /* ============================================================
-   СОХРАНЕНИЕ
-   ============================================================ */
-function loadState(){
-  try{
-    const raw = localStorage.getItem('vibinio');
-    if(!raw) return;
-    const s = JSON.parse(raw);
-    if(typeof s.night === 'boolean') night = s.night;
-    if(typeof s.lightIdx === 'number' && s.lightIdx >= 0 && s.lightIdx < LIGHT_THEMES.length) lightIdx = s.lightIdx;
-    if(typeof s.darkIdx === 'number' && s.darkIdx >= 0 && s.darkIdx < DARK_THEMES.length) darkIdx = s.darkIdx;
-  }catch(e){}
-}
-function saveState(){
-  try{
-    localStorage.setItem('vibinio', JSON.stringify({night, lightIdx, darkIdx}));
-  }catch(e){}
-}
-
-/* ============================================================
-   ТЕМА
-   ============================================================ */
-function currentTheme(){
-  return night ? DARK_THEMES[darkIdx] : LIGHT_THEMES[lightIdx];
-}
-
-function applyTheme(){
-  const t = currentTheme();
-  const root = document.documentElement;
-  root.classList.toggle('night', night);
-
-  root.style.setProperty('--paper',      t.paper);
-  root.style.setProperty('--ink',        t.ink);
-  root.style.setProperty('--ink-soft',   t.inkSoft);
-  root.style.setProperty('--ui-bg',      t.uiBg);
-  root.style.setProperty('--ui-border',  t.uiBorder);
-  root.style.setProperty('--swatch',     t.swatch);
-  root.style.setProperty('--line',       t.ink);
-
-  const meta = document.querySelector('meta[name="theme-color"]');
-  if(meta) meta.setAttribute('content', t.paper);
-
-  buildPaper();
-  needsDraw = true;
-}
-
-/* ============================================================
    ИНИЦИАЛИЗАЦИЯ
    ============================================================ */
 function init(){
@@ -632,7 +575,6 @@ function init(){
   const plat = document.getElementById('end-platform');
   if(plat) plat.textContent = IS_MOBILE ? '📱' : '🖥️';
 
-  loadState();
   preloadAllEmoji();
   pickRandomPool(currentCat);
   resize();
@@ -657,13 +599,13 @@ function resize(){
     GRID_X = 5;
     GRID_Y = 7;
   } else {
-    GRID_X = 13;  // 13 по горизонтали
-    GRID_Y = 7;   // 7 по вертикали
+    GRID_X = 12;
+    GRID_Y = 7;
   }
 
-  const padTop = IS_MOBILE ? 100 : 104;
-  const padBot = IS_MOBILE ? 14 : 24;
-  const padSide = IS_MOBILE ? 8 : 24;
+  const padTop = IS_MOBILE ? 108 : 118;
+  const padBot = IS_MOBILE ? 12 : 28;
+  const padSide = IS_MOBILE ? 8 : 28;
 
   const availH = H - padTop - padBot;
   const availW = W - padSide * 2;
@@ -675,7 +617,15 @@ function resize(){
 }
 
 /* ============================================================
-   БУМАГА
+   БУМАГА — многослойный «дорогой» фон
+   ============================================================
+   Слои (в порядке наложения):
+     1. base — базовый средний тон
+     2. sky — светлый отсвет сверху
+     3. horizon — тёплая полоса чуть выше центра
+     4. ground — тёмное основание снизу
+     5. bloom — мягкий боковой отсвет (тёплый)
+     6. зернистость + виньетка
    ============================================================ */
 function buildPaper(){
   paperCanvas = document.createElement('canvas');
@@ -684,63 +634,107 @@ function buildPaper(){
   const p = paperCanvas.getContext('2d', {alpha:false});
   p.setTransform(DPR, 0, 0, DPR, 0, 0);
 
-  const t = currentTheme();
-  p.fillStyle = t.paper;
+  const key = currentThemeKey();
+  const t = THEMES[key] || THEMES.home;
+  const isDark = key === 'poop';
+
+  // 1. BASE
+  p.fillStyle = t.base;
   p.fillRect(0, 0, W, H);
 
-  if(!night){
-    if(t.warmTop){
-      const warmTop = p.createRadialGradient(
-        W*0.5, H*0.12, 0,
-        W*0.5, H*0.12, Math.max(W,H)*0.85
-      );
-      warmTop.addColorStop(0, t.warmTop);
-      warmTop.addColorStop(0.55, t.warmMid || 'rgba(255,225,165,0.15)');
-      warmTop.addColorStop(1, 'rgba(0,0,0,0)');
-      p.fillStyle = warmTop;
-      p.fillRect(0, 0, W, H);
-    }
-    if(t.vignette){
-      const vignette = p.createRadialGradient(
-        W*0.5, H*0.55, Math.min(W,H)*0.45,
-        W*0.5, H*0.55, Math.max(W,H)*0.8
-      );
-      vignette.addColorStop(0, 'rgba(0,0,0,0)');
-      vignette.addColorStop(1, t.vignette);
-      p.fillStyle = vignette;
-      p.fillRect(0, 0, W, H);
-    }
-  } else {
-    if(t.coolTop){
-      const coolTop = p.createRadialGradient(
-        W*0.5, H*0.2, 0,
-        W*0.5, H*0.2, Math.max(W,H)*0.75
-      );
-      coolTop.addColorStop(0, t.coolTop);
-      coolTop.addColorStop(1, 'rgba(0,0,0,0)');
-      p.fillStyle = coolTop;
-      p.fillRect(0, 0, W, H);
-    }
+  // 2. SKY — светлое пятно сверху, как утренний воздух
+  if(t.sky){
+    const sky = p.createRadialGradient(
+      W * 0.5, -H * 0.2, 0,
+      W * 0.5, -H * 0.2, Math.max(W, H) * 1.0
+    );
+    sky.addColorStop(0, t.sky);
+    sky.addColorStop(0.5, hexToRgba(t.sky, isDark ? 0.4 : 0.5));
+    sky.addColorStop(1, 'rgba(0,0,0,0)');
+    p.fillStyle = sky;
+    p.fillRect(0, 0, W, H);
   }
 
-  const grainRGB = night ? [190,180,165] : [130,100,65];
-  const tile = getNoiseTile(!night, grainRGB);
+  // 3. HORIZON — тёплая полоса чуть выше центра
+  if(t.horizon){
+    const horizon = p.createLinearGradient(0, H * 0.25, 0, H * 0.75);
+    horizon.addColorStop(0, hexToRgba(t.horizon, 0));
+    horizon.addColorStop(0.5, hexToRgba(t.horizon, isDark ? 0.15 : 0.22));
+    horizon.addColorStop(1, hexToRgba(t.horizon, 0));
+    p.fillStyle = horizon;
+    p.fillRect(0, 0, W, H);
+  }
+
+  // 4. GROUND — тёмное основание снизу
+  if(t.ground){
+    const ground = p.createRadialGradient(
+      W * 0.5, H * 1.15, 0,
+      W * 0.5, H * 1.15, Math.max(W, H) * 0.8
+    );
+    ground.addColorStop(0, hexToRgba(t.ground, isDark ? 0.7 : 0.55));
+    ground.addColorStop(0.55, hexToRgba(t.ground, isDark ? 0.3 : 0.22));
+    ground.addColorStop(1, 'rgba(0,0,0,0)');
+    p.fillStyle = ground;
+    p.fillRect(0, 0, W, H);
+  }
+
+  // 5. BLOOM — тёплый боковой отсвет (слева снизу)
+  if(t.bloom){
+    const bloom = p.createRadialGradient(
+      -W * 0.1, H * 0.9, 0,
+      -W * 0.1, H * 0.9, Math.max(W, H) * 0.85
+    );
+    bloom.addColorStop(0, t.bloom);
+    bloom.addColorStop(0.6, hexToRgba(t.bloom, 0.08));
+    bloom.addColorStop(1, 'rgba(0,0,0,0)');
+    p.fillStyle = bloom;
+    p.fillRect(0, 0, W, H);
+  }
+
+  // 6. ЗЕРНИСТОСТЬ
+  const grainRGB = t.grain || [130, 100, 65];
+  const tile = getNoiseTile(grainRGB, isDark);
   const pattern = p.createPattern(tile, 'repeat');
   if(pattern){
     p.fillStyle = pattern;
     p.fillRect(0, 0, W, H);
   }
 
-  const grainCount = IS_MOBILE ? 300 : 700;
+  const grainCount = IS_MOBILE ? 280 : 640;
   for(let i = 0; i < grainCount; i++){
     const x = Math.random() * W;
     const y = Math.random() * H;
-    const a = Math.random() * 0.04;
-    p.fillStyle = night
+    const a = Math.random() * 0.045;
+    p.fillStyle = isDark
       ? `rgba(232,224,208,${a})`
-      : `rgba(130,100,65,${a})`;
+      : `rgba(${grainRGB[0]},${grainRGB[1]},${grainRGB[2]},${a})`;
     p.fillRect(x, y, 1.5, 1.5);
   }
+
+  // 7. ВИНЬЕТКА
+  if(t.vignette){
+    const vignette = p.createRadialGradient(
+      W * 0.5, H * 0.5, Math.min(W, H) * 0.5,
+      W * 0.5, H * 0.5, Math.max(W, H) * 0.85
+    );
+    vignette.addColorStop(0, 'rgba(0,0,0,0)');
+    vignette.addColorStop(1, t.vignette);
+    p.fillStyle = vignette;
+    p.fillRect(0, 0, W, H);
+  }
+}
+
+/* Утилита: hex → rgba с заданной альфой */
+function hexToRgba(hex, alpha){
+  if(!hex) return 'rgba(0,0,0,0)';
+  if(hex.startsWith('rgba') || hex.startsWith('rgb')){
+    return hex;
+  }
+  const h = hex.replace('#','');
+  const r = parseInt(h.substring(0,2), 16);
+  const g = parseInt(h.substring(2,4), 16);
+  const b = parseInt(h.substring(4,6), 16);
+  return `rgba(${r},${g},${b},${alpha})`;
 }
 
 /* ============================================================
@@ -758,8 +752,6 @@ function bindEvents(){
   canvas.addEventListener('touchcancel',onTouchEnd,   {passive:false});
 
   clearBtn.addEventListener('click', onClearClick);
-  document.getElementById('theme').addEventListener('click', toggleTheme);
-  document.getElementById('palette').addEventListener('click', cycleBackground);
   document.getElementById('boy').addEventListener('click', cycleCat);
   document.getElementById('end-restart').addEventListener('click', closeEnd);
 
@@ -788,8 +780,9 @@ function bindEvents(){
 
 function onEndTimeDoubleClick(e){
   e.preventDefault();
-  easterMode = Math.random() < 0.5 ? 'poop' : 'panda';
+  easterMode = 'poop';
   document.getElementById('end').classList.remove('visible');
+  applyTheme();
   startGame();
   updateBoyFace();
 }
@@ -938,14 +931,23 @@ function onTouchEnd(e){
   paintedDuringSwipe.clear();
 }
 
+/* ============================================================
+   РЕЖИМЫ
+   ============================================================ */
 function cycleCat(){
   if(animating) return;
-  if(easterMode) easterMode = null;
 
-  const i = ORDER.indexOf(currentCat);
-  currentCat = ORDER[(i + 1) % ORDER.length];
+  if(easterMode){
+    easterMode = null;
+    currentCat = 'home';
+  } else {
+    const i = ORDER.indexOf(currentCat);
+    currentCat = ORDER[(i + 1) % ORDER.length];
+  }
+
   pickRandomPool(currentCat);
   updateBoyFace();
+  applyTheme();
   startGame();
 }
 
@@ -953,9 +955,11 @@ function updateBoyFace(){
   const img = document.getElementById('boy-img');
   if(!img) return;
   let hex;
-  if(easterMode === 'poop') hex = '1F4A9';
-  else if(easterMode === 'panda') hex = '1F43C';
-  else hex = MODE_ICON_HEX[currentCat];
+  if(easterMode === 'poop'){
+    hex = '1F4A9';
+  } else {
+    hex = MODE_ICON_HEX[currentCat];
+  }
   img.src = getEmojiUrl(hex);
 }
 
@@ -979,7 +983,7 @@ function updateUI(){
 }
 
 /* ============================================================
-   ОЧИСТКА ДУБЛЕЙ
+   ОЧИСТКА
    ============================================================ */
 function onClearClick(e){
   e.preventDefault();
@@ -1072,6 +1076,9 @@ function applyClear(){
   animPhase = {start: now, removed, fallers, fadeDur: 1100, fallDur: 1300, delay: 500};
 }
 
+/* ============================================================
+   АНИМАЦИЯ
+   ============================================================ */
 function raf(){
   if(animating && animPhase){
     const elapsed = performance.now() - animPhase.start;
@@ -1104,6 +1111,9 @@ function raf(){
   requestAnimationFrame(raf);
 }
 
+/* ============================================================
+   ОТРИСОВКА
+   ============================================================ */
 function drawEmoji(hex, x, y, scale, alpha, bleed){
   const img = getEmojiImage(hex);
   const size = CELL * 0.94 * scale;
@@ -1192,6 +1202,9 @@ function drawFrame(fallEased, elapsed){
   });
 }
 
+/* ============================================================
+   ЗАВЕРШЕНИЕ
+   ============================================================ */
 function showEnd(){
   gameActive = false;
   clearBtn.classList.remove('visible', 'press');
@@ -1204,7 +1217,6 @@ function showEnd(){
 
   let hex;
   if(easterMode === 'poop') hex = '1F4A9';
-  else if(easterMode === 'panda') hex = '1F43C';
   else hex = END_ICON_HEX[currentCat] || '1F33F';
   const img = document.getElementById('end-icon-img');
   if(img) img.src = getEmojiUrl(hex);
@@ -1220,28 +1232,14 @@ function closeEnd(){
   currentCat = 'home';
   pickRandomPool(currentCat);
   updateBoyFace();
+  applyTheme();
   startGame();
 }
 
-function toggleTheme(){
-  night = !night;
-  saveState();
-  applyTheme();
-}
-
-function cycleBackground(){
-  const btn = document.getElementById('palette');
-  btn.classList.add('press');
-  setTimeout(() => btn.classList.remove('press'), 900);
-
-  if(night){
-    darkIdx = (darkIdx + 1) % DARK_THEMES.length;
-  } else {
-    lightIdx = (lightIdx + 1) % LIGHT_THEMES.length;
-  }
-  saveState();
-  applyTheme();
-}
+/* ============================================================
+   ЗВУК
+   ============================================================ */
+const PENTA = [130.81,146.83,164.81,196.00,220.00,261.63,293.66,329.63,392.00,440.00];
 
 function initAudio(){
   try{
@@ -1259,7 +1257,6 @@ function playNote(hex){
     hash = (hash * 31 + hex.charCodeAt(i)) | 0;
 
   let freq = PENTA[Math.abs(hash) % PENTA.length];
-  if(currentCat === 'cozy') freq *= 0.94;
 
   const osc = audioCtx.createOscillator();
   const gain = audioCtx.createGain();
