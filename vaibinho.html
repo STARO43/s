@@ -260,7 +260,6 @@ function getEmojiImage(hex){
   let img = imgCache.get(hex);
   if(img) return img;
   img = new Image();
-  img.crossOrigin = 'anonymous';
   img.src = getEmojiUrl(hex);
   imgCache.set(hex, img);
   return img;
