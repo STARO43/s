@@ -26,9 +26,6 @@ canvas{
   touch-action:none;cursor:default;
 }
 
-/* ============================================================
-   ВЕРХНЯЯ ПАНЕЛЬ
-   ============================================================ */
 .circ-btn{
   position:fixed;
   background:transparent;
@@ -43,9 +40,6 @@ canvas{
 }
 .circ-btn:active{transform:scale(.9)}
 
-/* ============================================================
-   ПЕРЕКЛЮЧАТЕЛЬ ФОНОВ — слева вверху
-   ============================================================ */
 #palette{
   left:max(14px,env(safe-area-inset-left));
   width:60px;height:60px;
@@ -78,10 +72,6 @@ canvas{
   100%{transform:scale(1)}
 }
 
-/* ============================================================
-   ПЕРЕКЛЮЧАТЕЛЬ РАЗДЕЛОВ — по центру вверху
-   Увеличен на 50% относительно предыдущего размера (42 → 63px)
-   ============================================================ */
 #boy{
   left:50%;
   width:84px;height:84px;
@@ -102,9 +92,6 @@ canvas{
   50%{transform:rotate(3deg)}
 }
 
-/* ============================================================
-   ПЕРЕКЛЮЧАТЕЛЬ ТЕМЫ — справа вверху
-   ============================================================ */
 #theme{
   right:max(14px,env(safe-area-inset-right));
   width:60px;height:60px;
@@ -124,11 +111,6 @@ canvas{
   transform:rotate(-8deg);
 }
 
-/* ============================================================
-   СПИРАЛЬ — заменяет кнопку режимов, когда поле заполнено
-   РАЗМЕР РОВНО КАК У КНОПКИ РЕЖИМОВ (84×84)
-   Позиция — на месте кнопки режимов (по центру вверху)
-   ============================================================ */
 #clear-btn{
   position:fixed;
   top:max(14px,env(safe-area-inset-top));
@@ -150,18 +132,9 @@ canvas{
   -webkit-user-select:none;user-select:none;
   z-index:14;
 }
-#clear-btn.visible{
-  opacity:1;pointer-events:auto;
-  transform:scale(1);
-}
-#clear-btn:active{
-  transform:scale(.9);
-}
-#clear-btn svg{
-  width:100%;height:100%;
-  display:block;
-  overflow:visible;
-}
+#clear-btn.visible{opacity:1;pointer-events:auto;transform:scale(1)}
+#clear-btn:active{transform:scale(.9)}
+#clear-btn svg{width:100%;height:100%;display:block;overflow:visible}
 #clear-btn svg path{
   fill:none;
   stroke:currentColor;
@@ -186,17 +159,8 @@ canvas{
   60%{opacity:.75}
   100%{transform:rotate(540deg);opacity:0}
 }
+#boy.hidden{opacity:0;pointer-events:none;transform:scale(.7)}
 
-/* Скрываем кнопку режимов, когда появляется спираль */
-#boy.hidden{
-  opacity:0;
-  pointer-events:none;
-  transform:scale(.7);
-}
-
-/* ============================================================
-   ЭКРАН ЗАВЕРШЕНИЯ
-   ============================================================ */
 #end{
   position:fixed;inset:0;z-index:100;background:var(--paper);
   display:flex;flex-direction:column;align-items:center;justify-content:center;
@@ -204,14 +168,8 @@ canvas{
   transition:opacity 1.6s cubic-bezier(.25,.1,.25,1),background 1.6s ease;
 }
 #end.visible{opacity:1;pointer-events:auto}
-
-#end-row{
-  display:flex;align-items:center;gap:18px;
-}
-#end-icon{
-  width:56px;height:56px;
-  display:flex;align-items:center;justify-content:center;
-}
+#end-row{display:flex;align-items:center;gap:18px}
+#end-icon{width:56px;height:56px;display:flex;align-items:center;justify-content:center}
 #end-icon img{
   width:48px;height:48px;display:block;
   filter:saturate(.55) brightness(.98) contrast(.92);
@@ -222,49 +180,28 @@ canvas{
   color:var(--ink);font-variant-numeric:tabular-nums;
   font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display",Georgia,sans-serif;
 }
-#end-platform{
-  font-size:26px;line-height:1;
-  opacity:.5;
-  filter:saturate(.55) brightness(.95);
-}
-
+#end-platform{font-size:26px;line-height:1;opacity:.5;filter:saturate(.55) brightness(.95)}
 #end-swaps{
   display:flex;align-items:center;gap:10px;
   color:var(--ink-soft);
   font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display",Georgia,sans-serif;
-  font-size:18px;
-  font-weight:300;
-  letter-spacing:.5px;
-  margin-top:-6px;
-  opacity:.7;
+  font-size:18px;font-weight:300;letter-spacing:.5px;
+  margin-top:-6px;opacity:.7;
 }
 #end-swaps svg{
-  width:20px;height:20px;
-  display:block;
-  color:var(--ink-soft);
-  stroke:currentColor;
-  stroke-width:1.6;
-  fill:none;
-  stroke-linecap:round;
-  stroke-linejoin:round;
-  opacity:.85;
+  width:20px;height:20px;display:block;
+  color:var(--ink-soft);stroke:currentColor;stroke-width:1.6;fill:none;
+  stroke-linecap:round;stroke-linejoin:round;opacity:.85;
   animation:swapsTurn 8s linear infinite;
 }
 @keyframes swapsTurn{
   0%{transform:rotate(0)}
   100%{transform:rotate(360deg)}
 }
-#end-swaps .count{
-  font-variant-numeric:tabular-nums;
-  color:var(--ink);
-  opacity:.75;
-  font-weight:400;
-}
-
+#end-swaps .count{font-variant-numeric:tabular-nums;color:var(--ink);opacity:.75;font-weight:400}
 #end-restart{
   margin-top:20px;border:none;background:transparent;
-  color:var(--ink-soft);
-  padding:12px;border-radius:100px;cursor:pointer;
+  color:var(--ink-soft);padding:12px;border-radius:100px;cursor:pointer;
   border:1px solid var(--ink-soft);opacity:.5;
   transition:opacity .8s ease, transform .3s ease;
   display:flex;align-items:center;justify-content:center;
@@ -275,15 +212,36 @@ canvas{
 
 /* ============================================================
    МОБИЛЬНАЯ АДАПТАЦИЯ
+   Кнопка режима БОЛЬШЕ, кнопки цвета и темы МЕНЬШЕ.
    ============================================================ */
 @media(max-width:500px){
-  #palette{width:50px;height:50px}
-  #palette svg{width:38px;height:38px}
-  #boy{width:64px;height:64px;margin-left:-32px}
-  #boy img{width:48px;height:48px}
-  #theme{width:50px;height:50px}
-  #theme .bulb{font-size:28px}
-  #clear-btn{width:64px;height:64px;margin-left:-32px}
+  /* Кнопка выбора режима — увеличенная */
+  #boy{
+    width:104px;height:104px;
+    margin-left:-52px;
+  }
+  #boy img{
+    width:80px;height:80px;
+  }
+  #clear-btn{
+    width:104px;height:104px;
+    margin-left:-52px;
+  }
+
+  /* Кнопки цвета и темы — уменьшенные */
+  #palette{
+    width:44px;height:44px;
+  }
+  #palette svg{
+    width:30px;height:30px;
+  }
+  #theme{
+    width:44px;height:44px;
+  }
+  #theme .bulb{
+    font-size:22px;
+  }
+
   #end-time{font-size:44px;letter-spacing:-1px}
   #end-icon{width:44px;height:44px}
   #end-icon img{width:38px;height:38px}
@@ -296,7 +254,6 @@ canvas{
 <body>
 <canvas id="field"></canvas>
 
-<!-- Переключатель фонов — слева вверху -->
 <button id="palette" class="circ-btn" aria-label="Сменить фон">
   <svg viewBox="0 0 40 40">
     <rect x="7" y="9" width="26" height="22" rx="1.5"
@@ -311,17 +268,14 @@ canvas{
   </svg>
 </button>
 
-<!-- Переключатель разделов — по центру вверху -->
 <button id="boy" class="circ-btn" aria-label="Сменить раздел">
   <img id="boy-img" src="" alt="">
 </button>
 
-<!-- Переключатель темы — справа вверху -->
 <button id="theme" class="circ-btn" aria-label="Сменить тему">
   <span class="bulb">💡</span>
 </button>
 
-<!-- Спираль — заменяет кнопку режимов, когда поле заполнено -->
 <button id="clear-btn" aria-label="Очистить дубли">
   <svg viewBox="0 0 100 100" preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg">
     <path id="spiral-path" d=""/>
@@ -376,9 +330,68 @@ function getEmojiImage(hex){
   return img;
 }
 
+/* ============================================================
+   ПОЛНЫЕ СПИСКИ
+   ============================================================ */
+const FULL_POOL = {
+  home: [
+    '1F33F', '1F331', '1F340', '1F33E', '1F338', '1F33C', '1F337', '1F33B',
+    '1F33A', '1F339', '1F342', '1F341', '1F98B', '1F41E', '1F997', '1F426'
+  ],
+  wild: [
+    '1F43B', '1F43C', '1F98A', '1F43A', '1F98C', '1F994', '1F410', '1F407',
+    '1F439', '1F43F', '1F985', '1F332', '1F333', '1F344', '1FAD0', '1F341',
+    '1F41C'
+  ],
+  sea: [
+    '1F433', '1F42C', '1F9AD', '1F419', '1F420', '1F41F', '1F980', '1F99E',
+    '1FAB8', '1FABC', '1F3DD'
+  ],
+  pets: [
+    '1F431', '1F436', '1F99C', '1F986', '1F424', '1F414', '1F983', '1F404',
+    '1F403', '1F402', '1F437', '1F40F', '1F40E', '1F422', '1F41D'
+  ],
+  cozy: [
+    '1F4DA', '1F4D5', '1F4F0', '270F', '1F58A', '1F4CE', '1F4CC', '1F4CF',
+    '2702', '1F4BB', '1F5A5', '1F4F1', '1F4FB', '1F3A7', '1F4F7', '2615',
+    '1F375', '1F950', '1F370', '1F36B', '1F36D', '1FAB4', '231A', '23F0',
+    '1F570', '1F9E9', '265F'
+  ]
+};
+
+/* ============================================================
+   АКТИВНЫЕ ПУЛЫ (10 случайных при каждой смене режима)
+   ============================================================ */
+const CATS = {
+  home: [],
+  wild: [],
+  sea:  [],
+  pets: [],
+  cozy: []
+};
+
+const POOL_SIZE = 10;
+
+function shuffle(arr){
+  const a = arr.slice();
+  for(let i = a.length - 1; i > 0; i--){
+    const j = (Math.random() * (i + 1)) | 0;
+    const t = a[i]; a[i] = a[j]; a[j] = t;
+  }
+  return a;
+}
+
+function pickRandomPool(cat){
+  const full = FULL_POOL[cat] || [];
+  const shuffled = shuffle(full);
+  const n = Math.min(POOL_SIZE, shuffled.length);
+  CATS[cat] = shuffled.slice(0, n);
+  return CATS[cat];
+}
+
 function preloadAllEmoji(){
-  Object.values(CATS).forEach(pool => {
-    pool.forEach(item => getEmojiImage(item.hex));
+  Object.values(FULL_POOL).forEach(pool => {
+    pool.forEach(hex => getEmojiImage(hex));
   });
 }
 
@@ -401,45 +414,16 @@ function makeSpiralPath(cx, cy, a, b, turns){
 }
 
 /* ============================================================
-   РАЗДЕЛЫ
+   ПОРЯДОК И ИКОНКИ РАЗДЕЛОВ
    ============================================================ */
 const ORDER = ['home', 'wild', 'sea', 'pets', 'cozy'];
-
-const CATS = {
-  home: [
-    {hex:'1F33F'}, {hex:'1F343'}, {hex:'1F331'}, {hex:'1F338'},
-    {hex:'1F33C'}, {hex:'1F33E'}, {hex:'1F340'}, {hex:'1F33A'},
-    {hex:'1F33B'}, {hex:'1F337'}, {hex:'1F342'}, {hex:'1F341'}
-  ],
-  wild: [
-    {hex:'1F43B'}, {hex:'1F98A'}, {hex:'1F430'}, {hex:'1F332'},
-    {hex:'1F333'}, {hex:'1F342'}, {hex:'1F341'}, {hex:'1F994'},
-    {hex:'1F43F'}, {hex:'1F98C'}, {hex:'1F989'}, {hex:'1F344'}
-  ],
-  sea: [
-    {hex:'1F40B'}, {hex:'1F42C'}, {hex:'1F30A'}, {hex:'1F41A'},
-    {hex:'1F420'}, {hex:'1F9AD'}, {hex:'1F419'}, {hex:'1F41F'},
-    {hex:'1F4A7'}, {hex:'1FAB8'}, {hex:'1F980'}
-  ],
-  pets: [
-    {hex:'1F431'}, {hex:'1F436'}, {hex:'1F426'}, {hex:'1F420'},
-    {hex:'1F422'}, {hex:'1F99C'}, {hex:'1F434'}, {hex:'1F411'},
-    {hex:'1F437'}, {hex:'1F404'}, {hex:'1F983'}, {hex:'1F41D'},
-    {hex:'1F414'}, {hex:'1F413'}
-  ],
-  cozy: [
-    {hex:'1F4D6'}, {hex:'1F4DA'}, {hex:'270F'}, {hex:'1F58A'},
-    {hex:'1F4BB'}, {hex:'2615'}, {hex:'1F950'}, {hex:'1FAB4'},
-    {hex:'1F3A7'}, {hex:'1F4F1'}, {hex:'1F4F7'}, {hex:'23F0'}
-  ]
-};
 
 const MODE_ICON_HEX = {
   home:'1F33F', wild:'1F994', sea:'1F41F', pets:'1F431', cozy:'2615'
 };
 
 const END_ICON_HEX = {
-  home:'1F33F', wild:'1F43B', sea:'1F40B', pets:'1F431', cozy:'1F4D6'
+  home:'1F33F', wild:'1F43B', sea:'1F433', pets:'1F431', cozy:'1F4DA'
 };
 
 const PENTA = [130.81,146.83,164.81,196.00,220.00,261.63,293.66,329.63,392.00,440.00];
@@ -542,7 +526,7 @@ function getNoiseTile(light, grainRGB){
 
 /* ===== СОСТОЯНИЕ ===== */
 let canvas, ctx, paperCanvas;
-let W, H, CELL, OX, OY, GRID;
+let W, H, CELL, OX, OY, GRID_X, GRID_Y;
 let grid, currentCat = 'home';
 let night = false;
 let lightIdx = 0;
@@ -558,8 +542,20 @@ const IS_MOBILE = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent) || match
 
 const EMOJI_ALPHA = 0.55;
 
+/* Анимация появления: разные параметры для мобил и десктопа */
+const POP_DURATION = IS_MOBILE ? 380 : 900; // мобильные — короче
+const POP_EASE_OUT = IS_MOBILE
+  ? (t => 1 - Math.pow(1 - t, 4)) // на мобильных — быстрый чистый выход
+  : (t => 1 - Math.pow(1 - t, 3)); // на десктопе — как было
+const POP_SCALE_FROM = IS_MOBILE ? 0.82 : 0.6;
+const POP_BLEED = IS_MOBILE ? 0.4 : 0.8; // на мобильных меньше «кровотечение»
+
 let clearBtn = null;
 let clearBtnBusy = false;
+
+let isPointerDown = false;
+let lastPaintedIdx = -1;
+const paintedDuringSwipe = new Set();
 
 /* ============================================================
    СОХРАНЕНИЕ
@@ -623,6 +619,7 @@ function init(){
 
   loadState();
   preloadAllEmoji();
+  pickRandomPool(currentCat);
   resize();
   buildPaper();
   bindEvents();
@@ -641,27 +638,27 @@ function resize(){
   canvas.style.height = H + 'px';
   ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
 
-  GRID = IS_MOBILE ? 5 : 10;
+  if(IS_MOBILE){
+    GRID_X = 5; // 5 по горизонтали
+    GRID_Y = 7; // 7 по вертикали
+  } else {
+    GRID_X = 10;
+    GRID_Y = 10;
+  }
 
-  // УМЕНЬШЕН верхний отступ: кнопка режима теперь 84px,
-  // значит первая линия смайлов начинается сразу под ней.
-  // Отступ = высота кнопки (84) + минимальный зазор (10) = 94.
-  const padTop = IS_MOBILE
-    ? 78
-    : 104;
-
-  // Нижний отступ минимальный — смайлы занимают всё пространство до низа
-  const padBot = IS_MOBILE
-    ? 20
-    : 24;
+  // Мобильный верхний отступ увеличен, чтобы 104px-кнопка режима
+  // не перекрывала первую линию смайлов.
+  const padTop = IS_MOBILE ? 100 : 104;
+  const padBot = IS_MOBILE ? 14 : 24;
+  const padSide = IS_MOBILE ? 8 : 24;
 
   const availH = H - padTop - padBot;
-  const availW = W - 24;
-  CELL = Math.min(availW / GRID, availH / GRID);
-  OX = (W - CELL * GRID) / 2;
-  OY = padTop + (availH - CELL * GRID) / 2;
+  const availW = W - padSide * 2;
+  CELL = Math.min(availW / GRID_X, availH / GRID_Y);
+  OX = (W - CELL * GRID_X) / 2;
+  OY = padTop + (availH - CELL * GRID_Y) / 2;
 
-  grid = Array.from({length:GRID}, () => Array(GRID).fill(null));
+  grid = Array.from({length:GRID_Y}, () => Array(GRID_X).fill(null));
 }
 
 /* ============================================================
@@ -733,11 +730,20 @@ function buildPaper(){
   }
 }
 
-/* ===== СОБЫТИЯ ===== */
+/* ============================================================
+   СОБЫТИЯ
+   ============================================================ */
 function bindEvents(){
   canvas.addEventListener('mousemove', onMove);
   canvas.addEventListener('mousedown', onDown);
-  canvas.addEventListener('touchstart', onTouch, {passive:false});
+  canvas.addEventListener('mouseup', onUp);
+  canvas.addEventListener('mouseleave', onUp);
+
+  canvas.addEventListener('touchstart', onTouchStart, {passive:false});
+  canvas.addEventListener('touchmove',  onTouchMove,  {passive:false});
+  canvas.addEventListener('touchend',   onTouchEnd,   {passive:false});
+  canvas.addEventListener('touchcancel',onTouchEnd,   {passive:false});
+
   clearBtn.addEventListener('click', onClearClick);
   document.getElementById('theme').addEventListener('click', toggleTheme);
   document.getElementById('palette').addEventListener('click', cycleBackground);
@@ -754,8 +760,8 @@ function bindEvents(){
 
 /* ===== ИГРА ===== */
 function startGame(){
-  for(let r = 0; r < GRID; r++)
-    for(let c = 0; c < GRID; c++)
+  for(let r = 0; r < GRID_Y; r++)
+    for(let c = 0; c < GRID_X; c++)
       grid[r][c] = null;
   popAnims.clear();
   locked = false;
@@ -768,63 +774,131 @@ function startGame(){
   clearBtnBusy = false;
   clearBtn.classList.remove('visible', 'press');
   document.getElementById('boy').classList.remove('hidden');
+  isPointerDown = false;
+  lastPaintedIdx = -1;
+  paintedDuringSwipe.clear();
   updateUI();
   needsDraw = true;
 }
 
-function onTouch(e){
-  e.preventDefault();
-  const t = e.touches[0];
-  if(t) tap(t.clientX, t.clientY);
+function pointToCell(cx, cy){
+  const col = Math.floor((cx - OX) / CELL);
+  const row = Math.floor((cy - OY) / CELL);
+  if(col < 0 || col >= GRID_X || row < 0 || row >= GRID_Y) return null;
+  return {row, col, idx: row * GRID_X + col};
 }
-function onDown(e){ tap(e.clientX, e.clientY); }
 
-function onMove(e){
-  if(IS_MOBILE || !gameActive || locked || animating) return;
-  const col = Math.floor((e.clientX - OX) / CELL);
-  const row = Math.floor((e.clientY - OY) / CELL);
-  if(col < 0 || col >= GRID || row < 0 || row >= GRID) return;
-  const idx = row * GRID + col;
-  if(idx === lastHover) return;
-  lastHover = idx;
-  if(grid[row][col]) return;
+function paintCell(cell){
+  if(!cell) return;
+  if(grid[cell.row][cell.col]) return;
+  if(paintedDuringSwipe.has(cell.idx)) return;
+
   if(!audioCtx) initAudio();
   const pool = CATS[currentCat];
-  const pick = pool[(Math.random() * pool.length) | 0];
-  grid[row][col] = pick.hex;
-  popAnims.set(idx, {t: performance.now(), dur: 900});
+  if(!pool || pool.length === 0) return;
+  const hex = pool[(Math.random() * pool.length) | 0];
+  grid[cell.row][cell.col] = hex;
+  popAnims.set(cell.idx, {t: performance.now(), dur: POP_DURATION});
+  paintedDuringSwipe.add(cell.idx);
   swapCount++;
-  playNote(pick.hex);
+  playNote(hex);
   checkFull();
   if(!animating) needsDraw = true;
 }
 
-function tap(cx, cy){
+/* ===== МЫШЬ ===== */
+function onDown(e){
   if(!gameActive || locked || animating) return;
-  const col = Math.floor((cx - OX) / CELL);
-  const row = Math.floor((cy - OY) / CELL);
-  if(col < 0 || col >= GRID || row < 0 || row >= GRID) return;
+  isPointerDown = true;
+  paintedDuringSwipe.clear();
+  const cell = pointToCell(e.clientX, e.clientY);
+  if(!cell) return;
   if(!audioCtx) initAudio();
 
   const pool = CATS[currentCat];
-  const pick = pool[(Math.random() * pool.length) | 0];
-  const idx = row * GRID + col;
+  if(!pool || pool.length === 0) return;
+  const hex = pool[(Math.random() * pool.length) | 0];
 
-  if(IS_MOBILE){
-    grid[row][col] = pick.hex;
-    popAnims.set(idx, {t: performance.now(), dur: 900});
+  if(grid[cell.row][cell.col]){
+    grid[cell.row][cell.col] = hex;
+    popAnims.set(cell.idx, {t: performance.now(), dur: POP_DURATION});
     swapCount++;
-    playNote(pick.hex);
-    checkFull();
-    if(!animating) needsDraw = true;
-  } else {
-    if(!grid[row][col]) return;
-    grid[row][col] = pick.hex;
-    popAnims.set(idx, {t: performance.now(), dur: 900});
-    swapCount++;
-    playNote(pick.hex);
+    playNote(hex);
     needsDraw = true;
+  } else {
+    paintCell(cell);
   }
+}
+
+function onMove(e){
+  if(!gameActive || locked || animating) return;
+  const cell = pointToCell(e.clientX, e.clientY);
+  if(!cell) return;
+
+  if(!isPointerDown){
+    if(cell.idx === lastHover) return;
+    lastHover = cell.idx;
+    if(grid[cell.row][cell.col]) return;
+    paintCell(cell);
+  } else {
+    paintCell(cell);
+  }
+}
+
+function onUp(){
+  isPointerDown = false;
+  paintedDuringSwipe.clear();
+}
+
+/* ===== ТАЧ ===== */
+function onTouchStart(e){
+  e.preventDefault();
+  if(!gameActive || locked || animating) return;
+  isPointerDown = true;
+  paintedDuringSwipe.clear();
+
+  const t = e.touches[0];
+  if(!t) return;
+  const cell = pointToCell(t.clientX, t.clientY);
+  if(!cell) return;
+
+  if(!audioCtx) initAudio();
+  const pool = CATS[currentCat];
+  if(!pool || pool.length === 0) return;
+  const hex = pool[(Math.random() * pool.length) | 0];
+
+  if(grid[cell.row][cell.col]){
+    grid[cell.row][cell.col] = hex;
+    popAnims.set(cell.idx, {t: performance.now(), dur: POP_DURATION});
+    swapCount++;
+    playNote(hex);
+    needsDraw = true;
+  } else {
+    paintCell(cell);
+  }
+  lastPaintedIdx = cell.idx;
+}
+
+function onTouchMove(e){
+  e.preventDefault();
+  if(!gameActive || locked || animating) return;
+  if(!isPointerDown) return;
+
+  const t = e.touches[0];
+  if(!t) return;
+  const cell = pointToCell(t.clientX, t.clientY);
+  if(!cell) return;
+
+  if(cell.idx === lastPaintedIdx) return;
+  lastPaintedIdx = cell.idx;
+  paintCell(cell);
+}
+
+function onTouchEnd(e){
+  e.preventDefault();
+  isPointerDown = false;
+  lastPaintedIdx = -1;
+  paintedDuringSwipe.clear();
 }
 
 /* ===== РАЗДЕЛЫ ===== */
@@ -832,6 +906,7 @@ function cycleCat(){
   if(animating) return;
   const i = ORDER.indexOf(currentCat);
   currentCat = ORDER[(i + 1) % ORDER.length];
+  pickRandomPool(currentCat);
   updateBoyFace();
   startGame();
 }
@@ -844,8 +919,8 @@ function updateBoyFace(){
 }
 
 function checkFull(){
-  for(let r = 0; r < GRID; r++)
-    for(let c = 0; c < GRID; c++)
+  for(let r = 0; r < GRID_Y; r++)
+    for(let c = 0; c < GRID_X; c++)
       if(!grid[r][c]) return;
   locked = true;
   updateUI();
@@ -854,7 +929,6 @@ function checkFull(){
 function updateUI(){
   const boy = document.getElementById('boy');
   if(locked && gameActive){
-    // Показываем спираль, скрываем кнопку режимов
     clearBtn.classList.add('visible');
     boy.classList.add('hidden');
   } else {
@@ -886,26 +960,26 @@ function applyClear(){
 
   const toRemove = new Set();
 
-  for(let c = 0; c < GRID; c++){
+  for(let c = 0; c < GRID_X; c++){
     let s = 0;
-    while(s < GRID){
+    while(s < GRID_Y){
       const v = grid[s][c];
       if(!v){ s++; continue; }
       let e = s + 1;
-      while(e < GRID && grid[e][c] === v) e++;
-      if(e - s >= 2) for(let r = s; r < e; r++) toRemove.add(r * GRID + c);
+      while(e < GRID_Y && grid[e][c] === v) e++;
+      if(e - s >= 2) for(let r = s; r < e; r++) toRemove.add(r * GRID_X + c);
       s = e;
     }
   }
 
-  for(let r = 0; r < GRID; r++){
+  for(let r = 0; r < GRID_Y; r++){
     let s = 0;
-    while(s < GRID){
+    while(s < GRID_X){
       const v = grid[r][s];
       if(!v){ s++; continue; }
       let e = s + 1;
-      while(e < GRID && grid[r][e] === v) e++;
-      if(e - s >= 2) for(let c = s; c < e; c++) toRemove.add(r * GRID + c);
+      while(e < GRID_X && grid[r][e] === v) e++;
+      if(e - s >= 2) for(let c = s; c < e; c++) toRemove.add(r * GRID_X + c);
       s = e;
     }
   }
@@ -921,36 +995,36 @@ function applyClear(){
   const now = performance.now();
   const removed = [];
   toRemove.forEach(idx => {
-    const r = Math.floor(idx / GRID), c = idx % GRID;
+    const r = Math.floor(idx / GRID_X), c = idx % GRID_X;
     removed.push({row:r, col:c, hex:grid[r][c], idx});
     grid[r][c] = null;
     popAnims.delete(idx);
   });
 
-  const finalGrid = Array.from({length:GRID}, () => Array(GRID).fill(null));
-  for(let c = 0; c < GRID; c++){
+  const finalGrid = Array.from({length:GRID_Y}, () => Array(GRID_X).fill(null));
+  for(let c = 0; c < GRID_X; c++){
     const existing = [];
-    for(let r = 0; r < GRID; r++) if(grid[r][c]) existing.push(grid[r][c]);
+    for(let r = 0; r < GRID_Y; r++) if(grid[r][c]) existing.push(grid[r][c]);
     for(let i = 0; i < existing.length; i++)
-      finalGrid[GRID - existing.length + i][c] = existing[i];
+      finalGrid[GRID_Y - existing.length + i][c] = existing[i];
   }
 
   const fallers = [];
-  for(let c = 0; c < GRID; c++){
+  for(let c = 0; c < GRID_X; c++){
     const existing = [];
-    for(let r = 0; r < GRID; r++)
+    for(let r = 0; r < GRID_Y; r++)
       if(grid[r][c]) existing.push({row:r, hex:grid[r][c]});
     const n = existing.length;
     for(let i = 0; i < n; i++){
       const fromRow = existing[i].row;
-      const toRow = GRID - n + i;
+      const toRow = GRID_Y - n + i;
       if(fromRow !== toRow)
         fallers.push({fromRow, toRow, col:c, hex:existing[i].hex});
     }
   }
 
-  for(let r = 0; r < GRID; r++)
-    for(let c = 0; c < GRID; c++)
+  for(let r = 0; r < GRID_Y; r++)
+    for(let c = 0; c < GRID_X; c++)
       grid[r][c] = finalGrid[r][c];
 
   playDissolve();
@@ -1022,10 +1096,10 @@ function drawEmoji(hex, x, y, scale, alpha, bleed){
 function renderStatic(now){
   ctx.drawImage(paperCanvas, 0, 0, W, H);
 
-  for(let r = 0; r < GRID; r++){
-    for(let c = 0; c < GRID; c++){
+  for(let r = 0; r < GRID_Y; r++){
+    for(let c = 0; c < GRID_X; c++){
       if(!grid[r][c]) continue;
-      const key = r * GRID + c;
+      const key = r * GRID_X + c;
       const x = OX + c * CELL + CELL / 2;
       const y = OY + r * CELL + CELL / 2;
       const pop = popAnims.get(key);
@@ -1033,10 +1107,10 @@ function renderStatic(now){
       if(pop){
         const t = Math.min((now - pop.t) / pop.dur, 1);
         if(t < 1){
-          const e = 1 - Math.pow(1 - t, 3);
-          const scale = 0.6 + 0.4 * e;
+          const e = POP_EASE_OUT(t);
+          const scale = POP_SCALE_FROM + (1 - POP_SCALE_FROM) * e;
           const alpha = e * EMOJI_ALPHA;
-          const bleed = (1 - t) * 0.8;
+          const bleed = (1 - t) * POP_BLEED;
           drawEmoji(grid[r][c], x, y, scale, alpha, bleed);
           continue;
         }
@@ -1051,7 +1125,7 @@ function drawFrame(fallEased, elapsed){
   ctx.drawImage(paperCanvas, 0, 0, W, H);
 
   const fallingSet = new Set();
-  animPhase.fallers.forEach(f => fallingSet.add(f.toRow * GRID + f.col));
+  animPhase.fallers.forEach(f => fallingSet.add(f.toRow * GRID_X + f.col));
 
   animPhase.removed.forEach(cell => {
     const t = Math.min(elapsed / animPhase.fadeDur, 1);
@@ -1065,9 +1139,9 @@ function drawFrame(fallEased, elapsed){
     drawEmoji(cell.hex, x, y, Math.max(scale, 0.01), alpha, bleed);
   });
 
-  for(let r = 0; r < GRID; r++){
-    for(let c = 0; c < GRID; c++){
-      if(fallingSet.has(r * GRID + c)) continue;
+  for(let r = 0; r < GRID_Y; r++){
+    for(let c = 0; c < GRID_X; c++){
+      if(fallingSet.has(r * GRID_X + c)) continue;
       if(grid[r][c])
         drawEmoji(grid[r][c], OX + c * CELL + CELL/2, OY + r * CELL + CELL/2, 1, EMOJI_ALPHA, 0);
     }
@@ -1101,6 +1175,7 @@ function showEnd(){
 function closeEnd(){
   document.getElementById('end').classList.remove('visible');
   currentCat = 'home';
+  pickRandomPool(currentCat);
   updateBoyFace();
   startGame();
 }
