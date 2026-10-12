@@ -363,17 +363,12 @@ const FULL_POOL = {
     '1F375', '1F950', '1F370', '1F36B', '1F36D', '1FAB4', '231A', '23F0',
     '1F570'
   ],
-  /* Пасхальные режимы */
-  poop: [
-    '1F4A9'
-  ],
-  panda: [
-    '1F43C'
-  ]
+  poop:  ['1F4A9'],
+  panda: ['1F43C']
 };
 
 /* ============================================================
-   АКТИВНЫЕ ПУЛЫ (10 случайных при каждой смене режима)
+   АКТИВНЫЕ ПУЛЫ
    ============================================================ */
 const CATS = {
   home: [],
@@ -383,7 +378,6 @@ const CATS = {
   cozy: []
 };
 
-/* Пасхалка — текущая активная */
 let easterMode = null; // 'poop' | 'panda' | null
 
 const POOL_SIZE = 10;
@@ -405,7 +399,6 @@ function pickRandomPool(cat){
   return CATS[cat];
 }
 
-/* Текущий пул для игры — с учётом пасхалки */
 function activePool(){
   if(easterMode) return FULL_POOL[easterMode];
   return CATS[currentCat];
@@ -436,7 +429,7 @@ function makeSpiralPath(cx, cy, a, b, turns){
 }
 
 /* ============================================================
-   ПОРЯДОК И ИКОНКИ РАЗДЕЛОВ
+   ПОРЯДОК И ИКОНКИ
    ============================================================ */
 const ORDER = ['home', 'wild', 'sea', 'pets', 'cozy'];
 
@@ -558,8 +551,8 @@ let animPhase = null, needsDraw = true;
 let startTime = 0, gameActive = false;
 let popAnims = new Map();
 let lastHover = -1;
-let swapCount = 0;       // автозамены (появление)
-let manualCount = 0;     // ручные замены (тык по существующему смайлу)
+let swapCount = 0;
+let manualCount = 0;
 let DPR = Math.min(devicePixelRatio || 1, 2);
 const IS_MOBILE = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent) || matchMedia('(pointer:coarse)').matches;
 
@@ -661,11 +654,11 @@ function resize(){
   ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
 
   if(IS_MOBILE){
-    GRID_X = 5;
-    GRID_Y = 7;
+    GRID_X = 5;   // 5 по горизонтали
+    GRID_Y = 7;   // 7 по вертикали
   } else {
-    GRID_X = 10;
-    GRID_Y = 10;
+    GRID_X = 12;  // 12 по горизонтали
+    GRID_Y = 8;   // 8 по вертикали
   }
 
   const padTop = IS_MOBILE ? 100 : 104;
@@ -770,10 +763,8 @@ function bindEvents(){
   document.getElementById('boy').addEventListener('click', cycleCat);
   document.getElementById('end-restart').addEventListener('click', closeEnd);
 
-  // Двойной клик по времени на экране победы — пасхалка
   const timeEl = document.getElementById('end-time');
   timeEl.addEventListener('dblclick', onEndTimeDoubleClick);
-  // Мобильный вариант: двойной тап
   let lastTapEnd = 0;
   timeEl.addEventListener('touchend', (e) => {
     const now = performance.now();
@@ -795,19 +786,10 @@ function bindEvents(){
   document.addEventListener('contextmenu', e => e.preventDefault());
 }
 
-/* ============================================================
-   ПАСХАЛКА: двойной клик по времени на экране победы
-   ============================================================ */
 function onEndTimeDoubleClick(e){
   e.preventDefault();
-  // Случайно выбираем одну из двух пасхалок
   easterMode = Math.random() < 0.5 ? 'poop' : 'panda';
-
-  // Закрываем экран победы
   document.getElementById('end').classList.remove('visible');
-
-  // Прячем кнопки фона/темы? Нет, оставляем — пусть играют.
-  // Перезапускаем игру с пасхалкой
   startGame();
   updateBoyFace();
 }
@@ -882,7 +864,6 @@ function replaceCell(cell){
   needsDraw = true;
 }
 
-/* ===== МЫШЬ ===== */
 function onDown(e){
   if(!gameActive || locked || animating) return;
   isPointerDown = true;
@@ -916,7 +897,6 @@ function onUp(){
   paintedDuringSwipe.clear();
 }
 
-/* ===== ТАЧ ===== */
 function onTouchStart(e){
   e.preventDefault();
   if(!gameActive || locked || animating) return;
@@ -958,14 +938,9 @@ function onTouchEnd(e){
   paintedDuringSwipe.clear();
 }
 
-/* ===== РАЗДЕЛЫ ===== */
 function cycleCat(){
   if(animating) return;
-
-  // Если включена пасхалка — выключаем её при смене режима
-  if(easterMode){
-    easterMode = null;
-  }
+  if(easterMode) easterMode = null;
 
   const i = ORDER.indexOf(currentCat);
   currentCat = ORDER[(i + 1) % ORDER.length];
@@ -1097,7 +1072,6 @@ function applyClear(){
   animPhase = {start: now, removed, fallers, fadeDur: 1100, fallDur: 1300, delay: 500};
 }
 
-/* ===== АНИМАЦИЯ ===== */
 function raf(){
   if(animating && animPhase){
     const elapsed = performance.now() - animPhase.start;
@@ -1130,7 +1104,6 @@ function raf(){
   requestAnimationFrame(raf);
 }
 
-/* ===== ОТРИСОВКА ===== */
 function drawEmoji(hex, x, y, scale, alpha, bleed){
   const img = getEmojiImage(hex);
   const size = CELL * 0.94 * scale;
@@ -1219,7 +1192,6 @@ function drawFrame(fallEased, elapsed){
   });
 }
 
-/* ===== ЗАВЕРШЕНИЕ ===== */
 function showEnd(){
   gameActive = false;
   clearBtn.classList.remove('visible', 'press');
@@ -1251,7 +1223,6 @@ function closeEnd(){
   startGame();
 }
 
-/* ===== ТЕМА / ФОН ===== */
 function toggleTheme(){
   night = !night;
   saveState();
@@ -1272,7 +1243,6 @@ function cycleBackground(){
   applyTheme();
 }
 
-/* ===== ЗВУК ===== */
 function initAudio(){
   try{
     const AC = window.AudioContext || window.webkitAudioContext;
