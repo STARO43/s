@@ -179,26 +179,44 @@ canvas{
   font-size:56px;font-weight:200;letter-spacing:-2px;
   color:var(--ink);font-variant-numeric:tabular-nums;
   font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display",Georgia,sans-serif;
+  cursor:pointer;
+  user-select:none;
+  -webkit-user-select:none;
+  -webkit-tap-highlight-color:transparent;
 }
 #end-platform{font-size:26px;line-height:1;opacity:.5;filter:saturate(.55) brightness(.95)}
-#end-swaps{
-  display:flex;align-items:center;gap:10px;
-  color:var(--ink-soft);
+
+#end-stats{
+  display:flex;
+  align-items:center;
+  gap:28px;
+  margin-top:-6px;
   font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display",Georgia,sans-serif;
-  font-size:18px;font-weight:300;letter-spacing:.5px;
-  margin-top:-6px;opacity:.7;
 }
-#end-swaps svg{
+
+.stat{
+  display:flex;align-items:center;gap:8px;
+  color:var(--ink-soft);
+  font-size:18px;font-weight:300;letter-spacing:.5px;
+  opacity:.7;
+}
+.stat svg{
   width:20px;height:20px;display:block;
   color:var(--ink-soft);stroke:currentColor;stroke-width:1.6;fill:none;
   stroke-linecap:round;stroke-linejoin:round;opacity:.85;
-  animation:swapsTurn 8s linear infinite;
 }
-@keyframes swapsTurn{
+.stat .spin{
+  animation:statSpin 8s linear infinite;
+}
+@keyframes statSpin{
   0%{transform:rotate(0)}
   100%{transform:rotate(360deg)}
 }
-#end-swaps .count{font-variant-numeric:tabular-nums;color:var(--ink);opacity:.75;font-weight:400}
+.stat .count{
+  font-variant-numeric:tabular-nums;
+  color:var(--ink);opacity:.75;font-weight:400;
+}
+
 #end-restart{
   margin-top:20px;border:none;background:transparent;
   color:var(--ink-soft);padding:12px;border-radius:100px;cursor:pointer;
@@ -210,44 +228,22 @@ canvas{
 #end-restart:active{opacity:1;transform:scale(.92)}
 #end-restart svg{width:20px;height:20px}
 
-/* ============================================================
-   МОБИЛЬНАЯ АДАПТАЦИЯ
-   Кнопка режима БОЛЬШЕ, кнопки цвета и темы МЕНЬШЕ.
-   ============================================================ */
 @media(max-width:500px){
-  /* Кнопка выбора режима — увеличенная */
-  #boy{
-    width:104px;height:104px;
-    margin-left:-52px;
-  }
-  #boy img{
-    width:80px;height:80px;
-  }
-  #clear-btn{
-    width:104px;height:104px;
-    margin-left:-52px;
-  }
-
-  /* Кнопки цвета и темы — уменьшенные */
-  #palette{
-    width:44px;height:44px;
-  }
-  #palette svg{
-    width:30px;height:30px;
-  }
-  #theme{
-    width:44px;height:44px;
-  }
-  #theme .bulb{
-    font-size:22px;
-  }
+  #boy{width:104px;height:104px;margin-left:-52px}
+  #boy img{width:80px;height:80px}
+  #clear-btn{width:104px;height:104px;margin-left:-52px}
+  #palette{width:44px;height:44px}
+  #palette svg{width:30px;height:30px}
+  #theme{width:44px;height:44px}
+  #theme .bulb{font-size:22px}
 
   #end-time{font-size:44px;letter-spacing:-1px}
   #end-icon{width:44px;height:44px}
   #end-icon img{width:38px;height:38px}
   #end-platform{font-size:22px}
-  #end-swaps{font-size:16px}
-  #end-swaps svg{width:18px;height:18px}
+  #end-stats{gap:18px}
+  .stat{font-size:16px}
+  .stat svg{width:18px;height:18px}
 }
 </style>
 </head>
@@ -289,14 +285,24 @@ canvas{
     <div id="end-platform">🖥️</div>
   </div>
 
-  <div id="end-swaps">
-    <svg viewBox="0 0 24 24">
-      <path d="M4 12 A 8 8 0 0 1 12 4 L14 4"/>
-      <path d="M14 4 L11 1 M14 4 L11 7"/>
-      <path d="M20 12 A 8 8 0 0 1 12 20 L10 20"/>
-      <path d="M10 20 L13 23 M10 20 L13 17"/>
-    </svg>
-    <span class="count" id="end-swaps-count">0</span>
+  <div id="end-stats">
+    <div class="stat" title="Автоматические замены">
+      <svg class="spin" viewBox="0 0 24 24">
+        <path d="M4 12 A 8 8 0 0 1 12 4 L14 4"/>
+        <path d="M14 4 L11 1 M14 4 L11 7"/>
+        <path d="M20 12 A 8 8 0 0 1 12 20 L10 20"/>
+        <path d="M10 20 L13 23 M10 20 L13 17"/>
+      </svg>
+      <span class="count" id="end-swaps-count">0</span>
+    </div>
+
+    <div class="stat" title="Ручные замены">
+      <svg viewBox="0 0 24 24">
+        <path d="M15 4 L19 8 L9 18 L5 19 L6 15 Z"/>
+        <path d="M13 6 L17 10"/>
+      </svg>
+      <span class="count" id="end-manual-count">0</span>
+    </div>
   </div>
 
   <button id="end-restart" aria-label="Начать заново">
@@ -339,13 +345,13 @@ const FULL_POOL = {
     '1F33A', '1F339', '1F342', '1F341', '1F98B', '1F41E', '1F997', '1F426'
   ],
   wild: [
-    '1F43B', '1F43C', '1F98A', '1F43A', '1F98C', '1F994', '1F410', '1F407',
+    '1F43B', '1F98A', '1F43A', '1F98C', '1F994', '1F407',
     '1F439', '1F43F', '1F985', '1F332', '1F333', '1F344', '1FAD0', '1F341',
     '1F41C'
   ],
   sea: [
     '1F433', '1F42C', '1F9AD', '1F419', '1F420', '1F41F', '1F980', '1F99E',
-    '1FAB8', '1FABC', '1F3DD'
+    '1FAB8', '1FABC'
   ],
   pets: [
     '1F431', '1F436', '1F99C', '1F986', '1F424', '1F414', '1F983', '1F404',
@@ -355,7 +361,14 @@ const FULL_POOL = {
     '1F4DA', '1F4D5', '1F4F0', '270F', '1F58A', '1F4CE', '1F4CC', '1F4CF',
     '2702', '1F4BB', '1F5A5', '1F4F1', '1F4FB', '1F3A7', '1F4F7', '2615',
     '1F375', '1F950', '1F370', '1F36B', '1F36D', '1FAB4', '231A', '23F0',
-    '1F570', '1F9E9', '265F'
+    '1F570'
+  ],
+  /* Пасхальные режимы */
+  poop: [
+    '1F4A9'
+  ],
+  panda: [
+    '1F43C'
   ]
 };
 
@@ -369,6 +382,9 @@ const CATS = {
   pets: [],
   cozy: []
 };
+
+/* Пасхалка — текущая активная */
+let easterMode = null; // 'poop' | 'panda' | null
 
 const POOL_SIZE = 10;
 
@@ -387,6 +403,12 @@ function pickRandomPool(cat){
   const n = Math.min(POOL_SIZE, shuffled.length);
   CATS[cat] = shuffled.slice(0, n);
   return CATS[cat];
+}
+
+/* Текущий пул для игры — с учётом пасхалки */
+function activePool(){
+  if(easterMode) return FULL_POOL[easterMode];
+  return CATS[currentCat];
 }
 
 function preloadAllEmoji(){
@@ -419,7 +441,7 @@ function makeSpiralPath(cx, cy, a, b, turns){
 const ORDER = ['home', 'wild', 'sea', 'pets', 'cozy'];
 
 const MODE_ICON_HEX = {
-  home:'1F33F', wild:'1F994', sea:'1F41F', pets:'1F431', cozy:'2615'
+  home:'1F33F', wild:'1F994', sea:'1F420', pets:'1F431', cozy:'2615'
 };
 
 const END_ICON_HEX = {
@@ -536,19 +558,19 @@ let animPhase = null, needsDraw = true;
 let startTime = 0, gameActive = false;
 let popAnims = new Map();
 let lastHover = -1;
-let swapCount = 0;
+let swapCount = 0;       // автозамены (появление)
+let manualCount = 0;     // ручные замены (тык по существующему смайлу)
 let DPR = Math.min(devicePixelRatio || 1, 2);
 const IS_MOBILE = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent) || matchMedia('(pointer:coarse)').matches;
 
 const EMOJI_ALPHA = 0.55;
 
-/* Анимация появления: разные параметры для мобил и десктопа */
-const POP_DURATION = IS_MOBILE ? 380 : 900; // мобильные — короче
+const POP_DURATION = IS_MOBILE ? 380 : 900;
 const POP_EASE_OUT = IS_MOBILE
-  ? (t => 1 - Math.pow(1 - t, 4)) // на мобильных — быстрый чистый выход
-  : (t => 1 - Math.pow(1 - t, 3)); // на десктопе — как было
+  ? (t => 1 - Math.pow(1 - t, 4))
+  : (t => 1 - Math.pow(1 - t, 3));
 const POP_SCALE_FROM = IS_MOBILE ? 0.82 : 0.6;
-const POP_BLEED = IS_MOBILE ? 0.4 : 0.8; // на мобильных меньше «кровотечение»
+const POP_BLEED = IS_MOBILE ? 0.4 : 0.8;
 
 let clearBtn = null;
 let clearBtnBusy = false;
@@ -639,15 +661,13 @@ function resize(){
   ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
 
   if(IS_MOBILE){
-    GRID_X = 5; // 5 по горизонтали
-    GRID_Y = 7; // 7 по вертикали
+    GRID_X = 5;
+    GRID_Y = 7;
   } else {
     GRID_X = 10;
     GRID_Y = 10;
   }
 
-  // Мобильный верхний отступ увеличен, чтобы 104px-кнопка режима
-  // не перекрывала первую линию смайлов.
   const padTop = IS_MOBILE ? 100 : 104;
   const padBot = IS_MOBILE ? 14 : 24;
   const padSide = IS_MOBILE ? 8 : 24;
@@ -749,6 +769,23 @@ function bindEvents(){
   document.getElementById('palette').addEventListener('click', cycleBackground);
   document.getElementById('boy').addEventListener('click', cycleCat);
   document.getElementById('end-restart').addEventListener('click', closeEnd);
+
+  // Двойной клик по времени на экране победы — пасхалка
+  const timeEl = document.getElementById('end-time');
+  timeEl.addEventListener('dblclick', onEndTimeDoubleClick);
+  // Мобильный вариант: двойной тап
+  let lastTapEnd = 0;
+  timeEl.addEventListener('touchend', (e) => {
+    const now = performance.now();
+    if(now - lastTapEnd < 350){
+      e.preventDefault();
+      onEndTimeDoubleClick(e);
+      lastTapEnd = 0;
+    } else {
+      lastTapEnd = now;
+    }
+  }, {passive:false});
+
   addEventListener('resize', () => { resize(); buildPaper(); needsDraw = true; });
 
   ['gesturestart','gesturechange','gestureend'].forEach(e =>
@@ -758,7 +795,26 @@ function bindEvents(){
   document.addEventListener('contextmenu', e => e.preventDefault());
 }
 
-/* ===== ИГРА ===== */
+/* ============================================================
+   ПАСХАЛКА: двойной клик по времени на экране победы
+   ============================================================ */
+function onEndTimeDoubleClick(e){
+  e.preventDefault();
+  // Случайно выбираем одну из двух пасхалок
+  easterMode = Math.random() < 0.5 ? 'poop' : 'panda';
+
+  // Закрываем экран победы
+  document.getElementById('end').classList.remove('visible');
+
+  // Прячем кнопки фона/темы? Нет, оставляем — пусть играют.
+  // Перезапускаем игру с пасхалкой
+  startGame();
+  updateBoyFace();
+}
+
+/* ============================================================
+   ИГРА
+   ============================================================ */
 function startGame(){
   for(let r = 0; r < GRID_Y; r++)
     for(let c = 0; c < GRID_X; c++)
@@ -771,6 +827,7 @@ function startGame(){
   gameActive = true;
   lastHover = -1;
   swapCount = 0;
+  manualCount = 0;
   clearBtnBusy = false;
   clearBtn.classList.remove('visible', 'press');
   document.getElementById('boy').classList.remove('hidden');
@@ -788,15 +845,20 @@ function pointToCell(cx, cy){
   return {row, col, idx: row * GRID_X + col};
 }
 
+function pickHex(){
+  const pool = activePool();
+  if(!pool || pool.length === 0) return null;
+  return pool[(Math.random() * pool.length) | 0];
+}
+
 function paintCell(cell){
   if(!cell) return;
   if(grid[cell.row][cell.col]) return;
   if(paintedDuringSwipe.has(cell.idx)) return;
 
   if(!audioCtx) initAudio();
-  const pool = CATS[currentCat];
-  if(!pool || pool.length === 0) return;
-  const hex = pool[(Math.random() * pool.length) | 0];
+  const hex = pickHex();
+  if(!hex) return;
   grid[cell.row][cell.col] = hex;
   popAnims.set(cell.idx, {t: performance.now(), dur: POP_DURATION});
   paintedDuringSwipe.add(cell.idx);
@@ -806,6 +868,20 @@ function paintCell(cell){
   if(!animating) needsDraw = true;
 }
 
+function replaceCell(cell){
+  if(!cell) return;
+  if(!grid[cell.row][cell.col]) return;
+  if(!audioCtx) initAudio();
+  const hex = pickHex();
+  if(!hex) return;
+  grid[cell.row][cell.col] = hex;
+  popAnims.set(cell.idx, {t: performance.now(), dur: POP_DURATION});
+  swapCount++;
+  manualCount++;
+  playNote(hex);
+  needsDraw = true;
+}
+
 /* ===== МЫШЬ ===== */
 function onDown(e){
   if(!gameActive || locked || animating) return;
@@ -813,18 +889,8 @@ function onDown(e){
   paintedDuringSwipe.clear();
   const cell = pointToCell(e.clientX, e.clientY);
   if(!cell) return;
-  if(!audioCtx) initAudio();
-
-  const pool = CATS[currentCat];
-  if(!pool || pool.length === 0) return;
-  const hex = pool[(Math.random() * pool.length) | 0];
-
   if(grid[cell.row][cell.col]){
-    grid[cell.row][cell.col] = hex;
-    popAnims.set(cell.idx, {t: performance.now(), dur: POP_DURATION});
-    swapCount++;
-    playNote(hex);
-    needsDraw = true;
+    replaceCell(cell);
   } else {
     paintCell(cell);
   }
@@ -862,17 +928,8 @@ function onTouchStart(e){
   const cell = pointToCell(t.clientX, t.clientY);
   if(!cell) return;
 
-  if(!audioCtx) initAudio();
-  const pool = CATS[currentCat];
-  if(!pool || pool.length === 0) return;
-  const hex = pool[(Math.random() * pool.length) | 0];
-
   if(grid[cell.row][cell.col]){
-    grid[cell.row][cell.col] = hex;
-    popAnims.set(cell.idx, {t: performance.now(), dur: POP_DURATION});
-    swapCount++;
-    playNote(hex);
-    needsDraw = true;
+    replaceCell(cell);
   } else {
     paintCell(cell);
   }
@@ -904,6 +961,12 @@ function onTouchEnd(e){
 /* ===== РАЗДЕЛЫ ===== */
 function cycleCat(){
   if(animating) return;
+
+  // Если включена пасхалка — выключаем её при смене режима
+  if(easterMode){
+    easterMode = null;
+  }
+
   const i = ORDER.indexOf(currentCat);
   currentCat = ORDER[(i + 1) % ORDER.length];
   pickRandomPool(currentCat);
@@ -914,7 +977,10 @@ function cycleCat(){
 function updateBoyFace(){
   const img = document.getElementById('boy-img');
   if(!img) return;
-  const hex = MODE_ICON_HEX[currentCat];
+  let hex;
+  if(easterMode === 'poop') hex = '1F4A9';
+  else if(easterMode === 'panda') hex = '1F43C';
+  else hex = MODE_ICON_HEX[currentCat];
   img.src = getEmojiUrl(hex);
 }
 
@@ -1164,16 +1230,21 @@ function showEnd(){
   const s = sec % 60;
   document.getElementById('end-time').textContent = `${m}:${String(s).padStart(2,'0')}`;
 
-  const hex = END_ICON_HEX[currentCat] || '1F33F';
+  let hex;
+  if(easterMode === 'poop') hex = '1F4A9';
+  else if(easterMode === 'panda') hex = '1F43C';
+  else hex = END_ICON_HEX[currentCat] || '1F33F';
   const img = document.getElementById('end-icon-img');
   if(img) img.src = getEmojiUrl(hex);
 
   document.getElementById('end-swaps-count').textContent = swapCount;
+  document.getElementById('end-manual-count').textContent = manualCount;
   document.getElementById('end').classList.add('visible');
 }
 
 function closeEnd(){
   document.getElementById('end').classList.remove('visible');
+  easterMode = null;
   currentCat = 'home';
   pickRandomPool(currentCat);
   updateBoyFace();
