@@ -378,7 +378,7 @@ const CATS = {
   cozy: []
 };
 
-let easterMode = null; // 'poop' | 'panda' | null
+let easterMode = null;
 
 const POOL_SIZE = 10;
 
@@ -654,11 +654,11 @@ function resize(){
   ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
 
   if(IS_MOBILE){
-    GRID_X = 5;   // 5 по горизонтали
-    GRID_Y = 7;   // 7 по вертикали
+    GRID_X = 5;
+    GRID_Y = 7;
   } else {
-    GRID_X = 12;  // 12 по горизонтали
-    GRID_Y = 8;   // 8 по вертикали
+    GRID_X = 13;  // 13 по горизонтали
+    GRID_Y = 7;   // 7 по вертикали
   }
 
   const padTop = IS_MOBILE ? 100 : 104;
