@@ -5,6 +5,13 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="theme-color" content="#e8ecd8">
+<meta name="description" content="Вайбиньо — интерактив для малышей, нервных родителей и работяг">
+<meta property="og:title" content="Вайбиньо">
+<meta property="og:description" content="Вайбиньо — интерактив для малышей, нервных родителей и работяг">
+<meta property="og:type" content="website">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Вайбиньо">
+<meta name="twitter:description" content="Вайбиньо — интерактив для малышей, нервных родителей и работяг">
 <title>Вайбиньо</title>
 <style>
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;margin:0;padding:0}
@@ -123,7 +130,6 @@ canvas{
   font-size:56px;font-weight:200;letter-spacing:-2px;
   color:var(--ink);font-variant-numeric:tabular-nums;
   font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display",Georgia,sans-serif;
-  cursor:pointer;
   user-select:none;
   -webkit-user-select:none;
   -webkit-tap-highlight-color:transparent;
@@ -194,6 +200,21 @@ canvas{
 </style>
 </head>
 <body>
+<!--
+  ВАЙБИНЬО
+  ─────────────────────────────────────────────────────────
+  Не игра, а интерактивный опыт.
+
+  Бумажное поле, эмодзи, тихий звук. Касаешься клеток — появляются картинки, поле заполняется; потом очищаешь одинаковые цепочки, остальное падает вниз. Ни проигрыша, ни правил, ни текста. Таймер не давит — виден только в финале. Цель — не результат, а процесс.
+
+  Атмосфера тёплая и тактильная.
+    Луг   — спокойная радость: цветы, травы, жучки, бабочки.
+    Лес   — умиротворение: деревья, грибы, звери, осень.
+    Море  — почти медитация: прохладные цвета, морские обитатели.
+    Мордочки и фрукты — для малышей.
+
+  Пасхалка: двойной тап по таймеру в финале.
+-->
 <canvas id="field"></canvas>
 
 <button id="mode-btn" aria-label="Сменить раздел">
@@ -260,12 +281,12 @@ function getEmojiImage(hex){
 }
 
 const FULL_POOL = {
-  home: [
+  meadow: [
     '1F331','1F340','1F33E','1F338','1F33C','1F337','1F33B',
-    '1F33A','1F339','1F341','1F98B','1F41E','1F997','1F426'
+    '1F33A','1F339','1F98B','1F41E','1F997','1F426'
   ],
-  wild: [
-    '1F332','1F333','1F344','1F33F','1F41C','1FAB2','1F98C','1F986','1F994',
+  forest: [
+    '1F332','1F333','1F344','1F33F','1F341','1F41C','1FAB2','1F98C','1F986','1F994',
     '1F43F','1F407','1F9A8','1F9A1','1F9A2','1F40D','1F40C','1F401','1F9AB'
   ],
   sea: [
@@ -276,27 +297,27 @@ const FULL_POOL = {
     '1F98A','1F43A','1F43B','1F43C','1F439','1F430','1F431','1F436',
     '1F437','1F42E','1F42D','1F438'
   ],
-  food: [
+  fruits: [
     '1F34E','1F34F','1F350','1F34A','1F34B','1F34C','1F349','1F347',
     '1F353','1F352','1FAD1'
   ],
   poop: ['1F4A9','1F9FB']
 };
 
-const ALWAYS = {
-  home: ['1F338','1F33C','1F337','1F33B','1F33A','1F339'],
-  wild: ['1F332','1F333','1F344','1F33F']
+const REQUIRED = {
+  meadow: ['1F338','1F33C','1F337','1F33B','1F33A','1F339'],
+  forest: ['1F332','1F333','1F344','1F33F','1F341']
 };
 
 const CATS = {
-  home: [],
-  wild: [],
-  sea:  [],
-  faces: [],
-  food: []
+  meadow: [],
+  forest: [],
+  sea:    [],
+  faces:  [],
+  fruits: []
 };
 
-let easterMode = null;
+let poopMode = false;
 
 const POOL_SIZE = 10;
 
@@ -311,8 +332,8 @@ function shuffle(arr){
 
 function pickRandomPool(cat){
   const full = FULL_POOL[cat] || [];
-  const always = ALWAYS[cat] || [];
-  const selected = new Set(always);
+  const required = REQUIRED[cat] || [];
+  const selected = new Set(required);
 
   const rest = full.filter(hex => !selected.has(hex));
   const shuffledRest = shuffle(rest);
@@ -327,7 +348,7 @@ function pickRandomPool(cat){
 }
 
 function activePool(){
-  if(easterMode) return FULL_POOL[easterMode];
+  if(poopMode) return FULL_POOL.poop;
   return CATS[currentCat];
 }
 
@@ -352,26 +373,26 @@ function makeSpiralPath(cx, cy, a, b, turns){
   return d;
 }
 
-const ORDER = ['home', 'wild', 'sea', 'faces', 'food'];
+const ORDER = ['meadow', 'forest', 'sea', 'faces', 'fruits'];
 
 const MODE_ICON_HEX = {
-  home:  '1F33F',
-  wild:  '1F332',
-  sea:   '1F420',
-  faces: '1F431',
-  food:  '1F34E'
+  meadow: '1F33F',
+  forest: '1F332',
+  sea:    '1F420',
+  faces:  '1F431',
+  fruits: '1F34E'
 };
 
 const END_ICON_HEX = {
-  home:  '1F33F',
-  wild:  '1F344',
-  sea:   '1F433',
-  faces: '1F431',
-  food:  '1F34E'
+  meadow: '1F33F',
+  forest: '1F344',
+  sea:    '1F433',
+  faces:  '1F431',
+  fruits: '1F34E'
 };
 
 const THEMES = {
-  home: {
+  meadow: {
     base:         '#e6ecd2',
     horizon:      '#f0eed8',
     sky:          '#f8f4dc',
@@ -382,7 +403,7 @@ const THEMES = {
     inkSoft:      'rgba(62,74,44,.38)',
     grain:        [110,140,80]
   },
-  wild: {
+  forest: {
     base:         '#e5d4bb',
     horizon:      '#efe0c5',
     sky:          '#f5ead0',
@@ -405,17 +426,17 @@ const THEMES = {
     grain:        [80,110,130]
   },
   faces: {
-    base:         '#ecdde0',
-    horizon:      '#f4e6e6',
-    sky:          '#f9f0ee',
-    ground:       '#cca8ad',
-    bloom:        'rgba(255,225,225,0.4)',
-    vignette:     'rgba(140,100,110,0.15)',
-    ink:          '#4a3238',
-    inkSoft:      'rgba(74,50,56,.38)',
-    grain:        [150,110,120]
+    base:         '#f5e8a8',
+    horizon:      '#fbf1c2',
+    sky:          '#fdf7d6',
+    ground:       '#ddc072',
+    bloom:        'rgba(255,250,175,0.5)',
+    vignette:     'rgba(170,150,60,0.14)',
+    ink:          '#4a3f18',
+    inkSoft:      'rgba(74,63,24,.38)',
+    grain:        [170,148,65]
   },
-  food: {
+  fruits: {
     base:         '#f0e4c4',
     horizon:      '#f6e8c8',
     sky:          '#fbf2d6',
@@ -440,12 +461,12 @@ const THEMES = {
 };
 
 function currentThemeKey(){
-  if(easterMode) return 'poop';
+  if(poopMode) return 'poop';
   return currentCat;
 }
 
 function applyTheme(){
-  const t = THEMES[currentThemeKey()] || THEMES.home;
+  const t = THEMES[currentThemeKey()] || THEMES.meadow;
   const root = document.documentElement;
 
   root.style.setProperty('--paper',     t.base);
@@ -491,7 +512,7 @@ function getNoiseTile(grainRGB, isDark){
 
 let canvas, ctx, paperCanvas;
 let W, H, CELL, OX, OY, GRID_X, GRID_Y;
-let grid, currentCat = 'home';
+let grid, currentCat = 'meadow';
 let audioCtx = null, locked = false, animating = false;
 let animPhase = null, needsDraw = true;
 let startTime = 0, gameActive = false;
@@ -578,7 +599,7 @@ function buildPaper(){
   p.setTransform(DPR, 0, 0, DPR, 0, 0);
 
   const key = currentThemeKey();
-  const t = THEMES[key] || THEMES.home;
+  const t = THEMES[key] || THEMES.meadow;
   const isDark = key === 'poop';
 
   p.fillStyle = t.base;
@@ -712,7 +733,7 @@ function bindEvents(){
 
 function onEndTimeDoubleClick(e){
   e.preventDefault();
-  easterMode = 'poop';
+  poopMode = true;
   document.getElementById('end').classList.remove('visible');
   applyTheme();
   startGame();
@@ -863,9 +884,9 @@ function onTouchEnd(e){
 function cycleMode(){
   if(animating) return;
 
-  if(easterMode){
-    easterMode = null;
-    currentCat = 'home';
+  if(poopMode){
+    poopMode = false;
+    currentCat = 'meadow';
   } else {
     const i = ORDER.indexOf(currentCat);
     currentCat = ORDER[(i + 1) % ORDER.length];
@@ -881,7 +902,7 @@ function updateModeIcon(){
   const img = document.getElementById('mode-icon');
   if(!img) return;
   let hex;
-  if(easterMode === 'poop'){
+  if(poopMode){
     hex = '1F4A9';
   } else {
     hex = MODE_ICON_HEX[currentCat];
@@ -1130,7 +1151,7 @@ function showEnd(){
   document.getElementById('end-time').textContent = `${m}:${String(s).padStart(2,'0')}`;
 
   let hex;
-  if(easterMode === 'poop') hex = '1F4A9';
+  if(poopMode) hex = '1F4A9';
   else hex = END_ICON_HEX[currentCat] || '1F33F';
   const img = document.getElementById('end-icon-img');
   if(img) img.src = getEmojiUrl(hex);
@@ -1142,8 +1163,8 @@ function showEnd(){
 
 function closeEnd(){
   document.getElementById('end').classList.remove('visible');
-  easterMode = null;
-  currentCat = 'home';
+  poopMode = false;
+  currentCat = 'meadow';
   pickRandomPool(currentCat);
   updateModeIcon();
   applyTheme();
