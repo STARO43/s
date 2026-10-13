@@ -22,95 +22,109 @@ html,body{height:100%;overflow:hidden;overscroll-behavior:none;touch-action:none
   --ink:#3d4a2a;
   --ink-soft:rgba(61,74,42,.35);
   --line:#3d4a2a;
+  --slide-shade:rgba(40,50,25,.22);
+  --slide-edge-c:rgba(61,74,42,.10);
+  --cell:64px;
 }
 html,body{background:var(--paper);transition:background 1.6s ease}
 
-canvas{
-  display:block;position:fixed;inset:0;width:100%;height:100%;
-  touch-action:none;cursor:default;
+#slide-stage{position:fixed;inset:0;z-index:5;overflow:hidden}
+#slide-stage canvas{
+  position:absolute;inset:0;
+  width:100%;height:100%;
+  display:block;
+  touch-action:none;
+  will-change:transform;
+  transform:translate3d(0,0,0);
+  backface-visibility:hidden;
 }
+#slide-stage::after{
+  content:'';position:absolute;inset:0;pointer-events:none;opacity:0;
+  background:radial-gradient(120% 90% at 50% 50%,rgba(0,0,0,0) 55%,var(--slide-shade) 100%);
+  transition:opacity .25s ease;z-index:6;
+}
+#slide-stage.dragging::after{opacity:1}
+
+#slide-seam{
+  position:fixed;top:0;bottom:0;width:160px;
+  pointer-events:none;opacity:0;
+  transform:translate3d(-9999px,0,0);
+  will-change:transform,opacity;z-index:6;
+  background:linear-gradient(to right,
+    rgba(0,0,0,0) 0%,
+    rgba(0,0,0,.05) 30%,
+    rgba(0,0,0,.14) 50%,
+    rgba(0,0,0,.05) 70%,
+    rgba(0,0,0,0) 100%);
+  mix-blend-mode:multiply;
+}
+
+#slide-edge{
+  position:fixed;inset:0;pointer-events:none;opacity:0;
+  transition:opacity .35s cubic-bezier(.25,.1,.25,1);z-index:6;
+  background:linear-gradient(to right,
+    var(--slide-edge-c) 0%,
+    rgba(0,0,0,0) 14%,
+    rgba(0,0,0,0) 86%,
+    var(--slide-edge-c) 100%);
+  mix-blend-mode:multiply;
+}
+#slide-edge.on{opacity:1}
 
 #mode-btn{
   position:fixed;
   top:max(14px,env(safe-area-inset-top));
   left:50%;
-  width:84px;height:84px;
-  margin-left:-42px;
-  border:none;
-  background:transparent;
-  padding:0;font-family:inherit;
-  cursor:pointer;
+  width:var(--cell);height:var(--cell);
+  margin-left:calc(var(--cell) / -2);
+  border:none;background:transparent;padding:0;font-family:inherit;
+  cursor:default;
   display:flex;align-items:center;justify-content:center;
-  color:var(--line);
-  z-index:10;
-  transition:transform .4s cubic-bezier(.25,.1,.25,1), opacity .5s ease;
+  color:var(--line);z-index:10;
+  overflow:visible;
   -webkit-user-select:none;user-select:none;
 }
-#mode-btn:active{transform:scale(.9)}
+#mode-btn.hidden{display:none}
 #mode-btn img{
-  width:63px;height:63px;
+  width:calc(var(--cell) * .94);
+  height:calc(var(--cell) * .94);
   display:block;
-  animation:modeSway 5s ease-in-out infinite;
-  transform-origin:center bottom;
-  opacity:.78;
+  transform-origin:center center;
+  opacity:0;
   filter:saturate(.6) brightness(.98) contrast(.92);
   -webkit-user-drag:none;
   user-select:none;
+  will-change:transform,opacity;
 }
-@keyframes modeSway{
-  0%,100%{transform:rotate(-3deg)}
-  50%{transform:rotate(3deg)}
-}
-#mode-btn.hidden{opacity:0;pointer-events:none;transform:scale(.7)}
 
 #clear-btn{
   position:fixed;
   top:max(14px,env(safe-area-inset-top));
   left:50%;
-  width:84px;height:84px;
-  margin-left:-42px;
-  border:none;
-  background:transparent;
-  padding:0;font-family:inherit;
-  cursor:pointer;
+  width:var(--cell);height:var(--cell);
+  margin-left:calc(var(--cell) / -2);
+  border:none;background:transparent;padding:0;font-family:inherit;
+  cursor:default;
   display:flex;align-items:center;justify-content:center;
-  color:var(--line);
+  color:var(--line);z-index:11;
   opacity:0;pointer-events:none;
-  transform:scale(.7);
-  transition:
-    opacity .7s cubic-bezier(.25,.1,.25,1),
-    transform .7s cubic-bezier(.34,1.2,.64,1),
-    color 1.6s ease;
   -webkit-user-select:none;user-select:none;
-  z-index:14;
+  overflow:visible;
 }
-#clear-btn.visible{opacity:1;pointer-events:auto;transform:scale(1)}
-#clear-btn:active{transform:scale(.9)}
-#clear-btn svg{width:100%;height:100%;display:block;overflow:visible}
+#clear-btn.hidden{display:none}
+#clear-btn svg{
+  width:100%;height:100%;display:block;overflow:visible;
+  transform-origin:center center;
+  will-change:transform,opacity;
+}
 #clear-btn svg path{
-  fill:none;
-  stroke:currentColor;
-  stroke-linecap:round;
-  stroke-linejoin:round;
-  stroke-width:1.8;
-  vector-effect:non-scaling-stroke;
-  opacity:.5;
-  transform-origin:center;
-  transform-box:fill-box;
+  fill:none;stroke:currentColor;
+  stroke-linecap:round;stroke-linejoin:round;stroke-width:1.8;
+  vector-effect:non-scaling-stroke;opacity:.5;
+  transform-origin:center;transform-box:fill-box;
   animation:spiralRotate 32s linear infinite;
 }
-@keyframes spiralRotate{
-  from{transform:rotate(0)}
-  to{transform:rotate(360deg)}
-}
-#clear-btn.press svg path{
-  animation:spiralWhip 1s cubic-bezier(.5,0,.3,1) forwards;
-}
-@keyframes spiralWhip{
-  0%{transform:rotate(0);opacity:.5}
-  60%{opacity:.75}
-  100%{transform:rotate(540deg);opacity:0}
-}
+@keyframes spiralRotate{from{transform:rotate(0)}to{transform:rotate(360deg)}}
 
 #end{
   position:fixed;inset:0;z-index:100;background:var(--paper);
@@ -130,25 +144,18 @@ canvas{
   font-size:56px;font-weight:200;letter-spacing:-2px;
   color:var(--ink);font-variant-numeric:tabular-nums;
   font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display",Georgia,sans-serif;
-  user-select:none;
-  -webkit-user-select:none;
-  -webkit-tap-highlight-color:transparent;
+  user-select:none;-webkit-user-select:none;-webkit-tap-highlight-color:transparent;
 }
 #end-platform{font-size:26px;line-height:1;opacity:.55;filter:saturate(.55) brightness(.95)}
 
 #end-stats{
-  display:flex;
-  align-items:center;
-  gap:28px;
-  margin-top:-6px;
+  display:flex;align-items:center;gap:28px;margin-top:-6px;
   font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display",Georgia,sans-serif;
 }
-
 .stat{
   display:flex;align-items:center;gap:8px;
   color:var(--ink-soft);
-  font-size:18px;font-weight:300;letter-spacing:.5px;
-  opacity:.75;
+  font-size:18px;font-weight:300;letter-spacing:.5px;opacity:.75;
 }
 .stat svg{
   width:20px;height:20px;display:block;
@@ -156,20 +163,14 @@ canvas{
   stroke-linecap:round;stroke-linejoin:round;opacity:.85;
 }
 .stat .spin{animation:statSpin 8s linear infinite}
-@keyframes statSpin{
-  0%{transform:rotate(0)}
-  100%{transform:rotate(360deg)}
-}
-.stat .count{
-  font-variant-numeric:tabular-nums;
-  color:var(--ink);opacity:.8;font-weight:400;
-}
+@keyframes statSpin{0%{transform:rotate(0)}100%{transform:rotate(360deg)}}
+.stat .count{font-variant-numeric:tabular-nums;color:var(--ink);opacity:.8;font-weight:400}
 
 #end-restart{
   margin-top:20px;border:none;background:transparent;
   color:var(--ink-soft);padding:12px;border-radius:100px;cursor:pointer;
   border:1px solid var(--ink-soft);opacity:.5;
-  transition:opacity .8s ease, transform .3s ease;
+  transition:opacity .8s ease,transform .3s ease;
   display:flex;align-items:center;justify-content:center;
   width:48px;height:48px;
 }
@@ -177,18 +178,6 @@ canvas{
 #end-restart svg{width:20px;height:20px}
 
 @media(max-width:500px){
-  #mode-btn{
-    width:104px;height:104px;
-    margin-left:-52px;
-  }
-  #mode-btn img{
-    width:80px;height:80px;
-  }
-  #clear-btn{
-    width:104px;height:104px;
-    margin-left:-52px;
-  }
-
   #end-time{font-size:44px;letter-spacing:-1px}
   #end-icon{width:44px;height:44px}
   #end-icon img{width:38px;height:38px}
@@ -200,22 +189,11 @@ canvas{
 </style>
 </head>
 <body>
-<!--
-  ВАЙБИНЬО
-  ─────────────────────────────────────────────────────────
-  Не игра, а интерактивный опыт.
-
-  Бумажное поле, эмодзи, тихий звук. Касаешься клеток — появляются картинки, поле заполняется; потом очищаешь одинаковые цепочки, остальное падает вниз. Ни проигрыша, ни правил, ни текста. Таймер не давит — виден только в финале. Цель — не результат, а процесс.
-
-  Атмосфера тёплая и тактильная.
-    Луг   — спокойная радость: цветы, травы, жучки, бабочки.
-    Лес   — умиротворение: деревья, грибы, звери, осень.
-    Море  — почти медитация: прохладные цвета, морские обитатели.
-    Мордочки и фрукты — для малышей.
-
-  Пасхалка: двойной тап по таймеру в финале.
--->
-<canvas id="field"></canvas>
+<div id="slide-stage">
+  <canvas id="field"></canvas>
+</div>
+<div id="slide-seam"></div>
+<div id="slide-edge"></div>
 
 <button id="mode-btn" aria-label="Сменить раздел">
   <img id="mode-icon" src="" alt="">
@@ -252,6 +230,7 @@ canvas{
       </svg>
       <span class="count" id="end-manual-count">0</span>
     </div>
+
   </div>
 
   <button id="end-restart" aria-label="Начать заново">
@@ -283,10 +262,10 @@ function getEmojiImage(hex){
 const FULL_POOL = {
   meadow: [
     '1F331','1F340','1F33E','1F338','1F33C','1F337','1F33B',
-    '1F33A','1F339','1F98B','1F41E','1F997','1F426'
+    '1F33A','1F339','1F98B','1F41E','1F997','1F426','1F33F'
   ],
   forest: [
-    '1F332','1F333','1F344','1F33F','1F341','1F41C','1FAB2','1F98C','1F986','1F994',
+    '1F332','1F333','1F344','1F341','1F41C','1FAB2','1F98C','1F986','1F994',
     '1F43F','1F407','1F9A8','1F9A1','1F9A2','1F40D','1F40C','1F401','1F9AB'
   ],
   sea: [
@@ -306,7 +285,7 @@ const FULL_POOL = {
 
 const REQUIRED = {
   meadow: ['1F338','1F33C','1F337','1F33B','1F33A','1F339'],
-  forest: ['1F332','1F333','1F344','1F33F','1F341']
+  forest: ['1F332','1F333','1F344','1F341']
 };
 
 const CATS = {
@@ -359,7 +338,7 @@ function preloadAllEmoji(){
 }
 
 function makeSpiralPath(cx, cy, a, b, turns){
-  const steps = 360;
+  const steps = 300;
   const maxTheta = turns * 2 * Math.PI;
   let d = '';
   for(let i = 0; i <= steps; i++){
@@ -393,70 +372,34 @@ const END_ICON_HEX = {
 
 const THEMES = {
   meadow: {
-    base:         '#e6ecd2',
-    horizon:      '#f0eed8',
-    sky:          '#f8f4dc',
-    ground:       '#b8c99a',
-    bloom:        'rgba(255,240,200,0.35)',
-    vignette:     'rgba(90,120,60,0.14)',
-    ink:          '#3e4a2c',
-    inkSoft:      'rgba(62,74,44,.38)',
-    grain:        [110,140,80]
+    base:'#e6ecd2', horizon:'#f0eed8', sky:'#f8f4dc', ground:'#b8c99a',
+    bloom:'rgba(255,240,200,0.35)', vignette:'rgba(90,120,60,0.14)',
+    ink:'#3e4a2c', inkSoft:'rgba(62,74,44,.38)', grain:[110,140,80]
   },
   forest: {
-    base:         '#e5d4bb',
-    horizon:      '#efe0c5',
-    sky:          '#f5ead0',
-    ground:       '#a8895f',
-    bloom:        'rgba(255,215,160,0.32)',
-    vignette:     'rgba(90,60,30,0.16)',
-    ink:          '#4a3826',
-    inkSoft:      'rgba(74,56,38,.38)',
-    grain:        [120,90,55]
+    base:'#e5d4bb', horizon:'#efe0c5', sky:'#f5ead0', ground:'#a8895f',
+    bloom:'rgba(255,215,160,0.32)', vignette:'rgba(90,60,30,0.16)',
+    ink:'#4a3826', inkSoft:'rgba(74,56,38,.38)', grain:[120,90,55]
   },
   sea: {
-    base:         '#d6e4ea',
-    horizon:      '#e6eef2',
-    sky:          '#f0f6f8',
-    ground:       '#8fb2c4',
-    bloom:        'rgba(210,235,245,0.4)',
-    vignette:     'rgba(60,90,110,0.16)',
-    ink:          '#2d3f4a',
-    inkSoft:      'rgba(45,63,74,.38)',
-    grain:        [80,110,130]
+    base:'#d6e4ea', horizon:'#e6eef2', sky:'#f0f6f8', ground:'#8fb2c4',
+    bloom:'rgba(210,235,245,0.4)', vignette:'rgba(60,90,110,0.16)',
+    ink:'#2d3f4a', inkSoft:'rgba(45,63,74,.38)', grain:[80,110,130]
   },
   faces: {
-    base:         '#f5e8a8',
-    horizon:      '#fbf1c2',
-    sky:          '#fdf7d6',
-    ground:       '#ddc072',
-    bloom:        'rgba(255,250,175,0.5)',
-    vignette:     'rgba(170,150,60,0.14)',
-    ink:          '#4a3f18',
-    inkSoft:      'rgba(74,63,24,.38)',
-    grain:        [170,148,65]
+    base:'#f5e8a8', horizon:'#fbf1c2', sky:'#fdf7d6', ground:'#ddc072',
+    bloom:'rgba(255,250,175,0.5)', vignette:'rgba(170,150,60,0.14)',
+    ink:'#4a3f18', inkSoft:'rgba(74,63,24,.38)', grain:[170,148,65]
   },
   fruits: {
-    base:         '#f0e4c4',
-    horizon:      '#f6e8c8',
-    sky:          '#fbf2d6',
-    ground:       '#d4b578',
-    bloom:        'rgba(255,240,190,0.45)',
-    vignette:     'rgba(150,120,70,0.15)',
-    ink:          '#4a3c1c',
-    inkSoft:      'rgba(74,60,28,.38)',
-    grain:        [150,120,70]
+    base:'#f0e4c4', horizon:'#f6e8c8', sky:'#fbf2d6', ground:'#d4b578',
+    bloom:'rgba(255,240,190,0.45)', vignette:'rgba(150,120,70,0.15)',
+    ink:'#4a3c1c', inkSoft:'rgba(74,60,28,.38)', grain:[150,120,70]
   },
   poop: {
-    base:         '#1a1814',
-    horizon:      '#1e1c18',
-    sky:          '#252220',
-    ground:       '#0f0d0a',
-    bloom:        'rgba(70,60,45,0.25)',
-    vignette:     'rgba(0,0,0,0.5)',
-    ink:          '#e8e0d0',
-    inkSoft:      'rgba(232,224,208,.3)',
-    grain:        [190,180,165]
+    base:'#1a1814', horizon:'#1e1c18', sky:'#252220', ground:'#0f0d0a',
+    bloom:'rgba(70,60,45,0.25)', vignette:'rgba(0,0,0,0.5)',
+    ink:'#e8e0d0', inkSoft:'rgba(232,224,208,.3)', grain:[190,180,165]
   }
 };
 
@@ -465,20 +408,21 @@ function currentThemeKey(){
   return currentCat;
 }
 
-function applyTheme(){
+function applyThemeVars(){
   const t = THEMES[currentThemeKey()] || THEMES.meadow;
   const root = document.documentElement;
 
-  root.style.setProperty('--paper',     t.base);
-  root.style.setProperty('--ink',       t.ink);
-  root.style.setProperty('--ink-soft',  t.inkSoft);
-  root.style.setProperty('--line',      t.ink);
+  root.style.setProperty('--paper',    t.base);
+  root.style.setProperty('--ink',      t.ink);
+  root.style.setProperty('--ink-soft', t.inkSoft);
+  root.style.setProperty('--line',     t.ink);
+  root.style.setProperty('--slide-shade',
+    currentThemeKey() === 'poop' ? 'rgba(0,0,0,.55)' : 'rgba(40,50,25,.22)');
+  root.style.setProperty('--slide-edge-c',
+    currentThemeKey() === 'poop' ? 'rgba(0,0,0,.55)' : hexToRgba(t.ink, .10));
 
   const meta = document.querySelector('meta[name="theme-color"]');
   if(meta) meta.setAttribute('content', t.base);
-
-  buildPaper();
-  needsDraw = true;
 }
 
 let noiseTileCache = new Map();
@@ -510,7 +454,7 @@ function getNoiseTile(grainRGB, isDark){
   return noiseTileCache.get(key);
 }
 
-let canvas, ctx, paperCanvas;
+let canvas, ctx, paperCanvas, paperCtx;
 let W, H, CELL, OX, OY, GRID_X, GRID_Y;
 let grid, currentCat = 'meadow';
 let audioCtx = null, locked = false, animating = false;
@@ -525,12 +469,10 @@ const IS_MOBILE = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent) || match
 
 const EMOJI_ALPHA = 0.62;
 
-const POP_DURATION = IS_MOBILE ? 380 : 900;
-const POP_EASE_OUT = IS_MOBILE
-  ? (t => 1 - Math.pow(1 - t, 4))
-  : (t => 1 - Math.pow(1 - t, 3));
-const POP_SCALE_FROM = IS_MOBILE ? 0.82 : 0.6;
-const POP_BLEED = IS_MOBILE ? 0.4 : 0.8;
+const POP_DURATION = 550;
+const POP_EASE_OUT = t => 1 - Math.pow(1 - t, 3);
+const POP_SCALE_FROM = 0.6;
+const POP_BLEED = 0.8;
 
 let clearBtn = null;
 let clearBtnBusy = false;
@@ -538,6 +480,629 @@ let clearBtnBusy = false;
 let isPointerDown = false;
 let lastPaintedIdx = -1;
 const paintedDuringSwipe = new Set();
+
+let rafRunning = false;
+function startRaf(){
+  if(rafRunning) return;
+  rafRunning = true;
+  requestAnimationFrame(raf);
+}
+
+const SLIDE = {
+  minDist: 70,
+  maxVert: 38,
+  edgeSafe: 24,
+  rubber: 0.42,
+  fireRatio: 0.22,
+  dur: 460
+};
+
+let slideStage, slideEdge, slideSeam;
+let slideState = null;
+let slideAnimating = false;
+let touchIdSlide = null;
+let mouseDownSlide = false;
+let incomingPreview = null;
+
+function slideInit(){
+  slideStage = document.getElementById('slide-stage');
+  slideEdge  = document.getElementById('slide-edge');
+  slideSeam  = document.getElementById('slide-seam');
+  ensureSlideLayers();
+}
+
+function getCanvasMain(){
+  return document.getElementById('field');
+}
+
+function ensureSlideLayers(){
+  let next = slideStage.querySelector('#slide-next');
+  if(!next){
+    next = document.createElement('canvas');
+    next.id = 'slide-next';
+    next.style.opacity = '0';
+    next.style.transform = 'translate3d(100%,0,0)';
+    next.style.zIndex = '1';
+    slideStage.appendChild(next);
+    const c = getCanvasMain();
+    if(c) c.style.zIndex = '2';
+  }
+  return next;
+}
+
+function getCanvasNext(){
+  return ensureSlideLayers();
+}
+
+function buildIncomingPreview(dir){
+  const i = ORDER.indexOf(currentCat);
+  const nextCat = ORDER[(i + dir + ORDER.length) % ORDER.length];
+
+  const next = getCanvasNext();
+  next.width  = Math.floor(W * DPR);
+  next.height = Math.floor(H * DPR);
+  next.style.width = W + 'px';
+  next.style.height = H + 'px';
+  const nctx = next.getContext('2d', {alpha:false});
+  nctx.setTransform(DPR, 0, 0, DPR, 0, 0);
+
+  paintPaper(nctx, nextCat, true);
+
+  incomingPreview = { cat: nextCat, dir };
+  return incomingPreview;
+}
+
+function isFreeZone(x, y){
+  if(x < OX - 4) return true;
+  if(x > OX + CELL*GRID_X + 4) return true;
+  if(y < OY - 4) return true;
+  if(y > OY + CELL*GRID_Y + 4) return true;
+  return false;
+}
+
+function slideCanStart(x, y){
+  if(!gameActive || animating || slideAnimating) return false;
+  if(!isFreeZone(x, y)) return false;
+  if(x < SLIDE.edgeSafe) return false;
+  if(x > W - SLIDE.edgeSafe) return false;
+  return true;
+}
+
+function slideBegin(x, y){
+  slideState = {
+    startX: x, startY: y,
+    dx: 0, dy: 0,
+    axis: null,
+    from: currentCat,
+    previewReady: false,
+    dir: 1
+  };
+}
+
+function updateSeam(seamX){
+  if(!slideSeam) return;
+  const half = slideSeam.offsetWidth / 2 || 80;
+  slideSeam.style.transform = `translate3d(${seamX - half}px,0,0)`;
+  slideSeam.style.opacity = '1';
+}
+
+function hideSeam(){
+  if(!slideSeam) return;
+  slideSeam.style.opacity = '0';
+}
+
+/* ==========================================================
+   АНИМАЦИИ КНОПКИ РЕЖИМОВ — Web Animations API
+   ========================================================== */
+
+let modeSwayAnim = null;
+
+function stopModeSway(){
+  if(modeSwayAnim){
+    try{ modeSwayAnim.cancel(); }catch(e){}
+    modeSwayAnim = null;
+  }
+}
+
+function startModeSway(){
+  const img = document.getElementById('mode-icon');
+  if(!img) return;
+  stopModeSway();
+  try{
+    modeSwayAnim = img.animate([
+      {transform:'rotate(-3deg)'},
+      {transform:'rotate(3deg)'},
+      {transform:'rotate(-3deg)'}
+    ], {
+      duration: 5000,
+      iterations: Infinity,
+      easing: 'ease-in-out'
+    });
+  }catch(e){}
+}
+
+function flyOutModeIcon(){
+  const img = document.getElementById('mode-icon');
+  if(!img) return;
+
+  if(img.getAnimations) img.getAnimations().forEach(a => { try{ a.cancel(); }catch(e){} });
+  stopModeSway();
+
+  img.style.transform = 'translate3d(0,0,0) scale(1) rotate(0deg)';
+  img.style.opacity = '.62';
+
+  try{
+    const anim = img.animate([
+      {transform:'translate3d(0,0,0) scale(1) rotate(0deg)',        opacity:.62, offset:0},
+      {transform:'translate3d(0,-16%,0) scale(1.05) rotate(-4deg)', opacity:.62, offset:.3},
+      {transform:'translate3d(0,-180%,0) scale(.5) rotate(-26deg)', opacity:0,   offset:1}
+    ], {
+      duration: 700,
+      easing: 'cubic-bezier(.55,0,.7,.4)',
+      fill: 'forwards'
+    });
+    anim.onfinish = () => {
+      img.style.transform = 'translate3d(0,-180%,0) scale(.5) rotate(-26deg)';
+      img.style.opacity = '0';
+    };
+  }catch(e){
+    img.style.transform = 'translate3d(0,-180%,0) scale(.5) rotate(-26deg)';
+    img.style.opacity = '0';
+  }
+}
+
+function flyInModeIcon(){
+  const img = document.getElementById('mode-icon');
+  if(!img) return;
+
+  if(img.getAnimations) img.getAnimations().forEach(a => { try{ a.cancel(); }catch(e){} });
+  stopModeSway();
+
+  img.style.transform = 'translate3d(0,-180%,0) scale(.5) rotate(26deg)';
+  img.style.opacity = '0';
+
+  try{
+    const anim = img.animate([
+      {transform:'translate3d(0,-180%,0) scale(.5) rotate(26deg)',  opacity:0,   offset:0},
+      {transform:'translate3d(0,5%,0) scale(1.06) rotate(-4deg)',   opacity:.6,  offset:.45},
+      {transform:'translate3d(0,-1.5%,0) scale(.98) rotate(2deg)',  opacity:.6,  offset:.7},
+      {transform:'translate3d(0,.4%,0) scale(1.005) rotate(-.8deg)',opacity:.62, offset:.88},
+      {transform:'translate3d(0,0,0) scale(1) rotate(0deg)',        opacity:.62, offset:1}
+    ], {
+      duration: 1050,
+      easing: 'cubic-bezier(.22,1.05,.32,1)',
+      fill: 'forwards'
+    });
+    anim.onfinish = () => {
+      img.style.transform = 'translate3d(0,0,0) scale(1) rotate(0deg)';
+      img.style.opacity = '.62';
+      startModeSway();
+    };
+  }catch(e){
+    img.style.transform = 'translate3d(0,0,0) scale(1) rotate(0deg)';
+    img.style.opacity = '.62';
+    startModeSway();
+  }
+}
+
+/* ==========================================================
+   АНИМАЦИЯ КНОПКИ ОЧИСТКИ — Web Animations API
+   ========================================================== */
+
+let clearSvgAnim = null;
+
+function hideClearBtn(){
+  const clr = document.getElementById('clear-btn');
+  if(!clr) return;
+  if(clearSvgAnim){ try{ clearSvgAnim.cancel(); }catch(e){} clearSvgAnim = null; }
+  clr.classList.add('hidden');
+  clr.style.opacity = '0';
+  clr.style.pointerEvents = 'none';
+}
+
+function showClearBtn(){
+  const btn = document.getElementById('mode-btn');
+  const clr = document.getElementById('clear-btn');
+  if(!clr) return;
+
+  if(btn) btn.classList.add('hidden');
+  clr.classList.remove('hidden');
+
+  // Показываем контейнер кнопки мгновенно
+  clr.style.opacity = '1';
+  clr.style.pointerEvents = 'auto';
+
+  const svg = clr.querySelector('svg');
+  if(!svg) return;
+
+  if(svg.getAnimations) svg.getAnimations().forEach(a => { try{ a.cancel(); }catch(e){} });
+
+  svg.style.transform = 'scale(.4) rotate(-90deg)';
+  svg.style.opacity = '0';
+
+  try{
+    clearSvgAnim = svg.animate([
+      {transform:'scale(.4) rotate(-90deg)',  opacity:0,   offset:0},
+      {transform:'scale(1.06) rotate(12deg)', opacity:.6,  offset:.45},
+      {transform:'scale(.98) rotate(-3deg)',  opacity:.55, offset:.7},
+      {transform:'scale(1.01) rotate(1.2deg)',opacity:.52, offset:.88},
+      {transform:'scale(1) rotate(0deg)',     opacity:1,   offset:1}
+    ], {
+      duration: 320,
+      easing: 'cubic-bezier(.2,1.05,.3,1)',
+      fill: 'forwards'
+    });
+    clearSvgAnim.onfinish = () => {
+      svg.style.transform = 'scale(1) rotate(0deg)';
+      svg.style.opacity = '1';
+    };
+  }catch(e){
+    svg.style.transform = 'scale(1) rotate(0deg)';
+    svg.style.opacity = '1';
+  }
+}
+
+/* ========================================================== */
+
+function showModeBtn(skipAnim){
+  const btn = document.getElementById('mode-btn');
+  const clr = document.getElementById('clear-btn');
+  if(!btn) return;
+
+  if(clr){
+    clr.classList.add('hidden');
+    clr.style.opacity = '0';
+    clr.style.pointerEvents = 'none';
+  }
+
+  btn.classList.remove('hidden');
+
+  if(skipAnim){
+    const img = document.getElementById('mode-icon');
+    if(img && img.getAnimations){
+      img.getAnimations().forEach(a => { try{ a.cancel(); }catch(e){} });
+    }
+    stopModeSway();
+    return;
+  }
+
+  flyInModeIcon();
+}
+
+function hideModeBtn(){
+  const btn = document.getElementById('mode-btn');
+  if(!btn) return;
+  btn.classList.add('hidden');
+}
+
+/* ========================================================== */
+
+function slideMove(x, y){
+  if(!slideState) return false;
+  const dx = x - slideState.startX;
+  const dy = y - slideState.startY;
+  slideState.dx = dx; slideState.dy = dy;
+
+  if(!slideState.axis){
+    if(Math.abs(dx) > 8 && Math.abs(dx) > Math.abs(dy) * 1.4){
+      slideState.axis = 'h';
+    } else if(Math.abs(dy) > 10){
+      slideState.axis = 'v';
+      slideState = null;
+      return false;
+    } else {
+      return false;
+    }
+  }
+  if(slideState.axis !== 'h') return false;
+
+  const wantDir = dx > 0 ? -1 : 1;
+  if(!slideState.previewReady || wantDir !== slideState.dir){
+    buildIncomingPreview(wantDir);
+    slideState.dir = wantDir;
+    slideState.previewReady = true;
+    slideEdge && slideEdge.classList.add('on');
+    slideStage.classList.add('dragging');
+    hideClearBtn();
+    flyOutModeIcon();
+  }
+
+  const raw = dx * SLIDE.rubber;
+  const max = W * 0.9;
+  const clamped = Math.max(-max, Math.min(max, raw));
+
+  const cur = getCanvasMain();
+  cur.style.transform = `translate3d(${clamped}px,0,0)`;
+
+  const next = getCanvasNext();
+  const from = slideState.dir === 1 ? W : -W;
+  const nextX = from + clamped;
+  next.style.opacity = '1';
+  next.style.transform = `translate3d(${nextX}px,0,0)`;
+
+  const seamPos = clamped + (slideState.dir === 1 ? W : 0);
+  updateSeam(seamPos);
+
+  return true;
+}
+
+function slideEnd(){
+  if(!slideState){ return false; }
+  const st = slideState;
+  slideState = null;
+
+  if(!st.previewReady){
+    return false;
+  }
+
+  const threshold = W * SLIDE.fireRatio;
+  const shouldFire = Math.abs(st.dx) >= Math.min(threshold, SLIDE.minDist * 4);
+  const wasFlick = Math.abs(st.dx) > SLIDE.minDist && Math.abs(st.dy) < SLIDE.maxVert;
+
+  const fire = shouldFire || wasFlick;
+
+  if(fire){
+    slideFinish(st.dir);
+  } else {
+    slideCancel(st.dir);
+  }
+  return true;
+}
+
+function slideFinish(dir){
+  slideAnimating = true;
+  const cur = getCanvasMain();
+  const next = getCanvasNext();
+
+  const targetCurX = dir === 1 ? -W : W;
+
+  const t0 = performance.now();
+  const dur = SLIDE.dur;
+  const ease = t => 1 - Math.pow(1 - t, 4);
+
+  function frame(){
+    const t = Math.min((performance.now() - t0) / dur, 1);
+    const e = ease(t);
+
+    const curX = targetCurX * e;
+    const nextX = (1 - e) * (dir === 1 ? W : -W);
+
+    cur.style.transform = `translate3d(${curX}px,0,0)`;
+    next.style.transform = `translate3d(${nextX}px,0,0)`;
+    next.style.opacity = '1';
+
+    const seamPos = curX + (dir === 1 ? W : 0);
+    updateSeam(seamPos);
+
+    if(t < 1){
+      requestAnimationFrame(frame);
+    } else {
+      hideSeam();
+      commitSlide(dir);
+    }
+  }
+  requestAnimationFrame(frame);
+}
+
+function slideCancel(dir){
+  slideAnimating = true;
+  const cur = getCanvasMain();
+  const next = getCanvasNext();
+
+  const fromCur = parseTranslateX(cur.style.transform);
+  const fromNext = parseTranslateX(next.style.transform);
+
+  const t0 = performance.now();
+  const dur = 280;
+  const ease = t => 1 - Math.pow(1 - t, 3);
+
+  function frame(){
+    const t = Math.min((performance.now() - t0) / dur, 1);
+    const e = ease(t);
+    const curX = fromCur * (1 - e);
+    const nextX = fromNext * (1 - e);
+
+    cur.style.transform = `translate3d(${curX}px,0,0)`;
+    next.style.transform = `translate3d(${nextX}px,0,0)`;
+
+    const seamPos = curX + (dir === 1 ? W : 0);
+    updateSeam(seamPos);
+
+    if(t < 1) requestAnimationFrame(frame);
+    else {
+      cur.style.transform = 'translate3d(0,0,0)';
+      next.style.opacity = '0';
+      next.style.transform = `translate3d(${dir === 1 ? W : -W}px,0,0)`;
+      slideStage.classList.remove('dragging');
+      slideEdge && slideEdge.classList.remove('on');
+      hideSeam();
+      slideAnimating = false;
+      incomingPreview = null;
+      flyInModeIcon();
+      needsDraw = true;
+      startRaf();
+    }
+  }
+  requestAnimationFrame(frame);
+}
+
+function commitSlide(dir){
+  const preview = incomingPreview;
+  if(!preview){ slideCancel(dir); return; }
+
+  if(poopMode){ poopMode = false; }
+  currentCat = preview.cat;
+  pickRandomPool(currentCat);
+
+  buildPaper();
+  applyThemeVars();
+  updateModeIcon();
+  resetGameState();
+  hideClearBtn();
+  updateModeIcon(); // на случай если изменится иконка
+
+  const cur = getCanvasMain();
+  const next = getCanvasNext();
+
+  cur.style.transform = 'translate3d(0,0,0)';
+  renderStaticNow();
+
+  next.style.opacity = '0';
+  next.style.transform = `translate3d(${dir === 1 ? W : -W}px,0,0)`;
+
+  slideStage.classList.remove('dragging');
+  slideEdge && slideEdge.classList.remove('on');
+  hideSeam();
+
+  incomingPreview = null;
+  slideAnimating = false;
+  needsDraw = false;
+
+  flyInModeIcon();
+}
+
+function parseTranslateX(tr){
+  const m = /translate3d\(\s*(-?[\d.]+)px/.exec(tr || '');
+  return m ? parseFloat(m[1]) : 0;
+}
+
+function slideTouchStart(e){
+  if(slideAnimating) return;
+  const t = e.touches[0];
+  if(!t) return;
+  if(!slideCanStart(t.clientX, t.clientY)) return;
+  touchIdSlide = t.identifier;
+  slideBegin(t.clientX, t.clientY);
+}
+
+function slideTouchMove(e){
+  if(!slideState) return;
+  let t = null;
+  for(let i = 0; i < e.touches.length; i++){
+    if(e.touches[i].identifier === touchIdSlide){ t = e.touches[i]; break; }
+  }
+  if(!t){ slideEnd(); return; }
+  const consumed = slideMove(t.clientX, t.clientY);
+  if(consumed) e.preventDefault();
+}
+
+function slideTouchEnd(e){
+  if(!slideState) return;
+  slideEnd();
+  touchIdSlide = null;
+}
+
+function slideMouseDown(e){
+  if(slideAnimating) return;
+  if(e.button !== 0) return;
+  if(!slideCanStart(e.clientX, e.clientY)) return;
+  mouseDownSlide = true;
+  slideBegin(e.clientX, e.clientY);
+}
+
+function slideMouseMove(e){
+  if(!mouseDownSlide || !slideState) return;
+  slideMove(e.clientX, e.clientY);
+}
+
+function slideMouseUp(e){
+  if(!mouseDownSlide) return;
+  mouseDownSlide = false;
+  slideEnd();
+}
+
+function programmaticSlide(dir){
+  if(slideAnimating || slideState || animating) return;
+  slideAnimating = true;
+
+  const cur = getCanvasMain();
+  const next = getCanvasNext();
+
+  let targetCat;
+  let fromPoop = false;
+  if(poopMode){
+    targetCat = 'meadow';
+    fromPoop = true;
+  } else {
+    const i = ORDER.indexOf(currentCat);
+    targetCat = ORDER[(i + dir + ORDER.length) % ORDER.length];
+  }
+
+  next.width  = Math.floor(W * DPR);
+  next.height = Math.floor(H * DPR);
+  next.style.width = W + 'px';
+  next.style.height = H + 'px';
+  const nctx = next.getContext('2d', {alpha:false});
+  nctx.setTransform(DPR, 0, 0, DPR, 0, 0);
+  paintPaper(nctx, targetCat, true);
+
+  slideEdge && slideEdge.classList.add('on');
+  slideStage.classList.add('dragging');
+  hideClearBtn();
+
+  /* КНОПКА УЛЕТАЕТ ВВЕРХ */
+  flyOutModeIcon();
+
+  const targetCurX = dir === 1 ? -W : W;
+  const startNextX = dir === 1 ? W : -W;
+
+  const t0 = performance.now();
+  const dur = SLIDE.dur;
+  const ease = t => 1 - Math.pow(1 - t, 4);
+
+  next.style.opacity = '1';
+  next.style.transform = `translate3d(${startNextX}px,0,0)`;
+
+  function frame(){
+    const t = Math.min((performance.now() - t0) / dur, 1);
+    const e = ease(t);
+
+    const curX = targetCurX * e;
+    const nextX = (1 - e) * startNextX;
+
+    cur.style.transform = `translate3d(${curX}px,0,0)`;
+    next.style.transform = `translate3d(${nextX}px,0,0)`;
+
+    const seamPos = curX + (dir === 1 ? W : 0);
+    updateSeam(seamPos);
+
+    if(t < 1){
+      requestAnimationFrame(frame);
+    } else {
+      hideSeam();
+
+      if(fromPoop){
+        poopMode = false;
+        currentCat = 'meadow';
+      } else {
+        currentCat = targetCat;
+      }
+      pickRandomPool(currentCat);
+      buildPaper();
+      applyThemeVars();
+      resetGameState();
+      hideClearBtn();
+
+      updateModeIcon();
+
+      cur.style.transform = 'translate3d(0,0,0)';
+      renderStaticNow();
+
+      next.style.opacity = '0';
+      next.style.transform = `translate3d(${startNextX}px,0,0)`;
+
+      slideStage.classList.remove('dragging');
+      slideEdge && slideEdge.classList.remove('on');
+
+      slideAnimating = false;
+      needsDraw = false;
+
+      /* КНОПКА ПРИЛЕТАЕТ СВЕРХУ */
+      flyInModeIcon();
+    }
+  }
+  requestAnimationFrame(frame);
+}
 
 function init(){
   canvas = document.getElementById('field');
@@ -550,20 +1115,30 @@ function init(){
   const plat = document.getElementById('end-platform');
   if(plat) plat.textContent = IS_MOBILE ? '📱' : '🖥️';
 
+  slideInit();
   preloadAllEmoji();
   pickRandomPool(currentCat);
   resize();
   buildPaper();
   bindEvents();
   updateModeIcon();
-  applyTheme();
-  startGame();
-  raf();
+  applyThemeVars();
+  resetGameState();
+  hideClearBtn();
+  // Показываем кнопку режимов с анимацией прилёта сверху
+  document.getElementById('mode-btn').classList.remove('hidden');
+  flyInModeIcon();
+  startRaf();
+
+  setTimeout(() => {
+    slideEdge.classList.add('on');
+    setTimeout(() => slideEdge.classList.remove('on'), 1400);
+  }, 900);
 }
 
 function resize(){
   W = innerWidth; H = innerHeight;
-  DPR = Math.min(devicePixelRatio || 1, IS_MOBILE ? 1.5 : 2);
+  DPR = Math.min(devicePixelRatio || 1, 2);
   canvas.width = Math.floor(W * DPR);
   canvas.height = Math.floor(H * DPR);
   canvas.style.width = W + 'px';
@@ -578,7 +1153,7 @@ function resize(){
     GRID_Y = 7;
   }
 
-  const padTop = IS_MOBILE ? 108 : 118;
+  const padTop = IS_MOBILE ? 92 : 118;
   const padBot = IS_MOBILE ? 12 : 28;
   const padSide = IS_MOBILE ? 8 : 28;
 
@@ -589,16 +1164,11 @@ function resize(){
   OY = padTop + (availH - CELL * GRID_Y) / 2;
 
   grid = Array.from({length:GRID_Y}, () => Array(GRID_X).fill(null));
+
+  document.documentElement.style.setProperty('--cell', CELL + 'px');
 }
 
-function buildPaper(){
-  paperCanvas = document.createElement('canvas');
-  paperCanvas.width = Math.floor(W * DPR);
-  paperCanvas.height = Math.floor(H * DPR);
-  const p = paperCanvas.getContext('2d', {alpha:false});
-  p.setTransform(DPR, 0, 0, DPR, 0, 0);
-
-  const key = currentThemeKey();
+function paintPaper(p, key, preview){
   const t = THEMES[key] || THEMES.meadow;
   const isDark = key === 'poop';
 
@@ -658,15 +1228,17 @@ function buildPaper(){
     p.fillRect(0, 0, W, H);
   }
 
-  const grainCount = IS_MOBILE ? 280 : 640;
-  for(let i = 0; i < grainCount; i++){
-    const x = Math.random() * W;
-    const y = Math.random() * H;
-    const a = Math.random() * 0.045;
-    p.fillStyle = isDark
-      ? `rgba(232,224,208,${a})`
-      : `rgba(${grainRGB[0]},${grainRGB[1]},${grainRGB[2]},${a})`;
-    p.fillRect(x, y, 1.5, 1.5);
+  if(!preview){
+    const grainCount = IS_MOBILE ? 70 : 300;
+    for(let i = 0; i < grainCount; i++){
+      const x = Math.random() * W;
+      const y = Math.random() * H;
+      const a = Math.random() * 0.045;
+      p.fillStyle = isDark
+        ? `rgba(232,224,208,${a})`
+        : `rgba(${grainRGB[0]},${grainRGB[1]},${grainRGB[2]},${a})`;
+      p.fillRect(x, y, 1.5, 1.5);
+    }
   }
 
   if(t.vignette){
@@ -681,11 +1253,20 @@ function buildPaper(){
   }
 }
 
+function buildPaper(){
+  if(!paperCanvas){
+    paperCanvas = document.createElement('canvas');
+    paperCtx = paperCanvas.getContext('2d', {alpha:false});
+  }
+  paperCanvas.width = Math.floor(W * DPR);
+  paperCanvas.height = Math.floor(H * DPR);
+  paperCtx.setTransform(DPR, 0, 0, DPR, 0, 0);
+  paintPaper(paperCtx, currentThemeKey(), false);
+}
+
 function hexToRgba(hex, alpha){
   if(!hex) return 'rgba(0,0,0,0)';
-  if(hex.startsWith('rgba') || hex.startsWith('rgb')){
-    return hex;
-  }
+  if(hex.startsWith('rgba') || hex.startsWith('rgb')) return hex;
   const h = hex.replace('#','');
   const r = parseInt(h.substring(0,2), 16);
   const g = parseInt(h.substring(2,4), 16);
@@ -703,6 +1284,15 @@ function bindEvents(){
   canvas.addEventListener('touchmove',  onTouchMove,  {passive:false});
   canvas.addEventListener('touchend',   onTouchEnd,   {passive:false});
   canvas.addEventListener('touchcancel',onTouchEnd,   {passive:false});
+
+  canvas.addEventListener('touchstart', slideTouchStart, {passive:false});
+  canvas.addEventListener('touchmove',  slideTouchMove,  {passive:false});
+  canvas.addEventListener('touchend',   slideTouchEnd,   {passive:false});
+  canvas.addEventListener('touchcancel',slideTouchEnd,   {passive:false});
+
+  canvas.addEventListener('mousedown',  slideMouseDown);
+  addEventListener('mousemove', slideMouseMove);
+  addEventListener('mouseup',   slideMouseUp);
 
   clearBtn.addEventListener('click', onClearClick);
   document.getElementById('mode-btn').addEventListener('click', cycleMode);
@@ -722,7 +1312,12 @@ function bindEvents(){
     }
   }, {passive:false});
 
-  addEventListener('resize', () => { resize(); buildPaper(); needsDraw = true; });
+  addEventListener('resize', () => {
+    resize();
+    buildPaper();
+    needsDraw = true;
+    startRaf();
+  });
 
   ['gesturestart','gesturechange','gestureend'].forEach(e =>
     document.addEventListener(e, ev => ev.preventDefault())
@@ -735,12 +1330,15 @@ function onEndTimeDoubleClick(e){
   e.preventDefault();
   poopMode = true;
   document.getElementById('end').classList.remove('visible');
-  applyTheme();
-  startGame();
+  buildPaper();
+  applyThemeVars();
+  resetGameState();
+  hideClearBtn();
   updateModeIcon();
+  flyInModeIcon();
 }
 
-function startGame(){
+function resetGameState(){
   for(let r = 0; r < GRID_Y; r++)
     for(let c = 0; c < GRID_X; c++)
       grid[r][c] = null;
@@ -754,13 +1352,11 @@ function startGame(){
   swapCount = 0;
   manualCount = 0;
   clearBtnBusy = false;
-  clearBtn.classList.remove('visible', 'press');
-  document.getElementById('mode-btn').classList.remove('hidden');
   isPointerDown = false;
   lastPaintedIdx = -1;
   paintedDuringSwipe.clear();
-  updateUI();
   needsDraw = true;
+  startRaf();
 }
 
 function pointToCell(cx, cy){
@@ -790,7 +1386,8 @@ function paintCell(cell){
   swapCount++;
   playNote(hex);
   checkFull();
-  if(!animating) needsDraw = true;
+  needsDraw = true;
+  startRaf();
 }
 
 function replaceCell(cell){
@@ -805,25 +1402,25 @@ function replaceCell(cell){
   manualCount++;
   playNote(hex);
   needsDraw = true;
+  startRaf();
 }
 
 function onDown(e){
-  if(!gameActive || locked || animating) return;
+  if(!gameActive || animating) return;
+  if(slideState || slideAnimating) return;
   isPointerDown = true;
   paintedDuringSwipe.clear();
   const cell = pointToCell(e.clientX, e.clientY);
   if(!cell) return;
-  if(grid[cell.row][cell.col]){
-    replaceCell(cell);
-  } else {
-    paintCell(cell);
-  }
+  if(grid[cell.row][cell.col]) replaceCell(cell);
+  else paintCell(cell);
 }
 
 function onMove(e){
-  if(!gameActive || locked || animating) return;
+  if(!gameActive || animating) return;
+  if(slideState || slideAnimating) return;
   const cell = pointToCell(e.clientX, e.clientY);
-  if(!cell) return;
+  if(!cell){ lastHover = -1; return; }
 
   if(!isPointerDown){
     if(cell.idx === lastHover) return;
@@ -841,8 +1438,9 @@ function onUp(){
 }
 
 function onTouchStart(e){
+  if(!gameActive || animating) return;
+  if(slideState || slideAnimating) return;
   e.preventDefault();
-  if(!gameActive || locked || animating) return;
   isPointerDown = true;
   paintedDuringSwipe.clear();
 
@@ -851,17 +1449,15 @@ function onTouchStart(e){
   const cell = pointToCell(t.clientX, t.clientY);
   if(!cell) return;
 
-  if(grid[cell.row][cell.col]){
-    replaceCell(cell);
-  } else {
-    paintCell(cell);
-  }
+  if(grid[cell.row][cell.col]) replaceCell(cell);
+  else paintCell(cell);
   lastPaintedIdx = cell.idx;
 }
 
 function onTouchMove(e){
+  if(!gameActive || animating) return;
+  if(slideState || slideAnimating) return;
   e.preventDefault();
-  if(!gameActive || locked || animating) return;
   if(!isPointerDown) return;
 
   const t = e.touches[0];
@@ -875,6 +1471,7 @@ function onTouchMove(e){
 }
 
 function onTouchEnd(e){
+  if(slideState || slideAnimating) return;
   e.preventDefault();
   isPointerDown = false;
   lastPaintedIdx = -1;
@@ -882,50 +1479,30 @@ function onTouchEnd(e){
 }
 
 function cycleMode(){
-  if(animating) return;
-
-  if(poopMode){
-    poopMode = false;
-    currentCat = 'meadow';
-  } else {
-    const i = ORDER.indexOf(currentCat);
-    currentCat = ORDER[(i + 1) % ORDER.length];
-  }
-
-  pickRandomPool(currentCat);
-  updateModeIcon();
-  applyTheme();
-  startGame();
+  if(animating || slideAnimating || slideState) return;
+  programmaticSlide(1);
 }
 
 function updateModeIcon(){
   const img = document.getElementById('mode-icon');
   if(!img) return;
   let hex;
-  if(poopMode){
-    hex = '1F4A9';
-  } else {
-    hex = MODE_ICON_HEX[currentCat];
-  }
+  if(poopMode) hex = '1F4A9';
+  else hex = MODE_ICON_HEX[currentCat];
   img.src = getEmojiUrl(hex);
 }
 
 function checkFull(){
-  for(let r = 0; r < GRID_Y; r++)
-    for(let c = 0; c < GRID_X; c++)
-      if(!grid[r][c]) return;
-  locked = true;
-  updateUI();
-}
-
-function updateUI(){
-  const modeBtn = document.getElementById('mode-btn');
-  if(locked && gameActive){
-    clearBtn.classList.add('visible');
-    modeBtn.classList.add('hidden');
-  } else {
-    clearBtn.classList.remove('visible');
-    modeBtn.classList.remove('hidden');
+  let full = true;
+  outer:
+  for(let r = 0; r < GRID_Y; r++){
+    for(let c = 0; c < GRID_X; c++){
+      if(!grid[r][c]){ full = false; break outer; }
+    }
+  }
+  if(full){
+    locked = true;
+    showClearBtn();
   }
 }
 
@@ -934,18 +1511,59 @@ function onClearClick(e){
   if(!gameActive || !locked || animating) return;
   if(clearBtnBusy) return;
   clearBtnBusy = true;
-
-  clearBtn.classList.add('press');
-  setTimeout(() => {
-    clearBtn.classList.remove('press');
-    clearBtnBusy = false;
-  }, 1100);
-
+  hideClearBtn();
   applyClear();
+}
+
+function isBeautifulGrid(){
+  for(let r = 0; r < GRID_Y; r++)
+    for(let c = 0; c < GRID_X; c++)
+      if(!grid[r][c]) return false;
+
+  let ok = true;
+  for(let r = 0; r < GRID_Y && ok; r++){
+    const v = grid[r][0];
+    for(let c = 1; c < GRID_X; c++){
+      if(grid[r][c] !== v){ ok = false; break; }
+    }
+  }
+  if(ok) return true;
+
+  ok = true;
+  for(let c = 0; c < GRID_X && ok; c++){
+    const v = grid[0][c];
+    for(let r = 1; r < GRID_Y; r++){
+      if(grid[r][c] !== v){ ok = false; break; }
+    }
+  }
+  if(ok) return true;
+
+  ok = true;
+  for(let r = 1; r < GRID_Y && ok; r++){
+    for(let c = 1; c < GRID_X; c++){
+      if(grid[r][c] !== grid[r-1][c-1]){ ok = false; break; }
+    }
+  }
+  if(ok) return true;
+
+  ok = true;
+  for(let r = 1; r < GRID_Y && ok; r++){
+    for(let c = 0; c < GRID_X - 1; c++){
+      if(grid[r][c] !== grid[r-1][c+1]){ ok = false; break; }
+    }
+  }
+  return ok;
 }
 
 function applyClear(){
   if(!gameActive || !locked || animating) return;
+
+  if(isBeautifulGrid()){
+    locked = false;
+    clearBtnBusy = false;
+    showEnd();
+    return;
+  }
 
   const toRemove = new Set();
 
@@ -975,7 +1593,11 @@ function applyClear(){
 
   if(toRemove.size === 0){
     locked = false;
-    updateUI();
+    clearBtnBusy = false;
+    setTimeout(() => {
+      document.getElementById('mode-btn').classList.remove('hidden');
+      flyInModeIcon();
+    }, 2000);
     showEnd();
     return;
   }
@@ -1017,71 +1639,25 @@ function applyClear(){
       grid[r][c] = finalGrid[r][c];
 
   playDissolve();
-  animPhase = {start: now, removed, fallers, fadeDur: 1100, fallDur: 1300, delay: 500};
+
+  const fallingSet = new Set();
+  fallers.forEach(f => fallingSet.add(f.toRow * GRID_X + f.col));
+
+  locked = false;
+  clearBtnBusy = false;
+
+  // Показываем кнопку режимов обратно с прилётом
+  document.getElementById('mode-btn').classList.remove('hidden');
+  flyInModeIcon();
+
+  animPhase = {start: now, removed, fallers, fallingSet, fadeDur: 1100, fallDur: 1300, delay: 500};
+  startRaf();
 }
 
-function raf(){
-  if(animating && animPhase){
-    const elapsed = performance.now() - animPhase.start;
-    const fallT = Math.max(0, Math.min((elapsed - animPhase.delay) / animPhase.fallDur, 1));
-    const fe = fallT < 0.5
-      ? 8 * fallT * fallT * fallT * fallT
-      : 1 - Math.pow(-2 * fallT + 2, 4) / 2;
-    drawFrame(fe, elapsed);
-
-    if(elapsed > animPhase.delay + animPhase.fallDur + 120){
-      animating = false;
-      animPhase = null;
-      popAnims.clear();
-      checkFull();
-      const empty = grid.some(row => row.some(cell => !cell));
-      if(empty) locked = false;
-      updateUI();
-      needsDraw = true;
-    }
-  } else {
-    let anyPop = false;
-    const now = performance.now();
-    popAnims.forEach(a => { if(now - a.t < a.dur) anyPop = true; });
-    if(anyPop || needsDraw){
-      renderStatic(now);
-      needsDraw = false;
-      if(!anyPop) popAnims.clear();
-    }
-  }
-  requestAnimationFrame(raf);
-}
-
-function drawEmoji(hex, x, y, scale, alpha, bleed){
-  const img = getEmojiImage(hex);
-  const size = CELL * 0.94 * scale;
-  const half = size / 2;
-
-  if(!img.complete || !img.naturalWidth){
-    ctx.globalAlpha = alpha * 0.12;
-    ctx.fillStyle = '#3d3529';
-    ctx.beginPath();
-    ctx.arc(x, y, size * 0.3, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.globalAlpha = 1;
-    return;
-  }
-
-  ctx.globalAlpha = alpha;
-
-  if(bleed > 0){
-    ctx.globalAlpha = alpha * bleed * 0.22;
-    const bSize = size * (1 + bleed * 0.35);
-    ctx.drawImage(img, x - bSize/2, y - bSize/2, bSize, bSize);
-  }
-
-  ctx.globalAlpha = alpha;
-  ctx.drawImage(img, x - half, y - half, size, size);
-  ctx.globalAlpha = 1;
-}
-
-function renderStatic(now){
+function renderStaticNow(){
   ctx.drawImage(paperCanvas, 0, 0, W, H);
+
+  const now = performance.now();
 
   for(let r = 0; r < GRID_Y; r++){
     for(let c = 0; c < GRID_X; c++){
@@ -1089,8 +1665,8 @@ function renderStatic(now){
       const key = r * GRID_X + c;
       const x = OX + c * CELL + CELL / 2;
       const y = OY + r * CELL + CELL / 2;
-      const pop = popAnims.get(key);
 
+      const pop = popAnims.get(key);
       if(pop){
         const t = Math.min((now - pop.t) / pop.dur, 1);
         if(t < 1){
@@ -1098,52 +1674,136 @@ function renderStatic(now){
           const scale = POP_SCALE_FROM + (1 - POP_SCALE_FROM) * e;
           const alpha = e * EMOJI_ALPHA;
           const bleed = (1 - t) * POP_BLEED;
-          drawEmoji(grid[r][c], x, y, scale, alpha, bleed);
+          drawEmojiOn(ctx, grid[r][c], x, y, scale, alpha, bleed);
           continue;
         }
         popAnims.delete(key);
       }
-      drawEmoji(grid[r][c], x, y, 1, EMOJI_ALPHA, 0);
+      drawEmojiOn(ctx, grid[r][c], x, y, 1, EMOJI_ALPHA, 0);
     }
   }
 }
 
-function drawFrame(fallEased, elapsed){
+function renderFrame(elapsed){
   ctx.drawImage(paperCanvas, 0, 0, W, H);
 
-  const fallingSet = new Set();
-  animPhase.fallers.forEach(f => fallingSet.add(f.toRow * GRID_X + f.col));
+  const fadeT = Math.min(elapsed / animPhase.fadeDur, 1);
+  const fadeE = 1 - Math.pow(1 - fadeT, 2);
+  const fadeScale = 1 - fadeE * 0.7;
+  const fadeAlphaBase = (1 - fadeE) * EMOJI_ALPHA;
+  const fadeBleed = fadeE * 1.5;
 
-  animPhase.removed.forEach(cell => {
-    const t = Math.min(elapsed / animPhase.fadeDur, 1);
-    const e = 1 - Math.pow(1 - t, 2);
-    const scale = 1 - e * 0.7;
-    const alpha = (1 - e) * EMOJI_ALPHA;
-    const bleed = e * 1.5;
-    if(alpha <= 0.01) return;
-    const x = OX + cell.col * CELL + CELL / 2;
-    const y = OY + cell.row * CELL + CELL / 2;
-    drawEmoji(cell.hex, x, y, Math.max(scale, 0.01), alpha, bleed);
-  });
-
-  for(let r = 0; r < GRID_Y; r++){
-    for(let c = 0; c < GRID_X; c++){
-      if(fallingSet.has(r * GRID_X + c)) continue;
-      if(grid[r][c])
-        drawEmoji(grid[r][c], OX + c * CELL + CELL/2, OY + r * CELL + CELL/2, 1, EMOJI_ALPHA, 0);
+  if(fadeAlphaBase > 0.01){
+    for(let i = 0; i < animPhase.removed.length; i++){
+      const cell = animPhase.removed[i];
+      const x = OX + cell.col * CELL + CELL / 2;
+      const y = OY + cell.row * CELL + CELL / 2;
+      drawEmojiOn(ctx, cell.hex, x, y, Math.max(fadeScale, 0.01), fadeAlphaBase, fadeBleed);
     }
   }
 
-  animPhase.fallers.forEach(f => {
+  for(let r = 0; r < GRID_Y; r++){
+    for(let c = 0; c < GRID_X; c++){
+      const key = r * GRID_X + c;
+      if(animPhase.fallingSet.has(key)) continue;
+      if(!grid[r][c]) continue;
+      const x = OX + c * CELL + CELL / 2;
+      const y = OY + r * CELL + CELL / 2;
+      drawEmojiOn(ctx, grid[r][c], x, y, 1, EMOJI_ALPHA, 0);
+    }
+  }
+
+  const fallEased = elapsed < animPhase.delay ? 0 : (() => {
+    const fallT = Math.max(0, Math.min((elapsed - animPhase.delay) / animPhase.fallDur, 1));
+    return fallT < 0.5
+      ? 8 * fallT * fallT * fallT * fallT
+      : 1 - Math.pow(-2 * fallT + 2, 4) / 2;
+  })();
+
+  for(let i = 0; i < animPhase.fallers.length; i++){
+    const f = animPhase.fallers[i];
     const y = f.fromRow * CELL + (f.toRow - f.fromRow) * CELL * fallEased;
-    drawEmoji(f.hex, OX + f.col * CELL + CELL/2, OY + y + CELL/2, 1, EMOJI_ALPHA, 0);
-  });
+    const x = OX + f.col * CELL + CELL / 2;
+    drawEmojiOn(ctx, f.hex, x, OY + y + CELL / 2, 1, EMOJI_ALPHA, 0);
+  }
+}
+
+function raf(){
+  if(slideAnimating || slideState){
+    requestAnimationFrame(raf);
+    return;
+  }
+
+  if(animating && animPhase){
+    const elapsed = performance.now() - animPhase.start;
+    renderFrame(elapsed);
+
+    if(elapsed > animPhase.delay + animPhase.fallDur + 120){
+      animating = false;
+      animPhase = null;
+      popAnims.clear();
+      checkFull();
+      needsDraw = true;
+      renderStaticNow();
+      rafRunning = false;
+      return;
+    }
+    requestAnimationFrame(raf);
+    return;
+  }
+
+  let anyPop = false;
+  const now = performance.now();
+  popAnims.forEach(a => { if(now - a.t < a.dur) anyPop = true; });
+  if(!anyPop) popAnims.clear();
+
+  if(anyPop || needsDraw){
+    renderStaticNow();
+    needsDraw = false;
+    if(anyPop){
+      requestAnimationFrame(raf);
+      return;
+    }
+    rafRunning = false;
+    return;
+  }
+
+  rafRunning = false;
+}
+
+function drawEmojiOn(g, hex, x, y, scale, alpha, bleed){
+  const img = getEmojiImage(hex);
+  const size = CELL * 0.94 * scale;
+  const half = size / 2;
+
+  if(!img.complete || !img.naturalWidth){
+    g.globalAlpha = alpha * 0.12;
+    g.fillStyle = '#3d3529';
+    g.beginPath();
+    g.arc(x, y, size * 0.3, 0, Math.PI * 2);
+    g.fill();
+    g.globalAlpha = 1;
+    return;
+  }
+
+  g.globalAlpha = alpha;
+
+  if(bleed > 0){
+    g.globalAlpha = alpha * bleed * 0.22;
+    const bSize = size * (1 + bleed * 0.35);
+    g.drawImage(img, x - bSize/2, y - bSize/2, bSize, bSize);
+  }
+
+  g.globalAlpha = alpha;
+  g.drawImage(img, x - half, y - half, size, size);
+  g.globalAlpha = 1;
 }
 
 function showEnd(){
   gameActive = false;
-  clearBtn.classList.remove('visible', 'press');
-  document.getElementById('mode-btn').classList.remove('hidden');
+  hideClearBtn();
+  const btn = document.getElementById('mode-btn');
+  if(btn) btn.classList.remove('hidden');
   const elapsed = performance.now() - startTime;
   const sec = Math.floor(elapsed / 1000);
   const m = Math.floor(sec / 60);
@@ -1166,9 +1826,13 @@ function closeEnd(){
   poopMode = false;
   currentCat = 'meadow';
   pickRandomPool(currentCat);
+  buildPaper();
+  applyThemeVars();
+  resetGameState();
+  hideClearBtn();
   updateModeIcon();
-  applyTheme();
-  startGame();
+  document.getElementById('mode-btn').classList.remove('hidden');
+  flyInModeIcon();
 }
 
 const PENTA = [130.81,146.83,164.81,196.00,220.00,261.63,293.66,329.63,392.00,440.00];
@@ -1188,7 +1852,7 @@ function playNote(hex){
   for(let i = 0; i < hex.length; i++)
     hash = (hash * 31 + hex.charCodeAt(i)) | 0;
 
-  let freq = PENTA[Math.abs(hash) % PENTA.length];
+  const freq = PENTA[Math.abs(hash) % PENTA.length];
 
   const osc = audioCtx.createOscillator();
   const gain = audioCtx.createGain();
