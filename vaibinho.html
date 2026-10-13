@@ -14,7 +14,6 @@ html,body{height:100%;overflow:hidden;overscroll-behavior:none;touch-action:none
   --paper:#e8ecd8;
   --ink:#3d4a2a;
   --ink-soft:rgba(61,74,42,.35);
-  --ui-border:rgba(61,74,42,.1);
   --line:#3d4a2a;
 }
 html,body{background:var(--paper);transition:background 1.6s ease}
@@ -24,39 +23,38 @@ canvas{
   touch-action:none;cursor:default;
 }
 
-.circ-btn{
+#mode-btn{
   position:fixed;
-  background:transparent;
-  border:none;
-  display:flex;align-items:center;justify-content:center;
-  cursor:pointer;z-index:10;
-  padding:0;font-family:inherit;
-  transition:transform .4s cubic-bezier(.25,.1,.25,1), opacity .5s ease;
-  -webkit-user-select:none;user-select:none;
-  color:var(--ink);
   top:max(14px,env(safe-area-inset-top));
-}
-.circ-btn:active{transform:scale(.9)}
-
-#boy{
   left:50%;
   width:84px;height:84px;
   margin-left:-42px;
+  border:none;
+  background:transparent;
+  padding:0;font-family:inherit;
+  cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  color:var(--line);
+  z-index:10;
+  transition:transform .4s cubic-bezier(.25,.1,.25,1), opacity .5s ease;
+  -webkit-user-select:none;user-select:none;
 }
-#boy img{
+#mode-btn:active{transform:scale(.9)}
+#mode-btn img{
   width:63px;height:63px;
   display:block;
-  animation:boySway 5s ease-in-out infinite;
+  animation:modeSway 5s ease-in-out infinite;
   transform-origin:center bottom;
   opacity:.78;
   filter:saturate(.6) brightness(.98) contrast(.92);
   -webkit-user-drag:none;
   user-select:none;
 }
-@keyframes boySway{
+@keyframes modeSway{
   0%,100%{transform:rotate(-3deg)}
   50%{transform:rotate(3deg)}
 }
+#mode-btn.hidden{opacity:0;pointer-events:none;transform:scale(.7)}
 
 #clear-btn{
   position:fixed;
@@ -106,7 +104,6 @@ canvas{
   60%{opacity:.75}
   100%{transform:rotate(540deg);opacity:0}
 }
-#boy.hidden{opacity:0;pointer-events:none;transform:scale(.7)}
 
 #end{
   position:fixed;inset:0;z-index:100;background:var(--paper);
@@ -174,11 +171,11 @@ canvas{
 #end-restart svg{width:20px;height:20px}
 
 @media(max-width:500px){
-  #boy{
+  #mode-btn{
     width:104px;height:104px;
     margin-left:-52px;
   }
-  #boy img{
+  #mode-btn img{
     width:80px;height:80px;
   }
   #clear-btn{
@@ -199,8 +196,8 @@ canvas{
 <body>
 <canvas id="field"></canvas>
 
-<button id="boy" class="circ-btn" aria-label="Сменить раздел">
-  <img id="boy-img" src="" alt="">
+<button id="mode-btn" aria-label="Сменить раздел">
+  <img id="mode-icon" src="" alt="">
 </button>
 
 <button id="clear-btn" aria-label="Очистить дубли">
@@ -246,9 +243,6 @@ canvas{
 <script>
 'use strict';
 
-/* ============================================================
-   OPENMOJI CDN
-   ============================================================ */
 const OPENMOJI_BASE = 'emoji/';
 const imgCache = new Map();
 
@@ -265,16 +259,13 @@ function getEmojiImage(hex){
   return img;
 }
 
-/* ============================================================
-   ПОЛНЫЕ СПИСКИ
-   ============================================================ */
 const FULL_POOL = {
   home: [
-    '1F33F','1F331','1F340','1F33E','1F338','1F33C','1F337','1F33B',
+    '1F331','1F340','1F33E','1F338','1F33C','1F337','1F33B',
     '1F33A','1F339','1F341','1F98B','1F41E','1F997','1F426'
   ],
   wild: [
-    '1F332','1F333','1F344','1F41C','1FAB2','1F98C','1F986','1F994',
+    '1F332','1F333','1F344','1F33F','1F41C','1FAB2','1F98C','1F986','1F994',
     '1F43F','1F407','1F9A8','1F9A1','1F9A2','1F40D','1F40C','1F401','1F9AB'
   ],
   sea: [
@@ -292,19 +283,11 @@ const FULL_POOL = {
   poop: ['1F4A9','1F9FB']
 };
 
-/* ============================================================
-   ОБЯЗАТЕЛЬНЫЕ ЭМОДЗИ
-   Луг — все цветы
-   Лес — оба дерева + гриб
-   ============================================================ */
 const ALWAYS = {
   home: ['1F338','1F33C','1F337','1F33B','1F33A','1F339'],
-  wild: ['1F332','1F333','1F344']   // оба дерева + грибочек
+  wild: ['1F332','1F333','1F344','1F33F']
 };
 
-/* ============================================================
-   АКТИВНЫЕ ПУЛЫ
-   ============================================================ */
 const CATS = {
   home: [],
   wild: [],
@@ -354,9 +337,6 @@ function preloadAllEmoji(){
   });
 }
 
-/* ============================================================
-   СПИРАЛЬ
-   ============================================================ */
 function makeSpiralPath(cx, cy, a, b, turns){
   const steps = 360;
   const maxTheta = turns * 2 * Math.PI;
@@ -372,9 +352,6 @@ function makeSpiralPath(cx, cy, a, b, turns){
   return d;
 }
 
-/* ============================================================
-   ПОРЯДОК РЕЖИМОВ
-   ============================================================ */
 const ORDER = ['home', 'wild', 'sea', 'faces', 'food'];
 
 const MODE_ICON_HEX = {
@@ -393,37 +370,23 @@ const END_ICON_HEX = {
   food:  '1F34E'
 };
 
-/* ============================================================
-   ПАЛИТРЫ — «дорогие» и вайбовые
-   ============================================================
-   Принцип:
-   · base — основной средний тон (в серединке экрана)
-   · horizon — тепло-холодный переход чуть выше центра,
-                даёт ощущение глубины, как в утреннем свете
-   · sky — светлый верхний отсвет (как будто свет падает сверху)
-   · ground — тёмное основание снизу (утяжеляет, но не глушит)
-   · bloom — тёплый мягкий отсвет с одной стороны
-                (имитация света от окна — «дорогой» эффект)
-   · vignette — мягкая тень по краям
-   Все тона — пастельные, слегка пыльные, с приглушённой насыщенностью.
-   ============================================================ */
 const THEMES = {
   home: {
-    base:         '#e6ecd2',  // пыльно-зелёный
-    horizon:      '#f0eed8',  // тёплый кремовый горизонт
-    sky:          '#f8f4dc',  // светлый солнечный верх
-    ground:       '#b8c99a',  // мятно-травяной низ
-    bloom:        'rgba(255,240,200,0.35)',  // тёплый боковой отсвет
+    base:         '#e6ecd2',
+    horizon:      '#f0eed8',
+    sky:          '#f8f4dc',
+    ground:       '#b8c99a',
+    bloom:        'rgba(255,240,200,0.35)',
     vignette:     'rgba(90,120,60,0.14)',
     ink:          '#3e4a2c',
     inkSoft:      'rgba(62,74,44,.38)',
     grain:        [110,140,80]
   },
   wild: {
-    base:         '#e5d4bb',  // тёплое дерево
+    base:         '#e5d4bb',
     horizon:      '#efe0c5',
     sky:          '#f5ead0',
-    ground:       '#a8895f',  // кедровый низ
+    ground:       '#a8895f',
     bloom:        'rgba(255,215,160,0.32)',
     vignette:     'rgba(90,60,30,0.16)',
     ink:          '#4a3826',
@@ -431,10 +394,10 @@ const THEMES = {
     grain:        [120,90,55]
   },
   sea: {
-    base:         '#d6e4ea',  // пыльно-голубой
+    base:         '#d6e4ea',
     horizon:      '#e6eef2',
     sky:          '#f0f6f8',
-    ground:       '#8fb2c4',  // глубинный синевато-серый
+    ground:       '#8fb2c4',
     bloom:        'rgba(210,235,245,0.4)',
     vignette:     'rgba(60,90,110,0.16)',
     ink:          '#2d3f4a',
@@ -442,10 +405,10 @@ const THEMES = {
     grain:        [80,110,130]
   },
   faces: {
-    base:         '#ecdde0',  // пыльно-розовый
+    base:         '#ecdde0',
     horizon:      '#f4e6e6',
     sky:          '#f9f0ee',
-    ground:       '#cca8ad',  // пудрово-розовый низ
+    ground:       '#cca8ad',
     bloom:        'rgba(255,225,225,0.4)',
     vignette:     'rgba(140,100,110,0.15)',
     ink:          '#4a3238',
@@ -453,10 +416,10 @@ const THEMES = {
     grain:        [150,110,120]
   },
   food: {
-    base:         '#f0e4c4',  // тёплый цитрус
+    base:         '#f0e4c4',
     horizon:      '#f6e8c8',
     sky:          '#fbf2d6',
-    ground:       '#d4b578',  // приглушённый охристый
+    ground:       '#d4b578',
     bloom:        'rgba(255,240,190,0.45)',
     vignette:     'rgba(150,120,70,0.15)',
     ink:          '#4a3c1c',
@@ -497,9 +460,6 @@ function applyTheme(){
   needsDraw = true;
 }
 
-/* ============================================================
-   ТЕКСТУРА
-   ============================================================ */
 let noiseTileCache = new Map();
 
 function makeNoiseTile(grainRGB, isDark){
@@ -529,7 +489,6 @@ function getNoiseTile(grainRGB, isDark){
   return noiseTileCache.get(key);
 }
 
-/* ===== СОСТОЯНИЕ ===== */
 let canvas, ctx, paperCanvas;
 let W, H, CELL, OX, OY, GRID_X, GRID_Y;
 let grid, currentCat = 'home';
@@ -559,9 +518,6 @@ let isPointerDown = false;
 let lastPaintedIdx = -1;
 const paintedDuringSwipe = new Set();
 
-/* ============================================================
-   ИНИЦИАЛИЗАЦИЯ
-   ============================================================ */
 function init(){
   canvas = document.getElementById('field');
   ctx = canvas.getContext('2d', {alpha:false});
@@ -578,7 +534,7 @@ function init(){
   resize();
   buildPaper();
   bindEvents();
-  updateBoyFace();
+  updateModeIcon();
   applyTheme();
   startGame();
   raf();
@@ -614,17 +570,6 @@ function resize(){
   grid = Array.from({length:GRID_Y}, () => Array(GRID_X).fill(null));
 }
 
-/* ============================================================
-   БУМАГА — многослойный «дорогой» фон
-   ============================================================
-   Слои (в порядке наложения):
-     1. base — базовый средний тон
-     2. sky — светлый отсвет сверху
-     3. horizon — тёплая полоса чуть выше центра
-     4. ground — тёмное основание снизу
-     5. bloom — мягкий боковой отсвет (тёплый)
-     6. зернистость + виньетка
-   ============================================================ */
 function buildPaper(){
   paperCanvas = document.createElement('canvas');
   paperCanvas.width = Math.floor(W * DPR);
@@ -636,11 +581,9 @@ function buildPaper(){
   const t = THEMES[key] || THEMES.home;
   const isDark = key === 'poop';
 
-  // 1. BASE
   p.fillStyle = t.base;
   p.fillRect(0, 0, W, H);
 
-  // 2. SKY — светлое пятно сверху, как утренний воздух
   if(t.sky){
     const sky = p.createRadialGradient(
       W * 0.5, -H * 0.2, 0,
@@ -653,7 +596,6 @@ function buildPaper(){
     p.fillRect(0, 0, W, H);
   }
 
-  // 3. HORIZON — тёплая полоса чуть выше центра
   if(t.horizon){
     const horizon = p.createLinearGradient(0, H * 0.25, 0, H * 0.75);
     horizon.addColorStop(0, hexToRgba(t.horizon, 0));
@@ -663,7 +605,6 @@ function buildPaper(){
     p.fillRect(0, 0, W, H);
   }
 
-  // 4. GROUND — тёмное основание снизу
   if(t.ground){
     const ground = p.createRadialGradient(
       W * 0.5, H * 1.15, 0,
@@ -676,7 +617,6 @@ function buildPaper(){
     p.fillRect(0, 0, W, H);
   }
 
-  // 5. BLOOM — тёплый боковой отсвет (слева снизу)
   if(t.bloom){
     const bloom = p.createRadialGradient(
       -W * 0.1, H * 0.9, 0,
@@ -689,7 +629,6 @@ function buildPaper(){
     p.fillRect(0, 0, W, H);
   }
 
-  // 6. ЗЕРНИСТОСТЬ
   const grainRGB = t.grain || [130, 100, 65];
   const tile = getNoiseTile(grainRGB, isDark);
   const pattern = p.createPattern(tile, 'repeat');
@@ -709,7 +648,6 @@ function buildPaper(){
     p.fillRect(x, y, 1.5, 1.5);
   }
 
-  // 7. ВИНЬЕТКА
   if(t.vignette){
     const vignette = p.createRadialGradient(
       W * 0.5, H * 0.5, Math.min(W, H) * 0.5,
@@ -722,7 +660,6 @@ function buildPaper(){
   }
 }
 
-/* Утилита: hex → rgba с заданной альфой */
 function hexToRgba(hex, alpha){
   if(!hex) return 'rgba(0,0,0,0)';
   if(hex.startsWith('rgba') || hex.startsWith('rgb')){
@@ -735,9 +672,6 @@ function hexToRgba(hex, alpha){
   return `rgba(${r},${g},${b},${alpha})`;
 }
 
-/* ============================================================
-   СОБЫТИЯ
-   ============================================================ */
 function bindEvents(){
   canvas.addEventListener('mousemove', onMove);
   canvas.addEventListener('mousedown', onDown);
@@ -750,7 +684,7 @@ function bindEvents(){
   canvas.addEventListener('touchcancel',onTouchEnd,   {passive:false});
 
   clearBtn.addEventListener('click', onClearClick);
-  document.getElementById('boy').addEventListener('click', cycleCat);
+  document.getElementById('mode-btn').addEventListener('click', cycleMode);
   document.getElementById('end-restart').addEventListener('click', closeEnd);
 
   const timeEl = document.getElementById('end-time');
@@ -782,12 +716,9 @@ function onEndTimeDoubleClick(e){
   document.getElementById('end').classList.remove('visible');
   applyTheme();
   startGame();
-  updateBoyFace();
+  updateModeIcon();
 }
 
-/* ============================================================
-   ИГРА
-   ============================================================ */
 function startGame(){
   for(let r = 0; r < GRID_Y; r++)
     for(let c = 0; c < GRID_X; c++)
@@ -803,7 +734,7 @@ function startGame(){
   manualCount = 0;
   clearBtnBusy = false;
   clearBtn.classList.remove('visible', 'press');
-  document.getElementById('boy').classList.remove('hidden');
+  document.getElementById('mode-btn').classList.remove('hidden');
   isPointerDown = false;
   lastPaintedIdx = -1;
   paintedDuringSwipe.clear();
@@ -929,10 +860,7 @@ function onTouchEnd(e){
   paintedDuringSwipe.clear();
 }
 
-/* ============================================================
-   РЕЖИМЫ
-   ============================================================ */
-function cycleCat(){
+function cycleMode(){
   if(animating) return;
 
   if(easterMode){
@@ -944,13 +872,13 @@ function cycleCat(){
   }
 
   pickRandomPool(currentCat);
-  updateBoyFace();
+  updateModeIcon();
   applyTheme();
   startGame();
 }
 
-function updateBoyFace(){
-  const img = document.getElementById('boy-img');
+function updateModeIcon(){
+  const img = document.getElementById('mode-icon');
   if(!img) return;
   let hex;
   if(easterMode === 'poop'){
@@ -970,19 +898,16 @@ function checkFull(){
 }
 
 function updateUI(){
-  const boy = document.getElementById('boy');
+  const modeBtn = document.getElementById('mode-btn');
   if(locked && gameActive){
     clearBtn.classList.add('visible');
-    boy.classList.add('hidden');
+    modeBtn.classList.add('hidden');
   } else {
     clearBtn.classList.remove('visible');
-    boy.classList.remove('hidden');
+    modeBtn.classList.remove('hidden');
   }
 }
 
-/* ============================================================
-   ОЧИСТКА
-   ============================================================ */
 function onClearClick(e){
   e.preventDefault();
   if(!gameActive || !locked || animating) return;
@@ -1074,9 +999,6 @@ function applyClear(){
   animPhase = {start: now, removed, fallers, fadeDur: 1100, fallDur: 1300, delay: 500};
 }
 
-/* ============================================================
-   АНИМАЦИЯ
-   ============================================================ */
 function raf(){
   if(animating && animPhase){
     const elapsed = performance.now() - animPhase.start;
@@ -1109,9 +1031,6 @@ function raf(){
   requestAnimationFrame(raf);
 }
 
-/* ============================================================
-   ОТРИСОВКА
-   ============================================================ */
 function drawEmoji(hex, x, y, scale, alpha, bleed){
   const img = getEmojiImage(hex);
   const size = CELL * 0.94 * scale;
@@ -1200,13 +1119,10 @@ function drawFrame(fallEased, elapsed){
   });
 }
 
-/* ============================================================
-   ЗАВЕРШЕНИЕ
-   ============================================================ */
 function showEnd(){
   gameActive = false;
   clearBtn.classList.remove('visible', 'press');
-  document.getElementById('boy').classList.remove('hidden');
+  document.getElementById('mode-btn').classList.remove('hidden');
   const elapsed = performance.now() - startTime;
   const sec = Math.floor(elapsed / 1000);
   const m = Math.floor(sec / 60);
@@ -1229,14 +1145,11 @@ function closeEnd(){
   easterMode = null;
   currentCat = 'home';
   pickRandomPool(currentCat);
-  updateBoyFace();
+  updateModeIcon();
   applyTheme();
   startGame();
 }
 
-/* ============================================================
-   ЗВУК
-   ============================================================ */
 const PENTA = [130.81,146.83,164.81,196.00,220.00,261.63,293.66,329.63,392.00,440.00];
 
 function initAudio(){
