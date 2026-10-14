@@ -464,12 +464,13 @@ let popAnims = new Map();
 let lastHover = -1;
 let swapCount = 0;
 let manualCount = 0;
+let lastRemovedCount = 0;
 let DPR = Math.min(devicePixelRatio || 1, 2);
 const IS_MOBILE = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent) || matchMedia('(pointer:coarse)').matches;
 
 const EMOJI_ALPHA = 0.62;
 
-const POP_DURATION = 550;
+const POP_DURATION = (/iPhone|iPad|iPod|Android/i.test(navigator.userAgent) || matchMedia('(pointer:coarse)').matches) ? 700 : 2000;
 const POP_EASE_OUT = t => 1 - Math.pow(1 - t, 3);
 const POP_SCALE_FROM = 0.6;
 const POP_BLEED = 0.8;
@@ -503,6 +504,7 @@ let slideAnimating = false;
 let touchIdSlide = null;
 let mouseDownSlide = false;
 let incomingPreview = null;
+let modeOutPromise = null;
 
 function slideInit(){
   slideStage = document.getElementById('slide-stage');
@@ -623,7 +625,7 @@ function startModeSway(){
 
 function flyOutModeIcon(){
   const img = document.getElementById('mode-icon');
-  if(!img) return;
+  if(!img) return Promise.resolve();
 
   if(img.getAnimations) img.getAnimations().forEach(a => { try{ a.cancel(); }catch(e){} });
   stopModeSway();
@@ -637,17 +639,21 @@ function flyOutModeIcon(){
       {transform:'translate3d(0,-16%,0) scale(1.05) rotate(-4deg)', opacity:.62, offset:.3},
       {transform:'translate3d(0,-180%,0) scale(.5) rotate(-26deg)', opacity:0,   offset:1}
     ], {
-      duration: 700,
+      duration: 10000,
       easing: 'cubic-bezier(.55,0,.7,.4)',
       fill: 'forwards'
     });
-    anim.onfinish = () => {
-      img.style.transform = 'translate3d(0,-180%,0) scale(.5) rotate(-26deg)';
-      img.style.opacity = '0';
-    };
+    return new Promise(resolve => {
+      anim.onfinish = () => {
+        img.style.transform = 'translate3d(0,-180%,0) scale(.5) rotate(-26deg)';
+        img.style.opacity = '0';
+        resolve();
+      };
+    });
   }catch(e){
     img.style.transform = 'translate3d(0,-180%,0) scale(.5) rotate(-26deg)';
     img.style.opacity = '0';
+    return Promise.resolve();
   }
 }
 
@@ -669,7 +675,7 @@ function flyInModeIcon(){
       {transform:'translate3d(0,.4%,0) scale(1.005) rotate(-.8deg)',opacity:.62, offset:.88},
       {transform:'translate3d(0,0,0) scale(1) rotate(0deg)',        opacity:.62, offset:1}
     ], {
-      duration: 1050,
+      duration: 10000,
       easing: 'cubic-bezier(.22,1.05,.32,1)',
       fill: 'forwards'
     });
@@ -708,7 +714,6 @@ function showClearBtn(){
   if(btn) btn.classList.add('hidden');
   clr.classList.remove('hidden');
 
-  // Показываем контейнер кнопки мгновенно
   clr.style.opacity = '1';
   clr.style.pointerEvents = 'auto';
 
@@ -804,7 +809,7 @@ function slideMove(x, y){
     slideEdge && slideEdge.classList.add('on');
     slideStage.classList.add('dragging');
     hideClearBtn();
-    flyOutModeIcon();
+    modeOutPromise = flyOutModeIcon();
   }
 
   const raw = dx * SLIDE.rubber;
@@ -877,7 +882,9 @@ function slideFinish(dir){
     if(t < 1){
       requestAnimationFrame(frame);
     } else {
-      hideSeam();
+          hideSeam();
+      modeOutPromise = null;
+      document.getElementById('mode-btn').classList.remove('hidden');
       commitSlide(dir);
     }
   }
@@ -918,6 +925,7 @@ function slideCancel(dir){
       hideSeam();
       slideAnimating = false;
       incomingPreview = null;
+      modeOutPromise = null;
       flyInModeIcon();
       needsDraw = true;
       startRaf();
@@ -939,7 +947,7 @@ function commitSlide(dir){
   updateModeIcon();
   resetGameState();
   hideClearBtn();
-  updateModeIcon(); // на случай если изменится иконка
+  updateModeIcon();
 
   const cur = getCanvasMain();
   const next = getCanvasNext();
@@ -957,6 +965,7 @@ function commitSlide(dir){
   incomingPreview = null;
   slideAnimating = false;
   needsDraw = false;
+  modeOutPromise = null;
 
   flyInModeIcon();
 }
@@ -1040,8 +1049,7 @@ function programmaticSlide(dir){
   slideStage.classList.add('dragging');
   hideClearBtn();
 
-  /* КНОПКА УЛЕТАЕТ ВВЕРХ */
-  flyOutModeIcon();
+  modeOutPromise = flyOutModeIcon();
 
   const targetCurX = dir === 1 ? -W : W;
   const startNextX = dir === 1 ? W : -W;
@@ -1094,10 +1102,11 @@ function programmaticSlide(dir){
       slideStage.classList.remove('dragging');
       slideEdge && slideEdge.classList.remove('on');
 
-      slideAnimating = false;
+       slideAnimating = false;
       needsDraw = false;
 
-      /* КНОПКА ПРИЛЕТАЕТ СВЕРХУ */
+      modeOutPromise = null;
+      document.getElementById('mode-btn').classList.remove('hidden');
       flyInModeIcon();
     }
   }
@@ -1125,7 +1134,6 @@ function init(){
   applyThemeVars();
   resetGameState();
   hideClearBtn();
-  // Показываем кнопку режимов с анимацией прилёта сверху
   document.getElementById('mode-btn').classList.remove('hidden');
   flyInModeIcon();
   startRaf();
@@ -1351,6 +1359,7 @@ function resetGameState(){
   lastHover = -1;
   swapCount = 0;
   manualCount = 0;
+  lastRemovedCount = 0;
   clearBtnBusy = false;
   isPointerDown = false;
   lastPaintedIdx = -1;
@@ -1372,14 +1381,35 @@ function pickHex(){
   return pool[(Math.random() * pool.length) | 0];
 }
 
+function pickNeighborHex(cell){
+  const dirs = [[-1,0],[1,0],[0,-1],[0,1]];
+  const candidates = [];
+  for(let i = 0; i < 4; i++){
+    const nr = cell.row + dirs[i][0];
+    const nc = cell.col + dirs[i][1];
+    if(nr < 0 || nr >= GRID_Y || nc < 0 || nc >= GRID_X) continue;
+    const h = grid[nr][nc];
+    if(h) candidates.push(h);
+  }
+  if(candidates.length === 0) return null;
+  return candidates[(Math.random() * candidates.length) | 0];
+}
+
 function paintCell(cell){
   if(!cell) return;
   if(grid[cell.row][cell.col]) return;
   if(paintedDuringSwipe.has(cell.idx)) return;
 
   if(!audioCtx) initAudio();
-  const hex = pickHex();
+  let hex = pickHex();
   if(!hex) return;
+
+  if(lastRemovedCount > 0){
+    const forced = pickNeighborHex(cell);
+    if(forced) hex = forced;
+    lastRemovedCount--;
+  }
+
   grid[cell.row][cell.col] = hex;
   popAnims.set(cell.idx, {t: performance.now(), dur: POP_DURATION});
   paintedDuringSwipe.add(cell.idx);
@@ -1602,6 +1632,8 @@ function applyClear(){
     return;
   }
 
+  lastRemovedCount = toRemove.size < 6 ? toRemove.size : 0;
+
   animating = true;
   const now = performance.now();
   const removed = [];
@@ -1646,7 +1678,6 @@ function applyClear(){
   locked = false;
   clearBtnBusy = false;
 
-  // Показываем кнопку режимов обратно с прилётом
   document.getElementById('mode-btn').classList.remove('hidden');
   flyInModeIcon();
 
@@ -1788,7 +1819,7 @@ function drawEmojiOn(g, hex, x, y, scale, alpha, bleed){
 
   g.globalAlpha = alpha;
 
-  if(bleed > 0){
+  if(bleed > 0 && !IS_MOBILE){
     g.globalAlpha = alpha * bleed * 0.22;
     const bSize = size * (1 + bleed * 0.35);
     g.drawImage(img, x - bSize/2, y - bSize/2, bSize, bSize);
