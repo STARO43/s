@@ -1,4 +1,3 @@
-```html
 <!DOCTYPE html>
 <html lang="ru">
 <head>
@@ -16,6 +15,7 @@
     -webkit-font-smoothing: antialiased;
   }
   #webgl { position: fixed; inset: 0; width: 100vw; height: 100vh; z-index: 0; pointer-events: none; }
+
   #loader {
     position: fixed; inset: 0; z-index: 20;
     display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px;
@@ -31,7 +31,7 @@
   #loader .dot:nth-child(3) { animation-delay: 0.30s; }
   #loader-status { font-size: 10px; letter-spacing: 0.12em; opacity: 0.6; min-height: 1em; }
   @keyframes pulse { 0%,80%,100% { opacity: 0.15; } 40% { opacity: 1; } }
-  
+
   #hint {
     position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%);
     z-index: 10; font-size: 10px; letter-spacing: 0.18em; text-transform: uppercase;
@@ -60,7 +60,7 @@
     transition: transform 0.5s cubic-bezier(0.19, 1, 0.22, 1);
   }
   #lightbox.open img { transform: scale(1); }
-  
+
   #lightbox-close {
     position: absolute; top: 24px; right: 28px;
     width: 40px; height: 40px;
@@ -127,48 +127,31 @@
 
     const ACTIVITY_MIN    = 0.08;
     const ACTIVITY_MAX    = 1.0;
-    const ACTIVITY_RISE   = 8.0;
+    const ACTIVITY_RISE   = 6.0;
     const ACTIVITY_DECAY  = 1.5;
 
     // ============================================================
-    //  EASE — Lusion cubic-bezier
+    //  НАСТРОЙКИ СКРОЛЛА
+    //  Всё в мировых единицах Three.js.
     // ============================================================
-    const ease = {
-      cubicBezier(t, p0, p1, p2, p3) {
-        if (t <= 0) return 0;
-        if (t >= 1) return 1;
-        if (p0 === p1 && p2 === p3) return t;
-        const A = 1 - 3 * p2 + 3 * p0;
-        const B = 3 * p2 - 6 * p0;
-        const C = 3 * p0;
-        const E = 1 - 3 * p3 + 3 * p1;
-        const F = 3 * p3 - 6 * p1;
-        const G = 3 * p1;
-        const poly = (v, a, b, c) => a * v * v * v + b * v * v + c * v;
-        const dpoly = (v, a, b, c) => 3 * a * v * v + 2 * b * v + c;
-        let v = t;
-        for (let i = 0; i < 8; i++) {
-          const x = poly(v, A, B, C);
-          const dx = dpoly(v, A, B, C);
-          if (dx === 0) break;
-          v -= (x - t) / dx;
-          v = Math.min(Math.max(v, 0), 1);
-        }
-        return poly(v, E, F, G);
-      },
-      lusion(t)      { return ease.cubicBezier(t, .35, 0, 0, 1); },
-      expoOut(t)     { return t === 1 ? 1 : 1 - Math.pow(2, -10 * t); },
-      expoIn(t)      { return t === 0 ? 0 : Math.pow(2, 10 * (t - 1)); },
-      expoInOut(t)   { return t === 0 ? 0 : t === 1 ? 1 : (t *= 2) < 1 ? 0.5 * Math.pow(2, 10 * (t - 1)) : 0.5 * (-Math.pow(2, -10 * (t - 1)) + 2); },
-      cubicOut(t)    { return 1 - Math.pow(1 - t, 3); },
-      cubicInOut(t)  { return (t *= 2) < 1 ? 0.5 * t * t * t : 0.5 * ((t -= 2) * t * t + 2); },
-      backOut(t)     { const c = 1.70158; return --t * t * ((c + 1) * t + c) + 1; }
-    };
+    const WHEEL_SENS        = 1.8;   // чувствительность колеса (1 клик ≈ ½ карточки)
+    const FOLLOW_LAMBDA     = 2;  // скорость догоняния цели после колеса (1/сек)
+    const INERTIA_LAMBDA    = 1;   // затухание инерции после свайпа (1/сек)
+    const INERTIA_MULT      = 0.9;   // сила инерции после свайпа
+    const INERTIA_MAX       = 600;   // потолок инерции
+    const INERTIA_MIN_ALIVE = 0.5;   // порог остановки
+    const SETTLE_EPS        = 0.005; // снап к цели при таком расстоянии
 
     // ============================================================
-    //  УТИЛИТЫ
+    //  EASE
     // ============================================================
+    const ease = {
+      expoOut(t)     { return t === 1 ? 1 : 1 - Math.pow(2, -10 * t); },
+      cubicOut(t)    { return 1 - Math.pow(1 - t, 3); }
+    };
+
     const clamp = (v, a, b) => Math.min(b, Math.max(a, v));
+    const lerp  = (a, b, t) => a + (b - a) * t;
 
     function mulberry32(seed) {
       return function () {
@@ -281,9 +264,6 @@
 
     const maxAniso = Math.min(4, renderer.capabilities.getMaxAnisotropy());
 
-    // ============================================================
-    //  SKY
-    // ============================================================
     const sky = new Sky();
     sky.scale.setScalar(450000);
     scene.add(sky);
@@ -295,18 +275,11 @@
     su.mieDirectionalG.value = 0.78;
 
     const sunDir = new THREE.Vector3();
-    sunDir.setFromSphericalCoords(
-      1,
-      THREE.MathUtils.degToRad(90 - 1.2),
-      THREE.MathUtils.degToRad(160)
-    );
+    sunDir.setFromSphericalCoords(1, THREE.MathUtils.degToRad(90 - 1.2), THREE.MathUtils.degToRad(160));
     su.sunPosition.value.copy(sunDir);
 
     const SUN_COLOR = new THREE.Color(1.0, 0.88, 0.68);
 
-    // ============================================================
-    //  ГАЛЕРЕЯ
-    // ============================================================
     const galleryGroup = new THREE.Group();
     scene.add(galleryGroup);
 
@@ -317,6 +290,18 @@
     const cards = [];
     let totalWidth   = 0;
     let visibleWidth = 0;
+    let maxScroll    = 0;
+    let worldWidth   = 0;
+
+    // ============================================================
+    //  СОСТОЯНИЕ СКРОЛЛА (всё в мировых единицах)
+    // ============================================================
+    let scrollTarget  = 0;   // куда стремимся
+    let scrollCurrent = 0;   // где находимся (плавно догоняет)
+    let dragInertia   = 0;   // мировая скорость после отпускания
+    let isDragging    = false;
+    let pendingDragPx = 0;   // накопленные пиксели между кадрами
+    let dragVelPxMs   = 0;   // EMA скорости пальца/мыши
 
     const cardShared = {
       uTime:     { value: 0 },
@@ -334,13 +319,6 @@
       }
     `;
 
-    // ============================================================
-    //  Fragment shader
-    //  → Полностью восстановленный "лупа-стекло" эффект из оригинала
-    //    с видимым движением картинки внутри при скролле (activity)
-    //  + солнечные блики
-    //  + reveal (плавное проявление, без масштаба при hover)
-    // ============================================================
     const lensFragment = /* glsl */`
       precision highp float;
       varying vec2 vUv;
@@ -365,109 +343,61 @@
       }
       float fbm(vec2 p) {
         float v = 0.0, a = 0.5;
-        for (int i = 0; i < 2; i++) {
-          v += a * noise(p);
-          p = p * 2.03 + 11.7;
-          a *= 0.5;
-        }
+        for (int i = 0; i < 2; i++) { v += a * noise(p); p = p * 2.03 + 11.7; a *= 0.5; }
         return v;
       }
-
-      // Купол-лупа + жидкостная рябь, амплитуда которой прямо управляется activity.
-      // Когда скроллим — activity = 1 — картинка внутри сильно "плывёт".
-      // Когда стоит — activity = 0.08 — почти статичная линза.
       vec3 liquidNormal(vec2 uv, float t, float activity) {
         vec2 c = uv - 0.5;
         float r2 = dot(c, c);
         vec3 nDome = normalize(vec3(c.x * 1.44, c.y * 1.44, 1.0 - r2 * 1.6));
-
         float wobbleAmp = 0.08 + 0.72 * activity;
         float eps = 0.02;
         vec2 q = uv * 6.0 + vec2(t * 0.10);
         float h  = fbm(q);
         float hx = fbm(q + vec2(eps, 0.0));
         float hy = fbm(q + vec2(0.0, eps));
-        vec3 nRough = normalize(vec3(
-          (hx - h) * wobbleAmp * 3.2,
-          (hy - h) * wobbleAmp * 3.2,
-          1.0
-        ));
-
+        vec3 nRough = normalize(vec3((hx - h) * wobbleAmp * 3.2, (hy - h) * wobbleAmp * 3.2, 1.0));
         return normalize(mix(nDome, nRough, 0.28));
       }
-
       float roundedRectSDF(vec2 uv, vec2 size, float r) {
         vec2 p = (uv - 0.5) * size;
         vec2 halfSize = size * 0.5;
         vec2 d = abs(p) - halfSize + vec2(r);
         return length(max(d, 0.0)) - r + min(max(d.x, d.y), 0.0);
       }
-
       void main() {
         vec2 uv = vUv;
         float t  = uTime;
-
         vec2 cardSize = uCardSize;
         float sdf = roundedRectSDF(uv, cardSize, uRadius);
-
         float aa = 1.2 / max(cardSize.x, cardSize.y);
         float cornerMask = 1.0 - smoothstep(-aa, aa, sdf);
-
         if (cornerMask <= 0.001) discard;
 
-        // --- НОРМАЛЬ ЛУПЫ (двигается от activity) ---
         vec3 Nview = liquidNormal(uv, t, uActivity);
         vec3 Vview = normalize(cameraPosition - vWorldPos);
-
-        // --- ПРЕЛОМЛЕНИЕ ---
-        // В оригинале был жёсткий 0.064. Здесь оставляем ту же базу,
-        // но добавляем небольшой буст от activity, чтобы движение
-        // картинки внутри было заметнее при скролле.
         vec3 refr = refract(Vview, Nview, 1.0 / 1.5);
-
-        float refrBase = 0.064;
-        float refrBoost = 1.0 + uActivity * 0.55;    // при скролле → до 1.55×
-        float refrStrength = refrBase * refrBoost;
-
+        float refrStrength = 0.064 * (1.0 + uActivity * 0.55);
         vec2 uvRefr = uv + refr.xy * refrStrength;
-
-        // Одиночная выборка (без chroma-сплита) — именно она даёт
-        // чёткое "движение картинки внутри плашки"
         vec3 col = texture2D(uMap, uvRefr).rgb;
 
-        // --- СОЛНЕЧНЫЙ БЛИК ---
-        vec3 N = Nview;
-        vec3 V = Vview;
-        vec3 L = uSunDir;
-
+        vec3 N = Nview, V = Vview, L = uSunDir;
         vec3 R = reflect(-V, N);
         float sunDot = max(dot(R, L), 0.0);
-
-        float core = pow(sunDot, 512.0);
-        float halo = pow(sunDot, 32.0);
-        float spec = core * 0.9 + halo * 0.25;
-
+        float spec = pow(sunDot, 512.0) * 0.9 + pow(sunDot, 32.0) * 0.25;
         float lensMask = smoothstep(0.05, 0.75, Nview.z);
-        spec *= lensMask;
-
-        // Блик проявляется вместе с карточкой
-        float sunFade = smoothstep(0.25, 0.85, uShowRatio);
-        spec *= sunFade;
-
+        spec *= lensMask * smoothstep(0.25, 0.85, uShowRatio);
         col += uSunColor * spec;
 
-        // Второй — объёмный блик от искажённой нормали
         vec3 N2 = normalize(vec3(Nview.x * 0.85, Nview.y * 0.85, Nview.z));
         vec3 R2 = reflect(-V, N2);
         float spec2 = pow(max(dot(R2, L), 0.0), 256.0) * 0.4 * lensMask;
-        spec2 *= sunFade;
+        spec2 *= smoothstep(0.25, 0.85, uShowRatio);
         col += uSunColor * spec2;
 
-        // --- FRESNEL (краевое свечение стекла) ---
         float fresnel = pow(1.0 - max(dot(N, V), 0.0), 4.0);
         col += uSunColor * fresnel * 0.08;
 
-        // --- ВНУТРЕННЯЯ ТЕНЬ (SDF edge) ---
         float edgeShadow = smoothstep(-0.08, 0.0, sdf) * 0.35;
         col *= (1.0 - edgeShadow);
 
@@ -486,6 +416,196 @@
 
     const sharedGeometry = new THREE.PlaneGeometry(1, 1);
 
+    // ============================================================
+    //  ПОСТОБРАБОТКА
+    // ============================================================
+    let composer = null;
+    let finalPass = null;
+
+    if (USE_COMPOSER) {
+      composer = new EffectComposer(renderer);
+      composer.setPixelRatio(Math.min(devicePixelRatio, DPR_CAP));
+      composer.setSize(innerWidth, innerHeight);
+      composer.addPass(new RenderPass(scene, camera));
+
+      finalPass = new ShaderPass({
+        uniforms: {
+          tDiffuse:    { value: null },
+          uTime:       { value: 0 },
+          uRes:        { value: new THREE.Vector2(innerWidth, innerHeight) },
+          uAberration: { value: 0.00144 },
+          uGrain:      { value: 0.032 },
+          uVignette:   { value: 0.40 }
+        },
+        vertexShader: `
+          varying vec2 vUv;
+          void main() { vUv = uv; gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0); }
+        `,
+        fragmentShader: `
+          precision highp float;
+          varying vec2 vUv;
+          uniform sampler2D tDiffuse;
+          uniform float uTime;
+          uniform vec2  uRes;
+          uniform float uAberration;
+          uniform float uGrain;
+          uniform float uVignette;
+          float hash(vec2 p) { return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }
+          void main() {
+            vec2 uv = vUv;
+            vec2 d  = uv - 0.5;
+            float r2 = dot(d, d);
+            vec2 off = d * r2 * uAberration * 5.0;
+            vec3 col;
+            col.r = texture2D(tDiffuse, uv + off).r;
+            col.g = texture2D(tDiffuse, uv).g;
+            col.b = texture2D(tDiffuse, uv - off).b;
+            float g = hash(uv * uRes + fract(uTime * 10.0) * 10.0) - 0.5;
+            col += g * uGrain;
+            col *= 1.0 - smoothstep(0.35, 1.0, r2 * 1.5) * uVignette;
+            gl_FragColor = vec4(col, 1.0);
+          }
+        `
+      });
+      composer.addPass(finalPass);
+    }
+
+    // ============================================================
+    //  ЛАЙТБОКС
+    // ============================================================
+    let isLightboxOpen = false;
+    const lightboxEl = document.getElementById('lightbox');
+    const lightboxImg = document.getElementById('lightbox-img');
+    const lightboxClose = document.getElementById('lightbox-close');
+
+    function openLightbox(src) {
+      if (!src) return;
+      lightboxImg.src = src;
+      lightboxEl.classList.add('open');
+      isLightboxOpen = true;
+    }
+    function closeLightbox() {
+      lightboxEl.classList.remove('open');
+      isLightboxOpen = false;
+      setTimeout(() => { lightboxImg.src = ''; }, 400);
+    }
+    lightboxClose.addEventListener('click', closeLightbox);
+    lightboxEl.addEventListener('click', (e) => { if (e.target === lightboxEl) closeLightbox(); });
+    window.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && isLightboxOpen) closeLightbox();
+    });
+
+    // ============================================================
+    //  RAYCAST / DOUBLE TAP
+    // ============================================================
+    const raycaster = new THREE.Raycaster();
+    const mouse = new THREE.Vector2();
+
+    function handleCardDoubleTap(clientX, clientY) {
+      if (isLightboxOpen) return;
+      mouse.x = (clientX / innerWidth) * 2 - 1;
+      mouse.y = -(clientY / innerHeight) * 2 + 1;
+      raycaster.setFromCamera(mouse, camera);
+      const intersects = raycaster.intersectObjects(cards, false);
+      if (intersects.length > 0) {
+        const hitCard = intersects[0].object;
+        if (hitCard.userData.src) openLightbox(hitCard.userData.src);
+      }
+    }
+    window.addEventListener('dblclick', (e) => handleCardDoubleTap(e.clientX, e.clientY));
+
+    // ============================================================
+    //  ВВОД
+    // ============================================================
+    let pointerId = null;
+    let lastPointerX = 0, lastPointerT = 0;
+    let lastTapT = 0, lastTapX = 0, lastTapY = 0;
+
+    // ---- КОЛЕСО ----
+    window.addEventListener('wheel', (e) => {
+      if (isLightboxOpen) return;
+      e.preventDefault();
+
+      let delta = Math.abs(e.deltaX) > Math.abs(e.deltaY) ? e.deltaX : e.deltaY;
+      if (e.deltaMode === 1) delta *= 16;
+      else if (e.deltaMode === 2) delta *= innerHeight;
+      delta = clamp(delta, -200, 200);
+
+      const worldDelta = delta * (worldWidth / innerWidth) * WHEEL_SENS;
+
+      scrollTarget = clamp(scrollTarget + worldDelta, 0, maxScroll);
+      dragInertia = 0;
+    }, { passive: false });
+
+    // ---- DRAG ----
+    window.addEventListener('pointerdown', (e) => {
+      if (isLightboxOpen) return;
+      if (e.pointerType === 'mouse' && e.button !== 0) return;
+      if (pointerId !== null) return;
+
+      const now = performance.now();
+
+      if (e.pointerType !== 'mouse' && (now - lastTapT < 300) &&
+          Math.hypot(e.clientX - lastTapX, e.clientY - lastTapY) < 30) {
+        handleCardDoubleTap(e.clientX, e.clientY);
+        lastTapT = 0;
+        return;
+      }
+      lastTapT = now; lastTapX = e.clientX; lastTapY = e.clientY;
+
+      pointerId = e.pointerId;
+      isDragging = true;
+      pendingDragPx = 0;
+      dragVelPxMs = 0;
+      dragInertia = 0;
+
+      scrollTarget = scrollCurrent;
+
+      lastPointerX = e.clientX;
+      lastPointerT = now;
+
+      try { canvas.setPointerCapture?.(e.pointerId); } catch (_) {}
+    }, { passive: true });
+
+    window.addEventListener('pointermove', (e) => {
+      if (pointerId === null || e.pointerId !== pointerId || isLightboxOpen) return;
+
+      const now = performance.now();
+      const dt = Math.max(1, now - lastPointerT);
+      const dx = e.clientX - lastPointerX;
+
+      pendingDragPx += dx;
+      dragVelPxMs = dragVelPxMs * 0.65 + (dx / dt) * 0.35;
+
+      lastPointerX = e.clientX;
+      lastPointerT = now;
+    }, { passive: true });
+
+    function endPointer() {
+      if (pointerId === null) return;
+
+      const worldVel = -dragVelPxMs * 1000 * (worldWidth / innerWidth) * INERTIA_MULT;
+      dragInertia = clamp(worldVel, -INERTIA_MAX, INERTIA_MAX);
+      if (Math.abs(dragInertia) < 10) dragInertia = 0;
+
+      pointerId = null;
+      isDragging = false;
+      pendingDragPx = 0;
+      dragVelPxMs = 0;
+    }
+    window.addEventListener('pointerup', endPointer, { passive: true });
+    window.addEventListener('pointercancel', endPointer, { passive: true });
+
+    // ---- КЛАВИАТУРА ----
+    window.addEventListener('keydown', (e) => {
+      if (isLightboxOpen) return;
+      if (e.key === 'ArrowRight') scrollTarget = clamp(scrollTarget + 60, 0, maxScroll);
+      if (e.key === 'ArrowLeft')  scrollTarget = clamp(scrollTarget - 60, 0, maxScroll);
+    });
+
+    // ============================================================
+    //  BUILD GALLERY
+    // ============================================================
     function buildGallery(items) {
       const cardData = [];
       let x = 0;
@@ -539,7 +659,6 @@
           });
 
           const mesh = new THREE.Mesh(sharedGeometry, mat);
-          // Начальное состояние для reveal (визуально скрыт)
           mesh.scale.set(d.w * 0.72, d.h * 0.72, 1);
           mesh.position.set(startX + d.x + d.w / 2, -25, 0);
           mesh.rotation.z = 0.12 * (i % 2 === 0 ? 1 : -1);
@@ -561,237 +680,15 @@
           console.warn('[gallery] не удалось создать карточку', e);
         }
       }
+
+      maxScroll = Math.max(0, totalWidth - visibleWidth);
+      scrollTarget = 0;
+      scrollCurrent = 0;
+      dragInertia = 0;
     }
 
     // ============================================================
-    //  ПОСТОБРАБОТКА
-    // ============================================================
-    let composer = null;
-    let finalPass = null;
-
-    if (USE_COMPOSER) {
-      composer = new EffectComposer(renderer);
-      composer.setPixelRatio(Math.min(devicePixelRatio, DPR_CAP));
-      composer.setSize(innerWidth, innerHeight);
-
-      composer.addPass(new RenderPass(scene, camera));
-
-      finalPass = new ShaderPass({
-        uniforms: {
-          tDiffuse:    { value: null },
-          uTime:       { value: 0 },
-          uRes:        { value: new THREE.Vector2(innerWidth, innerHeight) },
-          uAberration: { value: 0.00144 },
-          uGrain:      { value: 0.032 },
-          uVignette:   { value: 0.40 }
-        },
-        vertexShader: /* glsl */`
-          varying vec2 vUv;
-          void main() {
-            vUv = uv;
-            gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
-          }
-        `,
-        fragmentShader: /* glsl */`
-          precision highp float;
-          varying vec2 vUv;
-          uniform sampler2D tDiffuse;
-          uniform float uTime;
-          uniform vec2  uRes;
-          uniform float uAberration;
-          uniform float uGrain;
-          uniform float uVignette;
-          float hash(vec2 p) { return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }
-          void main() {
-            vec2 uv = vUv;
-            vec2 d  = uv - 0.5;
-            float r2 = dot(d, d);
-            vec2 off = d * r2 * uAberration * 5.0;
-            vec3 col;
-            col.r = texture2D(tDiffuse, uv + off).r;
-            col.g = texture2D(tDiffuse, uv).g;
-            col.b = texture2D(tDiffuse, uv - off).b;
-            float g = hash(uv * uRes + fract(uTime * 10.0) * 10.0) - 0.5;
-            col += g * uGrain;
-            col *= 1.0 - smoothstep(0.35, 1.0, r2 * 1.5) * uVignette;
-            gl_FragColor = vec4(col, 1.0);
-          }
-        `
-      });
-      composer.addPass(finalPass);
-    }
-
-    // ============================================================
-    //  СКРОЛЛ — оригинальная физика
-    // ============================================================
-    let targetScroll  = 0;
-    let currentScroll = 0;
-    let maxScroll     = 0;
-
-    const MODE_WHEEL = 0, MODE_DRAG = 1;
-    let inputMode = MODE_WHEEL;
-
-    const EASE_WHEEL = IS_TOUCH ? 0.030 : 0.024;
-    const EASE_DRAG  = IS_TOUCH ? 0.080 : 0.060;
-    const SENS_WHEEL = 0.20;
-    const SENS_DRAG  = IS_TOUCH ? 0.18  : 0.13;
-    const MAX_DELTA       = 50;
-    const MAX_SPEED_WHEEL = 45;
-    const MAX_SPEED_DRAG  = IS_TOUCH ? 70 : 45;
-    const INERTIA_MULT    = IS_TOUCH ? 32 : 30;
-    const INERTIA_CLAMP   = IS_TOUCH ? 120 : 100;
-    const INERTIA_DECAY   = IS_TOUCH ? 0.965 : 0.96;
-
-    let inertiaVel = 0;
-    let dragTilt = 0, dragTiltTarget = 0;
-    let dragStretch = 0, dragStretchTarget = 0;
-    let dragVelocityX = 0;
-    let isDragging = false;
-    const velocityEMA = { v: 0 };
-
-    let isLightboxOpen = false;
-    const lightboxEl = document.getElementById('lightbox');
-    const lightboxImg = document.getElementById('lightbox-img');
-    const lightboxClose = document.getElementById('lightbox-close');
-
-    function openLightbox(src) {
-      if (!src) return;
-      lightboxImg.src = src;
-      lightboxEl.classList.add('open');
-      isLightboxOpen = true;
-      inertiaVel = 0;
-    }
-    function closeLightbox() {
-      lightboxEl.classList.remove('open');
-      isLightboxOpen = false;
-      setTimeout(() => { lightboxImg.src = ''; }, 400);
-    }
-
-    lightboxClose.addEventListener('click', closeLightbox);
-    lightboxEl.addEventListener('click', (e) => { if (e.target === lightboxEl) closeLightbox(); });
-    window.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape' && isLightboxOpen) closeLightbox();
-    });
-
-    const raycaster = new THREE.Raycaster();
-    const mouse = new THREE.Vector2();
-
-    function handleCardDoubleTap(clientX, clientY) {
-      if (isLightboxOpen) return;
-      mouse.x = (clientX / innerWidth) * 2 - 1;
-      mouse.y = -(clientY / innerHeight) * 2 + 1;
-      raycaster.setFromCamera(mouse, camera);
-      const intersects = raycaster.intersectObjects(cards, false);
-      if (intersects.length > 0) {
-        const hitCard = intersects[0].object;
-        if (hitCard.userData.src) openLightbox(hitCard.userData.src);
-      }
-    }
-    window.addEventListener('dblclick', (e) => handleCardDoubleTap(e.clientX, e.clientY));
-
-    const addScroll = v => {
-      if (isLightboxOpen) return;
-      targetScroll = clamp(targetScroll + v, 0, maxScroll);
-    };
-
-    function normWheel(e) {
-      let dx = e.deltaX, dy = e.deltaY;
-      if (e.deltaMode === 1)      { dx *= 16; dy *= 16; }
-      else if (e.deltaMode === 2) { dx *= innerWidth; dy *= innerHeight; }
-      return clamp(Math.abs(dx) > Math.abs(dy) ? dx : dy, -MAX_DELTA, MAX_DELTA);
-    }
-
-    window.addEventListener('wheel', e => {
-      if (isLightboxOpen) return;
-      e.preventDefault();
-      inputMode = MODE_WHEEL;
-      inertiaVel = 0;
-      addScroll(normWheel(e) * SENS_WHEEL);
-    }, { passive: false });
-
-    let pointerId = null;
-    let lastPointerX = 0, lastPointerT = 0;
-    let lastTapT = 0, lastTapX = 0, lastTapY = 0;
-
-    window.addEventListener('pointerdown', e => {
-      if (isLightboxOpen) return;
-      if (e.pointerType === 'mouse' && e.button !== 0) return;
-      if (pointerId !== null) return;
-
-      const now = performance.now();
-      if (e.pointerType !== 'mouse' && (now - lastTapT < 300) &&
-          Math.hypot(e.clientX - lastTapX, e.clientY - lastTapY) < 30) {
-        handleCardDoubleTap(e.clientX, e.clientY);
-        lastTapT = 0;
-        return;
-      }
-      lastTapT = now; lastTapX = e.clientX; lastTapY = e.clientY;
-
-      pointerId = e.pointerId;
-      isDragging = true;
-      inputMode = MODE_DRAG;
-      inertiaVel = 0;
-      lastPointerX = e.clientX;
-      lastPointerT = now;
-      dragVelocityX = 0;
-      velocityEMA.v = 0;
-      dragTiltTarget = 0; dragStretchTarget = 0;
-
-      try { canvas.setPointerCapture?.(e.pointerId); } catch (_) {}
-    }, { passive: true });
-
-    window.addEventListener('pointermove', e => {
-      if (pointerId === null || e.pointerId !== pointerId || isLightboxOpen) return;
-      const now = performance.now();
-      const dt  = Math.max(1, now - lastPointerT);
-      const dx  = e.clientX - lastPointerX;
-      dragVelocityX = dx / dt;
-      velocityEMA.v = velocityEMA.v * 0.7 + dragVelocityX * 0.3;
-      addScroll(-dx * SENS_DRAG);
-      lastPointerX = e.clientX; lastPointerT = now;
-      const norm = clamp(dx / 80, -1, 1);
-      dragTiltTarget    = norm * 0.04;
-      dragStretchTarget = clamp(Math.abs(dx) / 300, 0, 0.04);
-    }, { passive: true });
-
-    function endPointer() {
-      if (pointerId === null) return;
-      const v = velocityEMA.v;
-      inertiaVel = clamp(-v * 1000 * INERTIA_MULT / 60, -INERTIA_CLAMP, INERTIA_CLAMP);
-      pointerId = null;
-      isDragging = false;
-      dragTiltTarget = 0; dragStretchTarget = 0;
-      dragVelocityX = 0;
-      velocityEMA.v = 0;
-    }
-    window.addEventListener('pointerup', endPointer, { passive: true });
-    window.addEventListener('pointercancel', endPointer, { passive: true });
-
-    window.addEventListener('keydown', e => {
-      if (isLightboxOpen) return;
-      inputMode = MODE_WHEEL; inertiaVel = 0;
-      if (e.key === 'ArrowRight') addScroll(60);
-      if (e.key === 'ArrowLeft')  addScroll(-60);
-    });
-
-    // Hover (только курсор, никакого scale/lift)
-    let hoveredCard = null;
-    window.addEventListener('pointermove', e => {
-      if (isLightboxOpen) return;
-      if (pointerId !== null) return;
-      mouse.x = (e.clientX / innerWidth) * 2 - 1;
-      mouse.y = -(e.clientY / innerHeight) * 2 + 1;
-      raycaster.setFromCamera(mouse, camera);
-      const hits = raycaster.intersectObjects(cards, false);
-      const newHover = hits.length > 0 ? hits[0].object : null;
-      if (newHover !== hoveredCard) {
-        hoveredCard = newHover;
-        document.body.style.cursor = hoveredCard ? 'pointer' : '';
-      }
-    }, { passive: true });
-
-    // ============================================================
-    //  АНИМАЦИЯ
+    //  ANIMATE
     // ============================================================
     let lastTime  = performance.now();
     let running   = false;
@@ -811,63 +708,67 @@
       elapsed += dt;
       const t = elapsed;
 
-      // -------- SCROLL (оригинальная формула) --------
-      if (!isDragging && Math.abs(inertiaVel) > 0.01) {
-        addScroll(inertiaVel * dt);
-        inertiaVel *= Math.pow(INERTIA_DECAY, dt * 60);
-        if (Math.abs(inertiaVel) < 0.05) inertiaVel = 0;
+      const worldPerPx = worldWidth / innerWidth;
+
+      // ============================================================
+      //  СКРОЛЛ-ДВИЖОК
+      // ============================================================
+      if (isDragging) {
+        // 1:1 — накопленные пиксели сразу в мировые единицы. Никакого сглаживания.
+        if (pendingDragPx !== 0) {
+          scrollCurrent = clamp(scrollCurrent - pendingDragPx * worldPerPx, 0, maxScroll);
+          scrollTarget = scrollCurrent;
+          pendingDragPx = 0;
+        }
+      } else if (Math.abs(dragInertia) > INERTIA_MIN_ALIVE) {
+        // Инерция после свайпа — двигаем напрямую, затухает экспоненциально
+        scrollCurrent += dragInertia * dt;
+        dragInertia   *= Math.exp(-INERTIA_LAMBDA * dt);
+
+        if (scrollCurrent < 0) { scrollCurrent = 0; dragInertia = 0; }
+        if (scrollCurrent > maxScroll) { scrollCurrent = maxScroll; dragInertia = 0; }
+
+        if (Math.abs(dragInertia) < INERTIA_MIN_ALIVE) dragInertia = 0;
+        scrollTarget = scrollCurrent;
+      } else {
+        // Колесо — плавное догоняние цели, кадро-независимое
+        dragInertia = 0;
+        const k = 1 - Math.exp(-FOLLOW_LAMBDA * dt);
+        scrollCurrent = lerp(scrollCurrent, scrollTarget, k);
+        if (Math.abs(scrollTarget - scrollCurrent) < SETTLE_EPS) {
+          scrollCurrent = scrollTarget;
+        }
       }
 
-      const easeV  = inputMode === MODE_DRAG ? EASE_DRAG : EASE_WHEEL;
-      const maxSp  = inputMode === MODE_DRAG ? MAX_SPEED_DRAG : MAX_SPEED_WHEEL;
+      // ============================================================
+      //  ACTIVITY (для шейдеров)
+      // ============================================================
+      const velocityMag = Math.abs(dragInertia) +
+        (isDragging ? Math.abs(dragVelPxMs * 1000 * worldPerPx) : 0);
 
-      const k = 1 - Math.pow(1 - easeV, dt * 60);
-      let step = (targetScroll - currentScroll) * k;
-      const maxStep = maxSp * dt;
-      if (Math.abs(step) > maxStep) step = Math.sign(step) * maxStep;
+      const scrollActive = isDragging ||
+        Math.abs(dragInertia) > 0.5 ||
+        Math.abs(scrollTarget - scrollCurrent) > 0.1;
 
-      currentScroll = clamp(currentScroll + step, 0, maxScroll);
-      if (Math.abs(targetScroll - currentScroll) < 0.005) currentScroll = targetScroll;
-
-      dragTilt    += (dragTiltTarget    - dragTilt)    * Math.min(1, dt * 10);
-      dragStretch += (dragStretchTarget - dragStretch) * Math.min(1, dt * 10);
-
-      // Activity driven by scroll speed / inertia — это топливо для "плывущей" картинки
-      const scrollActive =
-        isDragging ||
-        Math.abs(inertiaVel) > 0.2 ||
-        Math.abs(targetScroll - currentScroll) > 0.5;
       const targetActivity = scrollActive ? ACTIVITY_MAX : ACTIVITY_MIN;
       const speed = targetActivity > activity ? ACTIVITY_RISE : ACTIVITY_DECAY;
       activity += (targetActivity - activity) * Math.min(1, dt * speed);
 
-      galleryGroup.position.x = maxScroll / 2 - currentScroll;
+      // ============================================================
+      //  ПОЗИЦИЯ ГРУППЫ
+      // ============================================================
+      galleryGroup.position.x = maxScroll / 2 - scrollCurrent;
 
-      const velocity = targetScroll - currentScroll;
-      const velocityTilt = clamp(velocity * 0.00015, -0.015, 0.015);
+      // Никаких наклонов, качаний и зумов — только чистое движение по X.
+      galleryGroup.rotation.set(0, 0, 0);
+      galleryGroup.scale.set(1, 1, 1);
 
-      if (inputMode === MODE_DRAG) {
-        galleryGroup.rotation.y = velocityTilt * 0.5 + dragTilt * 0.5;
-        galleryGroup.rotation.x = dragTilt * -0.15;
-        galleryGroup.rotation.z = dragTilt * 0.05;
-        galleryGroup.scale.set(1 + dragStretch * 0.25, 1 - dragStretch * 0.08, 1);
-      } else {
-        galleryGroup.rotation.y = velocityTilt;
-        galleryGroup.rotation.x += (0 - galleryGroup.rotation.x) * Math.min(1, dt * 6);
-        galleryGroup.rotation.z += (0 - galleryGroup.rotation.z) * Math.min(1, dt * 6);
-        galleryGroup.scale.x += (1 - galleryGroup.scale.x) * Math.min(1, dt * 6);
-        galleryGroup.scale.y += (1 - galleryGroup.scale.y) * Math.min(1, dt * 6);
-      }
-
-      // -------- КАРТОЧКИ: reveal + hover glint (без scale/lift) --------
+      // ============================================================
+      //  REVEAL КАРТОЧЕК
+      // ============================================================
       for (let i = 0, l = cards.length; i < l; i++) {
         const c = cards[i];
         const ud = c.userData;
-
-        // Hover влияет ТОЛЬКО на блик в шейдере, без трансформации
-        const targetHover = (c === hoveredCard) ? 1 : 0;
-        const hoverCurrent = c.material.uniforms.uHover.value;
-        c.material.uniforms.uHover.value = hoverCurrent + (targetHover - hoverCurrent) * Math.min(1, dt * 10);
 
         if (!ud.revealed) {
           const raw = (t - ud.revealStart) / ud.revealDuration;
@@ -892,14 +793,12 @@
           } else {
             const showRatio = ease.expoOut(raw);
             const opacity   = ease.expoOut(clamp(raw / 0.4, 0, 1));
-
             const y  = -25 * (1 - showRatio);
             const s  = 0.72 + showRatio * 0.28;
             const rz = (1 - showRatio) * 0.12 * ud.parity;
 
             c.material.uniforms.uOpacity.value = opacity;
             c.material.uniforms.uShowRatio.value = showRatio;
-
             c.position.x = ud.baseX;
             c.position.y = y;
             c.position.z = 0;
@@ -907,7 +806,6 @@
             c.rotation.z = rz;
           }
         } else {
-          // После reveal — статика. Никакого увеличения/поднятия при hover.
           c.position.x = ud.baseX;
           c.position.y = 0;
           c.position.z = 0;
@@ -934,18 +832,30 @@
         renderer.render(scene, camera);
       }
 
-      if (!hintHidden && (currentScroll > 10 || isDragging)) {
+      if (!hintHidden && (scrollCurrent > 10 || isDragging)) {
         hintHidden = true;
         hintEl.classList.add('fade');
       }
     }
 
+    // ============================================================
+    //  RESIZE
+    // ============================================================
     window.addEventListener('resize', () => {
       camera.aspect = innerWidth / innerHeight;
       camera.updateProjectionMatrix();
       renderer.setSize(innerWidth, innerHeight);
       if (composer) composer.setSize(innerWidth, innerHeight);
       if (finalPass) finalPass.uniforms.uRes.value.set(innerWidth, innerHeight);
+
+      const vFOV = camera.fov * Math.PI / 180;
+      const worldHeight = 2 * Math.tan(vFOV / 2) * camera.position.z;
+      worldWidth  = worldHeight * camera.aspect;
+      visibleWidth = worldWidth * 0.95;
+      maxScroll = Math.max(0, totalWidth - visibleWidth);
+
+      scrollCurrent = clamp(scrollCurrent, 0, maxScroll);
+      scrollTarget  = clamp(scrollTarget, 0, maxScroll);
     });
 
     // ============================================================
@@ -957,13 +867,11 @@
       try {
         const files = [];
         for (let i = FROM; i <= TO; i++) files.push(`${IMAGE_FOLDER}${i}.${EXT}`);
-
         const ordered = SHUFFLE ? shuffle(files, SEED) : files;
 
         const results = await loadAll(ordered, (done, total) => {
           if (statusEl) statusEl.textContent = `${done} / ${total}`;
         });
-
         const items = results.filter(Boolean);
 
         if (items.length === 0) {
@@ -972,16 +880,12 @@
           return;
         }
 
-        buildGallery(items);
-
         const vFOV = camera.fov * Math.PI / 180;
         const worldHeight = 2 * Math.tan(vFOV / 2) * camera.position.z;
-        const worldWidth  = worldHeight * camera.aspect;
+        worldWidth  = worldHeight * camera.aspect;
         visibleWidth = worldWidth * 0.95;
 
-        maxScroll     = Math.max(0, totalWidth - visibleWidth);
-        currentScroll = 0;
-        targetScroll  = 0;
+        buildGallery(items);
 
         running = true;
         lastTime = performance.now();
@@ -1001,4 +905,3 @@
   </script>
 </body>
 </html>
-```
