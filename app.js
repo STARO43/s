@@ -1610,6 +1610,39 @@ function initReading() {
 }
 
 /* ---------- 6.3 TOOLS ---------- */
+/* ============================================================
+   TOOLS · ВКЛАДКИ
+   ============================================================ */
+function initToolsTabs() {
+    const tabs = $$('.tools-tab');
+    const panels = $$('.tools-panel');
+    if (!tabs.length || !panels.length) return;
+
+    function activate(name) {
+        tabs.forEach((t) => t.classList.toggle('active', t.dataset.tab === name));
+        panels.forEach((p) => p.classList.toggle('active', p.dataset.panel === name));
+
+        if (name === 'time') {
+            setTimeout(() => window.dispatchEvent(new Event('resize')), 60);
+        }
+
+        if (window.history && window.history.replaceState) {
+            const url = window.location.pathname + window.location.search +
+                (name !== 'interesting' ? '#' + name : '');
+            window.history.replaceState('', document.title, url);
+        }
+    }
+
+    tabs.forEach((tab) => {
+        tab.addEventListener('click', () => activate(tab.dataset.tab));
+    });
+
+    const hash = window.location.hash.replace('#', '');
+    if (hash && document.querySelector('.tools-panel[data-panel="' + hash + '"]')) {
+        activate(hash);
+    }
+}
+
 function initTools() {
     once('tools', () => {
         const evmOverlay = document.getElementById('evmOverlay');
@@ -1970,7 +2003,569 @@ function initTools() {
                 window.open(SPACE_URL, '_blank', 'noopener,noreferrer');
             });
         }
+        initToolsTabs();
+        initToolsBalls();
     });
+}
+
+/* ============================================================
+   TOOLS · ШАРЫ (Three.js)
+   ============================================================ */
+function initToolsBalls() {
+    const container = document.getElementById('ballsContainer');
+    const canvas = document.getElementById('ballsCanvas');
+    if (!container || !canvas || !window.THREE) return;
+
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(
+        45,
+        container.clientWidth / container.clientHeight,
+        0.1,
+        100
+    );
+    camera.position.set(0, 0, 22);
+
+    const renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
+    renderer.setSize(container.clientWidth, container.clientHeight);
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    renderer.toneMapping = THREE.ACESFilmicToneMapping;
+    renderer.toneMappingExposure = 1.3;
+    renderer.shadowMap.enabled = true;
+    renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+
+    scene.add(new THREE.AmbientLight(0xffffff, 0.5));
+    const keyLight = new THREE.DirectionalLight(0xffffff, 2.0);
+    keyLight.position.set(10, 20, 15);
+    keyLight.castShadow = true;
+    scene.add(keyLight);
+    const fillLight = new THREE.DirectionalLight(0xffffff, 1.0);
+    fillLight.position.set(-15, 0, 10);
+    scene.add(fillLight);
+
+    /* --- Текстуры и цвета --- */
+    const themeColors = {
+        metal:    { top: '#000510', line1: '#0066ff', line2: '#001133' },
+        neon:     { top: '#0a0015', line1: '#ff00ff', line2: '#330055' },
+        obsidian: { top: '#050505', line1: '#ff4444', line2: '#220000' },
+        magma:    { top: '#0a0000', line1: '#ff3300', line2: '#330000' },
+        concrete: { top: '#001000', line1: '#00ff88', line2: '#003322' }
+    };
+
+    function generateLiquidMetal() {
+        const c = document.createElement('canvas');
+        c.width = 1024; c.height = 1024;
+        const ctx = c.getContext('2d');
+        ctx.fillStyle = '#b0b0b0'; ctx.fillRect(0, 0, 1024, 1024);
+        ctx.globalAlpha = 0.6;
+        for (let i = 0; i < 3000; i++) {
+            ctx.fillStyle = Math.random() > 0.5 ? '#ffffff' : '#444444';
+            ctx.beginPath();
+            ctx.arc(Math.random() * 1024, Math.random() * 1024, Math.random() * 20 + 1, 0, Math.PI * 2);
+            ctx.fill();
+        }
+        return new THREE.CanvasTexture(c);
+    }
+    function generateNeonCeramic() {
+        const c = document.createElement('canvas');
+        c.width = 1024; c.height = 1024;
+        const ctx = c.getContext('2d');
+        const colors = ['#ff00ff', '#00ffff', '#ffff00', '#ff0055', '#00ff00'];
+        ctx.fillStyle = colors[Math.floor(Math.random() * colors.length)];
+        ctx.fillRect(0, 0, 1024, 1024);
+        ctx.globalAlpha = 0.15; ctx.fillStyle = '#000';
+        for (let i = 0; i < 5000; i++) {
+            ctx.beginPath();
+            ctx.arc(Math.random() * 1024, Math.random() * 1024, Math.random() * 10 + 2, 0, Math.PI * 2);
+            ctx.fill();
+        }
+        return new THREE.CanvasTexture(c);
+    }
+    function generateGlitchObsidian() {
+        const c = document.createElement('canvas');
+        c.width = 1024; c.height = 1024;
+        const ctx = c.getContext('2d');
+        ctx.fillStyle = '#050505'; ctx.fillRect(0, 0, 1024, 1024);
+        ctx.globalAlpha = 0.8;
+        ctx.strokeStyle = Math.random() > 0.5 ? '#00ffcc' : '#ff00cc';
+        for (let i = 0; i < 50; i++) {
+            ctx.lineWidth = Math.random() * 2 + 0.5;
+            ctx.beginPath();
+            ctx.moveTo(Math.random() * 1024, Math.random() * 1024);
+            ctx.lineTo(Math.random() * 1024, Math.random() * 1024);
+            ctx.stroke();
+        }
+        return new THREE.CanvasTexture(c);
+    }
+    function generateMagmaRock() {
+        const c = document.createElement('canvas');
+        c.width = 1024; c.height = 1024;
+        const ctx = c.getContext('2d');
+        ctx.fillStyle = '#1a0a0a'; ctx.fillRect(0, 0, 1024, 1024);
+        ctx.globalAlpha = 0.4; ctx.fillStyle = '#ff3300';
+        for (let i = 0; i < 500; i++) {
+            ctx.beginPath();
+            ctx.arc(Math.random() * 1024, Math.random() * 1024, Math.random() * 100 + 10, 0, Math.PI * 2);
+            ctx.fill();
+        }
+        return new THREE.CanvasTexture(c);
+    }
+    function generateCyberConcrete() {
+        const c = document.createElement('canvas');
+        c.width = 1024; c.height = 1024;
+        const ctx = c.getContext('2d');
+        ctx.fillStyle = '#222'; ctx.fillRect(0, 0, 1024, 1024);
+        ctx.globalAlpha = 0.1; ctx.fillStyle = '#fff';
+        for (let i = 0; i < 10000; i++) {
+            ctx.beginPath();
+            ctx.arc(Math.random() * 1024, Math.random() * 1024, Math.random() * 3 + 1, 0, Math.PI * 2);
+            ctx.fill();
+        }
+        return new THREE.CanvasTexture(c);
+    }
+
+    const materialsDef = {
+        metal:    { gen: generateLiquidMetal,    props: { roughness: 0.05, metalness: 0.9, clearcoat: 1.0 }, mass: 2.0, gravity: 0.3, torque: 0,    bounciness: 0.4 },
+        neon:     { gen: generateNeonCeramic,    props: { roughness: 0.3,  metalness: 0.0, clearcoat: 1.0 }, mass: 1.0, gravity: 0,   torque: 0,    bounciness: 0.6 },
+        obsidian: { gen: generateGlitchObsidian, props: { roughness: 0.05, metalness: 0.5, clearcoat: 1.0 }, mass: 1.2, gravity: 0,   torque: 0.05, bounciness: 0.5 },
+        magma:    { gen: generateMagmaRock,      props: { roughness: 0.4,  metalness: 0.0, clearcoat: 0.5 }, mass: 0.4, gravity: 0,   torque: 0,    bounciness: 1.0 },
+        concrete: { gen: generateCyberConcrete,  props: { roughness: 0.8,  metalness: 0.0, clearcoat: 0.0 }, mass: 4.0, gravity: 0,   torque: 0,    bounciness: 0.1 }
+    };
+
+    const materialPool = {};
+    Object.keys(materialsDef).forEach((k) => {
+        materialPool[k] = [];
+        for (let i = 0; i < 4; i++) {
+            const tex = materialsDef[k].gen();
+            tex.anisotropy = renderer.capabilities.getMaxAnisotropy();
+            materialPool[k].push(new THREE.MeshPhysicalMaterial({ map: tex, ...materialsDef[k].props }));
+        }
+    });
+
+    const materialOrder = ['metal', 'concrete', 'obsidian', 'neon', 'magma'];
+    let currentIndex = 0;
+    let currentGlobalType = materialOrder[currentIndex];
+
+    /* --- Фон --- */
+    const bgGeometry = new THREE.PlaneGeometry(2, 2);
+    const bgMaterial = new THREE.ShaderMaterial({
+        uniforms: {
+            uTime:       { value: 0 },
+            uColorTop:   { value: new THREE.Color() },
+            uColorLine1: { value: new THREE.Color() },
+            uColorLine2: { value: new THREE.Color() }
+        },
+        vertexShader: `varying vec2 vUv; void main() { vUv = uv; gl_Position = vec4(position, 1.0); }`,
+        fragmentShader: `
+            uniform float uTime;
+            uniform vec3 uColorTop;
+            uniform vec3 uColorLine1;
+            uniform vec3 uColorLine2;
+            varying vec2 vUv;
+            void main() {
+                vec2 uv = vUv;
+                float horizon = 0.4;
+                if (uv.y > horizon) {
+                    vec3 sky = mix(uColorTop, vec3(0.0), uv.y);
+                    gl_FragColor = vec4(sky, 1.0); return;
+                }
+                float perspective = (horizon - uv.y) / horizon;
+                float lineX = fract((uv.x - 0.5) / (perspective * 4.0) + uTime * 0.2);
+                float lineY = fract(1.0 / perspective - uTime * 0.5);
+                float gridX = smoothstep(0.02, 0.0, abs(lineX - 0.5) - 0.48);
+                float gridY = smoothstep(0.05, 0.0, abs(lineY - 0.5) - 0.45);
+                vec3 lineColor = mix(uColorLine1, uColorLine2, perspective);
+                lineColor *= (gridX + gridY) * (1.0 - perspective);
+                gl_FragColor = vec4(lineColor, 1.0);
+            }
+        `,
+        depthWrite: false, depthTest: false
+    });
+    const bgMesh = new THREE.Mesh(bgGeometry, bgMaterial);
+    bgMesh.frustumCulled = false;
+    bgMesh.renderOrder = -1;
+    scene.add(bgMesh);
+
+    function updateBackgroundColors(type) {
+        const colors = themeColors[type];
+        bgMaterial.uniforms.uColorTop.value.set(colors.top);
+        bgMaterial.uniforms.uColorLine1.value.set(colors.line1);
+        bgMaterial.uniforms.uColorLine2.value.set(colors.line2);
+    }
+
+    /* --- Границы --- */
+    const RADIUS = 1.8;
+    const bounds = { minX: -8, maxX: 8, minY: -4, maxY: 4, minZ: -4, maxZ: 4 };
+
+    function recomputeBounds() {
+        const vFovRad = camera.fov * Math.PI / 180;
+        const dist = camera.position.z;
+        const halfH = Math.tan(vFovRad / 2) * dist;
+        const halfW = halfH * camera.aspect;
+        bounds.minX = -halfW + RADIUS;
+        bounds.maxX =  halfW - RADIUS;
+        bounds.minY = -halfH + RADIUS;
+        bounds.maxY =  halfH - RADIUS;
+        bounds.minZ = -4;
+        bounds.maxZ =  4;
+    }
+
+    /* --- Шары --- */
+    const COUNT = 20;
+    const sphereGeo = new THREE.SphereGeometry(RADIUS, 64, 64);
+    const spheres = [];
+
+    for (let i = 0; i < COUNT; i++) {
+        const mesh = new THREE.Mesh(sphereGeo, materialPool[currentGlobalType][0]);
+        mesh.castShadow = true;
+        mesh.receiveShadow = true;
+        mesh.position.set(
+            (Math.random() - 0.5) * 12,
+            (Math.random() - 0.5) * 7,
+            (Math.random() - 0.5) * 6
+        );
+        scene.add(mesh);
+        spheres.push({ mesh, velocity: new THREE.Vector3() });
+    }
+
+    recomputeBounds();
+    spheres.forEach((s) => {
+        s.mesh.position.x = Math.max(bounds.minX, Math.min(bounds.maxX, s.mesh.position.x));
+        s.mesh.position.y = Math.max(bounds.minY, Math.min(bounds.maxY, s.mesh.position.y));
+        s.mesh.position.z = Math.max(bounds.minZ, Math.min(bounds.maxZ, s.mesh.position.z));
+    });
+
+    updateBackgroundColors(currentGlobalType);
+
+    /* --- Взаимодействие --- */
+    const raycaster = new THREE.Raycaster();
+    const mouse = new THREE.Vector2();
+    const mousePlane = new THREE.Plane(new THREE.Vector3(0, 0, 1), 0);
+    const currentMousePos = new THREE.Vector3();
+    const prevMousePos = new THREE.Vector3();
+    let isFirstMove = true;
+
+    const GRAB_OMEGA2 = 0.012;
+    const GRAB_DAMP = 0.35;
+    const GRAB_MAX_SPEED = 0.8;
+
+    let grabbedSphere = null;
+    const grabTarget = new THREE.Vector3();
+
+    function pointerToNDC(e) {
+        const rect = container.getBoundingClientRect();
+        return {
+            x: ((e.clientX - rect.left) / rect.width) * 2 - 1,
+            y: -((e.clientY - rect.top) / rect.height) * 2 + 1
+        };
+    }
+
+    function clampGrabTarget() {
+        if (grabTarget.x < bounds.minX) grabTarget.x = bounds.minX;
+        if (grabTarget.x > bounds.maxX) grabTarget.x = bounds.maxX;
+        if (grabTarget.y < bounds.minY) grabTarget.y = bounds.minY;
+        if (grabTarget.y > bounds.maxY) grabTarget.y = bounds.maxY;
+    }
+
+    const DOUBLE_TAP_DELAY = 320;
+    const TAP_MAX_DURATION = 350;
+    const TAP_MOVE_TOL = 24;
+    const DOUBLE_TAP_DIST = 48;
+
+    let tapActive = false;
+    let tapStartX = 0, tapStartY = 0, tapStartTime = 0, tapMoved = false;
+    let lastTapTime = -1e9, lastTapX = 0, lastTapY = 0;
+
+    function resetTapTracking() {
+        tapActive = false;
+        lastTapTime = -1e9;
+    }
+
+    function switchMaterial() {
+        currentIndex = (currentIndex + 1) % materialOrder.length;
+        currentGlobalType = materialOrder[currentIndex];
+        spheres.forEach((s) => {
+            s.mesh.material = materialPool[currentGlobalType][Math.floor(Math.random() * 4)];
+        });
+        updateBackgroundColors(currentGlobalType);
+    }
+
+    function registerTapEnd(e) {
+        if (!tapActive) return;
+        tapActive = false;
+        const now = performance.now();
+        if (tapMoved || (now - tapStartTime) > TAP_MAX_DURATION) {
+            lastTapTime = -1e9;
+            return;
+        }
+        const isDouble =
+            (now - lastTapTime) < DOUBLE_TAP_DELAY &&
+            Math.abs(e.clientX - lastTapX) < DOUBLE_TAP_DIST &&
+            Math.abs(e.clientY - lastTapY) < DOUBLE_TAP_DIST;
+        if (isDouble) {
+            lastTapTime = -1e9;
+            switchMaterial();
+        } else {
+            lastTapTime = now;
+            lastTapX = e.clientX;
+            lastTapY = e.clientY;
+        }
+    }
+
+    container.addEventListener('pointerdown', (e) => {
+        if (e.pointerType === 'mouse' && e.button !== 0) return;
+        tapActive = true;
+        tapMoved = false;
+        tapStartX = e.clientX;
+        tapStartY = e.clientY;
+        tapStartTime = performance.now();
+
+        const ndc = pointerToNDC(e);
+        mouse.x = ndc.x; mouse.y = ndc.y;
+        raycaster.setFromCamera(mouse, camera);
+        const hits = raycaster.intersectObjects(spheres.map((s) => s.mesh), false);
+        if (hits.length > 0) {
+            const s = spheres.find((sp) => sp.mesh === hits[0].object);
+            if (s) {
+                grabbedSphere = s;
+                raycaster.ray.intersectPlane(mousePlane, grabTarget);
+                clampGrabTarget();
+                s.mesh.scale.setScalar(1.10);
+                try { container.setPointerCapture(e.pointerId); } catch (_) {}
+                isFirstMove = true;
+            }
+        }
+    });
+
+    container.addEventListener('pointermove', (e) => {
+        if (tapActive) {
+            const dx = e.clientX - tapStartX;
+            const dy = e.clientY - tapStartY;
+            if (dx * dx + dy * dy > TAP_MOVE_TOL * TAP_MOVE_TOL) tapMoved = true;
+        }
+
+        const ndc = pointerToNDC(e);
+        mouse.x = ndc.x; mouse.y = ndc.y;
+        raycaster.setFromCamera(mouse, camera);
+
+        if (grabbedSphere) {
+            raycaster.ray.intersectPlane(mousePlane, grabTarget);
+            clampGrabTarget();
+            return;
+        }
+
+        if (raycaster.ray.intersectPlane(mousePlane, currentMousePos)) {
+            if (isFirstMove) {
+                prevMousePos.copy(currentMousePos);
+                isFirstMove = false;
+                return;
+            }
+            const speed = currentMousePos.distanceTo(prevMousePos);
+            if (speed > 0.1) {
+                spheres.forEach((s) => {
+                    const dx = s.mesh.position.x - currentMousePos.x;
+                    const dy = s.mesh.position.y - currentMousePos.y;
+                    const dist = Math.sqrt(dx * dx + dy * dy);
+                    if (dist < 5.0 && dist > 0.001) {
+                        const force = (5.0 - dist) * Math.min(speed, 1.0) * 0.05 / materialsDef[currentGlobalType].mass;
+                        s.velocity.x += (dx / dist) * force;
+                        s.velocity.y += (dy / dist) * force;
+                    }
+                });
+            }
+            prevMousePos.copy(currentMousePos);
+        }
+    });
+
+    function releaseGrab(e) {
+        if (!grabbedSphere) return;
+        grabbedSphere.mesh.scale.setScalar(1);
+        grabbedSphere = null;
+        isFirstMove = true;
+        if (e && e.pointerId !== undefined) {
+            try { container.releasePointerCapture(e.pointerId); } catch (_) {}
+        }
+    }
+
+    function handlePointerUp(e) {
+        releaseGrab(e);
+        registerTapEnd(e);
+    }
+
+    container.addEventListener('pointerup', handlePointerUp);
+    window.addEventListener('pointerup', handlePointerUp);
+
+    container.addEventListener('pointercancel', (e) => {
+        releaseGrab(e);
+        resetTapTracking();
+    });
+    window.addEventListener('pointercancel', (e) => {
+        releaseGrab(e);
+        resetTapTracking();
+    });
+
+    container.addEventListener('pointerleave', () => {
+        if (!grabbedSphere) isFirstMove = true;
+    });
+
+    container.addEventListener('contextmenu', (e) => e.preventDefault());
+
+    /* --- Цикл --- */
+    const clock = new THREE.Clock();
+    let globalTime = 0;
+    const MAX_SPEED = 0.5;
+
+    function animate() {
+        requestAnimationFrame(animate);
+        if (document.hidden) return;
+        const dt = Math.min(clock.getDelta(), 0.1);
+        globalTime += dt;
+
+        bgMaterial.uniforms.uTime.value = globalTime;
+        const def = materialsDef[currentGlobalType];
+
+        for (let i = 0; i < spheres.length; i++) {
+            const s = spheres[i];
+            const isGrabbed = (s === grabbedSphere);
+
+            if (isGrabbed) {
+                const dx = grabTarget.x - s.mesh.position.x;
+                const dy = grabTarget.y - s.mesh.position.y;
+                s.velocity.x += dx * GRAB_OMEGA2;
+                s.velocity.y += dy * GRAB_OMEGA2;
+                const dampFactor = 1 / (1 + GRAB_DAMP);
+                s.velocity.x *= dampFactor;
+                s.velocity.y *= dampFactor;
+                const sp = Math.sqrt(s.velocity.x * s.velocity.x + s.velocity.y * s.velocity.y);
+                if (sp > GRAB_MAX_SPEED) {
+                    const k = GRAB_MAX_SPEED / sp;
+                    s.velocity.x *= k; s.velocity.y *= k;
+                }
+            } else {
+                if (def.gravity > 0) s.velocity.y -= def.gravity * dt;
+                if (def.torque > 0) {
+                    s.mesh.rotation.z -= def.torque * dt;
+                    s.mesh.rotation.x += def.torque * 0.5 * dt;
+                }
+                const distToCenter = s.mesh.position.length();
+                if (distToCenter > 0.1) {
+                    const pull = (1.5 / def.mass) / (distToCenter + 1.0);
+                    s.velocity.x -= (s.mesh.position.x / distToCenter) * pull * dt;
+                    s.velocity.y -= (s.mesh.position.y / distToCenter) * pull * dt;
+                    s.velocity.z -= (s.mesh.position.z / distToCenter) * pull * dt;
+                }
+            }
+
+            for (let j = i + 1; j < spheres.length; j++) {
+                const s2 = spheres[j];
+                const dx = s.mesh.position.x - s2.mesh.position.x;
+                const dy = s.mesh.position.y - s2.mesh.position.y;
+                const dz = s.mesh.position.z - s2.mesh.position.z;
+                const dist = Math.sqrt(dx * dx + dy * dy + dz * dz);
+                const minDist = RADIUS * 2;
+
+                if (dist < minDist && dist > 0.01) {
+                    const overlap = minDist - dist;
+                    const nx = dx / dist, ny = dy / dist, nz = dz / dist;
+                    const sGrabbed = (s === grabbedSphere);
+                    const s2Grabbed = (s2 === grabbedSphere);
+
+                    if (sGrabbed && !s2Grabbed) {
+                        s2.mesh.position.x -= nx * overlap;
+                        s2.mesh.position.y -= ny * overlap;
+                        s2.mesh.position.z -= nz * overlap;
+                        const relVel =
+                            (s.velocity.x - s2.velocity.x) * nx +
+                            (s.velocity.y - s2.velocity.y) * ny +
+                            (s.velocity.z - s2.velocity.z) * nz;
+                        if (relVel < 0) {
+                            const impulse = -relVel * 0.6;
+                            s2.velocity.x -= impulse * nx;
+                            s2.velocity.y -= impulse * ny;
+                            s2.velocity.z -= impulse * nz;
+                            s.velocity.x *= 0.7;
+                            s.velocity.y *= 0.7;
+                            s.velocity.z *= 0.7;
+                        }
+                    } else if (s2Grabbed && !sGrabbed) {
+                        s.mesh.position.x += nx * overlap;
+                        s.mesh.position.y += ny * overlap;
+                        s.mesh.position.z += nz * overlap;
+                        const relVel =
+                            (s2.velocity.x - s.velocity.x) * (-nx) +
+                            (s2.velocity.y - s.velocity.y) * (-ny) +
+                            (s2.velocity.z - s.velocity.z) * (-nz);
+                        if (relVel < 0) {
+                            const impulse = -relVel * 0.6;
+                            s.velocity.x += impulse * nx;
+                            s.velocity.y += impulse * ny;
+                            s.velocity.z += impulse * nz;
+                            s2.velocity.x *= 0.7;
+                            s2.velocity.y *= 0.7;
+                            s2.velocity.z *= 0.7;
+                        }
+                    } else {
+                        const push = overlap * 0.5;
+                        s.mesh.position.x += nx * push;
+                        s.mesh.position.y += ny * push;
+                        s.mesh.position.z += nz * push;
+                        s2.mesh.position.x -= nx * push;
+                        s2.mesh.position.y -= ny * push;
+                        s2.mesh.position.z -= nz * push;
+                        const relVel =
+                            (s.velocity.x - s2.velocity.x) * nx +
+                            (s.velocity.y - s2.velocity.y) * ny +
+                            (s.velocity.z - s2.velocity.z) * nz;
+                        if (relVel < 0) {
+                            const impulse = relVel * 0.6;
+                            s.velocity.x -= impulse * nx;
+                            s.velocity.y -= impulse * ny;
+                            s.velocity.z -= impulse * nz;
+                            s2.velocity.x += impulse * nx;
+                            s2.velocity.y += impulse * ny;
+                            s2.velocity.z += impulse * nz;
+                        }
+                    }
+                }
+            }
+
+            if (s.mesh.position.x < bounds.minX) { s.mesh.position.x = bounds.minX; s.velocity.x *= -def.bounciness; }
+            if (s.mesh.position.x > bounds.maxX) { s.mesh.position.x = bounds.maxX; s.velocity.x *= -def.bounciness; }
+            if (s.mesh.position.y < bounds.minY) { s.mesh.position.y = bounds.minY; s.velocity.y *= -def.bounciness; }
+            if (s.mesh.position.y > bounds.maxY) { s.mesh.position.y = bounds.maxY; s.velocity.y *= -def.bounciness; }
+            if (s.mesh.position.z < bounds.minZ) { s.mesh.position.z = bounds.minZ; s.velocity.z *= -def.bounciness; }
+            if (s.mesh.position.z > bounds.maxZ) { s.mesh.position.z = bounds.maxZ; s.velocity.z *= -def.bounciness; }
+
+            if (!isGrabbed) {
+                s.velocity.multiplyScalar(0.85);
+                if (s.velocity.length() > MAX_SPEED) {
+                    s.velocity.normalize().multiplyScalar(MAX_SPEED);
+                }
+            }
+
+            s.mesh.position.x += s.velocity.x;
+            s.mesh.position.y += s.velocity.y;
+            s.mesh.position.z += s.velocity.z;
+        }
+
+        renderer.render(scene, camera);
+    }
+
+    window.addEventListener('resize', () => {
+        const w = container.clientWidth, h = container.clientHeight;
+        if (!w || !h) return;
+        camera.aspect = w / h;
+        camera.updateProjectionMatrix();
+        renderer.setSize(w, h);
+        recomputeBounds();
+        spheres.forEach((s) => {
+            s.mesh.position.x = Math.max(bounds.minX, Math.min(bounds.maxX, s.mesh.position.x));
+            s.mesh.position.y = Math.max(bounds.minY, Math.min(bounds.maxY, s.mesh.position.y));
+            s.mesh.position.z = Math.max(bounds.minZ, Math.min(bounds.maxZ, s.mesh.position.z));
+        });
+        if (grabbedSphere) clampGrabTarget();
+    });
+
+    animate();
 }
 
 /* ---------- 6.4 HEROES ---------- */
