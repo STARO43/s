@@ -3337,89 +3337,49 @@ html[data-theme="dark"] .history-check svg { stroke: #E0E0E0; }
    TOOLS · ИНСТРУМЕНТЫ, ОПЫТ
    ============================================================ */
 
-/* --- Шапка: только логотип --- */
 .page-header.tools-header {
     display: block;
     min-height: auto;
     max-width: 1400px;
     margin: 0 auto;
-    padding: 3.4rem 5vw 1.6rem;
+    padding: 3.4rem 5vw 1.2rem;
 }
 
-/* --- Шары --- */
 .balls-section {
     position: relative;
     z-index: 10;
-    max-width: 1400px;
-    margin: 0 auto;
-    padding: 0 5vw;
-}
-
-.balls-stage {
-    position: relative;
-    width: 100%;
-    aspect-ratio: 21 / 9;
-    max-height: 60vh;
-    background: #000;
-    border-radius: 16px;
+    width: 100vw;
+    margin-left: calc(50% - 50vw);
+    margin-right: calc(50% - 50vw);
+    height: 62vh;
+    min-height: 380px;
+    max-height: 720px;
+    margin-top: 0.8rem;
+    margin-bottom: 1.6rem;
     overflow: hidden;
-    cursor: grab;
+    pointer-events: auto;
     touch-action: none;
-    user-select: none;
-    -webkit-user-select: none;
-    -webkit-touch-callout: none;
-    -webkit-tap-highlight-color: transparent;
-    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.35);
 }
 
-.balls-stage:active { cursor: grabbing; }
-.balls-stage canvas { display: block; width: 100%; height: 100%; }
-
-.balls-overlay {
-    position: absolute;
-    inset: 0;
-    pointer-events: none;
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-    padding: 16px 20px;
-    z-index: 5;
-}
-
-.balls-label {
-    font-family: var(--font-mono);
-    font-size: 0.6rem;
-    font-weight: 700;
-    letter-spacing: 0.24em;
-    text-transform: uppercase;
-    color: rgba(255, 255, 255, 0.7);
-}
-
-.balls-hint {
-    font-family: var(--font-mono);
-    font-size: 0.55rem;
-    letter-spacing: 0.18em;
-    text-transform: uppercase;
-    color: rgba(255, 255, 255, 0.45);
-    text-align: right;
+.balls-section canvas {
+    display: block;
+    width: 100%;
+    height: 100%;
+    background: transparent;
 }
 
 @media (max-width: 768px) {
-    .balls-stage {
-        aspect-ratio: 4 / 3;
-        max-height: 52vh;
-        border-radius: 12px;
+    .balls-section {
+        height: 52vh;
+        min-height: 300px;
     }
-    .balls-hint { display: none; }
-    .balls-label { font-size: 0.5rem; letter-spacing: 0.18em; }
 }
 
-/* --- Вкладки --- */
 .tools-tabs {
     position: relative;
-    z-index: 10;
+    z-index: 20;
     max-width: 1400px;
-    margin: 2.4rem auto 0;
+    margin: 0 auto;
     padding: 0 5vw;
     display: flex;
     gap: 0;
@@ -3432,7 +3392,7 @@ html[data-theme="dark"] .history-check svg { stroke: #E0E0E0; }
 .tools-tab {
     position: relative;
     font-family: var(--font-display);
-    font-size: clamp(0.8rem, 1.6vw, 1.05rem);
+    font-size: clamp(0.78rem, 1.5vw, 1rem);
     font-weight: 700;
     letter-spacing: 0.05em;
     text-transform: uppercase;
@@ -3445,6 +3405,7 @@ html[data-theme="dark"] .history-check svg { stroke: #E0E0E0; }
     white-space: nowrap;
     -webkit-tap-highlight-color: transparent;
     transition: color 0.25s ease, background 0.25s ease;
+    pointer-events: auto;
 }
 .tools-tab:first-child { border-left: 1px solid var(--paper-line); }
 .tools-tab:hover { color: var(--text); }
@@ -3460,7 +3421,6 @@ html[data-theme="dark"] .history-check svg { stroke: #E0E0E0; }
     background: var(--red);
 }
 
-/* --- Панели --- */
 .tools-panels {
     position: relative;
     z-index: 10;
@@ -3469,20 +3429,9 @@ html[data-theme="dark"] .history-check svg { stroke: #E0E0E0; }
     padding: 0 5vw 6rem;
 }
 
-.tools-panel {
-    display: none;
-    padding: 2.4rem 0 2rem;
-}
-.tools-panel.active {
-    display: block;
-    animation: toolsPanelIn 0.35s cubic-bezier(0.16, 1, 0.3, 1);
-}
-@keyframes toolsPanelIn {
-    from { opacity: 0; transform: translateY(10px); }
-    to   { opacity: 1; transform: translateY(0); }
-}
+.tools-panel { display: none; padding: 2.4rem 0 2rem; }
+.tools-panel.active { display: block; }
 
-/* --- Панель «Время»: кнопка часов внутри панели --- */
 .tools-panel[data-panel="time"] .clock-side {
     display: flex;
     flex-direction: column;
@@ -3507,7 +3456,6 @@ html[data-theme="dark"] .history-check svg { stroke: #E0E0E0; }
     }
 }
 
-/* --- Ссылки (интересно-полезное) --- */
 .links-list {
     display: flex;
     flex-direction: column;
@@ -3540,10 +3488,7 @@ html[data-theme="dark"] .history-check svg { stroke: #E0E0E0; }
     transition: width 0.4s cubic-bezier(0.16, 1, 0.3, 1);
     z-index: 0;
 }
-.link-item:hover {
-    padding-left: 32px;
-    padding-right: 20px;
-}
+.link-item:hover { padding-left: 32px; padding-right: 20px; }
 .link-item:hover::before { width: 8px; }
 
 .link-num {
@@ -3556,7 +3501,6 @@ html[data-theme="dark"] .history-check svg { stroke: #E0E0E0; }
     transition: color 0.3s ease;
     position: relative;
     z-index: 1;
-    justify-self: start;
 }
 .link-item:hover .link-num { color: var(--red); }
 
@@ -3635,17 +3579,9 @@ html[data-theme="dark"] .history-check svg { stroke: #E0E0E0; }
     transition: opacity 0.4s cubic-bezier(0.16, 1, 0.3, 1),
                 transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
 }
-.link-item:hover .link-arrow {
-    opacity: 1;
-    transform: translateX(0);
-}
+.link-item:hover .link-arrow { opacity: 1; transform: translateX(0); }
 
-/* --- Лекции --- */
-.lectures-list {
-    display: flex;
-    flex-direction: column;
-    gap: 3.5rem;
-}
+.lectures-list { display: flex; flex-direction: column; gap: 3.5rem; }
 
 .lecture-group-title {
     font-family: var(--font-display);
@@ -3690,17 +3626,13 @@ html[data-theme="dark"] .history-check svg { stroke: #E0E0E0; }
     transition: width 0.35s cubic-bezier(0.16, 1, 0.3, 1);
     z-index: 0;
 }
-.lecture-item:hover {
-    padding-left: 24px;
-    padding-right: 16px;
-}
+.lecture-item:hover { padding-left: 24px; padding-right: 16px; }
 .lecture-item:hover::before { width: 6px; }
 
 .lecture-num {
     font-family: var(--font-display);
     font-size: clamp(1.4rem, 3vw, 2rem);
     font-weight: 700;
-    letter-spacing: -0.02em;
     color: var(--muted);
     font-variant-numeric: tabular-nums;
     transition: color 0.3s ease;
@@ -3745,7 +3677,6 @@ html[data-theme="dark"] .history-check svg { stroke: #E0E0E0; }
     font-weight: 600;
     font-size: clamp(1rem, 2vw, 1.4rem);
     line-height: 1.15;
-    letter-spacing: -0.01em;
     text-transform: uppercase;
     color: var(--text);
     transition: color 0.3s ease, transform 0.45s cubic-bezier(0.16, 1, 0.3, 1);
@@ -3776,37 +3707,17 @@ html[data-theme="dark"] .history-check svg { stroke: #E0E0E0; }
     transition: opacity 0.4s cubic-bezier(0.16, 1, 0.3, 1),
                 transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
 }
-.lecture-item:hover .lecture-arrow {
-    opacity: 1;
-    transform: translateX(0);
-}
+.lecture-item:hover .lecture-arrow { opacity: 1; transform: translateX(0); }
 
-/* --- Мобильные адаптации --- */
 @media (max-width: 720px) {
-    .tools-tabs {
-        margin-top: 1.8rem;
-    }
-    .tools-tab {
-        padding: 0.8rem 1rem;
-        font-size: 0.72rem;
-    }
+    .tools-tabs { margin-top: 0; }
+    .tools-tab { padding: 0.8rem 1rem; font-size: 0.72rem; }
+    .tools-panel { padding: 1.6rem 0 1.4rem; }
 
-    .tools-panel {
-        padding: 1.6rem 0 1.4rem;
-    }
-
-    .link-item {
-        grid-template-columns: 52px 1fr 32px;
-        gap: 14px;
-        padding: 24px 6px;
-    }
-    .link-item:hover {
-        padding-left: 16px;
-        padding-right: 10px;
-    }
+    .link-item { grid-template-columns: 52px 1fr 32px; gap: 14px; padding: 24px 6px; }
+    .link-item:hover { padding-left: 16px; padding-right: 10px; }
     .link-item:hover::before { width: 5px; }
     .link-num { font-size: 1.6rem; }
-    .link-body { gap: 8px; }
     .link-label { font-size: 0.5rem; letter-spacing: 0.2em; gap: 10px; }
     .link-label .dot { width: 5px; height: 5px; }
     .link-title { font-size: clamp(1.05rem, 5vw, 1.35rem); }
@@ -3817,24 +3728,11 @@ html[data-theme="dark"] .history-check svg { stroke: #E0E0E0; }
 
     .lectures-list { gap: 2.4rem; }
     .lecture-group-title { font-size: 1.15rem; }
-    .lecture-item {
-        grid-template-columns: 44px 1fr 30px;
-        gap: 12px;
-        padding: 16px 6px;
-    }
-    .lecture-item:hover {
-        padding-left: 14px;
-        padding-right: 8px;
-    }
+    .lecture-item { grid-template-columns: 44px 1fr 30px; gap: 12px; padding: 16px 6px; }
+    .lecture-item:hover { padding-left: 14px; padding-right: 8px; }
     .lecture-item:hover::before { width: 4px; }
     .lecture-num { font-size: 1.2rem; }
     .lecture-label { font-size: 0.48rem; letter-spacing: 0.18em; gap: 8px; }
     .lecture-title { font-size: 1rem; }
     .lecture-arrow { font-size: 1.2rem; }
-}
-
-/* --- Сдвиг space-switch вверх (часы больше не занимают фиксированную позицию) --- */
-.space-switch { top: 96px; }
-@media (max-width: 768px) {
-    .space-switch { top: 60px; }
 }
