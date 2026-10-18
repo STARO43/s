@@ -12,9 +12,9 @@ const SPEED_MULT = IS_MOBILE ? 0.65 : 1;
 const $  = (sel, root = document) => root.querySelector(sel);
 const $$ = (sel, root = document) => Array.from(root.querySelectorAll(sel));
 
- 
+
 const GRAMOTINO_UPDATES = [
-   
+
     { date: '27 · 09 · 2026', title: 'РАЗДЕЛ ПЕДАГОГИКИ',   text: 'Статьи и лекции' },
     { date: '28 · 09 · 2026', title: 'РАЗДЕЛ ИСТОРИИ',   text: 'Видео лекций' }
 ];
@@ -145,7 +145,6 @@ function playEntryAnimation(onDone) {
 let _menuBound = false;
 
 function openMenu() {
-    // Если открыт ридер статьи — закрываем его и сбрасываем hash
     if (typeof window.__gramotinoCloseArticle === 'function') {
         window.__gramotinoCloseArticle();
     }
@@ -694,8 +693,6 @@ function initReading() {
             progressTimer = setTimeout(() => progressContainer.classList.remove('show'), 2200);
         }
 
-        /* ---------- Новый рендер «Столкновение» ---------- */
-
         function makeSyllableWord(syllable, idx) {
             const w = document.createElement('span');
             w.className = 'syl-w';
@@ -726,55 +723,53 @@ function initReading() {
         }
 
         function renderGrid() {
-    const scrollY = window.scrollY;
-    const items = currentMode === 'random' ? randomItems : syllables;
+            const scrollY = window.scrollY;
+            const items = currentMode === 'random' ? randomItems : syllables;
 
-    grid.innerHTML = '';
-    grid.classList.add('collision-mode');
-    grid.classList.toggle('is-random', currentMode === 'random');
+            grid.innerHTML = '';
+            grid.classList.add('collision-mode');
+            grid.classList.toggle('is-random', currentMode === 'random');
 
-    const words = items.map((s, i) => makeSyllableWord(s, i));
+            const words = items.map((s, i) => makeSyllableWord(s, i));
 
-    const meas = document.createElement('div');
-    meas.className = 'syl-row';
-    meas.style.cssText = 'position:absolute;visibility:hidden;pointer-events:none;width:auto;white-space:nowrap;';
-    grid.appendChild(meas);
-    words.forEach((w) => meas.appendChild(w));
-    const widths = words.map((w) => w.getBoundingClientRect().width);
-    meas.remove();
+            const meas = document.createElement('div');
+            meas.className = 'syl-row';
+            meas.style.cssText = 'position:absolute;visibility:hidden;pointer-events:none;width:auto;white-space:nowrap;';
+            grid.appendChild(meas);
+            words.forEach((w) => meas.appendChild(w));
+            const widths = words.map((w) => w.getBoundingClientRect().width);
+            meas.remove();
 
-    const containerW = grid.clientWidth || window.innerWidth;
-    const MAX_ROW_W  = containerW * 0.98;
+            const containerW = grid.clientWidth || window.innerWidth;
+            const MAX_ROW_W  = containerW * 0.98;
 
-    const rows = [];
-    let row = [];
-    let rowW = 0;
+            const rows = [];
+            let row = [];
+            let rowW = 0;
 
-    widths.forEach((w, i) => {
-        if (rowW + w > MAX_ROW_W && row.length > 0) {
-            rows.push(row);
-            row = [];
-            rowW = 0;
+            widths.forEach((w, i) => {
+                if (rowW + w > MAX_ROW_W && row.length > 0) {
+                    rows.push(row);
+                    row = [];
+                    rowW = 0;
+                }
+                row.push(words[i]);
+                rowW += w;
+            });
+            if (row.length) rows.push(row);
+
+            rows.forEach((r) => {
+                const rowEl = document.createElement('div');
+                rowEl.className = 'syl-row';
+                r.forEach((w) => rowEl.appendChild(w));
+                grid.appendChild(rowEl);
+            });
+
+            refreshProgressData();
+            scheduleFit();
+
+            window.scrollTo(0, scrollY);
         }
-        row.push(words[i]);
-        rowW += w;
-    });
-    if (row.length) rows.push(row);
-
-    rows.forEach((r) => {
-        const rowEl = document.createElement('div');
-        rowEl.className = 'syl-row';
-        r.forEach((w) => rowEl.appendChild(w));
-        grid.appendChild(rowEl);
-    });
-
-    refreshProgressData();
-    scheduleFit();
-
-    window.scrollTo(0, scrollY);
-}
-
-        /* ---------- Автоподгон кегля по ширине ряда ---------- */
 
         function fitRow(row) {
             const words = row.querySelectorAll('.syl-w');
@@ -884,9 +879,6 @@ function initReading() {
             });
         }
 
-        /* ====================================================
-           QUIZ / DICT — дизайн-оверлеи
-           ==================================================== */
         const qdOverlay = document.getElementById('qdOverlay');
         const qdClose   = document.getElementById('qdClose');
         const qdBody    = document.getElementById('qdBody');
@@ -934,7 +926,6 @@ function initReading() {
             if (qdCounter) qdCounter.innerHTML = `ВОПРОС <b>${Math.min(cur+1,total)}</b> ИЗ <b>${total}</b>`;
         }
 
-        /* ---------- QUIZ ---------- */
         function startQuizQD(){
             examQuestions = syllables.slice().sort(() => Math.random() - 0.5).slice(0, 10);
             examIndex = 0;
@@ -1011,7 +1002,6 @@ function initReading() {
             });
         }
 
-        /* ---------- DICT ---------- */
         const ALPHA_LAYOUT = ['А','Б','В','Г','Д','Е','Ё','Ж','З','И','Й','К','Л','М','Н','О','П','Р','С','Т','У','Ф','Х','Ц','Ч','Ш','Щ','Ъ','Ы','Ь','Э','Ю','Я'];
         const QWERTY_ROW1 = ['Й','Ц','У','К','Е','Н','Г','Ш','Щ','З','Х','Ъ'];
         const QWERTY_ROW2 = ['Ф','Ы','В','А','П','Р','О','Л','Д','Ж','Э'];
@@ -1169,7 +1159,6 @@ function initReading() {
             a.play().catch(() => {});
         }
 
-        /* ---------- Общая кнопка «ДАЛЕЕ» ---------- */
         function showNextButton(onClick){
             const inner = qdBody.querySelector('.qd-inner');
             if (!inner) return;
@@ -1190,7 +1179,6 @@ function initReading() {
             setTimeout(() => btn.scrollIntoView({ behavior:'smooth', block:'nearest' }), 40);
         }
 
-        /* ---------- Результат ---------- */
         function showQDResult(score, total){
             if (!qdBody) return;
             qdBody.innerHTML = '';
@@ -1210,9 +1198,6 @@ function initReading() {
             qdBody.appendChild(inner);
         }
 
-        /* ====================================================
-           СТАРЫЙ ТЕРМИНАЛ — только как пасхалка (двойной клик)
-           ==================================================== */
         function openTerm() {
             if (!termOverlay) return;
             termOverlay.classList.add('show');
@@ -1563,14 +1548,8 @@ function initReading() {
             termScroll();
         }
 
-        /* ====================================================
-           ПАСХАЛКА: двойной клик по ПОДПИСЯМ "ВИКТОРИНА" и "ДИКТАНТ"
-           ==================================================== */
-
         if (examBtn)      examBtn.addEventListener('click', () => openQD('quiz'));
         if (dictationBtn) dictationBtn.addEventListener('click', () => openQD('dict'));
-
-      
 
         function bindCaptionDoubleTap(captionEl, mode){
             if (!captionEl) return;
@@ -1610,39 +1589,6 @@ function initReading() {
 }
 
 /* ---------- 6.3 TOOLS ---------- */
-/* ============================================================
-   TOOLS · ВКЛАДКИ
-   ============================================================ */
-function initToolsTabs() {
-    const tabs = $$('.tools-tab');
-    const panels = $$('.tools-panel');
-    if (!tabs.length || !panels.length) return;
-
-    function activate(name) {
-        tabs.forEach((t) => t.classList.toggle('active', t.dataset.tab === name));
-        panels.forEach((p) => p.classList.toggle('active', p.dataset.panel === name));
-
-        if (name === 'time') {
-            setTimeout(() => window.dispatchEvent(new Event('resize')), 60);
-        }
-
-        if (window.history && window.history.replaceState) {
-            const url = window.location.pathname + window.location.search +
-                (name !== 'interesting' ? '#' + name : '');
-            window.history.replaceState('', document.title, url);
-        }
-    }
-
-    tabs.forEach((tab) => {
-        tab.addEventListener('click', () => activate(tab.dataset.tab));
-    });
-
-    const hash = window.location.hash.replace('#', '');
-    if (hash && document.querySelector('.tools-panel[data-panel="' + hash + '"]')) {
-        activate(hash);
-    }
-}
-
 function initTools() {
     once('tools', () => {
         const evmOverlay = document.getElementById('evmOverlay');
@@ -1987,69 +1933,69 @@ function initTools() {
             window.initToolsClock();
         }
 
-              /* ============================================================
-           SPACE-SWITCH — кнопка «Орбиты»
-           desktop → spacewatch.html
-           mobile  → spacewatch2.html
-           ============================================================ */
-        const spaceSwitch = document.getElementById('spaceSwitch');
-        if (spaceSwitch) {
-            const IS_MOBILE_SPACE = window.matchMedia('(max-width: 768px)').matches;
-            const SPACE_URL = IS_MOBILE_SPACE
-                ? 'https://gramotinho.kick.sh/spacewatch2.html'
-                : 'https://gramotinho.kick.sh/spacewatch.html';
-
-            spaceSwitch.addEventListener('click', () => {
-                window.open(SPACE_URL, '_blank', 'noopener,noreferrer');
-            });
-        }
         initToolsTabs();
         initToolsBalls();
     });
 }
 
 /* ============================================================
-   TOOLS · ШАРЫ (Three.js)
+   TOOLS · ВКЛАДКИ
+   ============================================================ */
+function initToolsTabs() {
+    const tabs = Array.from(document.querySelectorAll('.tools-tab'));
+    const panels = Array.from(document.querySelectorAll('.tools-panel'));
+    if (!tabs.length || !panels.length) return;
+
+    function activate(name) {
+        tabs.forEach((t) => t.classList.toggle('active', t.dataset.tab === name));
+        panels.forEach((p) => p.classList.toggle('active', p.dataset.panel === name));
+        if (name === 'time') {
+            setTimeout(() => window.dispatchEvent(new Event('resize')), 60);
+        }
+    }
+
+    tabs.forEach((tab) => {
+        tab.addEventListener('click', () => activate(tab.dataset.tab));
+    });
+
+    const hash = (window.location.hash || '').replace('#', '');
+    if (hash && document.querySelector('.tools-panel[data-panel="' + hash + '"]')) {
+        activate(hash);
+    }
+}
+
+/* ============================================================
+   TOOLS · ШАРЫ
    ============================================================ */
 function initToolsBalls() {
-    const container = document.getElementById('ballsContainer');
+    const container = document.querySelector('.balls-section');
     const canvas = document.getElementById('ballsCanvas');
-    if (!container || !canvas || !window.THREE) return;
+    if (!container || !canvas || typeof THREE === 'undefined') return;
+
+    const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+    renderer.setSize(container.clientWidth, container.clientHeight, false);
+    renderer.setClearColor(0x000000, 0);
+    renderer.toneMapping = THREE.ACESFilmicToneMapping;
+    renderer.toneMappingExposure = 1.2;
+    renderer.shadowMap.enabled = false;
 
     const scene = new THREE.Scene();
     const camera = new THREE.PerspectiveCamera(
         45,
-        container.clientWidth / container.clientHeight,
+        (container.clientWidth || 1) / (container.clientHeight || 1),
         0.1,
-        100
+        200
     );
-    camera.position.set(0, 0, 22);
+    camera.position.set(0, 0, 18);
 
-    const renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
-    renderer.setSize(container.clientWidth, container.clientHeight);
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-    renderer.toneMapping = THREE.ACESFilmicToneMapping;
-    renderer.toneMappingExposure = 1.3;
-    renderer.shadowMap.enabled = true;
-    renderer.shadowMap.type = THREE.PCFSoftShadowMap;
-
-    scene.add(new THREE.AmbientLight(0xffffff, 0.5));
+    scene.add(new THREE.AmbientLight(0xffffff, 0.75));
     const keyLight = new THREE.DirectionalLight(0xffffff, 2.0);
     keyLight.position.set(10, 20, 15);
-    keyLight.castShadow = true;
     scene.add(keyLight);
     const fillLight = new THREE.DirectionalLight(0xffffff, 1.0);
     fillLight.position.set(-15, 0, 10);
     scene.add(fillLight);
-
-    /* --- Текстуры и цвета --- */
-    const themeColors = {
-        metal:    { top: '#000510', line1: '#0066ff', line2: '#001133' },
-        neon:     { top: '#0a0015', line1: '#ff00ff', line2: '#330055' },
-        obsidian: { top: '#050505', line1: '#ff4444', line2: '#220000' },
-        magma:    { top: '#0a0000', line1: '#ff3300', line2: '#330000' },
-        concrete: { top: '#001000', line1: '#00ff88', line2: '#003322' }
-    };
 
     function generateLiquidMetal() {
         const c = document.createElement('canvas');
@@ -2145,54 +2091,6 @@ function initToolsBalls() {
     let currentIndex = 0;
     let currentGlobalType = materialOrder[currentIndex];
 
-    /* --- Фон --- */
-    const bgGeometry = new THREE.PlaneGeometry(2, 2);
-    const bgMaterial = new THREE.ShaderMaterial({
-        uniforms: {
-            uTime:       { value: 0 },
-            uColorTop:   { value: new THREE.Color() },
-            uColorLine1: { value: new THREE.Color() },
-            uColorLine2: { value: new THREE.Color() }
-        },
-        vertexShader: `varying vec2 vUv; void main() { vUv = uv; gl_Position = vec4(position, 1.0); }`,
-        fragmentShader: `
-            uniform float uTime;
-            uniform vec3 uColorTop;
-            uniform vec3 uColorLine1;
-            uniform vec3 uColorLine2;
-            varying vec2 vUv;
-            void main() {
-                vec2 uv = vUv;
-                float horizon = 0.4;
-                if (uv.y > horizon) {
-                    vec3 sky = mix(uColorTop, vec3(0.0), uv.y);
-                    gl_FragColor = vec4(sky, 1.0); return;
-                }
-                float perspective = (horizon - uv.y) / horizon;
-                float lineX = fract((uv.x - 0.5) / (perspective * 4.0) + uTime * 0.2);
-                float lineY = fract(1.0 / perspective - uTime * 0.5);
-                float gridX = smoothstep(0.02, 0.0, abs(lineX - 0.5) - 0.48);
-                float gridY = smoothstep(0.05, 0.0, abs(lineY - 0.5) - 0.45);
-                vec3 lineColor = mix(uColorLine1, uColorLine2, perspective);
-                lineColor *= (gridX + gridY) * (1.0 - perspective);
-                gl_FragColor = vec4(lineColor, 1.0);
-            }
-        `,
-        depthWrite: false, depthTest: false
-    });
-    const bgMesh = new THREE.Mesh(bgGeometry, bgMaterial);
-    bgMesh.frustumCulled = false;
-    bgMesh.renderOrder = -1;
-    scene.add(bgMesh);
-
-    function updateBackgroundColors(type) {
-        const colors = themeColors[type];
-        bgMaterial.uniforms.uColorTop.value.set(colors.top);
-        bgMaterial.uniforms.uColorLine1.value.set(colors.line1);
-        bgMaterial.uniforms.uColorLine2.value.set(colors.line2);
-    }
-
-    /* --- Границы --- */
     const RADIUS = 1.8;
     const bounds = { minX: -8, maxX: 8, minY: -4, maxY: 4, minZ: -4, maxZ: 4 };
 
@@ -2209,34 +2107,23 @@ function initToolsBalls() {
         bounds.maxZ =  4;
     }
 
-    /* --- Шары --- */
+    recomputeBounds();
+
     const COUNT = 20;
     const sphereGeo = new THREE.SphereGeometry(RADIUS, 64, 64);
     const spheres = [];
 
     for (let i = 0; i < COUNT; i++) {
         const mesh = new THREE.Mesh(sphereGeo, materialPool[currentGlobalType][0]);
-        mesh.castShadow = true;
-        mesh.receiveShadow = true;
         mesh.position.set(
-            (Math.random() - 0.5) * 12,
-            (Math.random() - 0.5) * 7,
-            (Math.random() - 0.5) * 6
+            bounds.minX + Math.random() * (bounds.maxX - bounds.minX),
+            bounds.minY + Math.random() * (bounds.maxY - bounds.minY),
+            bounds.minZ + Math.random() * (bounds.maxZ - bounds.minZ)
         );
         scene.add(mesh);
         spheres.push({ mesh, velocity: new THREE.Vector3() });
     }
 
-    recomputeBounds();
-    spheres.forEach((s) => {
-        s.mesh.position.x = Math.max(bounds.minX, Math.min(bounds.maxX, s.mesh.position.x));
-        s.mesh.position.y = Math.max(bounds.minY, Math.min(bounds.maxY, s.mesh.position.y));
-        s.mesh.position.z = Math.max(bounds.minZ, Math.min(bounds.maxZ, s.mesh.position.z));
-    });
-
-    updateBackgroundColors(currentGlobalType);
-
-    /* --- Взаимодействие --- */
     const raycaster = new THREE.Raycaster();
     const mouse = new THREE.Vector2();
     const mousePlane = new THREE.Plane(new THREE.Vector3(0, 0, 1), 0);
@@ -2258,7 +2145,6 @@ function initToolsBalls() {
             y: -((e.clientY - rect.top) / rect.height) * 2 + 1
         };
     }
-
     function clampGrabTarget() {
         if (grabTarget.x < bounds.minX) grabTarget.x = bounds.minX;
         if (grabTarget.x > bounds.maxX) grabTarget.x = bounds.maxX;
@@ -2275,10 +2161,7 @@ function initToolsBalls() {
     let tapStartX = 0, tapStartY = 0, tapStartTime = 0, tapMoved = false;
     let lastTapTime = -1e9, lastTapX = 0, lastTapY = 0;
 
-    function resetTapTracking() {
-        tapActive = false;
-        lastTapTime = -1e9;
-    }
+    function resetTapTracking() { tapActive = false; lastTapTime = -1e9; }
 
     function switchMaterial() {
         currentIndex = (currentIndex + 1) % materialOrder.length;
@@ -2286,7 +2169,6 @@ function initToolsBalls() {
         spheres.forEach((s) => {
             s.mesh.material = materialPool[currentGlobalType][Math.floor(Math.random() * 4)];
         });
-        updateBackgroundColors(currentGlobalType);
     }
 
     function registerTapEnd(e) {
@@ -2342,7 +2224,6 @@ function initToolsBalls() {
             const dy = e.clientY - tapStartY;
             if (dx * dx + dy * dy > TAP_MOVE_TOL * TAP_MOVE_TOL) tapMoved = true;
         }
-
         const ndc = pointerToNDC(e);
         mouse.x = ndc.x; mouse.y = ndc.y;
         raycaster.setFromCamera(mouse, camera);
@@ -2354,11 +2235,7 @@ function initToolsBalls() {
         }
 
         if (raycaster.ray.intersectPlane(mousePlane, currentMousePos)) {
-            if (isFirstMove) {
-                prevMousePos.copy(currentMousePos);
-                isFirstMove = false;
-                return;
-            }
+            if (isFirstMove) { prevMousePos.copy(currentMousePos); isFirstMove = false; return; }
             const speed = currentMousePos.distanceTo(prevMousePos);
             if (speed > 0.1) {
                 spheres.forEach((s) => {
@@ -2385,42 +2262,21 @@ function initToolsBalls() {
             try { container.releasePointerCapture(e.pointerId); } catch (_) {}
         }
     }
-
-    function handlePointerUp(e) {
-        releaseGrab(e);
-        registerTapEnd(e);
-    }
-
+    function handlePointerUp(e) { releaseGrab(e); registerTapEnd(e); }
     container.addEventListener('pointerup', handlePointerUp);
     window.addEventListener('pointerup', handlePointerUp);
-
-    container.addEventListener('pointercancel', (e) => {
-        releaseGrab(e);
-        resetTapTracking();
-    });
-    window.addEventListener('pointercancel', (e) => {
-        releaseGrab(e);
-        resetTapTracking();
-    });
-
-    container.addEventListener('pointerleave', () => {
-        if (!grabbedSphere) isFirstMove = true;
-    });
-
+    container.addEventListener('pointercancel', (e) => { releaseGrab(e); resetTapTracking(); });
+    window.addEventListener('pointercancel', (e) => { releaseGrab(e); resetTapTracking(); });
+    container.addEventListener('pointerleave', () => { if (!grabbedSphere) isFirstMove = true; });
     container.addEventListener('contextmenu', (e) => e.preventDefault());
 
-    /* --- Цикл --- */
     const clock = new THREE.Clock();
-    let globalTime = 0;
     const MAX_SPEED = 0.5;
 
     function animate() {
         requestAnimationFrame(animate);
         if (document.hidden) return;
         const dt = Math.min(clock.getDelta(), 0.1);
-        globalTime += dt;
-
-        bgMaterial.uniforms.uTime.value = globalTime;
         const def = materialsDef[currentGlobalType];
 
         for (let i = 0; i < spheres.length; i++) {
@@ -2473,35 +2329,25 @@ function initToolsBalls() {
                         s2.mesh.position.x -= nx * overlap;
                         s2.mesh.position.y -= ny * overlap;
                         s2.mesh.position.z -= nz * overlap;
-                        const relVel =
-                            (s.velocity.x - s2.velocity.x) * nx +
-                            (s.velocity.y - s2.velocity.y) * ny +
-                            (s.velocity.z - s2.velocity.z) * nz;
+                        const relVel = (s.velocity.x - s2.velocity.x) * nx + (s.velocity.y - s2.velocity.y) * ny + (s.velocity.z - s2.velocity.z) * nz;
                         if (relVel < 0) {
                             const impulse = -relVel * 0.6;
                             s2.velocity.x -= impulse * nx;
                             s2.velocity.y -= impulse * ny;
                             s2.velocity.z -= impulse * nz;
-                            s.velocity.x *= 0.7;
-                            s.velocity.y *= 0.7;
-                            s.velocity.z *= 0.7;
+                            s.velocity.x *= 0.7; s.velocity.y *= 0.7; s.velocity.z *= 0.7;
                         }
                     } else if (s2Grabbed && !sGrabbed) {
                         s.mesh.position.x += nx * overlap;
                         s.mesh.position.y += ny * overlap;
                         s.mesh.position.z += nz * overlap;
-                        const relVel =
-                            (s2.velocity.x - s.velocity.x) * (-nx) +
-                            (s2.velocity.y - s.velocity.y) * (-ny) +
-                            (s2.velocity.z - s.velocity.z) * (-nz);
+                        const relVel = (s2.velocity.x - s.velocity.x) * (-nx) + (s2.velocity.y - s.velocity.y) * (-ny) + (s2.velocity.z - s.velocity.z) * (-nz);
                         if (relVel < 0) {
                             const impulse = -relVel * 0.6;
                             s.velocity.x += impulse * nx;
                             s.velocity.y += impulse * ny;
                             s.velocity.z += impulse * nz;
-                            s2.velocity.x *= 0.7;
-                            s2.velocity.y *= 0.7;
-                            s2.velocity.z *= 0.7;
+                            s2.velocity.x *= 0.7; s2.velocity.y *= 0.7; s2.velocity.z *= 0.7;
                         }
                     } else {
                         const push = overlap * 0.5;
@@ -2511,18 +2357,11 @@ function initToolsBalls() {
                         s2.mesh.position.x -= nx * push;
                         s2.mesh.position.y -= ny * push;
                         s2.mesh.position.z -= nz * push;
-                        const relVel =
-                            (s.velocity.x - s2.velocity.x) * nx +
-                            (s.velocity.y - s2.velocity.y) * ny +
-                            (s.velocity.z - s2.velocity.z) * nz;
+                        const relVel = (s.velocity.x - s2.velocity.x) * nx + (s.velocity.y - s2.velocity.y) * ny + (s.velocity.z - s2.velocity.z) * nz;
                         if (relVel < 0) {
                             const impulse = relVel * 0.6;
-                            s.velocity.x -= impulse * nx;
-                            s.velocity.y -= impulse * ny;
-                            s.velocity.z -= impulse * nz;
-                            s2.velocity.x += impulse * nx;
-                            s2.velocity.y += impulse * ny;
-                            s2.velocity.z += impulse * nz;
+                            s.velocity.x -= impulse * nx; s.velocity.y -= impulse * ny; s.velocity.z -= impulse * nz;
+                            s2.velocity.x += impulse * nx; s2.velocity.y += impulse * ny; s2.velocity.z += impulse * nz;
                         }
                     }
                 }
@@ -2555,7 +2394,7 @@ function initToolsBalls() {
         if (!w || !h) return;
         camera.aspect = w / h;
         camera.updateProjectionMatrix();
-        renderer.setSize(w, h);
+        renderer.setSize(w, h, false);
         recomputeBounds();
         spheres.forEach((s) => {
             s.mesh.position.x = Math.max(bounds.minX, Math.min(bounds.maxX, s.mesh.position.x));
@@ -3357,7 +3196,7 @@ function initArt() {
 }
 
 /* ============================================================
-   6.8 HISTORY — лекции с отметкой «просмотрено»
+   6.8 HISTORY
    ============================================================ */
 function initHistory() {
     once('history', () => {
@@ -3373,7 +3212,6 @@ function initHistory() {
         const STORAGE_KEY = 'history_viewed_v1';
         const HASH_PREFIX = '#lecture/';
 
-        /* ----- Список лекций (порядок сохраняется) ----- */
         const LECTURES = [
             { id: 'f5fb4cb726c27681aa9e59c571e697e3', title: 'Лекция 01' },
             { id: 'eca937c817e6d670f1a363da0a14f252', title: 'Лекция 02' },
@@ -3418,7 +3256,6 @@ function initHistory() {
 
         const pad2 = (n) => String(n).padStart(2, '0');
 
-        /* ----- Хранилище просмотренного ----- */
         function loadViewed() {
             try {
                 const raw = localStorage.getItem(STORAGE_KEY);
@@ -3428,11 +3265,10 @@ function initHistory() {
         }
         function saveViewed(set) {
             try { localStorage.setItem(STORAGE_KEY, JSON.stringify(Array.from(set))); }
-            catch (e) { /* quota */ }
+            catch (e) { }
         }
         let viewed = loadViewed();
 
-        /* ----- Прогресс ----- */
         function updateProgress() {
             const total = LECTURES.length;
             const done  = LECTURES.filter((l) => viewed.has(l.id)).length;
@@ -3441,7 +3277,6 @@ function initHistory() {
             if (fillEl) fillEl.style.width = pct + '%';
         }
 
-        /* ----- Отрисовка сетки ----- */
         function renderGrid() {
             gridEl.innerHTML = '';
             const frag = document.createDocumentFragment();
@@ -3452,7 +3287,6 @@ function initHistory() {
                 card.href = HASH_PREFIX + lec.id;
                 card.dataset.videoId = lec.id;
 
-                /* Превью */
                 const thumb = document.createElement('div');
                 thumb.className = 'history-thumb';
 
@@ -3468,7 +3302,6 @@ function initHistory() {
                 num.className = 'history-num';
                 num.textContent = pad2(i + 1);
 
-                /* Кнопка-галочка */
                 const check = document.createElement('button');
                 check.type = 'button';
                 check.className = 'history-check';
@@ -3496,7 +3329,6 @@ function initHistory() {
                 thumb.appendChild(num);
                 thumb.appendChild(check);
 
-                /* Инфо */
                 const info = document.createElement('div');
                 info.className = 'history-info';
 
@@ -3519,7 +3351,6 @@ function initHistory() {
             gridEl.appendChild(frag);
         }
 
-        /* ----- Плеер ----- */
         function openPlayer(id) {
             frame.src = 'https://rutube.ru/play/embed/' + id + '/';
             modal.classList.add('show');
@@ -3557,11 +3388,10 @@ function initHistory() {
         });
         window.addEventListener('hashchange', handleHash);
 
-        /* Клик по карточке: если хэш уже равен — открываем вручную (иначе hashchange сам сработает) */
         document.addEventListener('click', (e) => {
             const card = e.target.closest('.history-card');
             if (!card) return;
-            if (e.target.closest('.history-check')) return; // галочка уже обработана
+            if (e.target.closest('.history-check')) return;
             if (window.location.hash === card.getAttribute('href')) {
                 e.preventDefault();
                 const id = card.dataset.videoId;
@@ -3569,7 +3399,6 @@ function initHistory() {
             }
         });
 
-        /* ----- Сброс прогресса ----- */
         if (resetBtn) {
             resetBtn.addEventListener('click', () => {
                 if (viewed.size === 0) {
@@ -3584,14 +3413,13 @@ function initHistory() {
             });
         }
 
-        /* ----- Старт ----- */
         renderGrid();
         updateProgress();
         handleHash();
     });
 }
 
-/* ---------- 6.7 ARTICLES (ПЕДАГОГИКА) ---------- */
+/* ---------- 6.7 ARTICLES ---------- */
 function initArticles() {
     once('articles', () => {
         const INDEX_URL      = 'articles/index.json';
@@ -3612,10 +3440,6 @@ function initArticles() {
 
         if (!reader) return;
 
-        /* ---------- РИМСКИЕ СТРОЧНЫЕ: i, ii, iii... ---------- */
-        
-
-        /* ---------- ЛЕКЦИИ (жёстко зашиты) ---------- */
         const LECTURES = [
             {
                 title: 'Катерина Мурашова — Мифы о воспитании',
@@ -3686,7 +3510,6 @@ num.textContent = String(i + 1).padStart(2, '0');
             listLectures.appendChild(frag);
         }
 
-        /* ---------- СТАТЬИ / КЛАССИКА ---------- */
         const indexCache   = { loaded: false, data: [] };
         const articleCache = new Map();
         let readingSlug    = null;
@@ -3938,7 +3761,6 @@ num.textContent = String(idx + 1).padStart(2, '0');
                 closeReader();
             }
         }
-        // ← ГЛАВНОЕ: делаем закрытие доступным для бургер-меню
         window.__gramotinoCloseArticle = closeArticle;
 
         function handleHash() {
@@ -3976,7 +3798,6 @@ num.textContent = String(idx + 1).padStart(2, '0');
 
         loadIndex()
             .then((items) => {
-                // Классика — всё, где в slug/названии есть "макаренко"
                 const isMakarenko = (it) => {
                     const hay = ((it.slug || '') + ' ' + (it.title || '')).toLowerCase();
                     return hay.includes('макаренко');
@@ -4001,6 +3822,7 @@ num.textContent = String(idx + 1).padStart(2, '0');
             .finally(() => { handleHash(); });
     });
 }
+
 /* ============================================================
    7. СТРАНИЦА И СТАРТ
    ============================================================ */
@@ -4073,7 +3895,7 @@ function initKinetic() {
     let W = 0, H = 0, DPR = 1;
     let letters = [];
     let currentIdx = 0;
-    let phase = 'idle';        // 'enter' | 'hold' | 'exit'
+    let phase = 'idle';
     let phaseStart = 0;
     const HOLD_MS = 3400;
     const ENTER_MS = 1100;
@@ -4097,15 +3919,12 @@ function initKinetic() {
         canvas.style.width = W + 'px';
         canvas.style.height = H + 'px';
         ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
-        // Пересобрать текущее слово
         if (phase === 'hold') {
             buildTargets(currentIdx);
         }
     }
 
-    /* Считает позиции букв для заголовка */
     function computeTargets(text) {
-        // Подбираем размер шрифта, чтобы строка влезла в 90% ширины
         let fontSize = Math.min(W / (text.length * 0.62), H * 0.55, 140);
         fontSize = Math.max(fontSize, 26);
 
@@ -4132,7 +3951,6 @@ function initKinetic() {
         return targets;
     }
 
-    /* Создаёт букву, летящую извне */
     function spawnLetter(target, delay) {
         const angle = Math.random() * Math.PI * 2;
         const r = Math.max(W, H) * (0.7 + Math.random() * 0.5);
@@ -4145,7 +3963,7 @@ function initKinetic() {
             size: target.size,
             alpha: 0,
             delay: delay,
-            state: 'enter',           // 'enter' | 'settle' | 'exit'
+            state: 'enter',
             rot: (Math.random() - 0.5) * 0.6,
             rotV: 0
         };
@@ -4155,13 +3973,10 @@ function initKinetic() {
         const u = GRAMOTINO_UPDATES[idx % GRAMOTINO_UPDATES.length];
         const targets = computeTargets(u.title.toUpperCase());
 
-        // Пулы: старые буквы, которые могут стать новыми
         const remaining = letters.slice();
         const next = [];
 
-        // Попарно сопоставляем по символу — сохраняемся где можем
         targets.forEach((t, i) => {
-            // Ищем букву с таким же символом
             const foundIdx = remaining.findIndex(L => L.ch === t.ch && L.state !== 'exit');
             if (foundIdx >= 0) {
                 const L = remaining.splice(foundIdx, 1)[0];
@@ -4176,7 +3991,6 @@ function initKinetic() {
             }
         });
 
-        // Остальные буквы — на выход
         remaining.forEach(L => {
             L.state = 'exit';
             const angle = Math.random() * Math.PI * 2;
@@ -4217,7 +4031,6 @@ function initKinetic() {
                 const dist = Math.hypot(dx, dy);
                 if (dist < 2 && Math.abs(L.vx) < 0.4) L.state = 'settle';
             } else if (L.state === 'settle') {
-                // Микро-дыхание вокруг цели
                 L.x += (L.tx - L.x) * 0.14;
                 L.y += (L.ty - L.y) * 0.14;
                 L.alpha += (1 - L.alpha) * 0.16;
@@ -4236,10 +4049,8 @@ function initKinetic() {
             }
         });
 
-        // Чистим улетевшие
         letters = letters.filter(L => !(L.state === 'exit' && L.alpha < 0.02));
 
-        // Рисуем
         letters.forEach(L => {
             if (L.alpha < 0.02) return;
             ctx.save();
@@ -4249,13 +4060,11 @@ function initKinetic() {
             ctx.font = `700 ${L.size}px "Oswald", sans-serif`;
             ctx.textAlign = 'center';
             ctx.textBaseline = 'middle';
-            // Цвет: инвертируем при выходе
             ctx.fillStyle = L.state === 'exit' ? colors.red : colors.text;
             ctx.fillText(L.ch, 0, 0);
             ctx.restore();
         });
 
-        // Смена фаз
         if (phase === 'enter') {
             if (now - phaseStart > ENTER_MS) {
                 phase = 'hold';
@@ -4265,7 +4074,6 @@ function initKinetic() {
             if (now - phaseStart > HOLD_MS) {
                 phase = 'exit';
                 phaseStart = now;
-                // Все буквы на выход
                 letters.forEach(L => {
                     if (L.state !== 'exit') {
                         L.state = 'exit';
@@ -4283,7 +4091,6 @@ function initKinetic() {
                 phaseStart = now;
             }
         } else {
-            // Старт
             currentIdx = GRAMOTINO_UPDATES.length - 1;
             buildTargets(currentIdx);
             phase = 'enter';
@@ -4293,7 +4100,6 @@ function initKinetic() {
         requestAnimationFrame(tick);
     }
 
-    // IntersectionObserver — запуск, когда блок в поле зрения
     const io = new IntersectionObserver((entries) => {
         entries.forEach(e => {
             if (e.isIntersecting) {
@@ -4314,12 +4120,11 @@ function initKinetic() {
     window.addEventListener('resize', () => {
         resize();
     });
-    // Первичная инициализация размеров
     setTimeout(resize, 80);
 }
 
 /* ============================================================
-   8.2 ЖИВОЙ ЗВУК · СЮДА
+   8.2 ЖИВОЙ ЗВУК
    ============================================================ */
 function initLive() {
     const square = document.getElementById('liveSquare');
@@ -4341,8 +4146,8 @@ function initLive() {
     const uiTitle = document.getElementById('liveTitle');
     const uiText  = document.getElementById('liveText');
 
-    const BASE_FREQ = 174.61;                 // F3
-    const CONSONANT = [0, 4, 5, 7, 9, 12];    // мажорная пентатоника
+    const BASE_FREQ = 174.61;
+    const CONSONANT = [0, 4, 5, 7, 9, 12];
 
     function ensureAudio() {
         if (!audioCtx) {
@@ -4351,7 +4156,6 @@ function initLive() {
                 analyser = audioCtx.createAnalyser();
                 analyser.fftSize = 256;
                 freqData = new Uint8Array(analyser.frequencyBinCount);
-                // Подключаем анализатор к destination через gain
                 const master = audioCtx.createGain();
                 master.gain.value = 1;
                 master.connect(audioCtx.destination);
@@ -4421,7 +4225,6 @@ function initLive() {
         });
         generation++;
         if (uiGen) uiGen.textContent = 'ГЕН ' + String(generation).padStart(2, '0');
-        // Приветственная нота
         playTone(freq * 1.5, (x / W) * 2 - 1, 0.05, 0.5, 'triangle');
     }
 
@@ -4461,7 +4264,6 @@ function initLive() {
         const red  = cs.getPropertyValue('--red').trim()  || '#D90429';
         const text = cs.getPropertyValue('--text').trim() || '#0A0A0A';
 
-        // Амплитуда из анализатора
         let amp = 0;
         if (analyser && freqData) {
             analyser.getByteFrequencyData(freqData);
@@ -4485,17 +4287,14 @@ function initLive() {
             s.x += s.vx;
             s.y += s.vy;
 
-            // Ритмичная нота
             if (now - s.lastNote > s.rhythm * 1000) {
                 playTone(s.freq, (s.x / W) * 2 - 1, 0.03, 1.4, 'sine');
                 s.lastNote = now;
             }
 
-            // Пульс от амплитуды
             s.pulse += (amp - s.pulse) * 0.08;
             const r = 3 + s.pulse * 8 + (1 - lifeT) * 1.5;
 
-            // Ореол
             const halo = ctx.createRadialGradient(s.x, s.y, 0, s.x, s.y, r * 6);
             halo.addColorStop(0, `rgba(217,4,41,${alpha * 0.20 * (1 + s.pulse * 2)})`);
             halo.addColorStop(1, 'rgba(217,4,41,0)');
@@ -4504,14 +4303,12 @@ function initLive() {
             ctx.arc(s.x, s.y, r * 6, 0, Math.PI * 2);
             ctx.fill();
 
-            // Точка
             ctx.globalAlpha = alpha;
             ctx.fillStyle = s.hovered ? red : text;
             ctx.beginPath();
             ctx.arc(s.x, s.y, r, 0, Math.PI * 2);
             ctx.fill();
 
-            // Подпись при наведении
             if (s.hovered) {
                 ctx.globalAlpha = 0.9;
                 ctx.fillStyle = red;
@@ -4532,7 +4329,6 @@ function initLive() {
     window.addEventListener('resize', resize);
     requestAnimationFrame(tick);
 
-    // Показ блока
     const io = new IntersectionObserver((entries) => {
         entries.forEach(e => {
             if (e.isIntersecting) {
@@ -4546,13 +4342,12 @@ function initLive() {
 }
 
 /* ============================================================
-   8.3 КАРТОЧКИ-КАДРЫ · только mobile
+   8.3 КАРТОЧКИ-КАДРЫ
    ============================================================ */
 function initUpCards() {
     const wrap = document.getElementById('upCards');
     if (!wrap) return;
 
-    // Порядок: новые сверху
     const list = GRAMOTINO_UPDATES.slice().reverse();
 
     const frag = document.createDocumentFragment();
