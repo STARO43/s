@@ -2092,7 +2092,7 @@ function initToolsBalls() {
     let currentGlobalType = materialOrder[currentIndex];
 
        const RADIUS = 1.8;
-    const Z_RANGE = 1.2;                        // ← было 4, стало 1.2 (насколько глубоко шары летают к камере и от неё)
+    const Z_RANGE = 0.3;                       
     const bounds = { minX: -8, maxX: 8, minY: -4, maxY: 4, minZ: -Z_RANGE, maxZ: Z_RANGE };
 
     function recomputeBounds() {
