@@ -101,6 +101,8 @@
   <script type="module">
     import * as THREE from 'three';
     import { Sky } from 'three/addons/objects/Sky.js';
+    import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+    import { clone as skClone } from 'three/addons/utils/SkeletonUtils.js';
     import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
     import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
     import { ShaderPass } from 'three/addons/postprocessing/ShaderPass.js';
@@ -132,15 +134,42 @@
 
     // ============================================================
     //  НАСТРОЙКИ СКРОЛЛА
-    //  Всё в мировых единицах Three.js.
     // ============================================================
-    const WHEEL_SENS        = 1.8;   // чувствительность колеса (1 клик ≈ ½ карточки)
-    const FOLLOW_LAMBDA     = 2;  // скорость догоняния цели после колеса (1/сек)
-    const INERTIA_LAMBDA    = 1;   // затухание инерции после свайпа (1/сек)
-    const INERTIA_MULT      = 0.9;   // сила инерции после свайпа
-    const INERTIA_MAX       = 600;   // потолок инерции
-    const INERTIA_MIN_ALIVE = 0.5;   // порог остановки
-    const SETTLE_EPS        = 0.005; // снап к цели при таком расстоянии
+    const WHEEL_SENS        = 1.8;
+    const FOLLOW_LAMBDA     = 2;
+    const INERTIA_LAMBDA    = 1;
+    const INERTIA_MULT      = 0.9;
+    const INERTIA_MAX       = 600;
+    const INERTIA_MIN_ALIVE = 0.5;
+    const SETTLE_EPS        = 0.005;
+
+    // ============================================================
+    //  НАСТРОЙКИ АИСТОВ
+    // ============================================================
+    const STORK_TARGET_SIZE = 5;
+    const STORK_Y_MIN       = 22;
+    const STORK_Y_MAX       = 27;
+    const STORK_Z_MIN       = -30;
+    const STORK_Z_MAX       = -22;
+    const STORK_SPEED_MIN   = 8;
+    const STORK_SPEED_MAX   = 12;
+    const STORK_FLOCK_MIN   = 2;
+    const STORK_FLOCK_MAX   = IS_IPHONE ? 2 : (IS_IPAD ? 3 : 4);
+    const STORK_SPAN_X      = 80;
+
+    // ── Расписание вылетов ──────────────────────────────────────
+    // Первый вылет — случайно в течение первой минуты (0–60 сек).
+    // Каждый следующий интервал удваивается:
+    //   1-й вылет:   0–60 сек
+    //   2-й:        60–120 сек
+    //   3-й:       120–240 сек
+    //   4-й:       240–480 сек
+    //   ...
+    // Внутри каждого окна — случайный момент.
+    const STORK_FIRST_WINDOW = 60;   // секунд, первое окно
+
+    // CSP: только './Stork.glb' — файл должен лежать рядом с index.html
+    const MODEL_URLS = ['./Stork.glb'];
 
     // ============================================================
     //  EASE
@@ -172,7 +201,7 @@
     }
 
     // ============================================================
-    //  ЗАГРУЗКА
+    //  ЗАГРУЗКА КАРТИНОК
     // ============================================================
     const ALT_EXTS = ['jpeg', 'png', 'webp', 'JPG', 'JPEG', 'PNG', 'WEBP'];
 
@@ -280,6 +309,12 @@
 
     const SUN_COLOR = new THREE.Color(1.0, 0.88, 0.68);
 
+    const storkSun = new THREE.DirectionalLight(0xffd0a0, 2.2);
+    storkSun.position.copy(sunDir).multiplyScalar(80);
+    scene.add(storkSun);
+    const storkFill = new THREE.HemisphereLight(0xffaa77, 0x1a0f08, 0.9);
+    scene.add(storkFill);
+
     const galleryGroup = new THREE.Group();
     scene.add(galleryGroup);
 
@@ -294,14 +329,14 @@
     let worldWidth   = 0;
 
     // ============================================================
-    //  СОСТОЯНИЕ СКРОЛЛА (всё в мировых единицах)
+    //  СОСТОЯНИЕ СКРОЛЛА
     // ============================================================
-    let scrollTarget  = 0;   // куда стремимся
-    let scrollCurrent = 0;   // где находимся (плавно догоняет)
-    let dragInertia   = 0;   // мировая скорость после отпускания
+    let scrollTarget  = 0;
+    let scrollCurrent = 0;
+    let dragInertia   = 0;
     let isDragging    = false;
-    let pendingDragPx = 0;   // накопленные пиксели между кадрами
-    let dragVelPxMs   = 0;   // EMA скорости пальца/мыши
+    let pendingDragPx = 0;
+    let dragVelPxMs   = 0;
 
     const cardShared = {
       uTime:     { value: 0 },
@@ -471,6 +506,170 @@
     }
 
     // ============================================================
+    //  АИСТЫ
+    // ============================================================
+    const storks = {
+      template: null,
+      clip: null,
+      scale: 1,
+      centerOffset: new THREE.Vector3(),
+      active: [],
+      ready: false,
+
+      // Расписание: секунды от старта
+      nextSpawnAt: 0,
+      windowSize: STORK_FIRST_WINDOW,   // текущее окно (сек), удваивается
+      spawnIndex: 0                     // счётчик вылетов
+    };
+
+    function planNextSpawn(elapsed) {
+      // Первый вылет — случайно в окне [0, STORK_FIRST_WINDOW)
+      // Далее окно удваивается, момент внутри окна случайный:
+      //   spawn N = elapsed + random(0, windowSize)
+      //   windowSize *= 2 для следующего раза
+      const delay = Math.random() * storks.windowSize;
+      storks.nextSpawnAt = elapsed + delay;
+      console.log(
+        `[stork] next spawn #${storks.spawnIndex + 1} in ` +
+        `${delay.toFixed(1)}s (window=${storks.windowSize}s)`
+      );
+      storks.windowSize *= 2;
+    }
+
+    async function loadStorkModel() {
+      let gltf = null;
+      for (const url of MODEL_URLS) {
+        try {
+          gltf = await new GLTFLoader().loadAsync(url);
+          break;
+        } catch (e) {
+          console.warn('[stork] failed', url, e?.message || e);
+        }
+      }
+      if (!gltf) {
+        console.warn('[stork] model NOT loaded — аистов не будет');
+        return;
+      }
+
+      const size = new THREE.Box3()
+        .setFromObject(gltf.scene)
+        .getSize(new THREE.Vector3());
+      const maxDim = Math.max(size.x, size.y, size.z);
+      storks.scale = STORK_TARGET_SIZE / maxDim;
+
+      const center = new THREE.Box3()
+        .setFromObject(gltf.scene)
+        .getCenter(new THREE.Vector3());
+      storks.centerOffset.copy(center).multiplyScalar(storks.scale);
+
+      storks.template = gltf.scene;
+      storks.clip = gltf.animations?.[0] || null;
+      storks.ready = true;
+
+      // Планируем первый вылет
+      planNextSpawn(performance.now() / 1000);
+
+      console.log('[stork] ready, scale =', storks.scale.toFixed(3),
+                  'clip =', storks.clip ? `${storks.clip.duration.toFixed(2)}s` : 'none');
+    }
+
+    const STORK_FORMATION = [
+      { x:  0, y:  0, z:  0 },
+      { x: -5, y:  1, z:  3 },
+      { x: -9, y:  2, z:  6 },
+      { x: -5, y: -1, z: -3 }
+    ];
+
+    function spawnStorkFlock() {
+      if (!storks.ready) return;
+
+      const count = STORK_FLOCK_MIN +
+        Math.floor(Math.random() * (STORK_FLOCK_MAX - STORK_FLOCK_MIN + 1));
+
+      const dir = Math.random() < 0.5 ? 1 : -1;
+      const baseY = STORK_Y_MIN + Math.random() * (STORK_Y_MAX - STORK_Y_MIN);
+      const baseZ = STORK_Z_MIN + Math.random() * (STORK_Z_MAX - STORK_Z_MIN);
+      const speed = STORK_SPEED_MIN + Math.random() * (STORK_SPEED_MAX - STORK_SPEED_MIN);
+
+      const startX = dir > 0 ? -STORK_SPAN_X : STORK_SPAN_X;
+
+      console.log(`[stork] SPAWN #${storks.spawnIndex + 1}: ${count} birds, ` +
+                  `dir=${dir > 0 ? '→' : '←'}, Y=${baseY.toFixed(1)}, ` +
+                  `Z=${baseZ.toFixed(1)}, v=${speed.toFixed(1)}`);
+      storks.spawnIndex++;
+
+      for (let i = 0; i < count; i++) {
+        const model = skClone(storks.template);
+        model.scale.setScalar(storks.scale);
+        model.position.sub(storks.centerOffset);
+
+        model.traverse(child => {
+          if (child.isMesh) {
+            child.frustumCulled = false;
+            child.renderOrder = -10;
+          }
+        });
+
+        const wrapper = new THREE.Group();
+        wrapper.add(model);
+        wrapper.rotation.y = dir > 0 ? Math.PI / 2 : -Math.PI / 2;
+
+        const f = STORK_FORMATION[i % STORK_FORMATION.length];
+        wrapper.position.set(
+          startX + f.x * dir,
+          baseY + f.y,
+          baseZ + f.z
+        );
+
+        let mixer = null;
+        if (storks.clip) {
+          mixer = new THREE.AnimationMixer(model);
+          const action = mixer.clipAction(storks.clip);
+          action.play();
+          action.time = Math.random() * storks.clip.duration;
+          action.timeScale = 0.9 + Math.random() * 0.3;
+        }
+
+        scene.add(wrapper);
+        storks.active.push({
+          wrapper, model, mixer, speed, dir,
+          baseY: wrapper.position.y,
+          bobPhase: Math.random() * Math.PI * 2,
+          bobAmp: 0.4 + Math.random() * 0.5
+        });
+      }
+    }
+
+    function updateStorks(dt, elapsedSec) {
+      if (!storks.ready) return;
+
+      // Проверка расписания
+      if (elapsedSec >= storks.nextSpawnAt) {
+        spawnStorkFlock();
+        planNextSpawn(elapsedSec);
+      }
+
+      for (let i = storks.active.length - 1; i >= 0; i--) {
+        const s = storks.active[i];
+        s.mixer?.update(dt);
+
+        s.wrapper.position.x += s.speed * s.dir * dt;
+        s.wrapper.position.y =
+          s.baseY + Math.sin(elapsedSec * 0.6 + s.bobPhase) * s.bobAmp;
+
+        const offScreen = s.dir > 0
+          ? s.wrapper.position.x > STORK_SPAN_X + 10
+          : s.wrapper.position.x < -(STORK_SPAN_X + 10);
+
+        if (offScreen) {
+          scene.remove(s.wrapper);
+          s.mixer?.stopAllAction();
+          storks.active.splice(i, 1);
+        }
+      }
+    }
+
+    // ============================================================
     //  ЛАЙТБОКС
     // ============================================================
     let isLightboxOpen = false;
@@ -521,7 +720,6 @@
     let lastPointerX = 0, lastPointerT = 0;
     let lastTapT = 0, lastTapX = 0, lastTapY = 0;
 
-    // ---- КОЛЕСО ----
     window.addEventListener('wheel', (e) => {
       if (isLightboxOpen) return;
       e.preventDefault();
@@ -537,7 +735,6 @@
       dragInertia = 0;
     }, { passive: false });
 
-    // ---- DRAG ----
     window.addEventListener('pointerdown', (e) => {
       if (isLightboxOpen) return;
       if (e.pointerType === 'mouse' && e.button !== 0) return;
@@ -596,7 +793,6 @@
     window.addEventListener('pointerup', endPointer, { passive: true });
     window.addEventListener('pointercancel', endPointer, { passive: true });
 
-    // ---- КЛАВИАТУРА ----
     window.addEventListener('keydown', (e) => {
       if (isLightboxOpen) return;
       if (e.key === 'ArrowRight') scrollTarget = clamp(scrollTarget + 60, 0, maxScroll);
@@ -711,17 +907,15 @@
       const worldPerPx = worldWidth / innerWidth;
 
       // ============================================================
-      //  СКРОЛЛ-ДВИЖОК
+      //  СКРОЛЛ
       // ============================================================
       if (isDragging) {
-        // 1:1 — накопленные пиксели сразу в мировые единицы. Никакого сглаживания.
         if (pendingDragPx !== 0) {
           scrollCurrent = clamp(scrollCurrent - pendingDragPx * worldPerPx, 0, maxScroll);
           scrollTarget = scrollCurrent;
           pendingDragPx = 0;
         }
       } else if (Math.abs(dragInertia) > INERTIA_MIN_ALIVE) {
-        // Инерция после свайпа — двигаем напрямую, затухает экспоненциально
         scrollCurrent += dragInertia * dt;
         dragInertia   *= Math.exp(-INERTIA_LAMBDA * dt);
 
@@ -731,7 +925,6 @@
         if (Math.abs(dragInertia) < INERTIA_MIN_ALIVE) dragInertia = 0;
         scrollTarget = scrollCurrent;
       } else {
-        // Колесо — плавное догоняние цели, кадро-независимое
         dragInertia = 0;
         const k = 1 - Math.exp(-FOLLOW_LAMBDA * dt);
         scrollCurrent = lerp(scrollCurrent, scrollTarget, k);
@@ -741,11 +934,8 @@
       }
 
       // ============================================================
-      //  ACTIVITY (для шейдеров)
+      //  ACTIVITY
       // ============================================================
-      const velocityMag = Math.abs(dragInertia) +
-        (isDragging ? Math.abs(dragVelPxMs * 1000 * worldPerPx) : 0);
-
       const scrollActive = isDragging ||
         Math.abs(dragInertia) > 0.5 ||
         Math.abs(scrollTarget - scrollCurrent) > 0.1;
@@ -755,11 +945,14 @@
       activity += (targetActivity - activity) * Math.min(1, dt * speed);
 
       // ============================================================
+      //  АИСТЫ
+      // ============================================================
+      updateStorks(dt, t);
+
+      // ============================================================
       //  ПОЗИЦИЯ ГРУППЫ
       // ============================================================
       galleryGroup.position.x = maxScroll / 2 - scrollCurrent;
-
-      // Никаких наклонов, качаний и зумов — только чистое движение по X.
       galleryGroup.rotation.set(0, 0, 0);
       galleryGroup.scale.set(1, 1, 1);
 
@@ -864,6 +1057,9 @@
     async function init() {
       const statusEl = document.getElementById('loader-status');
       const loaderEl = document.getElementById('loader');
+
+      loadStorkModel().catch(e => console.warn('[stork] load error', e));
+
       try {
         const files = [];
         for (let i = FROM; i <= TO; i++) files.push(`${IMAGE_FOLDER}${i}.${EXT}`);
@@ -877,6 +1073,7 @@
         if (items.length === 0) {
           if (statusEl) statusEl.textContent = 'Не удалось загрузить картинки';
           setTimeout(() => loaderEl.classList.add('hidden'), 1200);
+          running = true;
           return;
         }
 
