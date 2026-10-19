@@ -1939,68 +1939,286 @@ function initTools() {
     });
 }
 
+
 /* ============================================================
-   TOOLS · ВКЛАДКИ
+   TOOLS · ТЕКСТОВЫЙ СКРАМБЛ (для кнопки-переключателя)
+   ============================================================ */
+function scrambleText(el, newText, duration = 380) {
+    if (!el) return;
+    const old = el.textContent;
+    const len = Math.max(old.length, newText.length);
+    const pool = 'АБВГДЕЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯ0123456789#@$%&*+=';
+    const start = performance.now();
+    function frame(now) {
+        const p = Math.min(1, (now - start) / duration);
+        const reveal = Math.floor(p * newText.length);
+        let out = '';
+        for (let i = 0; i < len; i++) {
+            if (i < reveal) out += newText[i] || '';
+            else if (i < newText.length) out += pool[Math.floor(Math.random() * pool.length)];
+            else if (i < old.length) out += pool[Math.floor(Math.random() * pool.length)];
+        }
+        el.textContent = out;
+        if (p < 1) requestAnimationFrame(frame);
+        else el.textContent = newText;
+    }
+    requestAnimationFrame(frame);
+}
+
+/* ============================================================
+   TOOLS · THREE.JS GLITCH OVERLAY
+   ============================================================ */
+function createGlitchOverlay(container) {
+    const canvas = document.createElement('canvas');
+    canvas.className = 'glitch-overlay';
+    container.appendChild(canvas);
+
+    const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: false });
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+    renderer.setClearColor(0x000000, 0);
+
+    const scene  = new THREE.Scene();
+    const camera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1);
+
+    const uniforms = {
+        uResolution: { value: new THREE.Vector2(1, 1) },
+        uTime:       { value: 0 },
+        uIntensity:  { value: 0 }
+    };
+
+    const material = new THREE.ShaderMaterial({
+        uniforms,
+        transparent: true,
+        depthTest: false,
+        depthWrite: false,
+        vertexShader: `
+            void main() {
+                gl_Position = vec4(position.xy, 0.0, 1.0);
+            }
+        `,
+        fragmentShader: `
+            precision highp float;
+            uniform vec2  uResolution;
+            uniform float uTime;
+            uniform float uIntensity;
+
+            float hash21(vec2 p) {
+                p = fract(p * vec2(233.34, 851.73));
+                p += dot(p, p + 23.45);
+                return fract(p.x * p.y);
+            }
+
+            void main() {
+                vec2  uv = gl_FragCoord.xy / uResolution;
+                float t  = uTime;
+                float I  = uIntensity;
+
+                vec3 col = vec3(0.0);
+
+                /* 1. VHS-подобный сдвиг строк */
+                float yBand      = floor(uv.y * 70.0);
+                float bandRand   = hash21(vec2(yBand, floor(t * 22.0)));
+                float bandActive = step(0.55, bandRand);
+                float bandOffset = (hash21(vec2(yBand, floor(t * 11.0))) - 0.5) * 0.10;
+
+                /* 2. RGB-полосы */
+                float redStripe  = step(0.62, hash21(vec2(floor(uv.y * 90.0),        floor(t * 55.0))));
+                float cyanStripe = step(0.62, hash21(vec2(floor(uv.y * 90.0) + 11.0, floor(t * 60.0))));
+                col.r += redStripe  * I * 0.55;
+                col.g += cyanStripe * I * 0.42;
+                col.b += cyanStripe * I * 0.42;
+
+                /* 3. Горизонтальный «разрыв» */
+                float tearY    = hash21(vec2(floor(t * 7.0), 7.0));
+                float tearDist = abs(uv.y - tearY);
+                float tear     = smoothstep(0.006, 0.0, tearDist);
+                col += tear * vec3(1.0, 0.12, 0.18) * I * 1.35;
+
+                /* 4. Скан-линии */
+                float scan = step(0.0, sin(uv.y * uResolution.y * 1.4 + t * 42.0));
+                col *= 0.55 + scan * 0.45;
+
+                /* 5. Блочный шум (цифровые артефакты) */
+                vec2  blockUV   = floor(uv * vec2(28.0, 76.0)) / vec2(28.0, 76.0);
+                float blockRand = hash21(blockUV + floor(t * 28.0));
+                if (blockRand > 0.965) {
+                    col += step(0.5, hash21(blockUV * 3.0)) * vec3(1.0, 0.92, 0.86) * I * 0.45;
+                }
+
+                /* 6. Зерно */
+                float grain = hash21(uv * uResolution + floor(t * 55.0));
+                col += step(0.985, grain) * I * 0.55;
+
+                /* 7. Виньетка по краям */
+                vec2  c   = uv - 0.5;
+                float vig = 1.0 - smoothstep(0.35, 0.72, length(c));
+                col *= vig;
+
+                /* 8. Дополнительная дизеризация по bandOffset — сдвигаем
+                      яркую часть строк, чтобы читалось как «сломанное видео» */
+                float shifted = smoothstep(0.5, 0.0, abs(fract(uv.x + bandOffset * bandActive) - 0.5));
+                col += shifted * bandActive * vec3(1.0, 0.5, 0.4) * I * 0.18;
+
+                float a = clamp(max(max(col.r, col.g), col.b), 0.0, 1.0);
+                gl_FragColor = vec4(col, a);
+            }
+        `
+    });
+
+    const geo  = new THREE.PlaneBufferGeometry(2, 2);
+    const mesh = new THREE.Mesh(geo, material);
+    scene.add(mesh);
+
+    function resize() {
+        const r = container.getBoundingClientRect();
+        const w = Math.max(1, r.width);
+        const h = Math.max(1, r.height);
+        renderer.setSize(w, h, false);
+        const pr = renderer.getPixelRatio();
+        uniforms.uResolution.value.set(w * pr, h * pr);
+    }
+    resize();
+    window.addEventListener('resize', resize);
+
+    let rafId = null;
+
+    function burst(duration = 720) {
+        const start = performance.now();
+        canvas.style.opacity = '1';
+
+        function frame(now) {
+            const p = (now - start) / duration;
+            if (p >= 1) {
+                uniforms.uIntensity.value = 0;
+                canvas.style.opacity = '0';
+                renderer.render(scene, camera);
+                rafId = null;
+                return;
+            }
+            uniforms.uTime.value = (now - start) * 0.001;
+
+            // конверт: быстрый подъём, плавное затухание
+            const env = p < 0.14
+                ? p / 0.14
+                : 1 - (p - 0.14) / 0.86;
+            uniforms.uIntensity.value = env;
+
+            renderer.render(scene, camera);
+            rafId = requestAnimationFrame(frame);
+        }
+        if (rafId) cancelAnimationFrame(rafId);
+        rafId = requestAnimationFrame(frame);
+    }
+
+    return { burst, resize };
+}
+
+/* ============================================================
+   TOOLS · ПЕРЕКЛЮЧАТЕЛЬ РАЗДЕЛОВ (слайдер + глитч)
    ============================================================ */
 function initToolsSwitch() {
-    const wrap     = document.getElementById('toolsPanelsWrap');
-    const panels   = document.getElementById('toolsPanels');
-    const btn      = document.getElementById('toolsSwitch');
-    const labelEl  = document.getElementById('toolsSwitchLabel');
-    const indexEl  = document.getElementById('toolsSwitchIndex');
-    if (!wrap || !panels || !btn) return;
+    const clip   = document.getElementById('toolsClip');
+    const track  = document.getElementById('toolsTrack');
+    const btn    = document.getElementById('toolsSwitch');
+    const label  = document.getElementById('toolsSwitchLabel');
+    const indexEl = document.getElementById('toolsSwitchIndex');
+    if (!clip || !track || !btn) return;
 
-    const ORDER  = ['interesting', 'lectures', 'time'];
-    const LABELS = { interesting: 'ИНТЕРЕСНО-ПОЛЕЗНОЕ', lectures: 'ЛЕКЦИИ', time: 'ЧАСЫ' };
-    const pad2   = (n) => String(n).padStart(2, '0');
-    let state = -1;
+    const SLIDES  = Array.from(track.querySelectorAll('.tools-slide'));
+    const ORDER   = ['interesting', 'lectures', 'time'];
+    const LABELS  = { interesting: 'ИНТЕРЕСНО-ПОЛЕЗНОЕ', lectures: 'ЛЕКЦИИ', time: 'ЧАСЫ' };
+    const pad2    = (n) => String(n).padStart(2, '0');
 
-    function setActive(name) {
-        panels.querySelectorAll('.tools-panel').forEach((p) => {
-            p.classList.toggle('active', p.dataset.panel === name);
+    const glitch  = createGlitchOverlay(clip);
+
+    let current = -1;      // -1 = закрыто
+    let busy    = false;
+
+    clip.style.height = '0';
+    clip.style.overflow = 'hidden';
+
+    const slideHeight = (el) => el ? el.offsetHeight : 0;
+
+    function openFirst() {
+        busy = true;
+        current = 0;
+        const h = slideHeight(SLIDES[0]);
+
+        gsap.to(clip, {
+            height: h,
+            duration: 0.85,
+            ease: 'expo.out',
+            onComplete: () => { busy = false; }
         });
-        if (name === 'time') {
-            setTimeout(() => window.dispatchEvent(new Event('resize')), 80);
-        }
+
+        indexEl.textContent = pad2(1);
+        scrambleText(label, LABELS[ORDER[0]], 420);
+        glitch.burst(520);
     }
 
-    function paint(name) {
-        if (labelEl) labelEl.textContent = LABELS[name];
-        if (indexEl) indexEl.textContent = pad2(ORDER.indexOf(name) + 1);
-    }
+    function slideTo(nextIdx) {
+        if (busy) return;
+        busy = true;
 
-    function glitchTo(name) {
-        panels.classList.add('glitching');
-        setTimeout(() => {
-            setActive(name);
-            paint(name);
-        }, 190);
-        setTimeout(() => {
-            panels.classList.remove('glitching');
-        }, 420);
+        const curSlide = SLIDES[current];
+        const newSlide = SLIDES[nextIdx];
+        const newH     = slideHeight(newSlide);
+        const clipW    = clip.offsetWidth;
+
+        // глитч запускаем сразу — он маскирует полёт
+        glitch.burst(720);
+
+        // трек едет: текущий уходит влево, следующий прилетает справа
+        gsap.to(track, {
+            x: -nextIdx * clipW,
+            duration: 0.8,
+            ease: 'expo.inOut'
+        });
+        gsap.to(clip, {
+            height: newH,
+            duration: 0.8,
+            ease: 'expo.inOut',
+            onComplete: () => {
+                current = nextIdx;
+                busy = false;
+            }
+        });
+
+        // метка и номер — скрамблятся
+        indexEl.textContent = pad2(nextIdx + 1);
+        scrambleText(label, LABELS[ORDER[nextIdx]], 420);
     }
 
     btn.addEventListener('click', () => {
-        if (state === -1) {
-            state = 0;
-            wrap.classList.add('open');
-            setActive(ORDER[0]);
-            paint(ORDER[0]);
-            return;
+        if (busy) return;
+        if (current === -1) {
+            openFirst();
+        } else {
+            const next = (current + 1) % ORDER.length;
+            slideTo(next);
         }
-        state = (state + 1) % ORDER.length;
-        glitchTo(ORDER[state]);
     });
 
+    // первичный замер после шрифтов
+    window.addEventListener('load', () => {
+        if (current >= 0) glitch.resize();
+    });
+
+    // hash-совместимость
     const hash = (window.location.hash || '').replace('#', '');
     if (hash && ORDER.includes(hash)) {
-        state = ORDER.indexOf(hash);
-        wrap.classList.add('open');
-        setActive(hash);
-        paint(hash);
+        // пока просто открываем — переход в конкретный слайд после загрузки
+        requestAnimationFrame(() => {
+            openFirst();
+            const idx = ORDER.indexOf(hash);
+            if (idx > 0) setTimeout(() => slideTo(idx), 900);
+        });
     }
 }
 
+/* ============================================================
+   TOOLS · ЛЕКЦИИ
+   ============================================================ */
 function initToolsLectures() {
     const grid  = document.getElementById('lecturesGrid');
     const modal = document.getElementById('mediaPlayerModal');
@@ -2008,6 +2226,9 @@ function initToolsLectures() {
     const close = document.getElementById('mediaPlayerClose');
     if (!grid || !modal || !frame) return;
 
+    // ЕСЛИ У ТЕБЯ ЕСТЬ РЕАЛЬНЫЕ НАЗВАНИЯ ЛЕКЦИЙ — ВПИШИ ИХ В title.
+    // Пока по факту известно только «Мифы о расах» — остальные в исходнике
+    // шли как «Лекция 01/02/…», я это сохранил.
     const LECTURES = [
         { platform: 'rutube', id: 'a414d1a2e392f4b9e2a034df42ba6bbd', title: 'Мифы о расах', subject: 'ФИЗИКА' },
         { platform: 'vk', owner: '225170958', video: '456240634', title: 'Лекция 02', subject: 'ФИЗИКА' },
@@ -2034,9 +2255,7 @@ function initToolsLectures() {
     ];
 
     function embedUrl(l) {
-        if (l.platform === 'rutube') {
-            return 'https://rutube.ru/play/embed/' + l.id + '/';
-        }
+        if (l.platform === 'rutube') return 'https://rutube.ru/play/embed/' + l.id + '/';
         return 'https://vk.com/video_ext.php?oid=-' + l.owner + '&id=' + l.video + '&hd=2';
     }
 
@@ -2058,12 +2277,435 @@ function initToolsLectures() {
             img.loading = 'lazy';
             img.decoding = 'async';
             img.src = 'https://rutube.ru/api/video/' + lec.id + '/thumbnail/?redirect=1';
-            img.onerror = function () { img.style.display = 'none'; };
+            img.onerror = function () {
+                img.remove();
+                const ph = document.createElement('div');
+                ph.className = 'thumb-placeholder';
+                ph.textContent = lec.subject;
+                thumb.appendChild(ph);
+            };
             thumb.appendChild(img);
         } else {
             const ph = document.createElement('div');
             ph.className = 'thumb-placeholder';
-            ph.textContent = 'VK ВИДЕО';
+            ph.innerHTML = '<span class="ph-sub">' + lec.subject + '</span><span class="ph-plat">VK ВИДЕО</span>';
+            thumb.appendChild(ph);
+        }
+
+        const num = document.createElement('div');
+        num.className = 'media-num';
+        num.textContent = pad2(i + 1);
+
+        const play = document.createElement('div');
+        play.className = 'media-play';
+
+        thumb.appendChild(num);
+        thumb.appendChild(play);
+
+        const info = document.createElement('div');
+        info.className = 'media-info';
+
+        const top = document.createElement('div');
+        top.className = 'media-info-top';
+        top.innerHTML = '<span class="dot"></span><span>' + lec.subject + ' · ' + lec.platform.toUpperCase() + '</span>';
+
+        const title = document.createElement('div');
+        title.className = 'media-title';
+        title.textContent = lec.title;
+
+        const line = document.createElement('span');
+        line.className = 'media-title-line';
+
+        info.appendChild(top);
+        info.appendChild(title);
+        info.appendChild(line);
+
+        const arrow = document.createElement('span');
+        arrow.className = 'media-arrow';
+        arrow.textContent = '→';
+
+        card.appendChild(thumb);
+        card.appendChild(info);
+        card.appendChild(arrow);
+
+        card.addEventListener('click', (e) => {
+            e.preventDefault();
+            openPlayer(embedUrl(lec));
+        });
+
+        frag.appendChild(card);
+    });
+
+    grid.appendChild(frag);
+
+    function openPlayer(url) {
+        frame.src = url;
+        modal.classList.add('show');
+        modal.setAttribute('aria-hidden', 'false');
+        document.body.style.overflow = 'hidden';
+    }
+    function closePlayer() {
+        modal.classList.remove('show');
+        modal.setAttribute('aria-hidden', 'true');
+        document.body.style.overflow = '';
+        setTimeout(() => { frame.src = 'about:blank'; }, 400);
+    }
+
+    if (close) close.addEventListener('click', closePlayer);
+    modal.addEventListener('click', (e) => { if (e.target === modal) closePlayer(); });
+    document.addEventListener('keydown', (e) => {
+        if (modal.classList.contains('show') && e.key === 'Escape') closePlayer();
+    });
+}
+/* ============================================================
+   TOOLS · ТЕКСТОВЫЙ СКРАМБЛ (для кнопки-переключателя)
+   ============================================================ */
+function scrambleText(el, newText, duration = 380) {
+    if (!el) return;
+    const old = el.textContent;
+    const len = Math.max(old.length, newText.length);
+    const pool = 'АБВГДЕЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯ0123456789#@$%&*+=';
+    const start = performance.now();
+    function frame(now) {
+        const p = Math.min(1, (now - start) / duration);
+        const reveal = Math.floor(p * newText.length);
+        let out = '';
+        for (let i = 0; i < len; i++) {
+            if (i < reveal) out += newText[i] || '';
+            else if (i < newText.length) out += pool[Math.floor(Math.random() * pool.length)];
+            else if (i < old.length) out += pool[Math.floor(Math.random() * pool.length)];
+        }
+        el.textContent = out;
+        if (p < 1) requestAnimationFrame(frame);
+        else el.textContent = newText;
+    }
+    requestAnimationFrame(frame);
+}
+
+/* ============================================================
+   TOOLS · THREE.JS GLITCH OVERLAY
+   ============================================================ */
+function createGlitchOverlay(container) {
+    const canvas = document.createElement('canvas');
+    canvas.className = 'glitch-overlay';
+    container.appendChild(canvas);
+
+    const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: false });
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+    renderer.setClearColor(0x000000, 0);
+
+    const scene  = new THREE.Scene();
+    const camera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1);
+
+    const uniforms = {
+        uResolution: { value: new THREE.Vector2(1, 1) },
+        uTime:       { value: 0 },
+        uIntensity:  { value: 0 }
+    };
+
+    const material = new THREE.ShaderMaterial({
+        uniforms,
+        transparent: true,
+        depthTest: false,
+        depthWrite: false,
+        vertexShader: `
+            void main() {
+                gl_Position = vec4(position.xy, 0.0, 1.0);
+            }
+        `,
+        fragmentShader: `
+            precision highp float;
+            uniform vec2  uResolution;
+            uniform float uTime;
+            uniform float uIntensity;
+
+            float hash21(vec2 p) {
+                p = fract(p * vec2(233.34, 851.73));
+                p += dot(p, p + 23.45);
+                return fract(p.x * p.y);
+            }
+
+            void main() {
+                vec2  uv = gl_FragCoord.xy / uResolution;
+                float t  = uTime;
+                float I  = uIntensity;
+
+                vec3 col = vec3(0.0);
+
+                /* 1. VHS-подобный сдвиг строк */
+                float yBand      = floor(uv.y * 70.0);
+                float bandRand   = hash21(vec2(yBand, floor(t * 22.0)));
+                float bandActive = step(0.55, bandRand);
+                float bandOffset = (hash21(vec2(yBand, floor(t * 11.0))) - 0.5) * 0.10;
+
+                /* 2. RGB-полосы */
+                float redStripe  = step(0.62, hash21(vec2(floor(uv.y * 90.0),        floor(t * 55.0))));
+                float cyanStripe = step(0.62, hash21(vec2(floor(uv.y * 90.0) + 11.0, floor(t * 60.0))));
+                col.r += redStripe  * I * 0.55;
+                col.g += cyanStripe * I * 0.42;
+                col.b += cyanStripe * I * 0.42;
+
+                /* 3. Горизонтальный «разрыв» */
+                float tearY    = hash21(vec2(floor(t * 7.0), 7.0));
+                float tearDist = abs(uv.y - tearY);
+                float tear     = smoothstep(0.006, 0.0, tearDist);
+                col += tear * vec3(1.0, 0.12, 0.18) * I * 1.35;
+
+                /* 4. Скан-линии */
+                float scan = step(0.0, sin(uv.y * uResolution.y * 1.4 + t * 42.0));
+                col *= 0.55 + scan * 0.45;
+
+                /* 5. Блочный шум (цифровые артефакты) */
+                vec2  blockUV   = floor(uv * vec2(28.0, 76.0)) / vec2(28.0, 76.0);
+                float blockRand = hash21(blockUV + floor(t * 28.0));
+                if (blockRand > 0.965) {
+                    col += step(0.5, hash21(blockUV * 3.0)) * vec3(1.0, 0.92, 0.86) * I * 0.45;
+                }
+
+                /* 6. Зерно */
+                float grain = hash21(uv * uResolution + floor(t * 55.0));
+                col += step(0.985, grain) * I * 0.55;
+
+                /* 7. Виньетка по краям */
+                vec2  c   = uv - 0.5;
+                float vig = 1.0 - smoothstep(0.35, 0.72, length(c));
+                col *= vig;
+
+                /* 8. Дополнительная дизеризация по bandOffset — сдвигаем
+                      яркую часть строк, чтобы читалось как «сломанное видео» */
+                float shifted = smoothstep(0.5, 0.0, abs(fract(uv.x + bandOffset * bandActive) - 0.5));
+                col += shifted * bandActive * vec3(1.0, 0.5, 0.4) * I * 0.18;
+
+                float a = clamp(max(max(col.r, col.g), col.b), 0.0, 1.0);
+                gl_FragColor = vec4(col, a);
+            }
+        `
+    });
+
+    const geo  = new THREE.PlaneBufferGeometry(2, 2);
+    const mesh = new THREE.Mesh(geo, material);
+    scene.add(mesh);
+
+    function resize() {
+        const r = container.getBoundingClientRect();
+        const w = Math.max(1, r.width);
+        const h = Math.max(1, r.height);
+        renderer.setSize(w, h, false);
+        const pr = renderer.getPixelRatio();
+        uniforms.uResolution.value.set(w * pr, h * pr);
+    }
+    resize();
+    window.addEventListener('resize', resize);
+
+    let rafId = null;
+
+    function burst(duration = 720) {
+        const start = performance.now();
+        canvas.style.opacity = '1';
+
+        function frame(now) {
+            const p = (now - start) / duration;
+            if (p >= 1) {
+                uniforms.uIntensity.value = 0;
+                canvas.style.opacity = '0';
+                renderer.render(scene, camera);
+                rafId = null;
+                return;
+            }
+            uniforms.uTime.value = (now - start) * 0.001;
+
+            // конверт: быстрый подъём, плавное затухание
+            const env = p < 0.14
+                ? p / 0.14
+                : 1 - (p - 0.14) / 0.86;
+            uniforms.uIntensity.value = env;
+
+            renderer.render(scene, camera);
+            rafId = requestAnimationFrame(frame);
+        }
+        if (rafId) cancelAnimationFrame(rafId);
+        rafId = requestAnimationFrame(frame);
+    }
+
+    return { burst, resize };
+}
+
+/* ============================================================
+   TOOLS · ПЕРЕКЛЮЧАТЕЛЬ РАЗДЕЛОВ (слайдер + глитч)
+   ============================================================ */
+function initToolsSwitch() {
+    const clip   = document.getElementById('toolsClip');
+    const track  = document.getElementById('toolsTrack');
+    const btn    = document.getElementById('toolsSwitch');
+    const label  = document.getElementById('toolsSwitchLabel');
+    const indexEl = document.getElementById('toolsSwitchIndex');
+    if (!clip || !track || !btn) return;
+
+    const SLIDES  = Array.from(track.querySelectorAll('.tools-slide'));
+    const ORDER   = ['interesting', 'lectures', 'time'];
+    const LABELS  = { interesting: 'ИНТЕРЕСНО-ПОЛЕЗНОЕ', lectures: 'ЛЕКЦИИ', time: 'ЧАСЫ' };
+    const pad2    = (n) => String(n).padStart(2, '0');
+
+    const glitch  = createGlitchOverlay(clip);
+
+    let current = -1;      // -1 = закрыто
+    let busy    = false;
+
+    clip.style.height = '0';
+    clip.style.overflow = 'hidden';
+
+    const slideHeight = (el) => el ? el.offsetHeight : 0;
+
+    function openFirst() {
+        busy = true;
+        current = 0;
+        const h = slideHeight(SLIDES[0]);
+
+        gsap.to(clip, {
+            height: h,
+            duration: 0.85,
+            ease: 'expo.out',
+            onComplete: () => { busy = false; }
+        });
+
+        indexEl.textContent = pad2(1);
+        scrambleText(label, LABELS[ORDER[0]], 420);
+        glitch.burst(520);
+    }
+
+    function slideTo(nextIdx) {
+        if (busy) return;
+        busy = true;
+
+        const curSlide = SLIDES[current];
+        const newSlide = SLIDES[nextIdx];
+        const newH     = slideHeight(newSlide);
+        const clipW    = clip.offsetWidth;
+
+        // глитч запускаем сразу — он маскирует полёт
+        glitch.burst(720);
+
+        // трек едет: текущий уходит влево, следующий прилетает справа
+        gsap.to(track, {
+            x: -nextIdx * clipW,
+            duration: 0.8,
+            ease: 'expo.inOut'
+        });
+        gsap.to(clip, {
+            height: newH,
+            duration: 0.8,
+            ease: 'expo.inOut',
+            onComplete: () => {
+                current = nextIdx;
+                busy = false;
+            }
+        });
+
+        // метка и номер — скрамблятся
+        indexEl.textContent = pad2(nextIdx + 1);
+        scrambleText(label, LABELS[ORDER[nextIdx]], 420);
+    }
+
+    btn.addEventListener('click', () => {
+        if (busy) return;
+        if (current === -1) {
+            openFirst();
+        } else {
+            const next = (current + 1) % ORDER.length;
+            slideTo(next);
+        }
+    });
+
+    // первичный замер после шрифтов
+    window.addEventListener('load', () => {
+        if (current >= 0) glitch.resize();
+    });
+
+    // hash-совместимость
+    const hash = (window.location.hash || '').replace('#', '');
+    if (hash && ORDER.includes(hash)) {
+        // пока просто открываем — переход в конкретный слайд после загрузки
+        requestAnimationFrame(() => {
+            openFirst();
+            const idx = ORDER.indexOf(hash);
+            if (idx > 0) setTimeout(() => slideTo(idx), 900);
+        });
+    }
+}
+
+/* ============================================================
+   TOOLS · ЛЕКЦИИ
+   ============================================================ */
+function initToolsLectures() {
+    const grid  = document.getElementById('lecturesGrid');
+    const modal = document.getElementById('mediaPlayerModal');
+    const frame = document.getElementById('mediaPlayerFrame');
+    const close = document.getElementById('mediaPlayerClose');
+    if (!grid || !modal || !frame) return;
+
+    // ЕСЛИ У ТЕБЯ ЕСТЬ РЕАЛЬНЫЕ НАЗВАНИЯ ЛЕКЦИЙ — ВПИШИ ИХ В title.
+    // Пока по факту известно только «Мифы о расах» — остальные в исходнике
+    // шли как «Лекция 01/02/…», я это сохранил.
+    const LECTURES = [
+        { platform: 'rutube', id: 'a414d1a2e392f4b9e2a034df42ba6bbd', title: 'Мифы о расах', subject: 'ФИЗИКА' },
+        { platform: 'vk', owner: '225170958', video: '456240634', title: 'Лекция 02', subject: 'ФИЗИКА' },
+        { platform: 'rutube', id: '3ed02305d905e526f0cb1eb522154e7d', title: 'Лекция 03', subject: 'ФИЗИКА' },
+        { platform: 'rutube', id: '1c6606e712a573817bf7d5998378b326', title: 'Лекция 04', subject: 'ФИЗИКА' },
+        { platform: 'rutube', id: '64963a9db321049bb8375a62c4dc8fbc', title: 'Лекция 05', subject: 'ФИЗИКА' },
+        { platform: 'vk', owner: '218914525', video: '456239626', title: 'Лекция 06', subject: 'ФИЗИКА' },
+        { platform: 'vk', owner: '218914525', video: '456239374', title: 'Лекция 07', subject: 'ФИЗИКА' },
+
+        { platform: 'vk', owner: '218914525', video: '456239692', title: 'Лекция 01', subject: 'ХИМИЯ' },
+        { platform: 'vk', owner: '218914525', video: '456239791', title: 'Лекция 02', subject: 'ХИМИЯ' },
+        { platform: 'rutube', id: 'cd0329a8eda3bc6821315b6569640df2', title: 'Лекция 03', subject: 'ХИМИЯ' },
+        { platform: 'vk', owner: '217610177', video: '456241170', title: 'Лекция 04', subject: 'ХИМИЯ' },
+        { platform: 'rutube', id: '20b38c2bcb25c3550ba31625b8ba474a', title: 'Лекция 05', subject: 'ХИМИЯ' },
+        { platform: 'vk', owner: '218914525', video: '456239797', title: 'Лекция 06', subject: 'ХИМИЯ' },
+        { platform: 'vk', owner: '221377127', video: '456240070', title: 'Лекция 07', subject: 'ХИМИЯ' },
+
+        { platform: 'vk', owner: '29793598', video: '456240918', title: 'Лекция 01', subject: 'БИОЛОГИЯ' },
+        { platform: 'vk', owner: '29793598', video: '456240887', title: 'Лекция 02', subject: 'БИОЛОГИЯ' },
+        { platform: 'vk', owner: '29793598', video: '456241045', title: 'Лекция 03', subject: 'БИОЛОГИЯ' },
+        { platform: 'vk', owner: '29793598', video: '456240966', title: 'Лекция 04', subject: 'БИОЛОГИЯ' },
+        { platform: 'vk', owner: '29793598', video: '456240803', title: 'Лекция 05', subject: 'БИОЛОГИЯ' },
+        { platform: 'vk', owner: '29793598', video: '456240846', title: 'Лекция 06', subject: 'БИОЛОГИЯ' }
+    ];
+
+    function embedUrl(l) {
+        if (l.platform === 'rutube') return 'https://rutube.ru/play/embed/' + l.id + '/';
+        return 'https://vk.com/video_ext.php?oid=-' + l.owner + '&id=' + l.video + '&hd=2';
+    }
+
+    const pad2 = (n) => String(n).padStart(2, '0');
+    const frag = document.createDocumentFragment();
+
+    LECTURES.forEach((lec, i) => {
+        const card = document.createElement('a');
+        card.className = 'media-card';
+        card.href = '#';
+
+        const thumb = document.createElement('div');
+        thumb.className = 'media-thumb';
+
+        if (lec.platform === 'rutube') {
+            const img = document.createElement('img');
+            img.className = 'thumb-img';
+            img.alt = lec.title;
+            img.loading = 'lazy';
+            img.decoding = 'async';
+            img.src = 'https://rutube.ru/api/video/' + lec.id + '/thumbnail/?redirect=1';
+            img.onerror = function () {
+                img.remove();
+                const ph = document.createElement('div');
+                ph.className = 'thumb-placeholder';
+                ph.textContent = lec.subject;
+                thumb.appendChild(ph);
+            };
+            thumb.appendChild(img);
+        } else {
+            const ph = document.createElement('div');
+            ph.className = 'thumb-placeholder';
+            ph.innerHTML = '<span class="ph-sub">' + lec.subject + '</span><span class="ph-plat">VK ВИДЕО</span>';
             thumb.appendChild(ph);
         }
 
@@ -2133,6 +2775,7 @@ function initToolsLectures() {
     });
 }
 
+
 /* ============================================================
    TOOLS · ШАРЫ
    ============================================================ */
@@ -2180,21 +2823,32 @@ function initToolsBalls() {
         }
         return new THREE.CanvasTexture(c);
     }
-    function generateOrangeNeon() {
+      function generateOrangeNeon() {
         const c = document.createElement('canvas');
         c.width = 1024; c.height = 1024;
         const ctx = c.getContext('2d');
-        const grad = ctx.createRadialGradient(512, 380, 60, 512, 512, 700);
-        grad.addColorStop(0, '#ffb347');
-        grad.addColorStop(0.55, '#ff7a18');
-        grad.addColorStop(1, '#e04a00');
+        const grad = ctx.createRadialGradient(512, 380, 80, 512, 512, 720);
+        grad.addColorStop(0,    '#ffb347');
+        grad.addColorStop(0.45, '#ff8a1a');
+        grad.addColorStop(0.8,  '#f56200');
+        grad.addColorStop(1,    '#c83a00');
         ctx.fillStyle = grad;
         ctx.fillRect(0, 0, 1024, 1024);
-        ctx.globalAlpha = 0.14;
-        ctx.fillStyle = '#000';
-        for (let i = 0; i < 5000; i++) {
+
+        // лёгкая матовость — тёмные вкрапления, чтобы не было «пластикового» блика
+        ctx.globalAlpha = 0.10;
+        ctx.fillStyle = '#2a0d00';
+        for (let i = 0; i < 4000; i++) {
             ctx.beginPath();
-            ctx.arc(Math.random() * 1024, Math.random() * 1024, Math.random() * 10 + 2, 0, Math.PI * 2);
+            ctx.arc(Math.random() * 1024, Math.random() * 1024, Math.random() * 8 + 1, 0, Math.PI * 2);
+            ctx.fill();
+        }
+        // тёплые блики
+        ctx.globalAlpha = 0.08;
+        ctx.fillStyle = '#fff0b8';
+        for (let i = 0; i < 2000; i++) {
+            ctx.beginPath();
+            ctx.arc(Math.random() * 1024, Math.random() * 1024, Math.random() * 6 + 1, 0, Math.PI * 2);
             ctx.fill();
         }
         return new THREE.CanvasTexture(c);
@@ -2245,7 +2899,7 @@ function initToolsBalls() {
     const materialsDef = {
         metal:    { gen: generateLiquidMetal,    props: { roughness: 0.05, metalness: 0.9, clearcoat: 1.0 }, mass: 2.0, gravity: 0.3, torque: 0,    bounciness: 0.4 },
         orange:   { gen: generateOrangeNeon,     props: { roughness: 0.22, metalness: 0.05, clearcoat: 1.0 }, mass: 1.0, gravity: 0,   torque: 0,    bounciness: 0.6 },
-        neon:     { gen: generateNeonCeramic,    props: { roughness: 0.3,  metalness: 0.0, clearcoat: 1.0 }, mass: 1.0, gravity: 0,   torque: 0,    bounciness: 0.6 },       
+        neon:     { gen: generateOrangeNeon,     props: { roughness: 0.22, metalness: 0.05, clearcoat: 1.0 }, mass: 1.0, gravity: 0,   torque: 0,    bounciness: 0.6 },
        obsidian: { gen: generateGlitchObsidian, props: { roughness: 0.05, metalness: 0.5, clearcoat: 1.0 }, mass: 1.2, gravity: 0,   torque: 0.05, bounciness: 0.5 },
         magma:    { gen: generateMagmaRock,      props: { roughness: 0.4,  metalness: 0.0, clearcoat: 0.5 }, mass: 0.4, gravity: 0,   torque: 0,    bounciness: 1.0 },
         concrete: { gen: generateCyberConcrete,  props: { roughness: 0.8,  metalness: 0.0, clearcoat: 0.0 }, mass: 4.0, gravity: 0,   torque: 0,    bounciness: 0.1 }
