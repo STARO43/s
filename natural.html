@@ -830,7 +830,7 @@
                 if (s.mesh.position.y > bounds.maxY) { s.mesh.position.y = bounds.maxY; s.velocity.y *= -def.bounciness; }
 
                 if (!isGrabbed) {
-                    s.velocity.multiplyScalar(0.985);
+                    s.velocity.multiplyScalar(0.85);
                     if (s.velocity.length() > MAX_SPEED) s.velocity.normalize().multiplyScalar(MAX_SPEED);
                 }
 
