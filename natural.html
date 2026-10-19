@@ -19,7 +19,6 @@
 <style>
 .page-nature .wrapper { opacity: 1 !important; }
 
-    
 /* ===== локальные стили страницы «Опыт» ===== */
 .tools-experience-stage {
     position: relative;
@@ -223,7 +222,6 @@
 
 <main class="wrapper" id="mainContent">
 
-    <!-- скрытый логотип, чтобы GSAP не ругался -->
     <div class="page-logo" style="display:none" aria-hidden="true">
         <span class="l1"></span><span class="l2"></span>
     </div>
@@ -451,414 +449,420 @@
     }
 
     /* ================= ШАРЫ ================= */
-function initBalls() {
-    var wrap = document.getElementById('ballsWrap');
-    var canvas = document.getElementById('ballsCanvas');
-    if (!wrap || !canvas) return;
-    if (typeof THREE === 'undefined') {
-        console.warn('[balls] THREE не загружен');
-        return;
-    }
-
-    var W = wrap.clientWidth, H = wrap.clientHeight;
-    if (!W || !H) {
-        setTimeout(initBalls, 120);
-        return;
-    }
-
-    var scene = new THREE.Scene();
-    var camera = new THREE.PerspectiveCamera(45, W / H, 0.1, 100);
-    camera.position.set(0, 0, 22);
-
-    var renderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: true, alpha: true });
-    renderer.setClearColor(0x000000, 0);
-    renderer.setSize(W, H);
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-    renderer.toneMapping = THREE.ACESFilmicToneMapping;
-    renderer.toneMappingExposure = 1.15;
-
-    /* ---------- environment map ---------- */
-    function makeEnvTexture() {
-        var c = document.createElement('canvas');
-        c.width = 512; c.height = 256;
-        var ctx = c.getContext('2d');
-        var g = ctx.createLinearGradient(0, 0, 0, 256);
-        g.addColorStop(0.0, '#ffffff');
-        g.addColorStop(0.4, '#c8c8d0');
-        g.addColorStop(0.6, '#3a3a44');
-        g.addColorStop(1.0, '#050508');
-        ctx.fillStyle = g;
-        ctx.fillRect(0, 0, 512, 256);
-        ctx.globalAlpha = 0.5;
-        ctx.fillStyle = '#ff5533'; ctx.beginPath(); ctx.arc(110, 70, 60, 0, Math.PI * 2); ctx.fill();
-        ctx.fillStyle = '#3388ff'; ctx.beginPath(); ctx.arc(400, 90, 70, 0, Math.PI * 2); ctx.fill();
-        ctx.globalAlpha = 1;
-        var tex = new THREE.CanvasTexture(c);
-        tex.mapping = THREE.EquirectangularReflectionMapping;
-        return tex;
-    }
-    var envTex = makeEnvTexture();
-    var pmrem = new THREE.PMREMGenerator(renderer);
-    pmrem.compileEquirectangularShader();
-    var envRT = pmrem.fromEquirectangular(envTex);
-    scene.environment = envRT.texture;
-    envTex.dispose();
-    pmrem.dispose();
-
-    /* ---------- свет ---------- */
-    scene.add(new THREE.AmbientLight(0xffffff, 0.6));
-    var keyLight = new THREE.DirectionalLight(0xffffff, 2.2);
-    keyLight.position.set(10, 20, 15);
-    scene.add(keyLight);
-    var fillLight = new THREE.DirectionalLight(0xffffff, 1.0);
-    fillLight.position.set(-15, 0, 10);
-    scene.add(fillLight);
-
-    /* ---------- текстуры ---------- */
-    function generateLiquidMetal() {
-        var c = document.createElement('canvas'); c.width = 1024; c.height = 1024;
-        var ctx = c.getContext('2d');
-        ctx.fillStyle = '#b0b0b0'; ctx.fillRect(0, 0, 1024, 1024);
-        ctx.globalAlpha = 0.6;
-        for (var i = 0; i < 3000; i++) {
-            ctx.fillStyle = Math.random() > 0.5 ? '#ffffff' : '#444444';
-            ctx.beginPath(); ctx.arc(Math.random() * 1024, Math.random() * 1024, Math.random() * 20 + 1, 0, Math.PI * 2); ctx.fill();
-        }
-        return new THREE.CanvasTexture(c);
-    }
-    function generateNeonCeramic() {
-        var c = document.createElement('canvas'); c.width = 1024; c.height = 1024;
-        var ctx = c.getContext('2d');
-        var colors = ['#ff00ff', '#00ffff', '#ffff00', '#ff0055', '#00ff00'];
-        ctx.fillStyle = colors[Math.floor(Math.random() * colors.length)]; ctx.fillRect(0, 0, 1024, 1024);
-        ctx.globalAlpha = 0.15; ctx.fillStyle = '#000';
-        for (var i = 0; i < 5000; i++) { ctx.beginPath(); ctx.arc(Math.random() * 1024, Math.random() * 1024, Math.random() * 10 + 2, 0, Math.PI * 2); ctx.fill(); }
-        return new THREE.CanvasTexture(c);
-    }
-    function generateGlitchObsidian() {
-        var c = document.createElement('canvas'); c.width = 1024; c.height = 1024;
-        var ctx = c.getContext('2d');
-        ctx.fillStyle = '#050505'; ctx.fillRect(0, 0, 1024, 1024);
-        ctx.globalAlpha = 0.8; ctx.strokeStyle = Math.random() > 0.5 ? '#00ffcc' : '#ff00cc';
-        for (var i = 0; i < 50; i++) { ctx.lineWidth = Math.random() * 2 + 0.5; ctx.beginPath(); ctx.moveTo(Math.random() * 1024, Math.random() * 1024); ctx.lineTo(Math.random() * 1024, Math.random() * 1024); ctx.stroke(); }
-        return new THREE.CanvasTexture(c);
-    }
-    function generateMagmaRock() {
-        var c = document.createElement('canvas'); c.width = 1024; c.height = 1024;
-        var ctx = c.getContext('2d');
-        ctx.fillStyle = '#2a0a05'; ctx.fillRect(0, 0, 1024, 1024);
-        ctx.globalAlpha = 0.55; ctx.fillStyle = '#ff5522';
-        for (var i = 0; i < 600; i++) { ctx.beginPath(); ctx.arc(Math.random() * 1024, Math.random() * 1024, Math.random() * 90 + 8, 0, Math.PI * 2); ctx.fill(); }
-        ctx.globalAlpha = 0.9; ctx.fillStyle = '#ffcc66';
-        for (var j = 0; j < 200; j++) { ctx.beginPath(); ctx.arc(Math.random() * 1024, Math.random() * 1024, Math.random() * 12 + 2, 0, Math.PI * 2); ctx.fill(); }
-        return new THREE.CanvasTexture(c);
-    }
-    function generateCyberConcrete() {
-        var c = document.createElement('canvas'); c.width = 1024; c.height = 1024;
-        var ctx = c.getContext('2d');
-        ctx.fillStyle = '#222'; ctx.fillRect(0, 0, 1024, 1024);
-        ctx.globalAlpha = 0.1; ctx.fillStyle = '#fff';
-        for (var i = 0; i < 10000; i++) { ctx.beginPath(); ctx.arc(Math.random() * 1024, Math.random() * 1024, Math.random() * 3 + 1, 0, Math.PI * 2); ctx.fill(); }
-        return new THREE.CanvasTexture(c);
-    }
-
-    var materialsDef = {
-        metal:    { gen: generateLiquidMetal,    props: { roughness: 0.08, metalness: 0.85, clearcoat: 1.0, clearcoatRoughness: 0.05 }, mass: 2.0, gravity: 0.3, torque: 0,    bounciness: 0.4 },
-        neon:     { gen: generateNeonCeramic,    props: { roughness: 0.35, metalness: 0.0,  clearcoat: 1.0 },                                   mass: 1.0, gravity: 0,   torque: 0,    bounciness: 0.6 },
-        obsidian: { gen: generateGlitchObsidian, props: { roughness: 0.06, metalness: 0.4,  clearcoat: 1.0, emissive: 0x001122, emissiveIntensity: 0.4 }, mass: 1.2, gravity: 0, torque: 0.05, bounciness: 0.5 },
-        magma:    { gen: generateMagmaRock,      props: { roughness: 0.45, metalness: 0.0,  clearcoat: 0.4, emissive: 0x441100, emissiveIntensity: 0.7 }, mass: 0.4, gravity: 0, torque: 0, bounciness: 1.0 },
-        concrete: { gen: generateCyberConcrete,  props: { roughness: 0.8,  metalness: 0.0,  clearcoat: 0.0 },                                   mass: 4.0, gravity: 0,   torque: 0,    bounciness: 0.1 }
-    };
-
-    var materialPool = {};
-    Object.keys(materialsDef).forEach(function (k) {
-        materialPool[k] = [];
-        for (var i = 0; i < 4; i++) {
-            var tex = materialsDef[k].gen();
-            tex.anisotropy = renderer.capabilities.getMaxAnisotropy();
-            var params = Object.assign({ map: tex }, materialsDef[k].props);
-            materialPool[k].push(new THREE.MeshPhysicalMaterial(params));
-        }
-    });
-
-    var materialOrder = ['magma', 'metal', 'concrete', 'obsidian', 'neon'];
-    var currentIndex = 0;
-    var currentGlobalType = materialOrder[currentIndex];
-
-    /* ---------- границы ---------- */
-    var RADIUS = 1.8;
-    var bounds = { minX: -8, maxX: 8, minY: -4, maxY: 4 };
-
-    function recomputeBounds() {
-        var vFovRad = camera.fov * Math.PI / 180;
-        var dist = camera.position.z;
-        var halfH = Math.tan(vFovRad / 2) * dist;
-        var halfW = halfH * camera.aspect;
-        bounds.minX = -halfW + RADIUS;
-        bounds.maxX =  halfW - RADIUS;
-        bounds.minY = -halfH + RADIUS;
-        bounds.maxY =  halfH - RADIUS;
-    }
-
-    /* ---------- шары ---------- */
-    var COUNT = 20;
-    var sphereGeo = new THREE.SphereGeometry(RADIUS, 64, 64);
-    var spheres = [];
-    var meshList = [];
-
-    for (var i = 0; i < COUNT; i++) {
-        var mesh = new THREE.Mesh(sphereGeo, materialPool[currentGlobalType][i % 4]);
-        mesh.position.set(
-            (Math.random() - 0.5) * 12,
-            (Math.random() - 0.5) * 7,
-            0
-        );
-        scene.add(mesh);
-        spheres.push({ mesh: mesh, velocity: new THREE.Vector3() });
-        meshList.push(mesh);
-    }
-
-    recomputeBounds();
-    spheres.forEach(function (s) {
-        s.mesh.position.x = Math.max(bounds.minX, Math.min(bounds.maxX, s.mesh.position.x));
-        s.mesh.position.y = Math.max(bounds.minY, Math.min(bounds.maxY, s.mesh.position.y));
-        s.mesh.position.z = 0;
-    });
-
-    /* ---------- взаимодействие ---------- */
-    var raycaster = new THREE.Raycaster();
-    var mouse = new THREE.Vector2();
-    var mousePlane = new THREE.Plane(new THREE.Vector3(0, 0, 1), 0);
-    var currentMousePos = new THREE.Vector3();
-    var prevMousePos = new THREE.Vector3();
-    var isFirstMove = true;
-
-    var GRAB_OMEGA2 = 0.012;
-    var GRAB_DAMP = 0.35;
-    var GRAB_MAX_SPEED = 0.8;
-    var grabbedSphere = null;
-    var grabTarget = new THREE.Vector3();
-
-    var clickCooldownTimer = null;
-    var canDblClick = true;
-    function blockDblClickFor(ms) {
-        canDblClick = false;
-        if (clickCooldownTimer) clearTimeout(clickCooldownTimer);
-        clickCooldownTimer = setTimeout(function () { canDblClick = true; }, ms);
-    }
-
-    function pointerToNDC(e) {
-        var rect = wrap.getBoundingClientRect();
-        return {
-            x: ((e.clientX - rect.left) / rect.width) * 2 - 1,
-            y: -((e.clientY - rect.top) / rect.height) * 2 + 1
-        };
-    }
-    function clampGrabTarget() {
-        grabTarget.x = Math.max(bounds.minX, Math.min(bounds.maxX, grabTarget.x));
-        grabTarget.y = Math.max(bounds.minY, Math.min(bounds.maxY, grabTarget.y));
-    }
-
-    wrap.addEventListener('pointerdown', function (e) {
-        if (e.pointerType === 'mouse' && e.button !== 0) return;
-        var ndc = pointerToNDC(e);
-        mouse.x = ndc.x; mouse.y = ndc.y;
-        raycaster.setFromCamera(mouse, camera);
-        var hits = raycaster.intersectObjects(meshList, false);
-        if (hits.length > 0) {
-            var s = spheres.find(function (sp) { return sp.mesh === hits[0].object; });
-            if (s) {
-                grabbedSphere = s;
-                raycaster.ray.intersectPlane(mousePlane, grabTarget);
-                clampGrabTarget();
-                s.mesh.scale.setScalar(1.10);
-                try { wrap.setPointerCapture(e.pointerId); } catch (_) {}
-                isFirstMove = true;
-                blockDblClickFor(400);
-            }
-        }
-    });
-
-    wrap.addEventListener('pointermove', function (e) {
-        var ndc = pointerToNDC(e);
-        mouse.x = ndc.x; mouse.y = ndc.y;
-        raycaster.setFromCamera(mouse, camera);
-
-        if (grabbedSphere) {
-            raycaster.ray.intersectPlane(mousePlane, grabTarget);
-            clampGrabTarget();
+    function initBalls() {
+        var wrap = document.getElementById('ballsWrap');
+        var canvas = document.getElementById('ballsCanvas');
+        if (!wrap || !canvas) return;
+        if (typeof THREE === 'undefined') {
+            console.warn('[balls] THREE не загружен');
             return;
         }
 
-        if (raycaster.ray.intersectPlane(mousePlane, currentMousePos)) {
-            if (isFirstMove) { prevMousePos.copy(currentMousePos); isFirstMove = false; return; }
-            var speed = currentMousePos.distanceTo(prevMousePos);
-            if (speed > 0.1) {
-                spheres.forEach(function (s) {
-                    var dx = s.mesh.position.x - currentMousePos.x;
-                    var dy = s.mesh.position.y - currentMousePos.y;
-                    var dist = Math.sqrt(dx * dx + dy * dy);
-                    if (dist < 5.0 && dist > 0.001) {
-                        var force = (5.0 - dist) * Math.min(speed, 1.0) * 0.05 / materialsDef[currentGlobalType].mass;
-                        s.velocity.x += (dx / dist) * force;
-                        s.velocity.y += (dy / dist) * force;
-                    }
-                });
+        var W = wrap.clientWidth, H = wrap.clientHeight;
+        if (!W || !H) {
+            setTimeout(initBalls, 120);
+            return;
+        }
+
+        var scene = new THREE.Scene();
+        var camera = new THREE.PerspectiveCamera(45, W / H, 0.1, 100);
+        camera.position.set(0, 0, 22);
+
+        var renderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: true, alpha: true });
+        renderer.setClearColor(0x000000, 0);
+        renderer.setSize(W, H);
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+        renderer.toneMapping = THREE.ACESFilmicToneMapping;
+        renderer.toneMappingExposure = 1.15;
+
+        /* ---------- environment map ---------- */
+        function makeEnvTexture() {
+            var c = document.createElement('canvas');
+            c.width = 512; c.height = 256;
+            var ctx = c.getContext('2d');
+            var g = ctx.createLinearGradient(0, 0, 0, 256);
+            g.addColorStop(0.0, '#ffffff');
+            g.addColorStop(0.4, '#c8c8d0');
+            g.addColorStop(0.6, '#3a3a44');
+            g.addColorStop(1.0, '#050508');
+            ctx.fillStyle = g;
+            ctx.fillRect(0, 0, 512, 256);
+            ctx.globalAlpha = 0.5;
+            ctx.fillStyle = '#ff5533'; ctx.beginPath(); ctx.arc(110, 70, 60, 0, Math.PI * 2); ctx.fill();
+            ctx.fillStyle = '#3388ff'; ctx.beginPath(); ctx.arc(400, 90, 70, 0, Math.PI * 2); ctx.fill();
+            ctx.globalAlpha = 1;
+            var tex = new THREE.CanvasTexture(c);
+            tex.mapping = THREE.EquirectangularReflectionMapping;
+            return tex;
+        }
+        var envTex = makeEnvTexture();
+        var pmrem = new THREE.PMREMGenerator(renderer);
+        pmrem.compileEquirectangularShader();
+        var envRT = pmrem.fromEquirectangular(envTex);
+        scene.environment = envRT.texture;
+        envTex.dispose();
+        pmrem.dispose();
+
+        /* ---------- свет ---------- */
+        scene.add(new THREE.AmbientLight(0xffffff, 0.6));
+        var keyLight = new THREE.DirectionalLight(0xffffff, 2.2);
+        keyLight.position.set(10, 20, 15);
+        scene.add(keyLight);
+        var fillLight = new THREE.DirectionalLight(0xffffff, 1.0);
+        fillLight.position.set(-15, 0, 10);
+        scene.add(fillLight);
+
+        /* ---------- текстуры ---------- */
+        function generateLiquidMetal() {
+            var c = document.createElement('canvas'); c.width = 1024; c.height = 1024;
+            var ctx = c.getContext('2d');
+            ctx.fillStyle = '#b0b0b0'; ctx.fillRect(0, 0, 1024, 1024);
+            ctx.globalAlpha = 0.6;
+            for (var i = 0; i < 3000; i++) {
+                ctx.fillStyle = Math.random() > 0.5 ? '#ffffff' : '#444444';
+                ctx.beginPath(); ctx.arc(Math.random() * 1024, Math.random() * 1024, Math.random() * 20 + 1, 0, Math.PI * 2); ctx.fill();
             }
-            prevMousePos.copy(currentMousePos);
+            return new THREE.CanvasTexture(c);
         }
-    });
-
-    function releaseGrab(e) {
-        if (!grabbedSphere) return;
-        grabbedSphere.mesh.scale.setScalar(1);
-        grabbedSphere = null;
-        isFirstMove = true;
-        if (e && e.pointerId !== undefined) {
-            try { wrap.releasePointerCapture(e.pointerId); } catch (_) {}
+        function generateNeonCeramic() {
+            var c = document.createElement('canvas'); c.width = 1024; c.height = 1024;
+            var ctx = c.getContext('2d');
+            var colors = ['#ff00ff', '#00ffff', '#ffff00', '#ff0055', '#00ff00'];
+            ctx.fillStyle = colors[Math.floor(Math.random() * colors.length)]; ctx.fillRect(0, 0, 1024, 1024);
+            ctx.globalAlpha = 0.15; ctx.fillStyle = '#000';
+            for (var i = 0; i < 5000; i++) { ctx.beginPath(); ctx.arc(Math.random() * 1024, Math.random() * 1024, Math.random() * 10 + 2, 0, Math.PI * 2); ctx.fill(); }
+            return new THREE.CanvasTexture(c);
         }
-    }
-    wrap.addEventListener('pointerup', releaseGrab);
-    wrap.addEventListener('pointercancel', releaseGrab);
-    window.addEventListener('pointerup', releaseGrab);
-    window.addEventListener('pointercancel', releaseGrab);
-    wrap.addEventListener('pointerleave', function () { if (!grabbedSphere) isFirstMove = true; });
+        function generateGlitchObsidian() {
+            var c = document.createElement('canvas'); c.width = 1024; c.height = 1024;
+            var ctx = c.getContext('2d');
+            ctx.fillStyle = '#050505'; ctx.fillRect(0, 0, 1024, 1024);
+            ctx.globalAlpha = 0.8; ctx.strokeStyle = Math.random() > 0.5 ? '#00ffcc' : '#ff00cc';
+            for (var i = 0; i < 50; i++) { ctx.lineWidth = Math.random() * 2 + 0.5; ctx.beginPath(); ctx.moveTo(Math.random() * 1024, Math.random() * 1024); ctx.lineTo(Math.random() * 1024, Math.random() * 1024); ctx.stroke(); }
+            return new THREE.CanvasTexture(c);
+        }
+        function generateMagmaRock() {
+            var c = document.createElement('canvas'); c.width = 1024; c.height = 1024;
+            var ctx = c.getContext('2d');
+            ctx.fillStyle = '#2a0a05'; ctx.fillRect(0, 0, 1024, 1024);
+            ctx.globalAlpha = 0.55; ctx.fillStyle = '#ff5522';
+            for (var i = 0; i < 600; i++) { ctx.beginPath(); ctx.arc(Math.random() * 1024, Math.random() * 1024, Math.random() * 90 + 8, 0, Math.PI * 2); ctx.fill(); }
+            ctx.globalAlpha = 0.9; ctx.fillStyle = '#ffcc66';
+            for (var j = 0; j < 200; j++) { ctx.beginPath(); ctx.arc(Math.random() * 1024, Math.random() * 1024, Math.random() * 12 + 2, 0, Math.PI * 2); ctx.fill(); }
+            return new THREE.CanvasTexture(c);
+        }
+        function generateCyberConcrete() {
+            var c = document.createElement('canvas'); c.width = 1024; c.height = 1024;
+            var ctx = c.getContext('2d');
+            ctx.fillStyle = '#222'; ctx.fillRect(0, 0, 1024, 1024);
+            ctx.globalAlpha = 0.1; ctx.fillStyle = '#fff';
+            for (var i = 0; i < 10000; i++) { ctx.beginPath(); ctx.arc(Math.random() * 1024, Math.random() * 1024, Math.random() * 3 + 1, 0, Math.PI * 2); ctx.fill(); }
+            return new THREE.CanvasTexture(c);
+        }
 
-    wrap.addEventListener('dblclick', function (e) {
-        if (!canDblClick || grabbedSphere) return;
-        var ndc = pointerToNDC(e);
-        mouse.x = ndc.x; mouse.y = ndc.y;
-        raycaster.setFromCamera(mouse, camera);
-        var hits = raycaster.intersectObjects(meshList, false);
-        if (hits.length > 0) return;
+        var materialsDef = {
+            metal:    { gen: generateLiquidMetal,    props: { roughness: 0.08, metalness: 0.85, clearcoat: 1.0, clearcoatRoughness: 0.05 }, mass: 2.0, gravity: 0.3, torque: 0,    bounciness: 0.4 },
+            neon:     { gen: generateNeonCeramic,    props: { roughness: 0.35, metalness: 0.0,  clearcoat: 1.0 },                                   mass: 1.0, gravity: 0,   torque: 0,    bounciness: 0.6 },
+            obsidian: { gen: generateGlitchObsidian, props: { roughness: 0.06, metalness: 0.4,  clearcoat: 1.0, emissive: 0x001122, emissiveIntensity: 0.4 }, mass: 1.2, gravity: 0, torque: 0.05, bounciness: 0.5 },
+            magma:    { gen: generateMagmaRock,      props: { roughness: 0.45, metalness: 0.0,  clearcoat: 0.4, emissive: 0x441100, emissiveIntensity: 0.7 }, mass: 0.4, gravity: 0, torque: 0, bounciness: 1.0 },
+            concrete: { gen: generateCyberConcrete,  props: { roughness: 0.8,  metalness: 0.0,  clearcoat: 0.0 },                                   mass: 4.0, gravity: 0,   torque: 0,    bounciness: 0.1 }
+        };
 
-        currentIndex = (currentIndex + 1) % materialOrder.length;
-        currentGlobalType = materialOrder[currentIndex];
-        spheres.forEach(function (s, idx) {
-            s.mesh.material = materialPool[currentGlobalType][idx % 4];
+        var materialPool = {};
+        Object.keys(materialsDef).forEach(function (k) {
+            materialPool[k] = [];
+            for (var i = 0; i < 4; i++) {
+                var tex = materialsDef[k].gen();
+                tex.anisotropy = renderer.capabilities.getMaxAnisotropy();
+                var params = Object.assign({ map: tex }, materialsDef[k].props);
+                materialPool[k].push(new THREE.MeshPhysicalMaterial(params));
+            }
         });
-    });
 
-    /* ---------- цикл ---------- */
-    var clock = new THREE.Clock();
-    var MAX_SPEED = 0.5;
+        var materialOrder = ['magma', 'metal', 'concrete', 'obsidian', 'neon'];
+        var currentIndex = 0;
+        var currentGlobalType = materialOrder[currentIndex];
 
-    function animate() {
-        requestAnimationFrame(animate);
-        var dt = Math.min(clock.getDelta(), 0.1);
-        var def = materialsDef[currentGlobalType];
+        /* ---------- границы: X/Y — экран, Z — узкий коридор ---------- */
+        var RADIUS = 1.8;
+        var Z_RANGE = 0.5;
+        var bounds = { minX: -8, maxX: 8, minY: -4, maxY: 4, minZ: -Z_RANGE, maxZ: Z_RANGE };
 
-        for (var i = 0; i < spheres.length; i++) {
-            var s = spheres[i];
-            var isGrabbed = (s === grabbedSphere);
-
-            if (isGrabbed) {
-                var dxg = grabTarget.x - s.mesh.position.x;
-                var dyg = grabTarget.y - s.mesh.position.y;
-                s.velocity.x += dxg * GRAB_OMEGA2;
-                s.velocity.y += dyg * GRAB_OMEGA2;
-                var dampFactor = 1 / (1 + GRAB_DAMP);
-                s.velocity.x *= dampFactor;
-                s.velocity.y *= dampFactor;
-                var sp = Math.sqrt(s.velocity.x * s.velocity.x + s.velocity.y * s.velocity.y);
-                if (sp > GRAB_MAX_SPEED) {
-                    var k = GRAB_MAX_SPEED / sp;
-                    s.velocity.x *= k; s.velocity.y *= k;
-                }
-            } else {
-                if (def.gravity > 0) s.velocity.y -= def.gravity * dt;
-                if (def.torque > 0) {
-                    s.mesh.rotation.z -= def.torque * dt;
-                    s.mesh.rotation.x += def.torque * 0.5 * dt;
-                }
-                var distToCenter = s.mesh.position.length();
-                if (distToCenter > 0.1) {
-                    var pull = (1.5 / def.mass) / (distToCenter + 1.0);
-                    s.velocity.x -= (s.mesh.position.x / distToCenter) * pull * dt;
-                    s.velocity.y -= (s.mesh.position.y / distToCenter) * pull * dt;
-                }
-            }
-
-            for (var j = i + 1; j < spheres.length; j++) {
-                var s2 = spheres[j];
-                var dx = s.mesh.position.x - s2.mesh.position.x;
-                var dy = s.mesh.position.y - s2.mesh.position.y;
-                var dist = Math.sqrt(dx * dx + dy * dy);
-                var minDist = RADIUS * 2;
-                if (dist < minDist && dist > 0.01) {
-                    var overlap = minDist - dist;
-                    var nx = dx / dist, ny = dy / dist;
-                    var sG = (s === grabbedSphere), s2G = (s2 === grabbedSphere);
-                    if (sG && !s2G) {
-                        s2.mesh.position.x -= nx * overlap;
-                        s2.mesh.position.y -= ny * overlap;
-                        var rel1 = (s.velocity.x - s2.velocity.x) * nx + (s.velocity.y - s2.velocity.y) * ny;
-                        if (rel1 < 0) {
-                            var imp1 = -rel1 * 0.6;
-                            s2.velocity.x -= imp1 * nx; s2.velocity.y -= imp1 * ny;
-                            s.velocity.x *= 0.7; s.velocity.y *= 0.7;
-                        }
-                    } else if (s2G && !sG) {
-                        s.mesh.position.x += nx * overlap;
-                        s.mesh.position.y += ny * overlap;
-                        var rel2 = (s2.velocity.x - s.velocity.x) * (-nx) + (s2.velocity.y - s.velocity.y) * (-ny);
-                        if (rel2 < 0) {
-                            var imp2 = -rel2 * 0.6;
-                            s.velocity.x += imp2 * nx; s.velocity.y += imp2 * ny;
-                            s2.velocity.x *= 0.7; s2.velocity.y *= 0.7;
-                        }
-                    } else {
-                        var push = overlap * 0.5;
-                        s.mesh.position.x += nx * push; s.mesh.position.y += ny * push;
-                        s2.mesh.position.x -= nx * push; s2.mesh.position.y -= ny * push;
-                        var rel3 = (s.velocity.x - s2.velocity.x) * nx + (s.velocity.y - s2.velocity.y) * ny;
-                        if (rel3 < 0) {
-                            var imp3 = rel3 * 0.6;
-                            s.velocity.x -= imp3 * nx; s.velocity.y -= imp3 * ny;
-                            s2.velocity.x += imp3 * nx; s2.velocity.y += imp3 * ny;
-                        }
-                    }
-                }
-            }
-
-            if (s.mesh.position.x < bounds.minX) { s.mesh.position.x = bounds.minX; s.velocity.x *= -def.bounciness; }
-            if (s.mesh.position.x > bounds.maxX) { s.mesh.position.x = bounds.maxX; s.velocity.x *= -def.bounciness; }
-            if (s.mesh.position.y < bounds.minY) { s.mesh.position.y = bounds.minY; s.velocity.y *= -def.bounciness; }
-            if (s.mesh.position.y > bounds.maxY) { s.mesh.position.y = bounds.maxY; s.velocity.y *= -def.bounciness; }
-
-            if (!isGrabbed) {
-                s.velocity.multiplyScalar(0.85);
-                if (s.velocity.length() > MAX_SPEED) s.velocity.normalize().multiplyScalar(MAX_SPEED);
-            }
-
-            s.mesh.position.x += s.velocity.x;
-            s.mesh.position.y += s.velocity.y;
-
-            /* жёсткая плоскость: Z всегда 0 */
-            s.mesh.position.z = 0;
-            s.velocity.z = 0;
+        function recomputeBounds() {
+            var vFovRad = camera.fov * Math.PI / 180;
+            var dist = camera.position.z;
+            var halfH = Math.tan(vFovRad / 2) * dist;
+            var halfW = halfH * camera.aspect;
+            bounds.minX = -halfW + RADIUS;
+            bounds.maxX =  halfW - RADIUS;
+            bounds.minY = -halfH + RADIUS;
+            bounds.maxY =  halfH - RADIUS;
+            bounds.minZ = -Z_RANGE;
+            bounds.maxZ =  Z_RANGE;
         }
 
-        renderer.render(scene, camera);
-    }
+        /* ---------- шары ---------- */
+        var COUNT = 20;
+        var sphereGeo = new THREE.SphereGeometry(RADIUS, 64, 64);
+        var spheres = [];
+        var meshList = [];
 
-    window.addEventListener('resize', function () {
-        var w = wrap.clientWidth, h = wrap.clientHeight;
-        if (!w || !h) return;
-        camera.aspect = w / h;
-        camera.updateProjectionMatrix();
-        renderer.setSize(w, h);
+        for (var i = 0; i < COUNT; i++) {
+            var mesh = new THREE.Mesh(sphereGeo, materialPool[currentGlobalType][i % 4]);
+            mesh.position.set(
+                (Math.random() - 0.5) * 12,
+                (Math.random() - 0.5) * 7,
+                (Math.random() - 0.5) * Z_RANGE * 2
+            );
+            scene.add(mesh);
+            spheres.push({ mesh: mesh, velocity: new THREE.Vector3() });
+            meshList.push(mesh);
+        }
+
         recomputeBounds();
         spheres.forEach(function (s) {
             s.mesh.position.x = Math.max(bounds.minX, Math.min(bounds.maxX, s.mesh.position.x));
             s.mesh.position.y = Math.max(bounds.minY, Math.min(bounds.maxY, s.mesh.position.y));
-            s.mesh.position.z = 0;
+            s.mesh.position.z = Math.max(bounds.minZ, Math.min(bounds.maxZ, s.mesh.position.z));
         });
-        if (grabbedSphere) clampGrabTarget();
-    });
 
-    animate();
-}
+        /* ---------- взаимодействие ---------- */
+        var raycaster = new THREE.Raycaster();
+        var mouse = new THREE.Vector2();
+        var mousePlane = new THREE.Plane(new THREE.Vector3(0, 0, 1), 0);
+        var currentMousePos = new THREE.Vector3();
+        var prevMousePos = new THREE.Vector3();
+        var isFirstMove = true;
+
+        var GRAB_OMEGA2 = 0.012;
+        var GRAB_DAMP = 0.35;
+        var GRAB_MAX_SPEED = 0.8;
+        var grabbedSphere = null;
+        var grabTarget = new THREE.Vector3();
+
+        var clickCooldownTimer = null;
+        var canDblClick = true;
+        function blockDblClickFor(ms) {
+            canDblClick = false;
+            if (clickCooldownTimer) clearTimeout(clickCooldownTimer);
+            clickCooldownTimer = setTimeout(function () { canDblClick = true; }, ms);
+        }
+
+        function pointerToNDC(e) {
+            var rect = wrap.getBoundingClientRect();
+            return {
+                x: ((e.clientX - rect.left) / rect.width) * 2 - 1,
+                y: -((e.clientY - rect.top) / rect.height) * 2 + 1
+            };
+        }
+        function clampGrabTarget() {
+            grabTarget.x = Math.max(bounds.minX, Math.min(bounds.maxX, grabTarget.x));
+            grabTarget.y = Math.max(bounds.minY, Math.min(bounds.maxY, grabTarget.y));
+        }
+
+        wrap.addEventListener('pointerdown', function (e) {
+            if (e.pointerType === 'mouse' && e.button !== 0) return;
+            var ndc = pointerToNDC(e);
+            mouse.x = ndc.x; mouse.y = ndc.y;
+            raycaster.setFromCamera(mouse, camera);
+            var hits = raycaster.intersectObjects(meshList, false);
+            if (hits.length > 0) {
+                var s = spheres.find(function (sp) { return sp.mesh === hits[0].object; });
+                if (s) {
+                    grabbedSphere = s;
+                    raycaster.ray.intersectPlane(mousePlane, grabTarget);
+                    clampGrabTarget();
+                    s.mesh.scale.setScalar(1.10);
+                    try { wrap.setPointerCapture(e.pointerId); } catch (_) {}
+                    isFirstMove = true;
+                    blockDblClickFor(400);
+                }
+            }
+        });
+
+        wrap.addEventListener('pointermove', function (e) {
+            var ndc = pointerToNDC(e);
+            mouse.x = ndc.x; mouse.y = ndc.y;
+            raycaster.setFromCamera(mouse, camera);
+
+            if (grabbedSphere) {
+                raycaster.ray.intersectPlane(mousePlane, grabTarget);
+                clampGrabTarget();
+                return;
+            }
+
+            if (raycaster.ray.intersectPlane(mousePlane, currentMousePos)) {
+                if (isFirstMove) { prevMousePos.copy(currentMousePos); isFirstMove = false; return; }
+                var speed = currentMousePos.distanceTo(prevMousePos);
+                if (speed > 0.1) {
+                    spheres.forEach(function (s) {
+                        var dx = s.mesh.position.x - currentMousePos.x;
+                        var dy = s.mesh.position.y - currentMousePos.y;
+                        var dist = Math.sqrt(dx * dx + dy * dy);
+                        if (dist < 5.0 && dist > 0.001) {
+                            var force = (5.0 - dist) * Math.min(speed, 1.0) * 0.05 / materialsDef[currentGlobalType].mass;
+                            s.velocity.x += (dx / dist) * force;
+                            s.velocity.y += (dy / dist) * force;
+                        }
+                    });
+                }
+                prevMousePos.copy(currentMousePos);
+            }
+        });
+
+        function releaseGrab(e) {
+            if (!grabbedSphere) return;
+            grabbedSphere.mesh.scale.setScalar(1);
+            grabbedSphere = null;
+            isFirstMove = true;
+            if (e && e.pointerId !== undefined) {
+                try { wrap.releasePointerCapture(e.pointerId); } catch (_) {}
+            }
+        }
+        wrap.addEventListener('pointerup', releaseGrab);
+        wrap.addEventListener('pointercancel', releaseGrab);
+        window.addEventListener('pointerup', releaseGrab);
+        window.addEventListener('pointercancel', releaseGrab);
+        wrap.addEventListener('pointerleave', function () { if (!grabbedSphere) isFirstMove = true; });
+
+        wrap.addEventListener('dblclick', function (e) {
+            if (!canDblClick || grabbedSphere) return;
+            var ndc = pointerToNDC(e);
+            mouse.x = ndc.x; mouse.y = ndc.y;
+            raycaster.setFromCamera(mouse, camera);
+            var hits = raycaster.intersectObjects(meshList, false);
+            if (hits.length > 0) return;
+
+            currentIndex = (currentIndex + 1) % materialOrder.length;
+            currentGlobalType = materialOrder[currentIndex];
+            spheres.forEach(function (s, idx) {
+                s.mesh.material = materialPool[currentGlobalType][idx % 4];
+            });
+        });
+
+        /* ---------- цикл ---------- */
+        var clock = new THREE.Clock();
+        var MAX_SPEED = 0.5;
+
+        function animate() {
+            requestAnimationFrame(animate);
+            var dt = Math.min(clock.getDelta(), 0.1);
+            var def = materialsDef[currentGlobalType];
+
+            for (var i = 0; i < spheres.length; i++) {
+                var s = spheres[i];
+                var isGrabbed = (s === grabbedSphere);
+
+                if (isGrabbed) {
+                    var dxg = grabTarget.x - s.mesh.position.x;
+                    var dyg = grabTarget.y - s.mesh.position.y;
+                    s.velocity.x += dxg * GRAB_OMEGA2;
+                    s.velocity.y += dyg * GRAB_OMEGA2;
+                    var dampFactor = 1 / (1 + GRAB_DAMP);
+                    s.velocity.x *= dampFactor;
+                    s.velocity.y *= dampFactor;
+                    var sp = Math.sqrt(s.velocity.x * s.velocity.x + s.velocity.y * s.velocity.y);
+                    if (sp > GRAB_MAX_SPEED) {
+                        var k = GRAB_MAX_SPEED / sp;
+                        s.velocity.x *= k; s.velocity.y *= k;
+                    }
+                } else {
+                    if (def.gravity > 0) s.velocity.y -= def.gravity * dt;
+                    if (def.torque > 0) {
+                        s.mesh.rotation.z -= def.torque * dt;
+                        s.mesh.rotation.x += def.torque * 0.5 * dt;
+                    }
+                    var distToCenter = s.mesh.position.length();
+                    if (distToCenter > 0.1) {
+                        var pull = (1.5 / def.mass) / (distToCenter + 1.0);
+                        s.velocity.x -= (s.mesh.position.x / distToCenter) * pull * dt;
+                        s.velocity.y -= (s.mesh.position.y / distToCenter) * pull * dt;
+                        s.velocity.z -= (s.mesh.position.z / distToCenter) * pull * dt;
+                    }
+                }
+
+                for (var j = i + 1; j < spheres.length; j++) {
+                    var s2 = spheres[j];
+                    var dx = s.mesh.position.x - s2.mesh.position.x;
+                    var dy = s.mesh.position.y - s2.mesh.position.y;
+                    var dz = s.mesh.position.z - s2.mesh.position.z;
+                    var dist = Math.sqrt(dx * dx + dy * dy + dz * dz);
+                    var minDist = RADIUS * 2;
+                    if (dist < minDist && dist > 0.01) {
+                        var overlap = minDist - dist;
+                        var nx = dx / dist, ny = dy / dist, nz = dz / dist;
+                        var sG = (s === grabbedSphere), s2G = (s2 === grabbedSphere);
+                        if (sG && !s2G) {
+                            s2.mesh.position.x -= nx * overlap;
+                            s2.mesh.position.y -= ny * overlap;
+                            s2.mesh.position.z -= nz * overlap;
+                            var rel1 = (s.velocity.x - s2.velocity.x) * nx + (s.velocity.y - s2.velocity.y) * ny + (s.velocity.z - s2.velocity.z) * nz;
+                            if (rel1 < 0) {
+                                var imp1 = -rel1 * 0.6;
+                                s2.velocity.x -= imp1 * nx; s2.velocity.y -= imp1 * ny; s2.velocity.z -= imp1 * nz;
+                                s.velocity.x *= 0.7; s.velocity.y *= 0.7; s.velocity.z *= 0.7;
+                            }
+                        } else if (s2G && !sG) {
+                            s.mesh.position.x += nx * overlap;
+                            s.mesh.position.y += ny * overlap;
+                            s.mesh.position.z += nz * overlap;
+                            var rel2 = (s2.velocity.x - s.velocity.x) * (-nx) + (s2.velocity.y - s.velocity.y) * (-ny) + (s2.velocity.z - s.velocity.z) * (-nz);
+                            if (rel2 < 0) {
+                                var imp2 = -rel2 * 0.6;
+                                s.velocity.x += imp2 * nx; s.velocity.y += imp2 * ny; s.velocity.z += imp2 * nz;
+                                s2.velocity.x *= 0.7; s2.velocity.y *= 0.7; s2.velocity.z *= 0.7;
+                            }
+                        } else {
+                            var push = overlap * 0.5;
+                            s.mesh.position.x += nx * push; s.mesh.position.y += ny * push; s.mesh.position.z += nz * push;
+                            s2.mesh.position.x -= nx * push; s2.mesh.position.y -= ny * push; s2.mesh.position.z -= nz * push;
+                            var rel3 = (s.velocity.x - s2.velocity.x) * nx + (s.velocity.y - s2.velocity.y) * ny + (s.velocity.z - s2.velocity.z) * nz;
+                            if (rel3 < 0) {
+                                var imp3 = rel3 * 0.6;
+                                s.velocity.x -= imp3 * nx; s.velocity.y -= imp3 * ny; s.velocity.z -= imp3 * nz;
+                                s2.velocity.x += imp3 * nx; s2.velocity.y += imp3 * ny; s2.velocity.z += imp3 * nz;
+                            }
+                        }
+                    }
+                }
+
+                if (s.mesh.position.x < bounds.minX) { s.mesh.position.x = bounds.minX; s.velocity.x *= -def.bounciness; }
+                if (s.mesh.position.x > bounds.maxX) { s.mesh.position.x = bounds.maxX; s.velocity.x *= -def.bounciness; }
+                if (s.mesh.position.y < bounds.minY) { s.mesh.position.y = bounds.minY; s.velocity.y *= -def.bounciness; }
+                if (s.mesh.position.y > bounds.maxY) { s.mesh.position.y = bounds.maxY; s.velocity.y *= -def.bounciness; }
+                if (s.mesh.position.z < bounds.minZ) { s.mesh.position.z = bounds.minZ; s.velocity.z *= -def.bounciness; }
+                if (s.mesh.position.z > bounds.maxZ) { s.mesh.position.z = bounds.maxZ; s.velocity.z *= -def.bounciness; }
+
+                if (!isGrabbed) {
+                    s.velocity.multiplyScalar(0.85);
+                    if (s.velocity.length() > MAX_SPEED) s.velocity.normalize().multiplyScalar(MAX_SPEED);
+                }
+
+                s.mesh.position.x += s.velocity.x;
+                s.mesh.position.y += s.velocity.y;
+                s.mesh.position.z += s.velocity.z;
+            }
+
+            renderer.render(scene, camera);
+        }
+
+        window.addEventListener('resize', function () {
+            var w = wrap.clientWidth, h = wrap.clientHeight;
+            if (!w || !h) return;
+            camera.aspect = w / h;
+            camera.updateProjectionMatrix();
+            renderer.setSize(w, h);
+            recomputeBounds();
+            spheres.forEach(function (s) {
+                s.mesh.position.x = Math.max(bounds.minX, Math.min(bounds.maxX, s.mesh.position.x));
+                s.mesh.position.y = Math.max(bounds.minY, Math.min(bounds.maxY, s.mesh.position.y));
+                s.mesh.position.z = Math.max(bounds.minZ, Math.min(bounds.maxZ, s.mesh.position.z));
+            });
+            if (grabbedSphere) clampGrabTarget();
+        });
+
+        animate();
+    }
 
     /* ================= СТАРТ ================= */
     function boot() {
