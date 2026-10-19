@@ -2087,8 +2087,8 @@ function initToolsBalls() {
         }
     });
 
-    const materialOrder = ['metal', 'concrete', 'obsidian', 'neon', 'magma'];
-    let currentIndex = 0;
+       const materialOrder = ['metal', 'concrete', 'obsidian', 'neon', 'magma'];
+    let currentIndex = 3;                          // ← 3 = neon (оранжево-неоновый)
     let currentGlobalType = materialOrder[currentIndex];
 
     const RADIUS = 1.8;
