@@ -14,7 +14,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Space+Mono:ital,wght@0,400;0,700;1,400&family=PT+Mono&display=swap" rel="stylesheet">
 
 <link rel="stylesheet" href="style.css">
-<title>Инструменты. Опыт — Грамотиньо</title>
+<title>Грамотиньо. Природоведение</title>
 
 <style>
 .page-nature .wrapper { opacity: 1 !important; }
@@ -260,19 +260,17 @@
 
     /* ================= ДАННЫЕ ================= */
     var EXPERIENCES = [
-        { url: 'https://htwins.net/scale2/', title: 'Scale of the Universe 2', desc: 'Масштабы Вселенной — от планковской длины до галактик.' },
-        { url: 'https://stars.chromeexperiments.com/', title: '100 000 Stars', desc: 'Трёхмерная карта звёзд в окрестностях Солнца.' },
-        { url: 'https://neal.fun/size-of-space/', title: 'Size of Space', desc: 'Сравнение размеров космических объектов.' },
-        { url: 'https://neal.fun/deep-sea/', title: 'The Deep Sea', desc: 'Погружение в океан: кто живёт на каждой глубине.' },
-        { url: 'https://www.oldmapsonline.org/en/Asia', title: 'Old Maps Online', desc: 'Исторические карты мира по годам.' },
-        { url: 'https://www.chronas.org/', title: 'Chronas', desc: 'История на карте: эпохи, границы, события.' },
-        { url: 'https://mol.org/', title: 'Map of Life', desc: 'Где на Земле живут те или иные виды.' },
-        { url: 'https://ptable.com', title: 'Periodic Table', desc: 'Интерактивная таблица Менделеева со свойствами элементов.' },
-        { url: 'https://neal.fun/wonders-of-street-view/', title: 'Wonders of Street View', desc: 'Необычные места, найденные на панорамах Google.' },
-        { url: 'https://experiments.withgoogle.com/collection/chrome', title: 'Chrome Experiments', desc: 'Коллекция экспериментов на браузерных технологиях.' },
-        { url: 'https://neal.fun/perfect-circle/', title: 'Perfect Circle', desc: 'Нарисуйте идеальный круг от руки.' },
-        { url: 'https://optical.toys/', title: 'Optical Toys', desc: 'Оптические иллюзии и обманы зрения.' },
-        { url: 'https://quickdraw.withgoogle.com/?locale=ru', title: 'Quick, Draw!', desc: 'Нейросеть угадывает рисунок за 20 секунд.' }
+        { url: 'https://htwins.net/scale2/', title: 'Масштабы вселенной', desc: 'От "планковской длины" до галактик.' },
+        { url: 'https://stars.chromeexperiments.com/', title: 'Звёздная карта', desc: 'Трёхмерная карта звёзд.' },
+        { url: 'https://neal.fun/size-of-space/', title: 'Размеры в космосе', desc: 'Сравнение размеров космических объектов.' },
+        { url: 'https://neal.fun/deep-sea/', title: 'Глубокое море', desc: 'Погружение в океан.' },
+        { url: 'https://mol.org/', title: 'Карта жизни', desc: 'Где на Земле живут те или иные виды.' },
+        { url: 'https://ptable.com', title: 'Таблица Менделеева', desc: 'Интерактивная таблица периодической системы химических элементов.' },
+        { url: 'https://neal.fun/wonders-of-street-view/', title: 'Необчные места', desc: 'Места на панорамах гугл.' },
+        { url: 'https://experiments.withgoogle.com/collection/chrome', title: 'Эксперименты хрома', desc: 'Коллекция экспериментов на браузерных технологиях.' },
+        { url: 'https://neal.fun/perfect-circle/', title: 'Рисуй круг', desc: 'Нарисуйте идеальный круг от руки.' },
+        { url: 'https://optical.toys/', title: 'Иллюзии', desc: 'Оптические иллюзии и обманы зрения.' },
+        { url: 'https://quickdraw.withgoogle.com/?locale=ru', title: 'Рисуй нейросети', desc: 'Нарисуйте картинку нейросети.' }
     ];
 
     var LECTURES = [
@@ -589,17 +587,21 @@
         var bounds = { minX: -8, maxX: 8, minY: -4, maxY: 4, minZ: -Z_RANGE, maxZ: Z_RANGE };
 
         function recomputeBounds() {
-            var vFovRad = camera.fov * Math.PI / 180;
-            var dist = camera.position.z;
-            var halfH = Math.tan(vFovRad / 2) * dist;
-            var halfW = halfH * camera.aspect;
-            bounds.minX = -halfW + RADIUS;
-            bounds.maxX =  halfW - RADIUS;
-            bounds.minY = -halfH + RADIUS;
-            bounds.maxY =  halfH - RADIUS;
-            bounds.minZ = -Z_RANGE;
-            bounds.maxZ =  Z_RANGE;
-        }
+    var vFovRad = camera.fov * Math.PI / 180;
+    var dist = camera.position.z;
+    var halfH = Math.tan(vFovRad / 2) * dist;
+    var halfW = halfH * camera.aspect;
+
+    /* запас по краям: радиус + небольшой отступ */
+    var PAD = RADIUS + 0.35;
+
+    bounds.minX = -halfW + PAD;
+    bounds.maxX =  halfW - PAD;
+    bounds.minY = -halfH + PAD;
+    bounds.maxY =  halfH - PAD;
+    bounds.minZ = -Z_RANGE;
+    bounds.maxZ =  Z_RANGE;
+}
 
         /* ---------- шары ---------- */
         var COUNT = 20;
