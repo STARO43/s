@@ -3375,51 +3375,6 @@ html[data-theme="dark"] .history-check svg { stroke: #E0E0E0; }
     }
 }
 
-.tools-tabs {
-    position: relative;
-    z-index: 20;
-    max-width: 1400px;
-    margin: 0 auto;
-    padding: 0 5vw;
-    display: flex;
-    gap: 0;
-    border-bottom: 2px solid var(--text);
-    overflow-x: auto;
-    scrollbar-width: none;
-}
-.tools-tabs::-webkit-scrollbar { display: none; }
-
-.tools-tab {
-    position: relative;
-    font-family: var(--font-display);
-    font-size: clamp(0.78rem, 1.5vw, 1rem);
-    font-weight: 700;
-    letter-spacing: 0.05em;
-    text-transform: uppercase;
-    color: var(--muted);
-    background: transparent;
-    border: none;
-    border-right: 1px solid var(--paper-line);
-    padding: 1rem 1.4rem;
-    cursor: pointer;
-    white-space: nowrap;
-    -webkit-tap-highlight-color: transparent;
-    transition: color 0.25s ease, background 0.25s ease;
-    pointer-events: auto;
-}
-.tools-tab:first-child { border-left: 1px solid var(--paper-line); }
-.tools-tab:hover { color: var(--text); }
-.tools-tab.active {
-    color: var(--red);
-    background: rgba(217, 4, 41, 0.04);
-}
-.tools-tab.active::after {
-    content: '';
-    position: absolute;
-    left: 0; right: 0; bottom: -2px;
-    height: 3px;
-    background: var(--red);
-}
 
 .tools-panels {
     position: relative;
@@ -3710,8 +3665,7 @@ html[data-theme="dark"] .history-check svg { stroke: #E0E0E0; }
 .lecture-item:hover .lecture-arrow { opacity: 1; transform: translateX(0); }
 
 @media (max-width: 720px) {
-    .tools-tabs { margin-top: 0; }
-    .tools-tab { padding: 0.8rem 1rem; font-size: 0.72rem; }
+
     .tools-panel { padding: 1.6rem 0 1.4rem; }
 
     .link-item { grid-template-columns: 52px 1fr 32px; gap: 14px; padding: 24px 6px; }
@@ -3735,4 +3689,180 @@ html[data-theme="dark"] .history-check svg { stroke: #E0E0E0; }
     .lecture-label { font-size: 0.48rem; letter-spacing: 0.18em; gap: 8px; }
     .lecture-title { font-size: 1rem; }
     .lecture-arrow { font-size: 1.2rem; }
+}
+/* ============================================================
+   TOOLS · КНОПКА-ПЕРЕКЛЮЧАТЕЛЬ + РАСКРЫТИЕ + ГЛИТЧ
+   ============================================================ */
+
+.tools-switch-wrap {
+    position: relative;
+    z-index: 20;
+    max-width: 1400px;
+    margin: 0 auto 2.2rem;
+    padding: 0 5vw;
+    display: flex;
+    justify-content: center;
+}
+
+.tools-switch {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    gap: 1.2rem;
+    padding: 1.5rem 3rem;
+    background: transparent;
+    border: 2px solid var(--text);
+    color: var(--text);
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: clamp(1rem, 2.1vw, 1.35rem);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    cursor: pointer;
+    overflow: hidden;
+    isolation: isolate;
+    transition: color .35s ease, border-color .35s ease, transform .3s cubic-bezier(.16,1,.3,1);
+    -webkit-tap-highlight-color: transparent;
+}
+.tools-switch::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: var(--red);
+    transform: translateY(101%);
+    transition: transform .5s cubic-bezier(.16,1,.3,1);
+    z-index: -1;
+}
+.tools-switch:hover {
+    color: var(--bg);
+    border-color: var(--red);
+}
+.tools-switch:hover::before { transform: translateY(0); }
+.tools-switch:active { transform: scale(.97); }
+
+.tools-switch-index {
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    letter-spacing: 0.22em;
+    color: var(--red);
+    transition: color .3s ease;
+    font-variant-numeric: tabular-nums;
+}
+.tools-switch:hover .tools-switch-index { color: var(--bg); }
+
+.tools-switch-label { white-space: nowrap; }
+
+.tools-switch-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 22px;
+    height: 22px;
+    transition: transform .4s cubic-bezier(.16,1,.3,1);
+}
+.tools-switch-icon svg {
+    width: 100%;
+    height: 100%;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+.tools-switch:hover .tools-switch-icon { transform: translateY(3px); }
+
+@media (max-width: 640px) {
+    .tools-switch { padding: 1.1rem 1.8rem; gap: .8rem; font-size: 0.9rem; }
+    .tools-switch-index { font-size: 0.6rem; }
+}
+
+/* Раскрытие панелей */
+.tools-panels-wrap {
+    display: grid;
+    grid-template-rows: 0fr;
+    transition: grid-template-rows .85s cubic-bezier(.16,1,.3,1);
+    overflow: hidden;
+}
+.tools-panels-wrap.open {
+    grid-template-rows: 1fr;
+}
+.tools-panels-wrap > .tools-panels {
+    min-height: 0;
+}
+
+/* Глитч при смене панели */
+.tools-panels { position: relative; }
+.tools-panels.glitching::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background:
+        repeating-linear-gradient(0deg, rgba(217,4,41,.5) 0 2px, transparent 2px 4px),
+        repeating-linear-gradient(90deg, rgba(0,229,255,.18) 0 3px, transparent 3px 8px);
+    mix-blend-mode: screen;
+    pointer-events: none;
+    z-index: 5;
+    animation: toolsGlitchFlash .42s steps(10) forwards;
+}
+@keyframes toolsGlitchFlash {
+    0%   { opacity: 0; transform: translateX(0); }
+    15%  { opacity: 1; transform: translateX(-7px); }
+    32%  { transform: translateX(5px); }
+    50%  { transform: translateX(-3px); }
+    68%  { transform: translateX(2px); }
+    85%  { opacity: 1; }
+    100% { opacity: 0; transform: translateX(0); }
+}
+
+/* Заголовок панели */
+.tools-panel-title {
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: clamp(1.6rem, 4vw, 2.6rem);
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--text);
+    margin: 0 0 1.4rem;
+    padding-bottom: 0.6rem;
+    border-bottom: 2px solid var(--red);
+}
+
+/* VK-заглушка в карточках лекций */
+.media-thumb .thumb-placeholder {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, #1a1a1a 0%, #2b2b2b 100%);
+    color: rgba(255,255,255,0.55);
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: clamp(1.2rem, 3vw, 2rem);
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+}
+
+/* Шапка часов: кнопка слева, цифры справа */
+.clock-top-row {
+    width: 100%;
+    max-width: 620px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    margin: 0 auto 0.8rem;
+    padding: 0 0.4rem;
+}
+.clock-top-row .clock-switch {
+    position: relative;
+    top: auto;
+    right: auto;
+    margin: 0;
+    opacity: 1;
+    flex-shrink: 0;
+}
+.clock-top-row .clock-digital {
+    margin: 0;
+    flex-shrink: 0;
 }
