@@ -12,9 +12,9 @@ const SPEED_MULT = IS_MOBILE ? 0.65 : 1;
 const $  = (sel, root = document) => root.querySelector(sel);
 const $$ = (sel, root = document) => Array.from(root.querySelectorAll(sel));
 
-
+ 
 const GRAMOTINO_UPDATES = [
-
+   
     { date: '27 · 09 · 2026', title: 'РАЗДЕЛ ПЕДАГОГИКИ',   text: 'Статьи и лекции' },
     { date: '28 · 09 · 2026', title: 'РАЗДЕЛ ИСТОРИИ',   text: 'Видео лекций' }
 ];
@@ -145,6 +145,7 @@ function playEntryAnimation(onDone) {
 let _menuBound = false;
 
 function openMenu() {
+    // Если открыт ридер статьи — закрываем его и сбрасываем hash
     if (typeof window.__gramotinoCloseArticle === 'function') {
         window.__gramotinoCloseArticle();
     }
@@ -693,6 +694,8 @@ function initReading() {
             progressTimer = setTimeout(() => progressContainer.classList.remove('show'), 2200);
         }
 
+        /* ---------- Новый рендер «Столкновение» ---------- */
+
         function makeSyllableWord(syllable, idx) {
             const w = document.createElement('span');
             w.className = 'syl-w';
@@ -723,53 +726,55 @@ function initReading() {
         }
 
         function renderGrid() {
-            const scrollY = window.scrollY;
-            const items = currentMode === 'random' ? randomItems : syllables;
+    const scrollY = window.scrollY;
+    const items = currentMode === 'random' ? randomItems : syllables;
 
-            grid.innerHTML = '';
-            grid.classList.add('collision-mode');
-            grid.classList.toggle('is-random', currentMode === 'random');
+    grid.innerHTML = '';
+    grid.classList.add('collision-mode');
+    grid.classList.toggle('is-random', currentMode === 'random');
 
-            const words = items.map((s, i) => makeSyllableWord(s, i));
+    const words = items.map((s, i) => makeSyllableWord(s, i));
 
-            const meas = document.createElement('div');
-            meas.className = 'syl-row';
-            meas.style.cssText = 'position:absolute;visibility:hidden;pointer-events:none;width:auto;white-space:nowrap;';
-            grid.appendChild(meas);
-            words.forEach((w) => meas.appendChild(w));
-            const widths = words.map((w) => w.getBoundingClientRect().width);
-            meas.remove();
+    const meas = document.createElement('div');
+    meas.className = 'syl-row';
+    meas.style.cssText = 'position:absolute;visibility:hidden;pointer-events:none;width:auto;white-space:nowrap;';
+    grid.appendChild(meas);
+    words.forEach((w) => meas.appendChild(w));
+    const widths = words.map((w) => w.getBoundingClientRect().width);
+    meas.remove();
 
-            const containerW = grid.clientWidth || window.innerWidth;
-            const MAX_ROW_W  = containerW * 0.98;
+    const containerW = grid.clientWidth || window.innerWidth;
+    const MAX_ROW_W  = containerW * 0.98;
 
-            const rows = [];
-            let row = [];
-            let rowW = 0;
+    const rows = [];
+    let row = [];
+    let rowW = 0;
 
-            widths.forEach((w, i) => {
-                if (rowW + w > MAX_ROW_W && row.length > 0) {
-                    rows.push(row);
-                    row = [];
-                    rowW = 0;
-                }
-                row.push(words[i]);
-                rowW += w;
-            });
-            if (row.length) rows.push(row);
-
-            rows.forEach((r) => {
-                const rowEl = document.createElement('div');
-                rowEl.className = 'syl-row';
-                r.forEach((w) => rowEl.appendChild(w));
-                grid.appendChild(rowEl);
-            });
-
-            refreshProgressData();
-            scheduleFit();
-
-            window.scrollTo(0, scrollY);
+    widths.forEach((w, i) => {
+        if (rowW + w > MAX_ROW_W && row.length > 0) {
+            rows.push(row);
+            row = [];
+            rowW = 0;
         }
+        row.push(words[i]);
+        rowW += w;
+    });
+    if (row.length) rows.push(row);
+
+    rows.forEach((r) => {
+        const rowEl = document.createElement('div');
+        rowEl.className = 'syl-row';
+        r.forEach((w) => rowEl.appendChild(w));
+        grid.appendChild(rowEl);
+    });
+
+    refreshProgressData();
+    scheduleFit();
+
+    window.scrollTo(0, scrollY);
+}
+
+        /* ---------- Автоподгон кегля по ширине ряда ---------- */
 
         function fitRow(row) {
             const words = row.querySelectorAll('.syl-w');
@@ -879,6 +884,9 @@ function initReading() {
             });
         }
 
+        /* ====================================================
+           QUIZ / DICT — дизайн-оверлеи
+           ==================================================== */
         const qdOverlay = document.getElementById('qdOverlay');
         const qdClose   = document.getElementById('qdClose');
         const qdBody    = document.getElementById('qdBody');
@@ -926,6 +934,7 @@ function initReading() {
             if (qdCounter) qdCounter.innerHTML = `ВОПРОС <b>${Math.min(cur+1,total)}</b> ИЗ <b>${total}</b>`;
         }
 
+        /* ---------- QUIZ ---------- */
         function startQuizQD(){
             examQuestions = syllables.slice().sort(() => Math.random() - 0.5).slice(0, 10);
             examIndex = 0;
@@ -1002,6 +1011,7 @@ function initReading() {
             });
         }
 
+        /* ---------- DICT ---------- */
         const ALPHA_LAYOUT = ['А','Б','В','Г','Д','Е','Ё','Ж','З','И','Й','К','Л','М','Н','О','П','Р','С','Т','У','Ф','Х','Ц','Ч','Ш','Щ','Ъ','Ы','Ь','Э','Ю','Я'];
         const QWERTY_ROW1 = ['Й','Ц','У','К','Е','Н','Г','Ш','Щ','З','Х','Ъ'];
         const QWERTY_ROW2 = ['Ф','Ы','В','А','П','Р','О','Л','Д','Ж','Э'];
@@ -1159,6 +1169,7 @@ function initReading() {
             a.play().catch(() => {});
         }
 
+        /* ---------- Общая кнопка «ДАЛЕЕ» ---------- */
         function showNextButton(onClick){
             const inner = qdBody.querySelector('.qd-inner');
             if (!inner) return;
@@ -1179,6 +1190,7 @@ function initReading() {
             setTimeout(() => btn.scrollIntoView({ behavior:'smooth', block:'nearest' }), 40);
         }
 
+        /* ---------- Результат ---------- */
         function showQDResult(score, total){
             if (!qdBody) return;
             qdBody.innerHTML = '';
@@ -1198,6 +1210,9 @@ function initReading() {
             qdBody.appendChild(inner);
         }
 
+        /* ====================================================
+           СТАРЫЙ ТЕРМИНАЛ — только как пасхалка (двойной клик)
+           ==================================================== */
         function openTerm() {
             if (!termOverlay) return;
             termOverlay.classList.add('show');
@@ -1548,8 +1563,14 @@ function initReading() {
             termScroll();
         }
 
+        /* ====================================================
+           ПАСХАЛКА: двойной клик по ПОДПИСЯМ "ВИКТОРИНА" и "ДИКТАНТ"
+           ==================================================== */
+
         if (examBtn)      examBtn.addEventListener('click', () => openQD('quiz'));
         if (dictationBtn) dictationBtn.addEventListener('click', () => openQD('dict'));
+
+      
 
         function bindCaptionDoubleTap(captionEl, mode){
             if (!captionEl) return;
@@ -1933,1307 +1954,23 @@ function initTools() {
             window.initToolsClock();
         }
 
-        initToolsSwitch();
-        initToolsLectures();
-        initToolsBalls();
-    });
-}
+              /* ============================================================
+           SPACE-SWITCH — кнопка «Орбиты»
+           desktop → spacewatch.html
+           mobile  → spacewatch2.html
+           ============================================================ */
+        const spaceSwitch = document.getElementById('spaceSwitch');
+        if (spaceSwitch) {
+            const IS_MOBILE_SPACE = window.matchMedia('(max-width: 768px)').matches;
+            const SPACE_URL = IS_MOBILE_SPACE
+                ? 'https://gramotinho.kick.sh/spacewatch2.html'
+                : 'https://gramotinho.kick.sh/spacewatch.html';
 
-
-/* ============================================================
-   TOOLS · ТЕКСТОВЫЙ СКРАМБЛ (для кнопки-переключателя)
-   ============================================================ */
-function scrambleText(el, newText, duration = 380) {
-    if (!el) return;
-    const old = el.textContent;
-    const len = Math.max(old.length, newText.length);
-    const pool = 'АБВГДЕЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯ0123456789#@$%&*+=';
-    const start = performance.now();
-    function frame(now) {
-        const p = Math.min(1, (now - start) / duration);
-        const reveal = Math.floor(p * newText.length);
-        let out = '';
-        for (let i = 0; i < len; i++) {
-            if (i < reveal) out += newText[i] || '';
-            else if (i < newText.length) out += pool[Math.floor(Math.random() * pool.length)];
-            else if (i < old.length) out += pool[Math.floor(Math.random() * pool.length)];
-        }
-        el.textContent = out;
-        if (p < 1) requestAnimationFrame(frame);
-        else el.textContent = newText;
-    }
-    requestAnimationFrame(frame);
-}
-
-/* ============================================================
-   TOOLS · THREE.JS GLITCH OVERLAY
-   ============================================================ */
-function createGlitchOverlay(container) {
-    const canvas = document.createElement('canvas');
-    canvas.className = 'glitch-overlay';
-    container.appendChild(canvas);
-
-    const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: false });
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
-    renderer.setClearColor(0x000000, 0);
-
-    const scene  = new THREE.Scene();
-    const camera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1);
-
-    const uniforms = {
-        uResolution: { value: new THREE.Vector2(1, 1) },
-        uTime:       { value: 0 },
-        uIntensity:  { value: 0 }
-    };
-
-    const material = new THREE.ShaderMaterial({
-        uniforms,
-        transparent: true,
-        depthTest: false,
-        depthWrite: false,
-        vertexShader: `
-            void main() {
-                gl_Position = vec4(position.xy, 0.0, 1.0);
-            }
-        `,
-        fragmentShader: `
-            precision highp float;
-            uniform vec2  uResolution;
-            uniform float uTime;
-            uniform float uIntensity;
-
-            float hash21(vec2 p) {
-                p = fract(p * vec2(233.34, 851.73));
-                p += dot(p, p + 23.45);
-                return fract(p.x * p.y);
-            }
-
-            void main() {
-                vec2  uv = gl_FragCoord.xy / uResolution;
-                float t  = uTime;
-                float I  = uIntensity;
-
-                vec3 col = vec3(0.0);
-
-                /* 1. VHS-подобный сдвиг строк */
-                float yBand      = floor(uv.y * 70.0);
-                float bandRand   = hash21(vec2(yBand, floor(t * 22.0)));
-                float bandActive = step(0.55, bandRand);
-                float bandOffset = (hash21(vec2(yBand, floor(t * 11.0))) - 0.5) * 0.10;
-
-                /* 2. RGB-полосы */
-                float redStripe  = step(0.62, hash21(vec2(floor(uv.y * 90.0),        floor(t * 55.0))));
-                float cyanStripe = step(0.62, hash21(vec2(floor(uv.y * 90.0) + 11.0, floor(t * 60.0))));
-                col.r += redStripe  * I * 0.55;
-                col.g += cyanStripe * I * 0.42;
-                col.b += cyanStripe * I * 0.42;
-
-                /* 3. Горизонтальный «разрыв» */
-                float tearY    = hash21(vec2(floor(t * 7.0), 7.0));
-                float tearDist = abs(uv.y - tearY);
-                float tear     = smoothstep(0.006, 0.0, tearDist);
-                col += tear * vec3(1.0, 0.12, 0.18) * I * 1.35;
-
-                /* 4. Скан-линии */
-                float scan = step(0.0, sin(uv.y * uResolution.y * 1.4 + t * 42.0));
-                col *= 0.55 + scan * 0.45;
-
-                /* 5. Блочный шум (цифровые артефакты) */
-                vec2  blockUV   = floor(uv * vec2(28.0, 76.0)) / vec2(28.0, 76.0);
-                float blockRand = hash21(blockUV + floor(t * 28.0));
-                if (blockRand > 0.965) {
-                    col += step(0.5, hash21(blockUV * 3.0)) * vec3(1.0, 0.92, 0.86) * I * 0.45;
-                }
-
-                /* 6. Зерно */
-                float grain = hash21(uv * uResolution + floor(t * 55.0));
-                col += step(0.985, grain) * I * 0.55;
-
-                /* 7. Виньетка по краям */
-                vec2  c   = uv - 0.5;
-                float vig = 1.0 - smoothstep(0.35, 0.72, length(c));
-                col *= vig;
-
-                /* 8. Дополнительная дизеризация по bandOffset — сдвигаем
-                      яркую часть строк, чтобы читалось как «сломанное видео» */
-                float shifted = smoothstep(0.5, 0.0, abs(fract(uv.x + bandOffset * bandActive) - 0.5));
-                col += shifted * bandActive * vec3(1.0, 0.5, 0.4) * I * 0.18;
-
-                float a = clamp(max(max(col.r, col.g), col.b), 0.0, 1.0);
-                gl_FragColor = vec4(col, a);
-            }
-        `
-    });
-
-    const geo  = new THREE.PlaneBufferGeometry(2, 2);
-    const mesh = new THREE.Mesh(geo, material);
-    scene.add(mesh);
-
-    function resize() {
-        const r = container.getBoundingClientRect();
-        const w = Math.max(1, r.width);
-        const h = Math.max(1, r.height);
-        renderer.setSize(w, h, false);
-        const pr = renderer.getPixelRatio();
-        uniforms.uResolution.value.set(w * pr, h * pr);
-    }
-    resize();
-    window.addEventListener('resize', resize);
-
-    let rafId = null;
-
-    function burst(duration = 720) {
-        const start = performance.now();
-        canvas.style.opacity = '1';
-
-        function frame(now) {
-            const p = (now - start) / duration;
-            if (p >= 1) {
-                uniforms.uIntensity.value = 0;
-                canvas.style.opacity = '0';
-                renderer.render(scene, camera);
-                rafId = null;
-                return;
-            }
-            uniforms.uTime.value = (now - start) * 0.001;
-
-            // конверт: быстрый подъём, плавное затухание
-            const env = p < 0.14
-                ? p / 0.14
-                : 1 - (p - 0.14) / 0.86;
-            uniforms.uIntensity.value = env;
-
-            renderer.render(scene, camera);
-            rafId = requestAnimationFrame(frame);
-        }
-        if (rafId) cancelAnimationFrame(rafId);
-        rafId = requestAnimationFrame(frame);
-    }
-
-    return { burst, resize };
-}
-
-/* ============================================================
-   TOOLS · ПЕРЕКЛЮЧАТЕЛЬ РАЗДЕЛОВ (слайдер + глитч)
-   ============================================================ */
-function initToolsSwitch() {
-    const clip   = document.getElementById('toolsClip');
-    const track  = document.getElementById('toolsTrack');
-    const btn    = document.getElementById('toolsSwitch');
-    const label  = document.getElementById('toolsSwitchLabel');
-    const indexEl = document.getElementById('toolsSwitchIndex');
-    if (!clip || !track || !btn) return;
-
-    const SLIDES  = Array.from(track.querySelectorAll('.tools-slide'));
-    const ORDER   = ['interesting', 'lectures', 'time'];
-    const LABELS  = { interesting: 'ИНТЕРЕСНО-ПОЛЕЗНОЕ', lectures: 'ЛЕКЦИИ', time: 'ЧАСЫ' };
-    const pad2    = (n) => String(n).padStart(2, '0');
-
-    const glitch  = createGlitchOverlay(clip);
-
-    let current = -1;      // -1 = закрыто
-    let busy    = false;
-
-    clip.style.height = '0';
-    clip.style.overflow = 'hidden';
-
-    const slideHeight = (el) => el ? el.offsetHeight : 0;
-
-    function openFirst() {
-        busy = true;
-        current = 0;
-        const h = slideHeight(SLIDES[0]);
-
-        gsap.to(clip, {
-            height: h,
-            duration: 0.85,
-            ease: 'expo.out',
-            onComplete: () => { busy = false; }
-        });
-
-        indexEl.textContent = pad2(1);
-        scrambleText(label, LABELS[ORDER[0]], 420);
-        glitch.burst(520);
-    }
-
-    function slideTo(nextIdx) {
-        if (busy) return;
-        busy = true;
-
-        const curSlide = SLIDES[current];
-        const newSlide = SLIDES[nextIdx];
-        const newH     = slideHeight(newSlide);
-        const clipW    = clip.offsetWidth;
-
-        // глитч запускаем сразу — он маскирует полёт
-        glitch.burst(720);
-
-        // трек едет: текущий уходит влево, следующий прилетает справа
-        gsap.to(track, {
-            x: -nextIdx * clipW,
-            duration: 0.8,
-            ease: 'expo.inOut'
-        });
-        gsap.to(clip, {
-            height: newH,
-            duration: 0.8,
-            ease: 'expo.inOut',
-            onComplete: () => {
-                current = nextIdx;
-                busy = false;
-            }
-        });
-
-        // метка и номер — скрамблятся
-        indexEl.textContent = pad2(nextIdx + 1);
-        scrambleText(label, LABELS[ORDER[nextIdx]], 420);
-    }
-
-    btn.addEventListener('click', () => {
-        if (busy) return;
-        if (current === -1) {
-            openFirst();
-        } else {
-            const next = (current + 1) % ORDER.length;
-            slideTo(next);
+            spaceSwitch.addEventListener('click', () => {
+                window.open(SPACE_URL, '_blank', 'noopener,noreferrer');
+            });
         }
     });
-
-    // первичный замер после шрифтов
-    window.addEventListener('load', () => {
-        if (current >= 0) glitch.resize();
-    });
-
-    // hash-совместимость
-    const hash = (window.location.hash || '').replace('#', '');
-    if (hash && ORDER.includes(hash)) {
-        // пока просто открываем — переход в конкретный слайд после загрузки
-        requestAnimationFrame(() => {
-            openFirst();
-            const idx = ORDER.indexOf(hash);
-            if (idx > 0) setTimeout(() => slideTo(idx), 900);
-        });
-    }
-}
-
-/* ============================================================
-   TOOLS · ЛЕКЦИИ
-   ============================================================ */
-function initToolsLectures() {
-    const grid  = document.getElementById('lecturesGrid');
-    const modal = document.getElementById('mediaPlayerModal');
-    const frame = document.getElementById('mediaPlayerFrame');
-    const close = document.getElementById('mediaPlayerClose');
-    if (!grid || !modal || !frame) return;
-
-    // ЕСЛИ У ТЕБЯ ЕСТЬ РЕАЛЬНЫЕ НАЗВАНИЯ ЛЕКЦИЙ — ВПИШИ ИХ В title.
-    // Пока по факту известно только «Мифы о расах» — остальные в исходнике
-    // шли как «Лекция 01/02/…», я это сохранил.
-    const LECTURES = [
-        { platform: 'rutube', id: 'a414d1a2e392f4b9e2a034df42ba6bbd', title: 'Мифы о расах', subject: 'ФИЗИКА' },
-        { platform: 'vk', owner: '225170958', video: '456240634', title: 'Лекция 02', subject: 'ФИЗИКА' },
-        { platform: 'rutube', id: '3ed02305d905e526f0cb1eb522154e7d', title: 'Лекция 03', subject: 'ФИЗИКА' },
-        { platform: 'rutube', id: '1c6606e712a573817bf7d5998378b326', title: 'Лекция 04', subject: 'ФИЗИКА' },
-        { platform: 'rutube', id: '64963a9db321049bb8375a62c4dc8fbc', title: 'Лекция 05', subject: 'ФИЗИКА' },
-        { platform: 'vk', owner: '218914525', video: '456239626', title: 'Лекция 06', subject: 'ФИЗИКА' },
-        { platform: 'vk', owner: '218914525', video: '456239374', title: 'Лекция 07', subject: 'ФИЗИКА' },
-
-        { platform: 'vk', owner: '218914525', video: '456239692', title: 'Лекция 01', subject: 'ХИМИЯ' },
-        { platform: 'vk', owner: '218914525', video: '456239791', title: 'Лекция 02', subject: 'ХИМИЯ' },
-        { platform: 'rutube', id: 'cd0329a8eda3bc6821315b6569640df2', title: 'Лекция 03', subject: 'ХИМИЯ' },
-        { platform: 'vk', owner: '217610177', video: '456241170', title: 'Лекция 04', subject: 'ХИМИЯ' },
-        { platform: 'rutube', id: '20b38c2bcb25c3550ba31625b8ba474a', title: 'Лекция 05', subject: 'ХИМИЯ' },
-        { platform: 'vk', owner: '218914525', video: '456239797', title: 'Лекция 06', subject: 'ХИМИЯ' },
-        { platform: 'vk', owner: '221377127', video: '456240070', title: 'Лекция 07', subject: 'ХИМИЯ' },
-
-        { platform: 'vk', owner: '29793598', video: '456240918', title: 'Лекция 01', subject: 'БИОЛОГИЯ' },
-        { platform: 'vk', owner: '29793598', video: '456240887', title: 'Лекция 02', subject: 'БИОЛОГИЯ' },
-        { platform: 'vk', owner: '29793598', video: '456241045', title: 'Лекция 03', subject: 'БИОЛОГИЯ' },
-        { platform: 'vk', owner: '29793598', video: '456240966', title: 'Лекция 04', subject: 'БИОЛОГИЯ' },
-        { platform: 'vk', owner: '29793598', video: '456240803', title: 'Лекция 05', subject: 'БИОЛОГИЯ' },
-        { platform: 'vk', owner: '29793598', video: '456240846', title: 'Лекция 06', subject: 'БИОЛОГИЯ' }
-    ];
-
-    function embedUrl(l) {
-        if (l.platform === 'rutube') return 'https://rutube.ru/play/embed/' + l.id + '/';
-        return 'https://vk.com/video_ext.php?oid=-' + l.owner + '&id=' + l.video + '&hd=2';
-    }
-
-    const pad2 = (n) => String(n).padStart(2, '0');
-    const frag = document.createDocumentFragment();
-
-    LECTURES.forEach((lec, i) => {
-        const card = document.createElement('a');
-        card.className = 'media-card';
-        card.href = '#';
-
-        const thumb = document.createElement('div');
-        thumb.className = 'media-thumb';
-
-        if (lec.platform === 'rutube') {
-            const img = document.createElement('img');
-            img.className = 'thumb-img';
-            img.alt = lec.title;
-            img.loading = 'lazy';
-            img.decoding = 'async';
-            img.src = 'https://rutube.ru/api/video/' + lec.id + '/thumbnail/?redirect=1';
-            img.onerror = function () {
-                img.remove();
-                const ph = document.createElement('div');
-                ph.className = 'thumb-placeholder';
-                ph.textContent = lec.subject;
-                thumb.appendChild(ph);
-            };
-            thumb.appendChild(img);
-        } else {
-            const ph = document.createElement('div');
-            ph.className = 'thumb-placeholder';
-            ph.innerHTML = '<span class="ph-sub">' + lec.subject + '</span><span class="ph-plat">VK ВИДЕО</span>';
-            thumb.appendChild(ph);
-        }
-
-        const num = document.createElement('div');
-        num.className = 'media-num';
-        num.textContent = pad2(i + 1);
-
-        const play = document.createElement('div');
-        play.className = 'media-play';
-
-        thumb.appendChild(num);
-        thumb.appendChild(play);
-
-        const info = document.createElement('div');
-        info.className = 'media-info';
-
-        const top = document.createElement('div');
-        top.className = 'media-info-top';
-        top.innerHTML = '<span class="dot"></span><span>' + lec.subject + ' · ' + lec.platform.toUpperCase() + '</span>';
-
-        const title = document.createElement('div');
-        title.className = 'media-title';
-        title.textContent = lec.title;
-
-        const line = document.createElement('span');
-        line.className = 'media-title-line';
-
-        info.appendChild(top);
-        info.appendChild(title);
-        info.appendChild(line);
-
-        const arrow = document.createElement('span');
-        arrow.className = 'media-arrow';
-        arrow.textContent = '→';
-
-        card.appendChild(thumb);
-        card.appendChild(info);
-        card.appendChild(arrow);
-
-        card.addEventListener('click', (e) => {
-            e.preventDefault();
-            openPlayer(embedUrl(lec));
-        });
-
-        frag.appendChild(card);
-    });
-
-    grid.appendChild(frag);
-
-    function openPlayer(url) {
-        frame.src = url;
-        modal.classList.add('show');
-        modal.setAttribute('aria-hidden', 'false');
-        document.body.style.overflow = 'hidden';
-    }
-    function closePlayer() {
-        modal.classList.remove('show');
-        modal.setAttribute('aria-hidden', 'true');
-        document.body.style.overflow = '';
-        setTimeout(() => { frame.src = 'about:blank'; }, 400);
-    }
-
-    if (close) close.addEventListener('click', closePlayer);
-    modal.addEventListener('click', (e) => { if (e.target === modal) closePlayer(); });
-    document.addEventListener('keydown', (e) => {
-        if (modal.classList.contains('show') && e.key === 'Escape') closePlayer();
-    });
-}
-/* ============================================================
-   TOOLS · ТЕКСТОВЫЙ СКРАМБЛ (для кнопки-переключателя)
-   ============================================================ */
-function scrambleText(el, newText, duration = 380) {
-    if (!el) return;
-    const old = el.textContent;
-    const len = Math.max(old.length, newText.length);
-    const pool = 'АБВГДЕЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯ0123456789#@$%&*+=';
-    const start = performance.now();
-    function frame(now) {
-        const p = Math.min(1, (now - start) / duration);
-        const reveal = Math.floor(p * newText.length);
-        let out = '';
-        for (let i = 0; i < len; i++) {
-            if (i < reveal) out += newText[i] || '';
-            else if (i < newText.length) out += pool[Math.floor(Math.random() * pool.length)];
-            else if (i < old.length) out += pool[Math.floor(Math.random() * pool.length)];
-        }
-        el.textContent = out;
-        if (p < 1) requestAnimationFrame(frame);
-        else el.textContent = newText;
-    }
-    requestAnimationFrame(frame);
-}
-
-/* ============================================================
-   TOOLS · THREE.JS GLITCH OVERLAY
-   ============================================================ */
-function createGlitchOverlay(container) {
-    const canvas = document.createElement('canvas');
-    canvas.className = 'glitch-overlay';
-    container.appendChild(canvas);
-
-    const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: false });
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
-    renderer.setClearColor(0x000000, 0);
-
-    const scene  = new THREE.Scene();
-    const camera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1);
-
-    const uniforms = {
-        uResolution: { value: new THREE.Vector2(1, 1) },
-        uTime:       { value: 0 },
-        uIntensity:  { value: 0 }
-    };
-
-    const material = new THREE.ShaderMaterial({
-        uniforms,
-        transparent: true,
-        depthTest: false,
-        depthWrite: false,
-        vertexShader: `
-            void main() {
-                gl_Position = vec4(position.xy, 0.0, 1.0);
-            }
-        `,
-        fragmentShader: `
-            precision highp float;
-            uniform vec2  uResolution;
-            uniform float uTime;
-            uniform float uIntensity;
-
-            float hash21(vec2 p) {
-                p = fract(p * vec2(233.34, 851.73));
-                p += dot(p, p + 23.45);
-                return fract(p.x * p.y);
-            }
-
-            void main() {
-                vec2  uv = gl_FragCoord.xy / uResolution;
-                float t  = uTime;
-                float I  = uIntensity;
-
-                vec3 col = vec3(0.0);
-
-                /* 1. VHS-подобный сдвиг строк */
-                float yBand      = floor(uv.y * 70.0);
-                float bandRand   = hash21(vec2(yBand, floor(t * 22.0)));
-                float bandActive = step(0.55, bandRand);
-                float bandOffset = (hash21(vec2(yBand, floor(t * 11.0))) - 0.5) * 0.10;
-
-                /* 2. RGB-полосы */
-                float redStripe  = step(0.62, hash21(vec2(floor(uv.y * 90.0),        floor(t * 55.0))));
-                float cyanStripe = step(0.62, hash21(vec2(floor(uv.y * 90.0) + 11.0, floor(t * 60.0))));
-                col.r += redStripe  * I * 0.55;
-                col.g += cyanStripe * I * 0.42;
-                col.b += cyanStripe * I * 0.42;
-
-                /* 3. Горизонтальный «разрыв» */
-                float tearY    = hash21(vec2(floor(t * 7.0), 7.0));
-                float tearDist = abs(uv.y - tearY);
-                float tear     = smoothstep(0.006, 0.0, tearDist);
-                col += tear * vec3(1.0, 0.12, 0.18) * I * 1.35;
-
-                /* 4. Скан-линии */
-                float scan = step(0.0, sin(uv.y * uResolution.y * 1.4 + t * 42.0));
-                col *= 0.55 + scan * 0.45;
-
-                /* 5. Блочный шум (цифровые артефакты) */
-                vec2  blockUV   = floor(uv * vec2(28.0, 76.0)) / vec2(28.0, 76.0);
-                float blockRand = hash21(blockUV + floor(t * 28.0));
-                if (blockRand > 0.965) {
-                    col += step(0.5, hash21(blockUV * 3.0)) * vec3(1.0, 0.92, 0.86) * I * 0.45;
-                }
-
-                /* 6. Зерно */
-                float grain = hash21(uv * uResolution + floor(t * 55.0));
-                col += step(0.985, grain) * I * 0.55;
-
-                /* 7. Виньетка по краям */
-                vec2  c   = uv - 0.5;
-                float vig = 1.0 - smoothstep(0.35, 0.72, length(c));
-                col *= vig;
-
-                /* 8. Дополнительная дизеризация по bandOffset — сдвигаем
-                      яркую часть строк, чтобы читалось как «сломанное видео» */
-                float shifted = smoothstep(0.5, 0.0, abs(fract(uv.x + bandOffset * bandActive) - 0.5));
-                col += shifted * bandActive * vec3(1.0, 0.5, 0.4) * I * 0.18;
-
-                float a = clamp(max(max(col.r, col.g), col.b), 0.0, 1.0);
-                gl_FragColor = vec4(col, a);
-            }
-        `
-    });
-
-    const geo  = new THREE.PlaneBufferGeometry(2, 2);
-    const mesh = new THREE.Mesh(geo, material);
-    scene.add(mesh);
-
-    function resize() {
-        const r = container.getBoundingClientRect();
-        const w = Math.max(1, r.width);
-        const h = Math.max(1, r.height);
-        renderer.setSize(w, h, false);
-        const pr = renderer.getPixelRatio();
-        uniforms.uResolution.value.set(w * pr, h * pr);
-    }
-    resize();
-    window.addEventListener('resize', resize);
-
-    let rafId = null;
-
-    function burst(duration = 720) {
-        const start = performance.now();
-        canvas.style.opacity = '1';
-
-        function frame(now) {
-            const p = (now - start) / duration;
-            if (p >= 1) {
-                uniforms.uIntensity.value = 0;
-                canvas.style.opacity = '0';
-                renderer.render(scene, camera);
-                rafId = null;
-                return;
-            }
-            uniforms.uTime.value = (now - start) * 0.001;
-
-            // конверт: быстрый подъём, плавное затухание
-            const env = p < 0.14
-                ? p / 0.14
-                : 1 - (p - 0.14) / 0.86;
-            uniforms.uIntensity.value = env;
-
-            renderer.render(scene, camera);
-            rafId = requestAnimationFrame(frame);
-        }
-        if (rafId) cancelAnimationFrame(rafId);
-        rafId = requestAnimationFrame(frame);
-    }
-
-    return { burst, resize };
-}
-
-/* ============================================================
-   TOOLS · ПЕРЕКЛЮЧАТЕЛЬ РАЗДЕЛОВ (слайдер + глитч)
-   ============================================================ */
-function initToolsSwitch() {
-    const clip   = document.getElementById('toolsClip');
-    const track  = document.getElementById('toolsTrack');
-    const btn    = document.getElementById('toolsSwitch');
-    const label  = document.getElementById('toolsSwitchLabel');
-    const indexEl = document.getElementById('toolsSwitchIndex');
-    if (!clip || !track || !btn) return;
-
-    const SLIDES  = Array.from(track.querySelectorAll('.tools-slide'));
-    const ORDER   = ['interesting', 'lectures', 'time'];
-    const LABELS  = { interesting: 'ИНТЕРЕСНО-ПОЛЕЗНОЕ', lectures: 'ЛЕКЦИИ', time: 'ЧАСЫ' };
-    const pad2    = (n) => String(n).padStart(2, '0');
-
-    const glitch  = createGlitchOverlay(clip);
-
-    let current = -1;      // -1 = закрыто
-    let busy    = false;
-
-    clip.style.height = '0';
-    clip.style.overflow = 'hidden';
-
-    const slideHeight = (el) => el ? el.offsetHeight : 0;
-
-    function openFirst() {
-        busy = true;
-        current = 0;
-        const h = slideHeight(SLIDES[0]);
-
-        gsap.to(clip, {
-            height: h,
-            duration: 0.85,
-            ease: 'expo.out',
-            onComplete: () => { busy = false; }
-        });
-
-        indexEl.textContent = pad2(1);
-        scrambleText(label, LABELS[ORDER[0]], 420);
-        glitch.burst(520);
-    }
-
-    function slideTo(nextIdx) {
-        if (busy) return;
-        busy = true;
-
-        const curSlide = SLIDES[current];
-        const newSlide = SLIDES[nextIdx];
-        const newH     = slideHeight(newSlide);
-        const clipW    = clip.offsetWidth;
-
-        // глитч запускаем сразу — он маскирует полёт
-        glitch.burst(720);
-
-        // трек едет: текущий уходит влево, следующий прилетает справа
-        gsap.to(track, {
-            x: -nextIdx * clipW,
-            duration: 0.8,
-            ease: 'expo.inOut'
-        });
-        gsap.to(clip, {
-            height: newH,
-            duration: 0.8,
-            ease: 'expo.inOut',
-            onComplete: () => {
-                current = nextIdx;
-                busy = false;
-            }
-        });
-
-        // метка и номер — скрамблятся
-        indexEl.textContent = pad2(nextIdx + 1);
-        scrambleText(label, LABELS[ORDER[nextIdx]], 420);
-    }
-
-    btn.addEventListener('click', () => {
-        if (busy) return;
-        if (current === -1) {
-            openFirst();
-        } else {
-            const next = (current + 1) % ORDER.length;
-            slideTo(next);
-        }
-    });
-
-    // первичный замер после шрифтов
-    window.addEventListener('load', () => {
-        if (current >= 0) glitch.resize();
-    });
-
-    // hash-совместимость
-    const hash = (window.location.hash || '').replace('#', '');
-    if (hash && ORDER.includes(hash)) {
-        // пока просто открываем — переход в конкретный слайд после загрузки
-        requestAnimationFrame(() => {
-            openFirst();
-            const idx = ORDER.indexOf(hash);
-            if (idx > 0) setTimeout(() => slideTo(idx), 900);
-        });
-    }
-}
-
-/* ============================================================
-   TOOLS · ЛЕКЦИИ
-   ============================================================ */
-function initToolsLectures() {
-    const grid  = document.getElementById('lecturesGrid');
-    const modal = document.getElementById('mediaPlayerModal');
-    const frame = document.getElementById('mediaPlayerFrame');
-    const close = document.getElementById('mediaPlayerClose');
-    if (!grid || !modal || !frame) return;
-
-    // ЕСЛИ У ТЕБЯ ЕСТЬ РЕАЛЬНЫЕ НАЗВАНИЯ ЛЕКЦИЙ — ВПИШИ ИХ В title.
-    // Пока по факту известно только «Мифы о расах» — остальные в исходнике
-    // шли как «Лекция 01/02/…», я это сохранил.
-    const LECTURES = [
-        { platform: 'rutube', id: 'a414d1a2e392f4b9e2a034df42ba6bbd', title: 'Мифы о расах', subject: 'ФИЗИКА' },
-        { platform: 'vk', owner: '225170958', video: '456240634', title: 'Лекция 02', subject: 'ФИЗИКА' },
-        { platform: 'rutube', id: '3ed02305d905e526f0cb1eb522154e7d', title: 'Лекция 03', subject: 'ФИЗИКА' },
-        { platform: 'rutube', id: '1c6606e712a573817bf7d5998378b326', title: 'Лекция 04', subject: 'ФИЗИКА' },
-        { platform: 'rutube', id: '64963a9db321049bb8375a62c4dc8fbc', title: 'Лекция 05', subject: 'ФИЗИКА' },
-        { platform: 'vk', owner: '218914525', video: '456239626', title: 'Лекция 06', subject: 'ФИЗИКА' },
-        { platform: 'vk', owner: '218914525', video: '456239374', title: 'Лекция 07', subject: 'ФИЗИКА' },
-
-        { platform: 'vk', owner: '218914525', video: '456239692', title: 'Лекция 01', subject: 'ХИМИЯ' },
-        { platform: 'vk', owner: '218914525', video: '456239791', title: 'Лекция 02', subject: 'ХИМИЯ' },
-        { platform: 'rutube', id: 'cd0329a8eda3bc6821315b6569640df2', title: 'Лекция 03', subject: 'ХИМИЯ' },
-        { platform: 'vk', owner: '217610177', video: '456241170', title: 'Лекция 04', subject: 'ХИМИЯ' },
-        { platform: 'rutube', id: '20b38c2bcb25c3550ba31625b8ba474a', title: 'Лекция 05', subject: 'ХИМИЯ' },
-        { platform: 'vk', owner: '218914525', video: '456239797', title: 'Лекция 06', subject: 'ХИМИЯ' },
-        { platform: 'vk', owner: '221377127', video: '456240070', title: 'Лекция 07', subject: 'ХИМИЯ' },
-
-        { platform: 'vk', owner: '29793598', video: '456240918', title: 'Лекция 01', subject: 'БИОЛОГИЯ' },
-        { platform: 'vk', owner: '29793598', video: '456240887', title: 'Лекция 02', subject: 'БИОЛОГИЯ' },
-        { platform: 'vk', owner: '29793598', video: '456241045', title: 'Лекция 03', subject: 'БИОЛОГИЯ' },
-        { platform: 'vk', owner: '29793598', video: '456240966', title: 'Лекция 04', subject: 'БИОЛОГИЯ' },
-        { platform: 'vk', owner: '29793598', video: '456240803', title: 'Лекция 05', subject: 'БИОЛОГИЯ' },
-        { platform: 'vk', owner: '29793598', video: '456240846', title: 'Лекция 06', subject: 'БИОЛОГИЯ' }
-    ];
-
-    function embedUrl(l) {
-        if (l.platform === 'rutube') return 'https://rutube.ru/play/embed/' + l.id + '/';
-        return 'https://vk.com/video_ext.php?oid=-' + l.owner + '&id=' + l.video + '&hd=2';
-    }
-
-    const pad2 = (n) => String(n).padStart(2, '0');
-    const frag = document.createDocumentFragment();
-
-    LECTURES.forEach((lec, i) => {
-        const card = document.createElement('a');
-        card.className = 'media-card';
-        card.href = '#';
-
-        const thumb = document.createElement('div');
-        thumb.className = 'media-thumb';
-
-        if (lec.platform === 'rutube') {
-            const img = document.createElement('img');
-            img.className = 'thumb-img';
-            img.alt = lec.title;
-            img.loading = 'lazy';
-            img.decoding = 'async';
-            img.src = 'https://rutube.ru/api/video/' + lec.id + '/thumbnail/?redirect=1';
-            img.onerror = function () {
-                img.remove();
-                const ph = document.createElement('div');
-                ph.className = 'thumb-placeholder';
-                ph.textContent = lec.subject;
-                thumb.appendChild(ph);
-            };
-            thumb.appendChild(img);
-        } else {
-            const ph = document.createElement('div');
-            ph.className = 'thumb-placeholder';
-            ph.innerHTML = '<span class="ph-sub">' + lec.subject + '</span><span class="ph-plat">VK ВИДЕО</span>';
-            thumb.appendChild(ph);
-        }
-
-        const num = document.createElement('div');
-        num.className = 'media-num';
-        num.textContent = pad2(i + 1);
-
-        const play = document.createElement('div');
-        play.className = 'media-play';
-
-        thumb.appendChild(num);
-        thumb.appendChild(play);
-
-        const info = document.createElement('div');
-        info.className = 'media-info';
-
-        const top = document.createElement('div');
-        top.className = 'media-info-top';
-        top.innerHTML = '<span class="dot"></span><span>' + lec.subject + ' · ' + lec.platform.toUpperCase() + '</span>';
-
-        const title = document.createElement('div');
-        title.className = 'media-title';
-        title.textContent = lec.title;
-
-        const line = document.createElement('span');
-        line.className = 'media-title-line';
-
-        info.appendChild(top);
-        info.appendChild(title);
-        info.appendChild(line);
-
-        const arrow = document.createElement('span');
-        arrow.className = 'media-arrow';
-        arrow.textContent = '→';
-
-        card.appendChild(thumb);
-        card.appendChild(info);
-        card.appendChild(arrow);
-
-        card.addEventListener('click', (e) => {
-            e.preventDefault();
-            openPlayer(embedUrl(lec));
-        });
-
-        frag.appendChild(card);
-    });
-
-    grid.appendChild(frag);
-
-    function openPlayer(url) {
-        frame.src = url;
-        modal.classList.add('show');
-        modal.setAttribute('aria-hidden', 'false');
-        document.body.style.overflow = 'hidden';
-    }
-    function closePlayer() {
-        modal.classList.remove('show');
-        modal.setAttribute('aria-hidden', 'true');
-        document.body.style.overflow = '';
-        setTimeout(() => { frame.src = 'about:blank'; }, 400);
-    }
-
-    if (close) close.addEventListener('click', closePlayer);
-    modal.addEventListener('click', (e) => { if (e.target === modal) closePlayer(); });
-    document.addEventListener('keydown', (e) => {
-        if (modal.classList.contains('show') && e.key === 'Escape') closePlayer();
-    });
-}
-
-
-/* ============================================================
-   TOOLS · ШАРЫ
-   ============================================================ */
-function initToolsBalls() {
-    const container = document.querySelector('.balls-section');
-    const canvas = document.getElementById('ballsCanvas');
-    if (!container || !canvas || typeof THREE === 'undefined') return;
-
-    const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
-    renderer.setSize(container.clientWidth, container.clientHeight, false);
-    renderer.setClearColor(0x000000, 0);
-    renderer.toneMapping = THREE.ACESFilmicToneMapping;
-    renderer.toneMappingExposure = 1.2;
-    renderer.shadowMap.enabled = false;
-
-    const scene = new THREE.Scene();
-    const camera = new THREE.PerspectiveCamera(
-        45,
-        (container.clientWidth || 1) / (container.clientHeight || 1),
-        0.1,
-        200
-    );
-    camera.position.set(0, 0, 18);
-
-    scene.add(new THREE.AmbientLight(0xffffff, 0.75));
-    const keyLight = new THREE.DirectionalLight(0xffffff, 2.0);
-    keyLight.position.set(10, 20, 15);
-    scene.add(keyLight);
-    const fillLight = new THREE.DirectionalLight(0xffffff, 1.0);
-    fillLight.position.set(-15, 0, 10);
-    scene.add(fillLight);
-
-    function generateLiquidMetal() {
-        const c = document.createElement('canvas');
-        c.width = 1024; c.height = 1024;
-        const ctx = c.getContext('2d');
-        ctx.fillStyle = '#b0b0b0'; ctx.fillRect(0, 0, 1024, 1024);
-        ctx.globalAlpha = 0.6;
-        for (let i = 0; i < 3000; i++) {
-            ctx.fillStyle = Math.random() > 0.5 ? '#ffffff' : '#444444';
-            ctx.beginPath();
-            ctx.arc(Math.random() * 1024, Math.random() * 1024, Math.random() * 20 + 1, 0, Math.PI * 2);
-            ctx.fill();
-        }
-        return new THREE.CanvasTexture(c);
-    }
-      function generateOrangeNeon() {
-        const c = document.createElement('canvas');
-        c.width = 1024; c.height = 1024;
-        const ctx = c.getContext('2d');
-        const grad = ctx.createRadialGradient(512, 380, 80, 512, 512, 720);
-        grad.addColorStop(0,    '#ffb347');
-        grad.addColorStop(0.45, '#ff8a1a');
-        grad.addColorStop(0.8,  '#f56200');
-        grad.addColorStop(1,    '#c83a00');
-        ctx.fillStyle = grad;
-        ctx.fillRect(0, 0, 1024, 1024);
-
-        // лёгкая матовость — тёмные вкрапления, чтобы не было «пластикового» блика
-        ctx.globalAlpha = 0.10;
-        ctx.fillStyle = '#2a0d00';
-        for (let i = 0; i < 4000; i++) {
-            ctx.beginPath();
-            ctx.arc(Math.random() * 1024, Math.random() * 1024, Math.random() * 8 + 1, 0, Math.PI * 2);
-            ctx.fill();
-        }
-        // тёплые блики
-        ctx.globalAlpha = 0.08;
-        ctx.fillStyle = '#fff0b8';
-        for (let i = 0; i < 2000; i++) {
-            ctx.beginPath();
-            ctx.arc(Math.random() * 1024, Math.random() * 1024, Math.random() * 6 + 1, 0, Math.PI * 2);
-            ctx.fill();
-        }
-        return new THREE.CanvasTexture(c);
-    }
-    function generateGlitchObsidian() {
-        const c = document.createElement('canvas');
-        c.width = 1024; c.height = 1024;
-        const ctx = c.getContext('2d');
-        ctx.fillStyle = '#050505'; ctx.fillRect(0, 0, 1024, 1024);
-        ctx.globalAlpha = 0.8;
-        ctx.strokeStyle = Math.random() > 0.5 ? '#00ffcc' : '#ff00cc';
-        for (let i = 0; i < 50; i++) {
-            ctx.lineWidth = Math.random() * 2 + 0.5;
-            ctx.beginPath();
-            ctx.moveTo(Math.random() * 1024, Math.random() * 1024);
-            ctx.lineTo(Math.random() * 1024, Math.random() * 1024);
-            ctx.stroke();
-        }
-        return new THREE.CanvasTexture(c);
-    }
-    function generateMagmaRock() {
-        const c = document.createElement('canvas');
-        c.width = 1024; c.height = 1024;
-        const ctx = c.getContext('2d');
-        ctx.fillStyle = '#1a0a0a'; ctx.fillRect(0, 0, 1024, 1024);
-        ctx.globalAlpha = 0.4; ctx.fillStyle = '#ff3300';
-        for (let i = 0; i < 500; i++) {
-            ctx.beginPath();
-            ctx.arc(Math.random() * 1024, Math.random() * 1024, Math.random() * 100 + 10, 0, Math.PI * 2);
-            ctx.fill();
-        }
-        return new THREE.CanvasTexture(c);
-    }
-    function generateCyberConcrete() {
-        const c = document.createElement('canvas');
-        c.width = 1024; c.height = 1024;
-        const ctx = c.getContext('2d');
-        ctx.fillStyle = '#222'; ctx.fillRect(0, 0, 1024, 1024);
-        ctx.globalAlpha = 0.1; ctx.fillStyle = '#fff';
-        for (let i = 0; i < 10000; i++) {
-            ctx.beginPath();
-            ctx.arc(Math.random() * 1024, Math.random() * 1024, Math.random() * 3 + 1, 0, Math.PI * 2);
-            ctx.fill();
-        }
-        return new THREE.CanvasTexture(c);
-    }
-
-    const materialsDef = {
-        metal:    { gen: generateLiquidMetal,    props: { roughness: 0.05, metalness: 0.9, clearcoat: 1.0 }, mass: 2.0, gravity: 0.3, torque: 0,    bounciness: 0.4 },
-        orange:   { gen: generateOrangeNeon,     props: { roughness: 0.22, metalness: 0.05, clearcoat: 1.0 }, mass: 1.0, gravity: 0,   torque: 0,    bounciness: 0.6 },
-        neon:     { gen: generateOrangeNeon,     props: { roughness: 0.22, metalness: 0.05, clearcoat: 1.0 }, mass: 1.0, gravity: 0,   torque: 0,    bounciness: 0.6 },
-       obsidian: { gen: generateGlitchObsidian, props: { roughness: 0.05, metalness: 0.5, clearcoat: 1.0 }, mass: 1.2, gravity: 0,   torque: 0.05, bounciness: 0.5 },
-        magma:    { gen: generateMagmaRock,      props: { roughness: 0.4,  metalness: 0.0, clearcoat: 0.5 }, mass: 0.4, gravity: 0,   torque: 0,    bounciness: 1.0 },
-        concrete: { gen: generateCyberConcrete,  props: { roughness: 0.8,  metalness: 0.0, clearcoat: 0.0 }, mass: 4.0, gravity: 0,   torque: 0,    bounciness: 0.1 }
-    };
-
-    const materialPool = {};
-    Object.keys(materialsDef).forEach((k) => {
-        materialPool[k] = [];
-        for (let i = 0; i < 4; i++) {
-            const tex = materialsDef[k].gen();
-            tex.anisotropy = renderer.capabilities.getMaxAnisotropy();
-            materialPool[k].push(new THREE.MeshPhysicalMaterial({ map: tex, ...materialsDef[k].props }));
-        }
-    });
-
-    const materialOrder = ['orange', 'metal', 'concrete', 'obsidian', 'neon', 'magma'];
-    let currentIndex = 0;
-    let currentGlobalType = materialOrder[currentIndex];
-
-       const RADIUS = 1.8;
-    const Z_RANGE = 0.3;                       
-    const bounds = { minX: -8, maxX: 8, minY: -4, maxY: 4, minZ: -Z_RANGE, maxZ: Z_RANGE };
-
-    function recomputeBounds() {
-        const vFovRad = camera.fov * Math.PI / 180;
-        const dist = camera.position.z;
-        const halfH = Math.tan(vFovRad / 2) * dist;
-        const halfW = halfH * camera.aspect;
-        bounds.minX = -halfW + RADIUS;
-        bounds.maxX =  halfW - RADIUS;
-        bounds.minY = -halfH + RADIUS;
-        bounds.maxY =  halfH - RADIUS;
-        bounds.minZ = -Z_RANGE;
-        bounds.maxZ =  Z_RANGE;
-    }
-
-    recomputeBounds();
-
-    const COUNT = 20;
-    const sphereGeo = new THREE.SphereGeometry(RADIUS, 64, 64);
-    const spheres = [];
-
-    for (let i = 0; i < COUNT; i++) {
-        const mesh = new THREE.Mesh(sphereGeo, materialPool[currentGlobalType][0]);
-        mesh.position.set(
-            bounds.minX + Math.random() * (bounds.maxX - bounds.minX),
-            bounds.minY + Math.random() * (bounds.maxY - bounds.minY),
-            bounds.minZ + Math.random() * (bounds.maxZ - bounds.minZ)
-        );
-        scene.add(mesh);
-        spheres.push({ mesh, velocity: new THREE.Vector3() });
-    }
-
-    const raycaster = new THREE.Raycaster();
-    const mouse = new THREE.Vector2();
-    const mousePlane = new THREE.Plane(new THREE.Vector3(0, 0, 1), 0);
-    const currentMousePos = new THREE.Vector3();
-    const prevMousePos = new THREE.Vector3();
-    let isFirstMove = true;
-
-    const GRAB_OMEGA2 = 0.012;
-    const GRAB_DAMP = 0.35;
-    const GRAB_MAX_SPEED = 0.8;
-
-    let grabbedSphere = null;
-    const grabTarget = new THREE.Vector3();
-
-    function pointerToNDC(e) {
-        const rect = container.getBoundingClientRect();
-        return {
-            x: ((e.clientX - rect.left) / rect.width) * 2 - 1,
-            y: -((e.clientY - rect.top) / rect.height) * 2 + 1
-        };
-    }
-    function clampGrabTarget() {
-        if (grabTarget.x < bounds.minX) grabTarget.x = bounds.minX;
-        if (grabTarget.x > bounds.maxX) grabTarget.x = bounds.maxX;
-        if (grabTarget.y < bounds.minY) grabTarget.y = bounds.minY;
-        if (grabTarget.y > bounds.maxY) grabTarget.y = bounds.maxY;
-    }
-
-    const DOUBLE_TAP_DELAY = 320;
-    const TAP_MAX_DURATION = 350;
-    const TAP_MOVE_TOL = 24;
-    const DOUBLE_TAP_DIST = 48;
-
-    let tapActive = false;
-    let tapStartX = 0, tapStartY = 0, tapStartTime = 0, tapMoved = false;
-    let lastTapTime = -1e9, lastTapX = 0, lastTapY = 0;
-
-    function resetTapTracking() { tapActive = false; lastTapTime = -1e9; }
-
-    function switchMaterial() {
-        currentIndex = (currentIndex + 1) % materialOrder.length;
-        currentGlobalType = materialOrder[currentIndex];
-        spheres.forEach((s) => {
-            s.mesh.material = materialPool[currentGlobalType][Math.floor(Math.random() * 4)];
-        });
-    }
-
-    function registerTapEnd(e) {
-        if (!tapActive) return;
-        tapActive = false;
-        const now = performance.now();
-        if (tapMoved || (now - tapStartTime) > TAP_MAX_DURATION) {
-            lastTapTime = -1e9;
-            return;
-        }
-        const isDouble =
-            (now - lastTapTime) < DOUBLE_TAP_DELAY &&
-            Math.abs(e.clientX - lastTapX) < DOUBLE_TAP_DIST &&
-            Math.abs(e.clientY - lastTapY) < DOUBLE_TAP_DIST;
-        if (isDouble) {
-            lastTapTime = -1e9;
-            switchMaterial();
-        } else {
-            lastTapTime = now;
-            lastTapX = e.clientX;
-            lastTapY = e.clientY;
-        }
-    }
-
-    container.addEventListener('pointerdown', (e) => {
-        if (e.pointerType === 'mouse' && e.button !== 0) return;
-        tapActive = true;
-        tapMoved = false;
-        tapStartX = e.clientX;
-        tapStartY = e.clientY;
-        tapStartTime = performance.now();
-
-        const ndc = pointerToNDC(e);
-        mouse.x = ndc.x; mouse.y = ndc.y;
-        raycaster.setFromCamera(mouse, camera);
-        const hits = raycaster.intersectObjects(spheres.map((s) => s.mesh), false);
-        if (hits.length > 0) {
-            const s = spheres.find((sp) => sp.mesh === hits[0].object);
-            if (s) {
-                grabbedSphere = s;
-                raycaster.ray.intersectPlane(mousePlane, grabTarget);
-                clampGrabTarget();
-                s.mesh.scale.setScalar(1.10);
-                try { container.setPointerCapture(e.pointerId); } catch (_) {}
-                isFirstMove = true;
-            }
-        }
-    });
-
-    container.addEventListener('pointermove', (e) => {
-        if (tapActive) {
-            const dx = e.clientX - tapStartX;
-            const dy = e.clientY - tapStartY;
-            if (dx * dx + dy * dy > TAP_MOVE_TOL * TAP_MOVE_TOL) tapMoved = true;
-        }
-        const ndc = pointerToNDC(e);
-        mouse.x = ndc.x; mouse.y = ndc.y;
-        raycaster.setFromCamera(mouse, camera);
-
-        if (grabbedSphere) {
-            raycaster.ray.intersectPlane(mousePlane, grabTarget);
-            clampGrabTarget();
-            return;
-        }
-
-        if (raycaster.ray.intersectPlane(mousePlane, currentMousePos)) {
-            if (isFirstMove) { prevMousePos.copy(currentMousePos); isFirstMove = false; return; }
-            const speed = currentMousePos.distanceTo(prevMousePos);
-            if (speed > 0.1) {
-                spheres.forEach((s) => {
-                    const dx = s.mesh.position.x - currentMousePos.x;
-                    const dy = s.mesh.position.y - currentMousePos.y;
-                    const dist = Math.sqrt(dx * dx + dy * dy);
-                    if (dist < 5.0 && dist > 0.001) {
-                        const force = (5.0 - dist) * Math.min(speed, 1.0) * 0.05 / materialsDef[currentGlobalType].mass;
-                        s.velocity.x += (dx / dist) * force;
-                        s.velocity.y += (dy / dist) * force;
-                    }
-                });
-            }
-            prevMousePos.copy(currentMousePos);
-        }
-    });
-
-    function releaseGrab(e) {
-        if (!grabbedSphere) return;
-        grabbedSphere.mesh.scale.setScalar(1);
-        grabbedSphere = null;
-        isFirstMove = true;
-        if (e && e.pointerId !== undefined) {
-            try { container.releasePointerCapture(e.pointerId); } catch (_) {}
-        }
-    }
-    function handlePointerUp(e) { releaseGrab(e); registerTapEnd(e); }
-    container.addEventListener('pointerup', handlePointerUp);
-    window.addEventListener('pointerup', handlePointerUp);
-    container.addEventListener('pointercancel', (e) => { releaseGrab(e); resetTapTracking(); });
-    window.addEventListener('pointercancel', (e) => { releaseGrab(e); resetTapTracking(); });
-    container.addEventListener('pointerleave', () => { if (!grabbedSphere) isFirstMove = true; });
-    container.addEventListener('contextmenu', (e) => e.preventDefault());
-
-    const clock = new THREE.Clock();
-    const MAX_SPEED = 0.5;
-
-    function animate() {
-        requestAnimationFrame(animate);
-        if (document.hidden) return;
-        const dt = Math.min(clock.getDelta(), 0.1);
-        const def = materialsDef[currentGlobalType];
-
-        for (let i = 0; i < spheres.length; i++) {
-            const s = spheres[i];
-            const isGrabbed = (s === grabbedSphere);
-
-            if (isGrabbed) {
-                const dx = grabTarget.x - s.mesh.position.x;
-                const dy = grabTarget.y - s.mesh.position.y;
-                s.velocity.x += dx * GRAB_OMEGA2;
-                s.velocity.y += dy * GRAB_OMEGA2;
-                const dampFactor = 1 / (1 + GRAB_DAMP);
-                s.velocity.x *= dampFactor;
-                s.velocity.y *= dampFactor;
-                const sp = Math.sqrt(s.velocity.x * s.velocity.x + s.velocity.y * s.velocity.y);
-                if (sp > GRAB_MAX_SPEED) {
-                    const k = GRAB_MAX_SPEED / sp;
-                    s.velocity.x *= k; s.velocity.y *= k;
-                }
-            } else {
-                if (def.gravity > 0) s.velocity.y -= def.gravity * dt;
-                if (def.torque > 0) {
-                    s.mesh.rotation.z -= def.torque * dt;
-                    s.mesh.rotation.x += def.torque * 0.5 * dt;
-                }
-                const distToCenter = s.mesh.position.length();
-                if (distToCenter > 0.1) {
-                    const pull = (1.5 / def.mass) / (distToCenter + 1.0);
-                    s.velocity.x -= (s.mesh.position.x / distToCenter) * pull * dt;
-                    s.velocity.y -= (s.mesh.position.y / distToCenter) * pull * dt;
-                    s.velocity.z -= (s.mesh.position.z / distToCenter) * pull * dt;
-                }
-            }
-
-            for (let j = i + 1; j < spheres.length; j++) {
-                const s2 = spheres[j];
-                const dx = s.mesh.position.x - s2.mesh.position.x;
-                const dy = s.mesh.position.y - s2.mesh.position.y;
-                const dz = s.mesh.position.z - s2.mesh.position.z;
-                const dist = Math.sqrt(dx * dx + dy * dy + dz * dz);
-                const minDist = RADIUS * 2;
-
-                if (dist < minDist && dist > 0.01) {
-                    const overlap = minDist - dist;
-                    const nx = dx / dist, ny = dy / dist, nz = dz / dist;
-                    const sGrabbed = (s === grabbedSphere);
-                    const s2Grabbed = (s2 === grabbedSphere);
-
-                    if (sGrabbed && !s2Grabbed) {
-                        s2.mesh.position.x -= nx * overlap;
-                        s2.mesh.position.y -= ny * overlap;
-                        s2.mesh.position.z -= nz * overlap;
-                        const relVel = (s.velocity.x - s2.velocity.x) * nx + (s.velocity.y - s2.velocity.y) * ny + (s.velocity.z - s2.velocity.z) * nz;
-                        if (relVel < 0) {
-                            const impulse = -relVel * 0.6;
-                            s2.velocity.x -= impulse * nx;
-                            s2.velocity.y -= impulse * ny;
-                            s2.velocity.z -= impulse * nz;
-                            s.velocity.x *= 0.7; s.velocity.y *= 0.7; s.velocity.z *= 0.7;
-                        }
-                    } else if (s2Grabbed && !sGrabbed) {
-                        s.mesh.position.x += nx * overlap;
-                        s.mesh.position.y += ny * overlap;
-                        s.mesh.position.z += nz * overlap;
-                        const relVel = (s2.velocity.x - s.velocity.x) * (-nx) + (s2.velocity.y - s.velocity.y) * (-ny) + (s2.velocity.z - s.velocity.z) * (-nz);
-                        if (relVel < 0) {
-                            const impulse = -relVel * 0.6;
-                            s.velocity.x += impulse * nx;
-                            s.velocity.y += impulse * ny;
-                            s.velocity.z += impulse * nz;
-                            s2.velocity.x *= 0.7; s2.velocity.y *= 0.7; s2.velocity.z *= 0.7;
-                        }
-                    } else {
-                        const push = overlap * 0.5;
-                        s.mesh.position.x += nx * push;
-                        s.mesh.position.y += ny * push;
-                        s.mesh.position.z += nz * push;
-                        s2.mesh.position.x -= nx * push;
-                        s2.mesh.position.y -= ny * push;
-                        s2.mesh.position.z -= nz * push;
-                        const relVel = (s.velocity.x - s2.velocity.x) * nx + (s.velocity.y - s2.velocity.y) * ny + (s.velocity.z - s2.velocity.z) * nz;
-                        if (relVel < 0) {
-                            const impulse = relVel * 0.6;
-                            s.velocity.x -= impulse * nx; s.velocity.y -= impulse * ny; s.velocity.z -= impulse * nz;
-                            s2.velocity.x += impulse * nx; s2.velocity.y += impulse * ny; s2.velocity.z += impulse * nz;
-                        }
-                    }
-                }
-            }
-
-            if (s.mesh.position.x < bounds.minX) { s.mesh.position.x = bounds.minX; s.velocity.x *= -def.bounciness; }
-            if (s.mesh.position.x > bounds.maxX) { s.mesh.position.x = bounds.maxX; s.velocity.x *= -def.bounciness; }
-            if (s.mesh.position.y < bounds.minY) { s.mesh.position.y = bounds.minY; s.velocity.y *= -def.bounciness; }
-            if (s.mesh.position.y > bounds.maxY) { s.mesh.position.y = bounds.maxY; s.velocity.y *= -def.bounciness; }
-            if (s.mesh.position.z < bounds.minZ) { s.mesh.position.z = bounds.minZ; s.velocity.z *= -def.bounciness; }
-            if (s.mesh.position.z > bounds.maxZ) { s.mesh.position.z = bounds.maxZ; s.velocity.z *= -def.bounciness; }
-
-            if (!isGrabbed) {
-                s.velocity.multiplyScalar(0.85);
-                if (s.velocity.length() > MAX_SPEED) {
-                    s.velocity.normalize().multiplyScalar(MAX_SPEED);
-                }
-            }
-
-            s.mesh.position.x += s.velocity.x;
-            s.mesh.position.y += s.velocity.y;
-            s.mesh.position.z += s.velocity.z;
-        }
-
-        renderer.render(scene, camera);
-    }
-
-    window.addEventListener('resize', () => {
-        const w = container.clientWidth, h = container.clientHeight;
-        if (!w || !h) return;
-        camera.aspect = w / h;
-        camera.updateProjectionMatrix();
-        renderer.setSize(w, h, false);
-        recomputeBounds();
-        spheres.forEach((s) => {
-            s.mesh.position.x = Math.max(bounds.minX, Math.min(bounds.maxX, s.mesh.position.x));
-            s.mesh.position.y = Math.max(bounds.minY, Math.min(bounds.maxY, s.mesh.position.y));
-            s.mesh.position.z = Math.max(bounds.minZ, Math.min(bounds.maxZ, s.mesh.position.z));
-        });
-        if (grabbedSphere) clampGrabTarget();
-    });
-
-    animate();
 }
 
 /* ---------- 6.4 HEROES ---------- */
@@ -4025,7 +2762,7 @@ function initArt() {
 }
 
 /* ============================================================
-   6.8 HISTORY
+   6.8 HISTORY — лекции с отметкой «просмотрено»
    ============================================================ */
 function initHistory() {
     once('history', () => {
@@ -4041,6 +2778,7 @@ function initHistory() {
         const STORAGE_KEY = 'history_viewed_v1';
         const HASH_PREFIX = '#lecture/';
 
+        /* ----- Список лекций (порядок сохраняется) ----- */
         const LECTURES = [
             { id: 'f5fb4cb726c27681aa9e59c571e697e3', title: 'Лекция 01' },
             { id: 'eca937c817e6d670f1a363da0a14f252', title: 'Лекция 02' },
@@ -4085,6 +2823,7 @@ function initHistory() {
 
         const pad2 = (n) => String(n).padStart(2, '0');
 
+        /* ----- Хранилище просмотренного ----- */
         function loadViewed() {
             try {
                 const raw = localStorage.getItem(STORAGE_KEY);
@@ -4094,10 +2833,11 @@ function initHistory() {
         }
         function saveViewed(set) {
             try { localStorage.setItem(STORAGE_KEY, JSON.stringify(Array.from(set))); }
-            catch (e) { }
+            catch (e) { /* quota */ }
         }
         let viewed = loadViewed();
 
+        /* ----- Прогресс ----- */
         function updateProgress() {
             const total = LECTURES.length;
             const done  = LECTURES.filter((l) => viewed.has(l.id)).length;
@@ -4106,6 +2846,7 @@ function initHistory() {
             if (fillEl) fillEl.style.width = pct + '%';
         }
 
+        /* ----- Отрисовка сетки ----- */
         function renderGrid() {
             gridEl.innerHTML = '';
             const frag = document.createDocumentFragment();
@@ -4116,6 +2857,7 @@ function initHistory() {
                 card.href = HASH_PREFIX + lec.id;
                 card.dataset.videoId = lec.id;
 
+                /* Превью */
                 const thumb = document.createElement('div');
                 thumb.className = 'history-thumb';
 
@@ -4131,6 +2873,7 @@ function initHistory() {
                 num.className = 'history-num';
                 num.textContent = pad2(i + 1);
 
+                /* Кнопка-галочка */
                 const check = document.createElement('button');
                 check.type = 'button';
                 check.className = 'history-check';
@@ -4158,6 +2901,7 @@ function initHistory() {
                 thumb.appendChild(num);
                 thumb.appendChild(check);
 
+                /* Инфо */
                 const info = document.createElement('div');
                 info.className = 'history-info';
 
@@ -4180,6 +2924,7 @@ function initHistory() {
             gridEl.appendChild(frag);
         }
 
+        /* ----- Плеер ----- */
         function openPlayer(id) {
             frame.src = 'https://rutube.ru/play/embed/' + id + '/';
             modal.classList.add('show');
@@ -4217,10 +2962,11 @@ function initHistory() {
         });
         window.addEventListener('hashchange', handleHash);
 
+        /* Клик по карточке: если хэш уже равен — открываем вручную (иначе hashchange сам сработает) */
         document.addEventListener('click', (e) => {
             const card = e.target.closest('.history-card');
             if (!card) return;
-            if (e.target.closest('.history-check')) return;
+            if (e.target.closest('.history-check')) return; // галочка уже обработана
             if (window.location.hash === card.getAttribute('href')) {
                 e.preventDefault();
                 const id = card.dataset.videoId;
@@ -4228,6 +2974,7 @@ function initHistory() {
             }
         });
 
+        /* ----- Сброс прогресса ----- */
         if (resetBtn) {
             resetBtn.addEventListener('click', () => {
                 if (viewed.size === 0) {
@@ -4242,13 +2989,14 @@ function initHistory() {
             });
         }
 
+        /* ----- Старт ----- */
         renderGrid();
         updateProgress();
         handleHash();
     });
 }
 
-/* ---------- 6.7 ARTICLES ---------- */
+/* ---------- 6.7 ARTICLES (ПЕДАГОГИКА) ---------- */
 function initArticles() {
     once('articles', () => {
         const INDEX_URL      = 'articles/index.json';
@@ -4269,6 +3017,10 @@ function initArticles() {
 
         if (!reader) return;
 
+        /* ---------- РИМСКИЕ СТРОЧНЫЕ: i, ii, iii... ---------- */
+        
+
+        /* ---------- ЛЕКЦИИ (жёстко зашиты) ---------- */
         const LECTURES = [
             {
                 title: 'Катерина Мурашова — Мифы о воспитании',
@@ -4339,6 +3091,7 @@ num.textContent = String(i + 1).padStart(2, '0');
             listLectures.appendChild(frag);
         }
 
+        /* ---------- СТАТЬИ / КЛАССИКА ---------- */
         const indexCache   = { loaded: false, data: [] };
         const articleCache = new Map();
         let readingSlug    = null;
@@ -4590,6 +3343,7 @@ num.textContent = String(idx + 1).padStart(2, '0');
                 closeReader();
             }
         }
+        // ← ГЛАВНОЕ: делаем закрытие доступным для бургер-меню
         window.__gramotinoCloseArticle = closeArticle;
 
         function handleHash() {
@@ -4627,6 +3381,7 @@ num.textContent = String(idx + 1).padStart(2, '0');
 
         loadIndex()
             .then((items) => {
+                // Классика — всё, где в slug/названии есть "макаренко"
                 const isMakarenko = (it) => {
                     const hay = ((it.slug || '') + ' ' + (it.title || '')).toLowerCase();
                     return hay.includes('макаренко');
@@ -4651,7 +3406,6 @@ num.textContent = String(idx + 1).padStart(2, '0');
             .finally(() => { handleHash(); });
     });
 }
-
 /* ============================================================
    7. СТРАНИЦА И СТАРТ
    ============================================================ */
@@ -4724,7 +3478,7 @@ function initKinetic() {
     let W = 0, H = 0, DPR = 1;
     let letters = [];
     let currentIdx = 0;
-    let phase = 'idle';
+    let phase = 'idle';        // 'enter' | 'hold' | 'exit'
     let phaseStart = 0;
     const HOLD_MS = 3400;
     const ENTER_MS = 1100;
@@ -4748,12 +3502,15 @@ function initKinetic() {
         canvas.style.width = W + 'px';
         canvas.style.height = H + 'px';
         ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
+        // Пересобрать текущее слово
         if (phase === 'hold') {
             buildTargets(currentIdx);
         }
     }
 
+    /* Считает позиции букв для заголовка */
     function computeTargets(text) {
+        // Подбираем размер шрифта, чтобы строка влезла в 90% ширины
         let fontSize = Math.min(W / (text.length * 0.62), H * 0.55, 140);
         fontSize = Math.max(fontSize, 26);
 
@@ -4780,6 +3537,7 @@ function initKinetic() {
         return targets;
     }
 
+    /* Создаёт букву, летящую извне */
     function spawnLetter(target, delay) {
         const angle = Math.random() * Math.PI * 2;
         const r = Math.max(W, H) * (0.7 + Math.random() * 0.5);
@@ -4792,7 +3550,7 @@ function initKinetic() {
             size: target.size,
             alpha: 0,
             delay: delay,
-            state: 'enter',
+            state: 'enter',           // 'enter' | 'settle' | 'exit'
             rot: (Math.random() - 0.5) * 0.6,
             rotV: 0
         };
@@ -4802,10 +3560,13 @@ function initKinetic() {
         const u = GRAMOTINO_UPDATES[idx % GRAMOTINO_UPDATES.length];
         const targets = computeTargets(u.title.toUpperCase());
 
+        // Пулы: старые буквы, которые могут стать новыми
         const remaining = letters.slice();
         const next = [];
 
+        // Попарно сопоставляем по символу — сохраняемся где можем
         targets.forEach((t, i) => {
+            // Ищем букву с таким же символом
             const foundIdx = remaining.findIndex(L => L.ch === t.ch && L.state !== 'exit');
             if (foundIdx >= 0) {
                 const L = remaining.splice(foundIdx, 1)[0];
@@ -4820,6 +3581,7 @@ function initKinetic() {
             }
         });
 
+        // Остальные буквы — на выход
         remaining.forEach(L => {
             L.state = 'exit';
             const angle = Math.random() * Math.PI * 2;
@@ -4860,6 +3622,7 @@ function initKinetic() {
                 const dist = Math.hypot(dx, dy);
                 if (dist < 2 && Math.abs(L.vx) < 0.4) L.state = 'settle';
             } else if (L.state === 'settle') {
+                // Микро-дыхание вокруг цели
                 L.x += (L.tx - L.x) * 0.14;
                 L.y += (L.ty - L.y) * 0.14;
                 L.alpha += (1 - L.alpha) * 0.16;
@@ -4878,8 +3641,10 @@ function initKinetic() {
             }
         });
 
+        // Чистим улетевшие
         letters = letters.filter(L => !(L.state === 'exit' && L.alpha < 0.02));
 
+        // Рисуем
         letters.forEach(L => {
             if (L.alpha < 0.02) return;
             ctx.save();
@@ -4889,11 +3654,13 @@ function initKinetic() {
             ctx.font = `700 ${L.size}px "Oswald", sans-serif`;
             ctx.textAlign = 'center';
             ctx.textBaseline = 'middle';
+            // Цвет: инвертируем при выходе
             ctx.fillStyle = L.state === 'exit' ? colors.red : colors.text;
             ctx.fillText(L.ch, 0, 0);
             ctx.restore();
         });
 
+        // Смена фаз
         if (phase === 'enter') {
             if (now - phaseStart > ENTER_MS) {
                 phase = 'hold';
@@ -4903,6 +3670,7 @@ function initKinetic() {
             if (now - phaseStart > HOLD_MS) {
                 phase = 'exit';
                 phaseStart = now;
+                // Все буквы на выход
                 letters.forEach(L => {
                     if (L.state !== 'exit') {
                         L.state = 'exit';
@@ -4920,6 +3688,7 @@ function initKinetic() {
                 phaseStart = now;
             }
         } else {
+            // Старт
             currentIdx = GRAMOTINO_UPDATES.length - 1;
             buildTargets(currentIdx);
             phase = 'enter';
@@ -4929,6 +3698,7 @@ function initKinetic() {
         requestAnimationFrame(tick);
     }
 
+    // IntersectionObserver — запуск, когда блок в поле зрения
     const io = new IntersectionObserver((entries) => {
         entries.forEach(e => {
             if (e.isIntersecting) {
@@ -4949,11 +3719,12 @@ function initKinetic() {
     window.addEventListener('resize', () => {
         resize();
     });
+    // Первичная инициализация размеров
     setTimeout(resize, 80);
 }
 
 /* ============================================================
-   8.2 ЖИВОЙ ЗВУК
+   8.2 ЖИВОЙ ЗВУК · СЮДА
    ============================================================ */
 function initLive() {
     const square = document.getElementById('liveSquare');
@@ -4975,8 +3746,8 @@ function initLive() {
     const uiTitle = document.getElementById('liveTitle');
     const uiText  = document.getElementById('liveText');
 
-    const BASE_FREQ = 174.61;
-    const CONSONANT = [0, 4, 5, 7, 9, 12];
+    const BASE_FREQ = 174.61;                 // F3
+    const CONSONANT = [0, 4, 5, 7, 9, 12];    // мажорная пентатоника
 
     function ensureAudio() {
         if (!audioCtx) {
@@ -4985,6 +3756,7 @@ function initLive() {
                 analyser = audioCtx.createAnalyser();
                 analyser.fftSize = 256;
                 freqData = new Uint8Array(analyser.frequencyBinCount);
+                // Подключаем анализатор к destination через gain
                 const master = audioCtx.createGain();
                 master.gain.value = 1;
                 master.connect(audioCtx.destination);
@@ -5054,6 +3826,7 @@ function initLive() {
         });
         generation++;
         if (uiGen) uiGen.textContent = 'ГЕН ' + String(generation).padStart(2, '0');
+        // Приветственная нота
         playTone(freq * 1.5, (x / W) * 2 - 1, 0.05, 0.5, 'triangle');
     }
 
@@ -5093,6 +3866,7 @@ function initLive() {
         const red  = cs.getPropertyValue('--red').trim()  || '#D90429';
         const text = cs.getPropertyValue('--text').trim() || '#0A0A0A';
 
+        // Амплитуда из анализатора
         let amp = 0;
         if (analyser && freqData) {
             analyser.getByteFrequencyData(freqData);
@@ -5116,14 +3890,17 @@ function initLive() {
             s.x += s.vx;
             s.y += s.vy;
 
+            // Ритмичная нота
             if (now - s.lastNote > s.rhythm * 1000) {
                 playTone(s.freq, (s.x / W) * 2 - 1, 0.03, 1.4, 'sine');
                 s.lastNote = now;
             }
 
+            // Пульс от амплитуды
             s.pulse += (amp - s.pulse) * 0.08;
             const r = 3 + s.pulse * 8 + (1 - lifeT) * 1.5;
 
+            // Ореол
             const halo = ctx.createRadialGradient(s.x, s.y, 0, s.x, s.y, r * 6);
             halo.addColorStop(0, `rgba(217,4,41,${alpha * 0.20 * (1 + s.pulse * 2)})`);
             halo.addColorStop(1, 'rgba(217,4,41,0)');
@@ -5132,12 +3909,14 @@ function initLive() {
             ctx.arc(s.x, s.y, r * 6, 0, Math.PI * 2);
             ctx.fill();
 
+            // Точка
             ctx.globalAlpha = alpha;
             ctx.fillStyle = s.hovered ? red : text;
             ctx.beginPath();
             ctx.arc(s.x, s.y, r, 0, Math.PI * 2);
             ctx.fill();
 
+            // Подпись при наведении
             if (s.hovered) {
                 ctx.globalAlpha = 0.9;
                 ctx.fillStyle = red;
@@ -5158,6 +3937,7 @@ function initLive() {
     window.addEventListener('resize', resize);
     requestAnimationFrame(tick);
 
+    // Показ блока
     const io = new IntersectionObserver((entries) => {
         entries.forEach(e => {
             if (e.isIntersecting) {
@@ -5171,12 +3951,13 @@ function initLive() {
 }
 
 /* ============================================================
-   8.3 КАРТОЧКИ-КАДРЫ
+   8.3 КАРТОЧКИ-КАДРЫ · только mobile
    ============================================================ */
 function initUpCards() {
     const wrap = document.getElementById('upCards');
     if (!wrap) return;
 
+    // Порядок: новые сверху
     const list = GRAMOTINO_UPDATES.slice().reverse();
 
     const frag = document.createDocumentFragment();
