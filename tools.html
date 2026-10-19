@@ -76,15 +76,21 @@
     <canvas id="ballsCanvas"></canvas>
 </section>
 
-<nav class="tools-tabs" id="toolsTabs">
-    <button class="tools-tab active" data-tab="interesting" type="button">ИНТЕРЕСНО-ПОЛЕЗНОЕ</button>
-    <button class="tools-tab" data-tab="time" type="button">ВРЕМЯ</button>
-    <button class="tools-tab" data-tab="lectures" type="button">ЛЕКЦИИ</button>
-</nav>
+<div class="tools-switch-wrap">
+    <button class="tools-switch" id="toolsSwitch" type="button" aria-label="Сменить раздел">
+        <span class="tools-switch-index" id="toolsSwitchIndex">01</span>
+        <span class="tools-switch-label" id="toolsSwitchLabel">ИНТЕРЕСНО-ПОЛЕЗНОЕ</span>
+        <span class="tools-switch-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+        </span>
+    </button>
+</div>
 
-<div class="tools-panels">
+<div class="tools-panels-wrap" id="toolsPanelsWrap">
+    <div class="tools-panels" id="toolsPanels">
 
     <div class="tools-panel active" data-panel="interesting">
+        <h2 class="tools-panel-title">ИНТЕРЕСНО-ПОЛЕЗНОЕ</h2>
         <div class="links-list">
 
             <a class="link-item" href="https://ptable.com" target="_blank" rel="noopener noreferrer">
@@ -256,7 +262,22 @@
     </div>
 
     <div class="tools-panel" data-panel="time">
+        <h2 class="tools-panel-title">ЧАСЫ</h2>
         <div class="clock-side">
+            <div class="clock-top-row">
+                <button class="clock-switch" id="clockSwitch" type="button" aria-label="Сменить стиль часов">
+                    <span class="switch-ring"></span>
+                    <span class="switch-icon">
+                        <span class="dial"></span>
+                        <span class="hand-h"></span>
+                        <span class="hand-m"></span>
+                        <span class="hand-c"></span>
+                    </span>
+                </button>
+                <div class="clock-digital" id="clockDigital" aria-live="off">
+                    <span id="clockDigitalH">03</span><span class="clock-digital-sep">:</span><span id="clockDigitalM">00</span>
+                </div>
+            </div>
             <div class="clock-view-wrap">
                 <div class="clock-view view-watch" id="clockView">
 
@@ -614,105 +635,17 @@
                 </div>
             </div>
 
-            <button class="clock-switch" id="clockSwitch" type="button" aria-label="Сменить стиль часов">
-                <span class="switch-ring"></span>
-                <span class="switch-icon">
-                    <span class="dial"></span>
-                    <span class="hand-h"></span>
-                    <span class="hand-m"></span>
-                    <span class="hand-c"></span>
-                </span>
-            </button>
 
-            <div class="clock-digital" id="clockDigital" aria-live="off">
-                <span id="clockDigitalH">03</span><span class="clock-digital-sep">:</span><span id="clockDigitalM">00</span>
-            </div>
         </div>
     </div>
 
     <div class="tools-panel" data-panel="lectures">
         <div class="lectures-list">
 
-            <div class="lecture-group">
-                <h3 class="lecture-group-title">ФИЗИКА</h3>
-                <div class="lecture-list">
-                    <a class="lecture-item" href="https://rutube.ru/video/a414d1a2e392f4b9e2a034df42ba6bbd/" target="_blank" rel="noopener noreferrer">
-                        <span class="lecture-num">01</span>
-                        <div class="lecture-body"><div class="lecture-label"><span class="dot"></span><span>ФИЗИКА · RUTUBE</span></div><div class="lecture-title">Мифы о расах</div><span class="lecture-line"></span></div>
-                        <span class="lecture-arrow">→</span>
-                    </a>
-                    <a class="lecture-item" href="https://vkvideo.ru/video-225170958_456240634" target="_blank" rel="noopener noreferrer">
-                        <span class="lecture-num">02</span>
-                        <div class="lecture-body"><div class="lecture-label"><span class="dot"></span><span>ФИЗИКА · VK</span></div><div class="lecture-title">Лекция 02</div><span class="lecture-line"></span></div>
-                        <span class="lecture-arrow">→</span>
-                    </a>
-                    <a class="lecture-item" href="https://rutube.ru/video/3ed02305d905e526f0cb1eb522154e7d/" target="_blank" rel="noopener noreferrer">
-                        <span class="lecture-num">03</span>
-                        <div class="lecture-body"><div class="lecture-label"><span class="dot"></span><span>ФИЗИКА · RUTUBE</span></div><div class="lecture-title">Лекция 03</div><span class="lecture-line"></span></div>
-                        <span class="lecture-arrow">→</span>
-                    </a>
-                    <a class="lecture-item" href="https://rutube.ru/video/1c6606e712a573817bf7d5998378b326/" target="_blank" rel="noopener noreferrer">
-                        <span class="lecture-num">04</span>
-                        <div class="lecture-body"><div class="lecture-label"><span class="dot"></span><span>ФИЗИКА · RUTUBE</span></div><div class="lecture-title">Лекция 04</div><span class="lecture-line"></span></div>
-                        <span class="lecture-arrow">→</span>
-                    </a>
-                    <a class="lecture-item" href="https://rutube.ru/video/64963a9db321049bb8375a62c4dc8fbc/" target="_blank" rel="noopener noreferrer">
-                        <span class="lecture-num">05</span>
-                        <div class="lecture-body"><div class="lecture-label"><span class="dot"></span><span>ФИЗИКА · RUTUBE</span></div><div class="lecture-title">Лекция 05</div><span class="lecture-line"></span></div>
-                        <span class="lecture-arrow">→</span>
-                    </a>
-                    <a class="lecture-item" href="https://vkvideo.ru/video-218914525_456239626" target="_blank" rel="noopener noreferrer">
-                        <span class="lecture-num">06</span>
-                        <div class="lecture-body"><div class="lecture-label"><span class="dot"></span><span>ФИЗИКА · VK</span></div><div class="lecture-title">Лекция 06</div><span class="lecture-line"></span></div>
-                        <span class="lecture-arrow">→</span>
-                    </a>
-                    <a class="lecture-item" href="https://vkvideo.ru/video-218914525_456239374" target="_blank" rel="noopener noreferrer">
-                        <span class="lecture-num">07</span>
-                        <div class="lecture-body"><div class="lecture-label"><span class="dot"></span><span>ФИЗИКА · VK</span></div><div class="lecture-title">Лекция 07</div><span class="lecture-line"></span></div>
-                        <span class="lecture-arrow">→</span>
-                    </a>
-                </div>
-            </div>
-
-            <div class="lecture-group">
-                <h3 class="lecture-group-title">ХИМИЯ</h3>
-                <div class="lecture-list">
-                    <a class="lecture-item" href="https://vkvideo.ru/video-218914525_456239692" target="_blank" rel="noopener noreferrer">
-                        <span class="lecture-num">01</span>
-                        <div class="lecture-body"><div class="lecture-label"><span class="dot"></span><span>ХИМИЯ · VK</span></div><div class="lecture-title">Лекция 01</div><span class="lecture-line"></span></div>
-                        <span class="lecture-arrow">→</span>
-                    </a>
-                    <a class="lecture-item" href="https://vkvideo.ru/video-218914525_456239791" target="_blank" rel="noopener noreferrer">
-                        <span class="lecture-num">02</span>
-                        <div class="lecture-body"><div class="lecture-label"><span class="dot"></span><span>ХИМИЯ · VK</span></div><div class="lecture-title">Лекция 02</div><span class="lecture-line"></span></div>
-                        <span class="lecture-arrow">→</span>
-                    </a>
-                    <a class="lecture-item" href="https://rutube.ru/video/cd0329a8eda3bc6821315b6569640df2/" target="_blank" rel="noopener noreferrer">
-                        <span class="lecture-num">03</span>
-                        <div class="lecture-body"><div class="lecture-label"><span class="dot"></span><span>ХИМИЯ · RUTUBE</span></div><div class="lecture-title">Лекция 03</div><span class="lecture-line"></span></div>
-                        <span class="lecture-arrow">→</span>
-                    </a>
-                    <a class="lecture-item" href="https://vkvideo.ru/video-217610177_456241170" target="_blank" rel="noopener noreferrer">
-                        <span class="lecture-num">04</span>
-                        <div class="lecture-body"><div class="lecture-label"><span class="dot"></span><span>ХИМИЯ · VK</span></div><div class="lecture-title">Лекция 04</div><span class="lecture-line"></span></div>
-                        <span class="lecture-arrow">→</span>
-                    </a>
-                    <a class="lecture-item" href="https://rutube.ru/video/20b38c2bcb25c3550ba31625b8ba474a/" target="_blank" rel="noopener noreferrer">
-                        <span class="lecture-num">05</span>
-                        <div class="lecture-body"><div class="lecture-label"><span class="dot"></span><span>ХИМИЯ · RUTUBE</span></div><div class="lecture-title">Лекция 05</div><span class="lecture-line"></span></div>
-                        <span class="lecture-arrow">→</span>
-                    </a>
-                    <a class="lecture-item" href="https://vkvideo.ru/video-218914525_456239797" target="_blank" rel="noopener noreferrer">
-                        <span class="lecture-num">06</span>
-                        <div class="lecture-body"><div class="lecture-label"><span class="dot"></span><span>ХИМИЯ · VK</span></div><div class="lecture-title">Лекция 06</div><span class="lecture-line"></span></div>
-                        <span class="lecture-arrow">→</span>
-                    </a>
-                    <a class="lecture-item" href="https://vkvideo.ru/video-221377127_456240070" target="_blank" rel="noopener noreferrer">
-                        <span class="lecture-num">07</span>
-                        <div class="lecture-body"><div class="lecture-label"><span class="dot"></span><span>ХИМИЯ · VK</span></div><div class="lecture-title">Лекция 07</div><span class="lecture-line"></span></div>
-                        <span class="lecture-arrow">→</span>
-                    </a>
-                </div>
+                <div class="tools-panel" data-panel="lectures">
+        <h2 class="tools-panel-title">ЛЕКЦИИ</h2>
+        <div class="media-grid" id="lecturesGrid"></div>
+    </div>
             </div>
 
             <div class="lecture-group">
@@ -754,6 +687,14 @@
         </div>
     </div>
 
+    </div>
+</div>
+
+<div class="media-player-overlay" id="mediaPlayerModal" aria-hidden="true">
+    <button class="media-player-close" id="mediaPlayerClose" type="button" aria-label="Закрыть">×</button>
+    <div class="media-player-stage">
+        <iframe id="mediaPlayerFrame" allow="clipboard-write; autoplay; fullscreen; picture-in-picture" allowfullscreen frameborder="0"></iframe>
+    </div>
 </div>
 
 <div class="evm-overlay term-tools-overlay" id="evmOverlay">
