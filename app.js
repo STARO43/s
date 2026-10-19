@@ -1933,7 +1933,8 @@ function initTools() {
             window.initToolsClock();
         }
 
-        initToolsTabs();
+        initToolsSwitch();
+        initToolsLectures();
         initToolsBalls();
     });
 }
@@ -1941,27 +1942,195 @@ function initTools() {
 /* ============================================================
    TOOLS · ВКЛАДКИ
    ============================================================ */
-function initToolsTabs() {
-    const tabs = Array.from(document.querySelectorAll('.tools-tab'));
-    const panels = Array.from(document.querySelectorAll('.tools-panel'));
-    if (!tabs.length || !panels.length) return;
+function initToolsSwitch() {
+    const wrap     = document.getElementById('toolsPanelsWrap');
+    const panels   = document.getElementById('toolsPanels');
+    const btn      = document.getElementById('toolsSwitch');
+    const labelEl  = document.getElementById('toolsSwitchLabel');
+    const indexEl  = document.getElementById('toolsSwitchIndex');
+    if (!wrap || !panels || !btn) return;
 
-    function activate(name) {
-        tabs.forEach((t) => t.classList.toggle('active', t.dataset.tab === name));
-        panels.forEach((p) => p.classList.toggle('active', p.dataset.panel === name));
+    const ORDER  = ['interesting', 'lectures', 'time'];
+    const LABELS = { interesting: 'ИНТЕРЕСНО-ПОЛЕЗНОЕ', lectures: 'ЛЕКЦИИ', time: 'ЧАСЫ' };
+    const pad2   = (n) => String(n).padStart(2, '0');
+    let state = -1;
+
+    function setActive(name) {
+        panels.querySelectorAll('.tools-panel').forEach((p) => {
+            p.classList.toggle('active', p.dataset.panel === name);
+        });
         if (name === 'time') {
-            setTimeout(() => window.dispatchEvent(new Event('resize')), 60);
+            setTimeout(() => window.dispatchEvent(new Event('resize')), 80);
         }
     }
 
-    tabs.forEach((tab) => {
-        tab.addEventListener('click', () => activate(tab.dataset.tab));
+    function paint(name) {
+        if (labelEl) labelEl.textContent = LABELS[name];
+        if (indexEl) indexEl.textContent = pad2(ORDER.indexOf(name) + 1);
+    }
+
+    function glitchTo(name) {
+        panels.classList.add('glitching');
+        setTimeout(() => {
+            setActive(name);
+            paint(name);
+        }, 190);
+        setTimeout(() => {
+            panels.classList.remove('glitching');
+        }, 420);
+    }
+
+    btn.addEventListener('click', () => {
+        if (state === -1) {
+            state = 0;
+            wrap.classList.add('open');
+            setActive(ORDER[0]);
+            paint(ORDER[0]);
+            return;
+        }
+        state = (state + 1) % ORDER.length;
+        glitchTo(ORDER[state]);
     });
 
     const hash = (window.location.hash || '').replace('#', '');
-    if (hash && document.querySelector('.tools-panel[data-panel="' + hash + '"]')) {
-        activate(hash);
+    if (hash && ORDER.includes(hash)) {
+        state = ORDER.indexOf(hash);
+        wrap.classList.add('open');
+        setActive(hash);
+        paint(hash);
     }
+}
+
+function initToolsLectures() {
+    const grid  = document.getElementById('lecturesGrid');
+    const modal = document.getElementById('mediaPlayerModal');
+    const frame = document.getElementById('mediaPlayerFrame');
+    const close = document.getElementById('mediaPlayerClose');
+    if (!grid || !modal || !frame) return;
+
+    const LECTURES = [
+        { platform: 'rutube', id: 'a414d1a2e392f4b9e2a034df42ba6bbd', title: 'Мифы о расах', subject: 'ФИЗИКА' },
+        { platform: 'vk', owner: '225170958', video: '456240634', title: 'Лекция 02', subject: 'ФИЗИКА' },
+        { platform: 'rutube', id: '3ed02305d905e526f0cb1eb522154e7d', title: 'Лекция 03', subject: 'ФИЗИКА' },
+        { platform: 'rutube', id: '1c6606e712a573817bf7d5998378b326', title: 'Лекция 04', subject: 'ФИЗИКА' },
+        { platform: 'rutube', id: '64963a9db321049bb8375a62c4dc8fbc', title: 'Лекция 05', subject: 'ФИЗИКА' },
+        { platform: 'vk', owner: '218914525', video: '456239626', title: 'Лекция 06', subject: 'ФИЗИКА' },
+        { platform: 'vk', owner: '218914525', video: '456239374', title: 'Лекция 07', subject: 'ФИЗИКА' },
+
+        { platform: 'vk', owner: '218914525', video: '456239692', title: 'Лекция 01', subject: 'ХИМИЯ' },
+        { platform: 'vk', owner: '218914525', video: '456239791', title: 'Лекция 02', subject: 'ХИМИЯ' },
+        { platform: 'rutube', id: 'cd0329a8eda3bc6821315b6569640df2', title: 'Лекция 03', subject: 'ХИМИЯ' },
+        { platform: 'vk', owner: '217610177', video: '456241170', title: 'Лекция 04', subject: 'ХИМИЯ' },
+        { platform: 'rutube', id: '20b38c2bcb25c3550ba31625b8ba474a', title: 'Лекция 05', subject: 'ХИМИЯ' },
+        { platform: 'vk', owner: '218914525', video: '456239797', title: 'Лекция 06', subject: 'ХИМИЯ' },
+        { platform: 'vk', owner: '221377127', video: '456240070', title: 'Лекция 07', subject: 'ХИМИЯ' },
+
+        { platform: 'vk', owner: '29793598', video: '456240918', title: 'Лекция 01', subject: 'БИОЛОГИЯ' },
+        { platform: 'vk', owner: '29793598', video: '456240887', title: 'Лекция 02', subject: 'БИОЛОГИЯ' },
+        { platform: 'vk', owner: '29793598', video: '456241045', title: 'Лекция 03', subject: 'БИОЛОГИЯ' },
+        { platform: 'vk', owner: '29793598', video: '456240966', title: 'Лекция 04', subject: 'БИОЛОГИЯ' },
+        { platform: 'vk', owner: '29793598', video: '456240803', title: 'Лекция 05', subject: 'БИОЛОГИЯ' },
+        { platform: 'vk', owner: '29793598', video: '456240846', title: 'Лекция 06', subject: 'БИОЛОГИЯ' }
+    ];
+
+    function embedUrl(l) {
+        if (l.platform === 'rutube') {
+            return 'https://rutube.ru/play/embed/' + l.id + '/';
+        }
+        return 'https://vk.com/video_ext.php?oid=-' + l.owner + '&id=' + l.video + '&hd=2';
+    }
+
+    const pad2 = (n) => String(n).padStart(2, '0');
+    const frag = document.createDocumentFragment();
+
+    LECTURES.forEach((lec, i) => {
+        const card = document.createElement('a');
+        card.className = 'media-card';
+        card.href = '#';
+
+        const thumb = document.createElement('div');
+        thumb.className = 'media-thumb';
+
+        if (lec.platform === 'rutube') {
+            const img = document.createElement('img');
+            img.className = 'thumb-img';
+            img.alt = lec.title;
+            img.loading = 'lazy';
+            img.decoding = 'async';
+            img.src = 'https://rutube.ru/api/video/' + lec.id + '/thumbnail/?redirect=1';
+            img.onerror = function () { img.style.display = 'none'; };
+            thumb.appendChild(img);
+        } else {
+            const ph = document.createElement('div');
+            ph.className = 'thumb-placeholder';
+            ph.textContent = 'VK ВИДЕО';
+            thumb.appendChild(ph);
+        }
+
+        const num = document.createElement('div');
+        num.className = 'media-num';
+        num.textContent = pad2(i + 1);
+
+        const play = document.createElement('div');
+        play.className = 'media-play';
+
+        thumb.appendChild(num);
+        thumb.appendChild(play);
+
+        const info = document.createElement('div');
+        info.className = 'media-info';
+
+        const top = document.createElement('div');
+        top.className = 'media-info-top';
+        top.innerHTML = '<span class="dot"></span><span>' + lec.subject + ' · ' + lec.platform.toUpperCase() + '</span>';
+
+        const title = document.createElement('div');
+        title.className = 'media-title';
+        title.textContent = lec.title;
+
+        const line = document.createElement('span');
+        line.className = 'media-title-line';
+
+        info.appendChild(top);
+        info.appendChild(title);
+        info.appendChild(line);
+
+        const arrow = document.createElement('span');
+        arrow.className = 'media-arrow';
+        arrow.textContent = '→';
+
+        card.appendChild(thumb);
+        card.appendChild(info);
+        card.appendChild(arrow);
+
+        card.addEventListener('click', (e) => {
+            e.preventDefault();
+            openPlayer(embedUrl(lec));
+        });
+
+        frag.appendChild(card);
+    });
+
+    grid.appendChild(frag);
+
+    function openPlayer(url) {
+        frame.src = url;
+        modal.classList.add('show');
+        modal.setAttribute('aria-hidden', 'false');
+        document.body.style.overflow = 'hidden';
+    }
+    function closePlayer() {
+        modal.classList.remove('show');
+        modal.setAttribute('aria-hidden', 'true');
+        document.body.style.overflow = '';
+        setTimeout(() => { frame.src = 'about:blank'; }, 400);
+    }
+
+    if (close) close.addEventListener('click', closePlayer);
+    modal.addEventListener('click', (e) => { if (e.target === modal) closePlayer(); });
+    document.addEventListener('keydown', (e) => {
+        if (modal.classList.contains('show') && e.key === 'Escape') closePlayer();
+    });
 }
 
 /* ============================================================
@@ -2011,14 +2180,18 @@ function initToolsBalls() {
         }
         return new THREE.CanvasTexture(c);
     }
-    function generateNeonCeramic() {
+    function generateOrangeNeon() {
         const c = document.createElement('canvas');
         c.width = 1024; c.height = 1024;
         const ctx = c.getContext('2d');
-        const colors = ['#ff00ff', '#00ffff', '#ffff00', '#ff0055', '#00ff00'];
-        ctx.fillStyle = colors[Math.floor(Math.random() * colors.length)];
+        const grad = ctx.createRadialGradient(512, 380, 60, 512, 512, 700);
+        grad.addColorStop(0, '#ffb347');
+        grad.addColorStop(0.55, '#ff7a18');
+        grad.addColorStop(1, '#e04a00');
+        ctx.fillStyle = grad;
         ctx.fillRect(0, 0, 1024, 1024);
-        ctx.globalAlpha = 0.15; ctx.fillStyle = '#000';
+        ctx.globalAlpha = 0.14;
+        ctx.fillStyle = '#000';
         for (let i = 0; i < 5000; i++) {
             ctx.beginPath();
             ctx.arc(Math.random() * 1024, Math.random() * 1024, Math.random() * 10 + 2, 0, Math.PI * 2);
@@ -2071,8 +2244,9 @@ function initToolsBalls() {
 
     const materialsDef = {
         metal:    { gen: generateLiquidMetal,    props: { roughness: 0.05, metalness: 0.9, clearcoat: 1.0 }, mass: 2.0, gravity: 0.3, torque: 0,    bounciness: 0.4 },
-        neon:     { gen: generateNeonCeramic,    props: { roughness: 0.3,  metalness: 0.0, clearcoat: 1.0 }, mass: 1.0, gravity: 0,   torque: 0,    bounciness: 0.6 },
-        obsidian: { gen: generateGlitchObsidian, props: { roughness: 0.05, metalness: 0.5, clearcoat: 1.0 }, mass: 1.2, gravity: 0,   torque: 0.05, bounciness: 0.5 },
+        orange:   { gen: generateOrangeNeon,     props: { roughness: 0.22, metalness: 0.05, clearcoat: 1.0 }, mass: 1.0, gravity: 0,   torque: 0,    bounciness: 0.6 },
+        neon:     { gen: generateNeonCeramic,    props: { roughness: 0.3,  metalness: 0.0, clearcoat: 1.0 }, mass: 1.0, gravity: 0,   torque: 0,    bounciness: 0.6 },       
+       obsidian: { gen: generateGlitchObsidian, props: { roughness: 0.05, metalness: 0.5, clearcoat: 1.0 }, mass: 1.2, gravity: 0,   torque: 0.05, bounciness: 0.5 },
         magma:    { gen: generateMagmaRock,      props: { roughness: 0.4,  metalness: 0.0, clearcoat: 0.5 }, mass: 0.4, gravity: 0,   torque: 0,    bounciness: 1.0 },
         concrete: { gen: generateCyberConcrete,  props: { roughness: 0.8,  metalness: 0.0, clearcoat: 0.0 }, mass: 4.0, gravity: 0,   torque: 0,    bounciness: 0.1 }
     };
@@ -2087,8 +2261,8 @@ function initToolsBalls() {
         }
     });
 
-       const materialOrder = ['metal', 'concrete', 'obsidian', 'neon', 'magma'];
-    let currentIndex = 3;                          // ← 3 = neon (оранжево-неоновый)
+    const materialOrder = ['orange', 'metal', 'concrete', 'obsidian', 'neon', 'magma'];
+    let currentIndex = 0;
     let currentGlobalType = materialOrder[currentIndex];
 
        const RADIUS = 1.8;
