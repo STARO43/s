@@ -168,6 +168,37 @@
     .experience-arrow { font-size: 1.2rem; }
     .lectures-grid { grid-template-columns: 1fr; gap: 16px; }
 }
+    .history-vk-cover {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    background:
+        radial-gradient(ellipse 120% 100% at 50% 0%, rgba(255,255,255,0.06), transparent 60%),
+        linear-gradient(135deg, #0a0a12 0%, #14141f 100%);
+    z-index: 1;
+}
+.history-vk-label {
+    font-family: var(--font-mono);
+    font-size: 0.55rem;
+    font-weight: 700;
+    letter-spacing: 0.32em;
+    text-transform: uppercase;
+    color: var(--red);
+}
+.history-vk-title {
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: clamp(1.2rem, 2vw, 1.6rem);
+    letter-spacing: -0.01em;
+    text-transform: uppercase;
+    color: #E0E0E0;
+    text-align: center;
+    padding: 0 16px;
+}
 </style>
 </head>
 <body class="page-nature">
@@ -396,18 +427,28 @@
             img.loading = 'lazy';
             img.decoding = 'async';
             if (lec.provider === 'rutube') {
-                img.src = 'https://rutube.ru/api/video/' + lec.id + '/thumbnail/?redirect=1';
-            } else {
-                img.style.display = 'none';
-            }
-            img.onerror = function () { img.style.display = 'none'; };
+    img.src = 'https://rutube.ru/api/video/' + lec.id + '/thumbnail/?redirect=1';
+    img.onerror = function () { img.style.display = 'none'; };
+    thumb.appendChild(img);
+} else {
+    var vkCover = document.createElement('div');
+    vkCover.className = 'history-vk-cover';
+    var vkLabel = document.createElement('span');
+    vkLabel.className = 'history-vk-label';
+    vkLabel.textContent = 'VK VIDEO';
+    var vkTitle = document.createElement('span');
+    vkTitle.className = 'history-vk-title';
+    vkTitle.textContent = lec.title;
+    vkCover.appendChild(vkLabel);
+    vkCover.appendChild(vkTitle);
+    thumb.appendChild(vkCover);
+}
 
-            var num = document.createElement('div');
-            num.className = 'history-num';
-            num.textContent = pad2(i + 1);
+var num = document.createElement('div');
+num.className = 'history-num';
+num.textContent = pad2(i + 1);
 
-            thumb.appendChild(img);
-            thumb.appendChild(num);
+thumb.appendChild(num);
 
             var info = document.createElement('div');
             info.className = 'history-info';
