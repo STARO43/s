@@ -122,10 +122,10 @@
     const IS_IPAD   = /iPad/.test(UA) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
     const IS_TOUCH  = IS_IPHONE || IS_IPAD || 'ontouchstart' in window;
 
-    const CONCURRENCY   = IS_IPHONE ? 1 : (IS_IPAD ? 3 : 6);
-    const DPR_CAP       = IS_IPHONE ? 1.0 : (IS_IPAD ? 1.75 : 2);
-    const PREVIEW_MAX   = IS_IPHONE ? 480 : (IS_IPAD ? 880 : 1024);
-    const USE_COMPOSER  = !IS_IPHONE;
+    const CONCURRENCY   = 6;      // или 4 — если важна нагрузка на сеть
+const DPR_CAP       = 2;      // retina-качество
+const PREVIEW_MAX   = 1024;   // размер превью-текстур
+const USE_COMPOSER  = true;   // постобработка (аберрация, зерно, виньетка) всем
 
     const ACTIVITY_MIN    = 0.08;
     const ACTIVITY_MAX    = 1.0;
