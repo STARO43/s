@@ -1,0 +1,906 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="description" content="Инструменты. Опыт — интерактивные эксперименты и лекции.">
+<meta name="theme-color" content="#F4F1EA">
+
+<link rel="icon" href="favicon.ico" sizes="any">
+<link rel="apple-touch-icon" href="favicon.ico">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Space+Mono:ital,wght@0,400;0,700;1,400&family=PT+Mono&display=swap" rel="stylesheet">
+
+<link rel="stylesheet" href="style.css">
+<title>Инструменты. Опыт — Грамотиньо</title>
+
+<style>
+/* локальные стили страницы «Опыт» — не трогают style.css */
+.tools-experience-stage {
+    position: relative;
+    z-index: 2;
+    width: 100%;
+    max-width: 1300px;
+    margin: 0 auto;
+    padding: 0 5vw;
+}
+.tools-experience-stage .balls-wrap {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 21 / 9;
+    max-height: 60vh;
+    overflow: hidden;
+    touch-action: none;
+    user-select: none;
+    -webkit-user-select: none;
+    -webkit-tap-highlight-color: transparent;
+    cursor: default;
+}
+.tools-experience-stage canvas { display: block; width: 100%; height: 100%; }
+
+.experience-section {
+    position: relative;
+    z-index: 10;
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 4rem 5vw 2rem;
+}
+.experience-head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 1.4rem;
+    padding-bottom: 1rem;
+    margin-bottom: 2rem;
+    border-bottom: 1px solid var(--paper-line);
+    position: relative;
+}
+.experience-head::after {
+    content: '';
+    position: absolute; left: 0; bottom: -1px;
+    width: 64px; height: 2px; background: var(--red);
+}
+.experience-head-label {
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: clamp(1.4rem, 3.4vw, 2.4rem);
+    letter-spacing: -0.02em;
+    text-transform: uppercase;
+    color: var(--text);
+    line-height: 1;
+}
+.experience-head-note {
+    font-family: var(--font-mono);
+    font-size: 0.62rem;
+    font-weight: 700;
+    letter-spacing: 0.24em;
+    text-transform: uppercase;
+    color: var(--muted);
+    white-space: nowrap;
+}
+
+.experience-list { display: flex; flex-direction: column; border-top: 3px solid var(--text); }
+.experience-card {
+    position: relative;
+    display: grid;
+    grid-template-columns: 70px 1fr 44px;
+    align-items: center;
+    gap: clamp(16px, 3vw, 36px);
+    padding: 26px 8px;
+    cursor: pointer;
+    color: inherit;
+    text-decoration: none;
+    border-bottom: 1px solid var(--paper-line);
+    transition: padding 0.55s cubic-bezier(0.16, 1, 0.3, 1);
+    -webkit-tap-highlight-color: transparent;
+    overflow: hidden;
+    isolation: isolate;
+}
+.experience-card::before {
+    content: '';
+    position: absolute; left: 0; top: 0; bottom: 0;
+    width: 0; background: var(--red);
+    transition: width 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    z-index: 0;
+}
+.experience-card:hover { padding-left: 28px; padding-right: 18px; }
+.experience-card:hover::before { width: 8px; }
+
+.experience-num {
+    position: relative; z-index: 1;
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: clamp(1.6rem, 3.4vw, 2.4rem);
+    line-height: 1;
+    letter-spacing: -0.03em;
+    color: var(--muted);
+    font-variant-numeric: tabular-nums;
+    transition: color 0.3s ease, transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.experience-card:hover .experience-num { color: var(--red); transform: translateX(4px); }
+
+.experience-body { position: relative; z-index: 1; min-width: 0; display: flex; flex-direction: column; gap: 8px; }
+.experience-title {
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: clamp(1.15rem, 2.6vw, 1.55rem);
+    line-height: 1.1;
+    letter-spacing: -0.01em;
+    text-transform: uppercase;
+    color: var(--text);
+    overflow-wrap: anywhere;
+    transition: color 0.3s ease, transform 0.45s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.experience-card:hover .experience-title { color: var(--red); transform: translateX(6px); }
+.experience-desc {
+    font-family: var(--font-mono);
+    font-size: 0.68rem;
+    font-weight: 400;
+    letter-spacing: 0.02em;
+    color: var(--muted);
+    line-height: 1.5;
+    overflow-wrap: anywhere;
+}
+.experience-arrow {
+    position: relative; z-index: 1; justify-self: end;
+    font-family: var(--font-display); font-size: 1.6rem; color: var(--red);
+    opacity: 0; transform: translateX(-14px);
+    transition: opacity 0.4s cubic-bezier(0.16, 1, 0.3, 1), transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.experience-card:hover .experience-arrow { opacity: 1; transform: translateX(0); }
+
+.lectures-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 22px;
+}
+@media (max-width: 640px) {
+    .experience-section { padding: 2.4rem 5vw 1rem; }
+    .experience-card { grid-template-columns: 44px 1fr 28px; gap: 14px; padding: 20px 6px; }
+    .experience-title { font-size: clamp(1rem, 4.6vw, 1.25rem); }
+    .experience-desc { font-size: 0.6rem; }
+    .experience-arrow { font-size: 1.2rem; }
+    .lectures-grid { grid-template-columns: 1fr; gap: 16px; }
+    .tools-experience-stage .balls-wrap { aspect-ratio: 4 / 3; }
+}
+</style>
+</head>
+<body class="page-tools-experience">
+
+<div class="loader-overlay" id="loader">
+    <div class="shutter shutter-top"></div>
+    <div class="shutter"></div>
+    <div class="shutter"></div>
+    <div class="shutter"></div>
+    <div class="shutter shutter-bot"></div>
+</div>
+
+<button class="burger-btn" id="burgerBtn" aria-label="Меню">
+    <span class="ring"></span>
+    <span class="burger-icon"><span></span><span></span><span></span><span></span></span>
+</button>
+
+<button class="theme-toggle" id="themeToggle" aria-label="Сменить тему">
+    <span class="ring"></span>
+    <span class="ico">
+        <svg class="sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4.2"/><line x1="12" y1="1.5" x2="12" y2="4"/><line x1="12" y1="20" x2="12" y2="22.5"/><line x1="1.5" y1="12" x2="4" y2="12"/><line x1="20" y1="12" x2="22.5" y2="12"/><line x1="4.6" y1="4.6" x2="6.4" y2="6.4"/><line x1="17.6" y1="17.6" x2="19.4" y2="19.4"/><line x1="4.6" y1="19.4" x2="6.4" y2="17.6"/><line x1="17.6" y1="6.4" x2="19.4" y2="4.6"/></svg>
+        <svg class="moon" viewBox="0 0 24 24"><path d="M20 14.5A8.2 8.2 0 0 1 9.5 4 8.5 8.5 0 1 0 20 14.5z"/></svg>
+    </span>
+</button>
+
+<div class="burger-menu" id="burgerMenu">
+    <div class="burger-menu-inner">
+        <div class="burger-menu-col burger-menu-col-left">
+            <a href="/"    class="burger-link" data-ns="home">ТИТУЛ.</a>
+            <a href="reading.html"  class="burger-link" data-ns="reading">УЧИ СЛОГИ,</a>
+            <a href="tools.html"    class="burger-link" data-ns="tools">УЧИСЬ ЧАСАМ,</a>
+            <a href="cinema.html"   class="burger-link" data-ns="cinema">МУЛЬТФИЛЬМЫ,</a>
+            <a href="games.html"    class="burger-link" data-ns="games">ИГРЫ.</a>
+        </div>
+        <div class="burger-menu-col burger-menu-col-right">
+            <a href="heroes.html"   class="burger-link" data-ns="heroes">ВЕЛИКИЕ ЛИЧНОСТИ,</a>
+            <a href="articles.html" class="burger-link" data-ns="articles">ПЕДАГОГИКА,</a>
+            <a href="history.html"  class="burger-link" data-ns="history">ИСТОРИЯ,</a>
+            <a href="art.html"      class="burger-link" data-ns="art">ЖИВОПИСЬ,</a>
+            <a href="poetry.html"   class="burger-link" data-ns="poetry">ПОЭЗИЯ.</a>
+        </div>
+    </div>
+    <div class="burger-menu-foot">ГРАМОТИНЬО · ТЕРМИНАЛ КУЛЬТУРЫ · 2026</div>
+</div>
+
+<div class="media-player-overlay" id="mediaPlayerModal" aria-hidden="true">
+    <div class="media-player-stage">
+        <iframe id="mediaPlayerFrame" allow="autoplay; encrypted-media; fullscreen; picture-in-picture" allowfullscreen></iframe>
+    </div>
+    <button class="media-player-close" id="mediaPlayerClose" aria-label="Закрыть">×</button>
+</div>
+
+<main class="wrapper" id="mainContent">
+
+    <!-- ===== ШАРЫ · прямо на странице, без рамки-приложения ===== -->
+    <section class="tools-experience-stage">
+        <div class="balls-wrap" id="ballsWrap">
+            <canvas id="ballsCanvas"></canvas>
+        </div>
+    </section>
+
+    <!-- ===== ОПЫТЫ · ссылки ===== -->
+    <section class="experience-section">
+        <div class="experience-head">
+            <span class="experience-head-label">ОПЫТЫ · ССЫЛКИ</span>
+            <span class="experience-head-note">ОТ СЕРЬЁЗНОГО К ИГРОВОМУ</span>
+        </div>
+        <div class="experience-list" id="experienceList"></div>
+    </section>
+
+    <!-- ===== ЛЕКЦИИ ===== -->
+    <section class="experience-section">
+        <div class="experience-head">
+            <span class="experience-head-label">ЛЕКЦИИ</span>
+            <span class="experience-head-note">RUTUBE · VKVIDEO</span>
+        </div>
+        <div class="lectures-grid" id="lecturesGrid"></div>
+    </section>
+
+</main>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+<script src="app.js"></script>
+
+<!-- ===== Данные + логика страницы ===== -->
+<script>
+(function () {
+    'use strict';
+
+    /* ---------- ОПЫТЫ (от серьёзных к несерьёзным) ---------- */
+    var EXPERIENCES = [
+        { url: 'https://htwins.net/scale2/', title: 'Scale of the Universe 2', desc: 'Масштабы Вселенной — от планковской длины до галактик.' },
+        { url: 'https://stars.chromeexperiments.com/', title: '100 000 Stars', desc: 'Трёхмерная карта звёзд в окрестностях Солнца.' },
+        { url: 'https://neal.fun/size-of-space/', title: 'Size of Space', desc: 'Сравнение размеров космических объектов.' },
+        { url: 'https://neal.fun/deep-sea/', title: 'The Deep Sea', desc: 'Погружение в океан: кто живёт на каждой глубине.' },
+        { url: 'https://www.oldmapsonline.org/en/Asia#position=1.8727/53.9/37.5&year=950', title: 'Old Maps Online', desc: 'Исторические карты мира по годам.' },
+        { url: 'https://www.chronas.org/', title: 'Chronas', desc: 'История на карте: эпохи, границы, события.' },
+        { url: 'https://mol.org/', title: 'Map of Life', desc: 'Где на Земле живут те или иные виды.' },
+        { url: 'https://ptable.com', title: 'Periodic Table', desc: 'Интерактивная таблица Менделеева со свойствами элементов.' },
+        { url: 'https://neal.fun/wonders-of-street-view/', title: 'Wonders of Street View', desc: 'Необычные места, найденные на панорамах Google.' },
+        { url: 'https://experiments.withgoogle.com/collection/chrome', title: 'Chrome Experiments', desc: 'Коллекция экспериментов на браузерных технологиях.' },
+        { url: 'https://neal.fun/perfect-circle/', title: 'Perfect Circle', desc: 'Нарисуйте идеальный круг от руки.' },
+        { url: 'https://optical.toys/', title: 'Optical Toys', desc: 'Оптические иллюзии и обманы зрения.' },
+        { url: 'https://quickdraw.withgoogle.com/?locale=ru', title: 'Quick, Draw!', desc: 'Нейросеть угадывает рисунок за 20 секунд.' }
+    ];
+
+    /* ---------- ЛЕКЦИИ (Rutube / VKVideo) ---------- */
+    var LECTURES = [
+        { provider: 'rutube', id: 'a414d1a2e392f4b9e2a034df42ba6bbd', title: 'Лекция 01' },
+        { provider: 'vk',     id: '-225170958_456240634',             title: 'Лекция 02' },
+        { provider: 'rutube', id: '3ed02305d905e526f0cb1eb522154e7d', title: 'Лекция 03' },
+        { provider: 'rutube', id: '1c6606e712a573817bf7d5998378b326', title: 'Лекция 04' },
+        { provider: 'rutube', id: '64963a9db321049bb8375a62c4dc8fbc', title: 'Лекция 05' },
+        { provider: 'vk',     id: '-218914525_456239626',             title: 'Лекция 06' },
+        { provider: 'vk',     id: '-218914525_456239374',             title: 'Лекция 07' },
+        { provider: 'vk',     id: '-218914525_456239692',             title: 'Лекция 08' },
+        { provider: 'vk',     id: '-218914525_456239791',             title: 'Лекция 09' },
+        { provider: 'rutube', id: 'cd0329a8eda3bc6821315b6569640df2', title: 'Лекция 10' },
+        { provider: 'vk',     id: '-217610177_456241170',             title: 'Лекция 11' },
+        { provider: 'rutube', id: '20b38c2bcb25c3550ba31625b8ba474a', title: 'Лекция 12' },
+        { provider: 'vk',     id: '-218914525_456239797',             title: 'Лекция 13' },
+        { provider: 'vk',     id: '-218914525_456239791',             title: 'Лекция 14' },
+        { provider: 'vk',     id: '-218914525_456239692',             title: 'Лекция 15' },
+        { provider: 'vk',     id: '-221377127_456240070',             title: 'Лекция 16' },
+        { provider: 'vk',     id: '-29793598_456240918',              title: 'Лекция 17' },
+        { provider: 'vk',     id: '-29793598_456240887',              title: 'Лекция 18' },
+        { provider: 'vk',     id: '-29793598_456241045',              title: 'Лекция 19' },
+        { provider: 'vk',     id: '-29793598_456240966',              title: 'Лекция 20' },
+        { provider: 'vk',     id: '-29793598_456240803',              title: 'Лекция 21' },
+        { provider: 'vk',     id: '-29793598_456240846',              title: 'Лекция 22' }
+    ];
+
+    function pad2(n) { return String(n).padStart(2, '0'); }
+
+    /* ---------- Рендер списка опытов ---------- */
+    function renderExperiences() {
+        var list = document.getElementById('experienceList');
+        if (!list) return;
+        var frag = document.createDocumentFragment();
+        EXPERIENCES.forEach(function (item, i) {
+            var a = document.createElement('a');
+            a.className = 'experience-card';
+            a.href = item.url;
+            a.target = '_blank';
+            a.rel = 'noopener noreferrer';
+
+            var num = document.createElement('span');
+            num.className = 'experience-num';
+            num.textContent = pad2(i + 1);
+
+            var body = document.createElement('div');
+            body.className = 'experience-body';
+
+            var title = document.createElement('div');
+            title.className = 'experience-title';
+            title.textContent = item.title;
+
+            var desc = document.createElement('div');
+            desc.className = 'experience-desc';
+            desc.textContent = item.desc;
+
+            body.appendChild(title);
+            body.appendChild(desc);
+
+            var arrow = document.createElement('span');
+            arrow.className = 'experience-arrow';
+            arrow.textContent = '→';
+
+            a.appendChild(num);
+            a.appendChild(body);
+            a.appendChild(arrow);
+            frag.appendChild(a);
+        });
+        list.appendChild(frag);
+    }
+
+    /* ---------- Плеер Rutube / VK ---------- */
+    var modal = document.getElementById('mediaPlayerModal');
+    var frame = document.getElementById('mediaPlayerFrame');
+    var closeBtn = document.getElementById('mediaPlayerClose');
+
+    function embedUrl(lec) {
+        if (lec.provider === 'rutube') {
+            return 'https://rutube.ru/play/embed/' + lec.id + '/';
+        }
+        return 'https://vkvideo.ru/video_ext.php?oid=' + lec.id.split('_')[0] +
+               '&id=' + lec.id.split('_')[1] + '&hd=2';
+    }
+
+    function openPlayer(lec) {
+        frame.src = embedUrl(lec);
+        modal.classList.add('show');
+        modal.setAttribute('aria-hidden', 'false');
+        document.body.style.overflow = 'hidden';
+    }
+    function closePlayer() {
+        modal.classList.remove('show');
+        modal.setAttribute('aria-hidden', 'true');
+        document.body.style.overflow = '';
+        setTimeout(function () { frame.src = 'about:blank'; }, 400);
+    }
+
+    if (closeBtn) closeBtn.addEventListener('click', closePlayer);
+    if (modal) modal.addEventListener('click', function (e) {
+        if (e.target === modal) closePlayer();
+    });
+    document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape' && modal && modal.classList.contains('show')) closePlayer();
+    });
+
+    /* ---------- Рендер лекций ---------- */
+    function renderLectures() {
+        var grid = document.getElementById('lecturesGrid');
+        if (!grid) return;
+        var frag = document.createDocumentFragment();
+
+        LECTURES.forEach(function (lec, i) {
+            var card = document.createElement('a');
+            card.className = 'history-card';
+            card.href = '#';
+
+            var thumb = document.createElement('div');
+            thumb.className = 'history-thumb';
+
+            var img = document.createElement('img');
+            img.className = 'thumb-img';
+            img.alt = lec.title;
+            img.loading = 'lazy';
+            img.decoding = 'async';
+            if (lec.provider === 'rutube') {
+                img.src = 'https://rutube.ru/api/video/' + lec.id + '/thumbnail/?redirect=1';
+            } else {
+                // VK не отдаёт публичный thumbnail-endpoint без токена — оставляем чёрный фон
+                img.style.display = 'none';
+            }
+            img.onerror = function () { img.style.display = 'none'; };
+
+            var num = document.createElement('div');
+            num.className = 'history-num';
+            num.textContent = pad2(i + 1);
+
+            thumb.appendChild(img);
+            thumb.appendChild(num);
+
+            var info = document.createElement('div');
+            info.className = 'history-info';
+
+            var top = document.createElement('div');
+            top.className = 'history-info-top';
+            var dot = document.createElement('span');
+            dot.className = 'dot';
+            var label = document.createElement('span');
+            label.textContent = lec.provider === 'rutube' ? 'ЛЕКЦИЯ · RUTUBE' : 'ЛЕКЦИЯ · VKVIDEO';
+            top.appendChild(dot);
+            top.appendChild(label);
+
+            var title = document.createElement('div');
+            title.className = 'history-title';
+            title.textContent = lec.title;
+
+            var line = document.createElement('span');
+            line.className = 'history-title-line';
+
+            info.appendChild(top);
+            info.appendChild(title);
+            info.appendChild(line);
+
+            card.appendChild(thumb);
+            card.appendChild(info);
+
+            card.addEventListener('click', function (e) {
+                e.preventDefault();
+                openPlayer(lec);
+            });
+
+            frag.appendChild(card);
+        });
+
+        grid.appendChild(frag);
+    }
+
+    /* ==========================================================
+       ШАРЫ · three.js r128 (как в вашем прототипе)
+       Глубина сжата через Z_RANGE, старт — magma (оранжевые)
+       ========================================================== */
+    function initBalls() {
+        var wrap = document.getElementById('ballsWrap');
+        var canvas = document.getElementById('ballsCanvas');
+        if (!wrap || !canvas || typeof THREE === 'undefined') return;
+
+        var scene = new THREE.Scene();
+        var camera = new THREE.PerspectiveCamera(45, wrap.clientWidth / wrap.clientHeight, 0.1, 100);
+        camera.position.set(0, 0, 22);
+
+        var renderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: true, alpha: true });
+        renderer.setSize(wrap.clientWidth, wrap.clientHeight);
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+        renderer.toneMapping = THREE.ACESFilmicToneMapping;
+        renderer.toneMappingExposure = 1.3;
+        renderer.shadowMap.enabled = true;
+        renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+
+        scene.add(new THREE.AmbientLight(0xffffff, 0.5));
+        var keyLight = new THREE.DirectionalLight(0xffffff, 2.0);
+        keyLight.position.set(10, 20, 15);
+        keyLight.castShadow = true;
+        scene.add(keyLight);
+        var fillLight = new THREE.DirectionalLight(0xffffff, 1.0);
+        fillLight.position.set(-15, 0, 10);
+        scene.add(fillLight);
+
+        /* ---------- генераторы текстур ---------- */
+        function generateLiquidMetal() {
+            var c = document.createElement('canvas'); c.width = 1024; c.height = 1024;
+            var ctx = c.getContext('2d');
+            ctx.fillStyle = '#b0b0b0'; ctx.fillRect(0, 0, 1024, 1024);
+            ctx.globalAlpha = 0.6;
+            for (var i = 0; i < 3000; i++) {
+                ctx.fillStyle = Math.random() > 0.5 ? '#ffffff' : '#444444';
+                ctx.beginPath(); ctx.arc(Math.random() * 1024, Math.random() * 1024, Math.random() * 20 + 1, 0, Math.PI * 2); ctx.fill();
+            }
+            return new THREE.CanvasTexture(c);
+        }
+        function generateNeonCeramic() {
+            var c = document.createElement('canvas'); c.width = 1024; c.height = 1024;
+            var ctx = c.getContext('2d');
+            var colors = ['#ff00ff', '#00ffff', '#ffff00', '#ff0055', '#00ff00'];
+            ctx.fillStyle = colors[Math.floor(Math.random() * colors.length)]; ctx.fillRect(0, 0, 1024, 1024);
+            ctx.globalAlpha = 0.15; ctx.fillStyle = '#000';
+            for (var i = 0; i < 5000; i++) { ctx.beginPath(); ctx.arc(Math.random() * 1024, Math.random() * 1024, Math.random() * 10 + 2, 0, Math.PI * 2); ctx.fill(); }
+            return new THREE.CanvasTexture(c);
+        }
+        function generateGlitchObsidian() {
+            var c = document.createElement('canvas'); c.width = 1024; c.height = 1024;
+            var ctx = c.getContext('2d');
+            ctx.fillStyle = '#050505'; ctx.fillRect(0, 0, 1024, 1024);
+            ctx.globalAlpha = 0.8; ctx.strokeStyle = Math.random() > 0.5 ? '#00ffcc' : '#ff00cc';
+            for (var i = 0; i < 50; i++) { ctx.lineWidth = Math.random() * 2 + 0.5; ctx.beginPath(); ctx.moveTo(Math.random() * 1024, Math.random() * 1024); ctx.lineTo(Math.random() * 1024, Math.random() * 1024); ctx.stroke(); }
+            return new THREE.CanvasTexture(c);
+        }
+        function generateMagmaRock() {
+            var c = document.createElement('canvas'); c.width = 1024; c.height = 1024;
+            var ctx = c.getContext('2d');
+            ctx.fillStyle = '#1a0a0a'; ctx.fillRect(0, 0, 1024, 1024);
+            ctx.globalAlpha = 0.4; ctx.fillStyle = '#ff3300';
+            for (var i = 0; i < 500; i++) { ctx.beginPath(); ctx.arc(Math.random() * 1024, Math.random() * 1024, Math.random() * 100 + 10, 0, Math.PI * 2); ctx.fill(); }
+            return new THREE.CanvasTexture(c);
+        }
+        function generateCyberConcrete() {
+            var c = document.createElement('canvas'); c.width = 1024; c.height = 1024;
+            var ctx = c.getContext('2d');
+            ctx.fillStyle = '#222'; ctx.fillRect(0, 0, 1024, 1024);
+            ctx.globalAlpha = 0.1; ctx.fillStyle = '#fff';
+            for (var i = 0; i < 10000; i++) { ctx.beginPath(); ctx.arc(Math.random() * 1024, Math.random() * 1024, Math.random() * 3 + 1, 0, Math.PI * 2); ctx.fill(); }
+            return new THREE.CanvasTexture(c);
+        }
+
+        var materialsDef = {
+            metal:    { gen: generateLiquidMetal,    props: { roughness: 0.05, metalness: 0.9, clearcoat: 1.0 }, mass: 2.0, gravity: 0.3, torque: 0,    bounciness: 0.4 },
+            neon:     { gen: generateNeonCeramic,    props: { roughness: 0.3,  metalness: 0.0, clearcoat: 1.0 }, mass: 1.0, gravity: 0,   torque: 0,    bounciness: 0.6 },
+            obsidian: { gen: generateGlitchObsidian, props: { roughness: 0.05, metalness: 0.5, clearcoat: 1.0 }, mass: 1.2, gravity: 0,   torque: 0.05, bounciness: 0.5 },
+            magma:    { gen: generateMagmaRock,      props: { roughness: 0.4,  metalness: 0.0, clearcoat: 0.5 }, mass: 0.4, gravity: 0,   torque: 0,    bounciness: 1.0 },
+            concrete: { gen: generateCyberConcrete,  props: { roughness: 0.8,  metalness: 0.0, clearcoat: 0.0 }, mass: 4.0, gravity: 0,   torque: 0,    bounciness: 0.1 }
+        };
+
+        var materialPool = {};
+        Object.keys(materialsDef).forEach(function (k) {
+            materialPool[k] = [];
+            for (var i = 0; i < 4; i++) {
+                var tex = materialsDef[k].gen();
+                tex.anisotropy = renderer.capabilities.getMaxAnisotropy();
+                materialPool[k].push(new THREE.MeshPhysicalMaterial(Object.assign({ map: tex }, materialsDef[k].props)));
+            }
+        });
+
+        /* Порядок цепочки: старт — magma (оранжевые) */
+        var materialOrder = ['magma', 'metal', 'concrete', 'obsidian', 'neon'];
+        var currentIndex = 0;
+        var currentGlobalType = materialOrder[currentIndex];
+
+        /* ---------- фон-шейдер (сетка) ---------- */
+        var bgGeometry = new THREE.PlaneGeometry(2, 2);
+        var themeColors = {
+            metal:    { top: '#000510', line1: '#0066ff', line2: '#001133' },
+            neon:     { top: '#0a0015', line1: '#ff00ff', line2: '#330055' },
+            obsidian: { top: '#050505', line1: '#ff4444', line2: '#220000' },
+            magma:    { top: '#0a0000', line1: '#ff3300', line2: '#330000' },
+            concrete: { top: '#001000', line1: '#00ff88', line2: '#003322' }
+        };
+        var bgMaterial = new THREE.ShaderMaterial({
+            uniforms: {
+                uTime:       { value: 0 },
+                uColorTop:   { value: new THREE.Color() },
+                uColorLine1: { value: new THREE.Color() },
+                uColorLine2: { value: new THREE.Color() }
+            },
+            vertexShader: 'varying vec2 vUv; void main() { vUv = uv; gl_Position = vec4(position, 1.0); }',
+            fragmentShader: [
+                'uniform float uTime;',
+                'uniform vec3 uColorTop;',
+                'uniform vec3 uColorLine1;',
+                'uniform vec3 uColorLine2;',
+                'varying vec2 vUv;',
+                'void main() {',
+                '  vec2 uv = vUv;',
+                '  float horizon = 0.4;',
+                '  if (uv.y > horizon) {',
+                '    vec3 sky = mix(uColorTop, vec3(0.0), uv.y);',
+                '    gl_FragColor = vec4(sky, 1.0); return;',
+                '  }',
+                '  float perspective = (horizon - uv.y) / horizon;',
+                '  float lineX = fract((uv.x - 0.5) / (perspective * 4.0) + uTime * 0.2);',
+                '  float lineY = fract(1.0 / perspective - uTime * 0.5);',
+                '  float gridX = smoothstep(0.02, 0.0, abs(lineX - 0.5) - 0.48);',
+                '  float gridY = smoothstep(0.05, 0.0, abs(lineY - 0.5) - 0.45);',
+                '  vec3 lineColor = mix(uColorLine1, uColorLine2, perspective);',
+                '  lineColor *= (gridX + gridY) * (1.0 - perspective);',
+                '  gl_FragColor = vec4(lineColor, 1.0);',
+                '}'
+            ].join('\n'),
+            depthWrite: false, depthTest: false
+        });
+        var bgMesh = new THREE.Mesh(bgGeometry, bgMaterial);
+        bgMesh.frustumCulled = false;
+        bgMesh.renderOrder = -1;
+        scene.add(bgMesh);
+
+        function updateBackgroundColors(type) {
+            var colors = themeColors[type];
+            bgMaterial.uniforms.uColorTop.value.set(colors.top);
+            bgMaterial.uniforms.uColorLine1.value.set(colors.line1);
+            bgMaterial.uniforms.uColorLine2.value.set(colors.line2);
+        }
+
+        /* ---------- границы ---------- */
+        var RADIUS = 1.8;
+        var Z_RANGE = 0.6; /* сжатие глубины: было 4.0 */
+        var bounds = { minX: -8, maxX: 8, minY: -4, maxY: 4, minZ: -Z_RANGE, maxZ: Z_RANGE };
+
+        function recomputeBounds() {
+            var vFovRad = camera.fov * Math.PI / 180;
+            var dist = camera.position.z;
+            var halfH = Math.tan(vFovRad / 2) * dist;
+            var halfW = halfH * camera.aspect;
+            bounds.minX = -halfW + RADIUS;
+            bounds.maxX =  halfW - RADIUS;
+            bounds.minY = -halfH + RADIUS;
+            bounds.maxY =  halfH - RADIUS;
+            bounds.minZ = -Z_RANGE;
+            bounds.maxZ =  Z_RANGE;
+        }
+
+        /* ---------- шары ---------- */
+        var COUNT = 20;
+        var sphereGeo = new THREE.SphereGeometry(RADIUS, 64, 64);
+        var spheres = [];
+
+        for (var i = 0; i < COUNT; i++) {
+            var mesh = new THREE.Mesh(sphereGeo, materialPool[currentGlobalType][0]);
+            mesh.castShadow = true;
+            mesh.receiveShadow = true;
+            mesh.position.set(
+                (Math.random() - 0.5) * 12,
+                (Math.random() - 0.5) * 7,
+                (Math.random() - 0.5) * Z_RANGE * 2
+            );
+            scene.add(mesh);
+            spheres.push({ mesh: mesh, velocity: new THREE.Vector3() });
+        }
+
+        recomputeBounds();
+        spheres.forEach(function (s) {
+            s.mesh.position.x = Math.max(bounds.minX, Math.min(bounds.maxX, s.mesh.position.x));
+            s.mesh.position.y = Math.max(bounds.minY, Math.min(bounds.maxY, s.mesh.position.y));
+            s.mesh.position.z = Math.max(bounds.minZ, Math.min(bounds.maxZ, s.mesh.position.z));
+        });
+
+        updateBackgroundColors(currentGlobalType);
+
+        /* ---------- взаимодействие ---------- */
+        var raycaster = new THREE.Raycaster();
+        var mouse = new THREE.Vector2();
+        var mousePlane = new THREE.Plane(new THREE.Vector3(0, 0, 1), 0);
+        var currentMousePos = new THREE.Vector3();
+        var prevMousePos = new THREE.Vector3();
+        var isFirstMove = true;
+
+        var GRAB_OMEGA2 = 0.012;
+        var GRAB_DAMP = 0.35;
+        var GRAB_MAX_SPEED = 0.8;
+        var grabbedSphere = null;
+        var grabTarget = new THREE.Vector3();
+
+        var clickCooldownTimer = null;
+        var canDblClick = true;
+        function blockDblClickFor(ms) {
+            canDblClick = false;
+            if (clickCooldownTimer) clearTimeout(clickCooldownTimer);
+            clickCooldownTimer = setTimeout(function () { canDblClick = true; }, ms);
+        }
+
+        function pointerToNDC(e) {
+            var rect = wrap.getBoundingClientRect();
+            return {
+                x: ((e.clientX - rect.left) / rect.width) * 2 - 1,
+                y: -((e.clientY - rect.top) / rect.height) * 2 + 1
+            };
+        }
+        function clampGrabTarget() {
+            grabTarget.x = Math.max(bounds.minX, Math.min(bounds.maxX, grabTarget.x));
+            grabTarget.y = Math.max(bounds.minY, Math.min(bounds.maxY, grabTarget.y));
+        }
+
+        wrap.addEventListener('pointerdown', function (e) {
+            if (e.pointerType === 'mouse' && e.button !== 0) return;
+            var ndc = pointerToNDC(e);
+            mouse.x = ndc.x; mouse.y = ndc.y;
+            raycaster.setFromCamera(mouse, camera);
+            var hits = raycaster.intersectObjects(spheres.map(function (s) { return s.mesh; }), false);
+            if (hits.length > 0) {
+                var s = spheres.find(function (sp) { return sp.mesh === hits[0].object; });
+                if (s) {
+                    grabbedSphere = s;
+                    raycaster.ray.intersectPlane(mousePlane, grabTarget);
+                    clampGrabTarget();
+                    s.mesh.scale.setScalar(1.10);
+                    try { wrap.setPointerCapture(e.pointerId); } catch (_) {}
+                    isFirstMove = true;
+                    blockDblClickFor(400);
+                }
+            }
+        });
+
+        wrap.addEventListener('pointermove', function (e) {
+            var ndc = pointerToNDC(e);
+            mouse.x = ndc.x; mouse.y = ndc.y;
+            raycaster.setFromCamera(mouse, camera);
+
+            if (grabbedSphere) {
+                raycaster.ray.intersectPlane(mousePlane, grabTarget);
+                clampGrabTarget();
+                return;
+            }
+
+            if (raycaster.ray.intersectPlane(mousePlane, currentMousePos)) {
+                if (isFirstMove) { prevMousePos.copy(currentMousePos); isFirstMove = false; return; }
+                var speed = currentMousePos.distanceTo(prevMousePos);
+                if (speed > 0.1) {
+                    spheres.forEach(function (s) {
+                        var dx = s.mesh.position.x - currentMousePos.x;
+                        var dy = s.mesh.position.y - currentMousePos.y;
+                        var dist = Math.sqrt(dx * dx + dy * dy);
+                        if (dist < 5.0 && dist > 0.001) {
+                            var force = (5.0 - dist) * Math.min(speed, 1.0) * 0.05 / materialsDef[currentGlobalType].mass;
+                            s.velocity.x += (dx / dist) * force;
+                            s.velocity.y += (dy / dist) * force;
+                        }
+                    });
+                }
+                prevMousePos.copy(currentMousePos);
+            }
+        });
+
+        function releaseGrab(e) {
+            if (!grabbedSphere) return;
+            grabbedSphere.mesh.scale.setScalar(1);
+            grabbedSphere = null;
+            isFirstMove = true;
+            if (e && e.pointerId !== undefined) {
+                try { wrap.releasePointerCapture(e.pointerId); } catch (_) {}
+            }
+        }
+        wrap.addEventListener('pointerup', releaseGrab);
+        wrap.addEventListener('pointercancel', releaseGrab);
+        window.addEventListener('pointerup', releaseGrab);
+        window.addEventListener('pointercancel', releaseGrab);
+        wrap.addEventListener('pointerleave', function () { if (!grabbedSphere) isFirstMove = true; });
+
+        /* ---------- двойной клик — смена материала ---------- */
+        wrap.addEventListener('dblclick', function (e) {
+            if (!canDblClick || grabbedSphere) return;
+            var ndc = pointerToNDC(e);
+            mouse.x = ndc.x; mouse.y = ndc.y;
+            raycaster.setFromCamera(mouse, camera);
+            var hits = raycaster.intersectObjects(spheres.map(function (s) { return s.mesh; }), false);
+            if (hits.length > 0) return;
+
+            currentIndex = (currentIndex + 1) % materialOrder.length;
+            currentGlobalType = materialOrder[currentIndex];
+            spheres.forEach(function (s) {
+                s.mesh.material = materialPool[currentGlobalType][Math.floor(Math.random() * 4)];
+            });
+            updateBackgroundColors(currentGlobalType);
+        });
+
+        /* ---------- цикл ---------- */
+        var clock = new THREE.Clock();
+        var globalTime = 0;
+        var MAX_SPEED = 0.5;
+
+        function animate() {
+            requestAnimationFrame(animate);
+            var dt = Math.min(clock.getDelta(), 0.1);
+            globalTime += dt;
+            bgMaterial.uniforms.uTime.value = globalTime;
+            var def = materialsDef[currentGlobalType];
+
+            for (var i = 0; i < spheres.length; i++) {
+                var s = spheres[i];
+                var isGrabbed = (s === grabbedSphere);
+
+                if (isGrabbed) {
+                    var dxg = grabTarget.x - s.mesh.position.x;
+                    var dyg = grabTarget.y - s.mesh.position.y;
+                    s.velocity.x += dxg * GRAB_OMEGA2;
+                    s.velocity.y += dyg * GRAB_OMEGA2;
+                    var dampFactor = 1 / (1 + GRAB_DAMP);
+                    s.velocity.x *= dampFactor;
+                    s.velocity.y *= dampFactor;
+                    var sp = Math.sqrt(s.velocity.x * s.velocity.x + s.velocity.y * s.velocity.y);
+                    if (sp > GRAB_MAX_SPEED) {
+                        var k = GRAB_MAX_SPEED / sp;
+                        s.velocity.x *= k; s.velocity.y *= k;
+                    }
+                } else {
+                    if (def.gravity > 0) s.velocity.y -= def.gravity * dt;
+                    if (def.torque > 0) {
+                        s.mesh.rotation.z -= def.torque * dt;
+                        s.mesh.rotation.x += def.torque * 0.5 * dt;
+                    }
+                    var distToCenter = s.mesh.position.length();
+                    if (distToCenter > 0.1) {
+                        var pull = (1.5 / def.mass) / (distToCenter + 1.0);
+                        s.velocity.x -= (s.mesh.position.x / distToCenter) * pull * dt;
+                        s.velocity.y -= (s.mesh.position.y / distToCenter) * pull * dt;
+                        s.velocity.z -= (s.mesh.position.z / distToCenter) * pull * dt;
+                    }
+                }
+
+                for (var j = i + 1; j < spheres.length; j++) {
+                    var s2 = spheres[j];
+                    var dx = s.mesh.position.x - s2.mesh.position.x;
+                    var dy = s.mesh.position.y - s2.mesh.position.y;
+                    var dz = s.mesh.position.z - s2.mesh.position.z;
+                    var dist = Math.sqrt(dx * dx + dy * dy + dz * dz);
+                    var minDist = RADIUS * 2;
+                    if (dist < minDist && dist > 0.01) {
+                        var overlap = minDist - dist;
+                        var nx = dx / dist, ny = dy / dist, nz = dz / dist;
+                        var sG = (s === grabbedSphere), s2G = (s2 === grabbedSphere);
+                        if (sG && !s2G) {
+                            s2.mesh.position.x -= nx * overlap;
+                            s2.mesh.position.y -= ny * overlap;
+                            s2.mesh.position.z -= nz * overlap;
+                            var rel1 = (s.velocity.x - s2.velocity.x) * nx + (s.velocity.y - s2.velocity.y) * ny + (s.velocity.z - s2.velocity.z) * nz;
+                            if (rel1 < 0) {
+                                var imp1 = -rel1 * 0.6;
+                                s2.velocity.x -= imp1 * nx; s2.velocity.y -= imp1 * ny; s2.velocity.z -= imp1 * nz;
+                                s.velocity.x *= 0.7; s.velocity.y *= 0.7; s.velocity.z *= 0.7;
+                            }
+                        } else if (s2G && !sG) {
+                            s.mesh.position.x += nx * overlap;
+                            s.mesh.position.y += ny * overlap;
+                            s.mesh.position.z += nz * overlap;
+                            var rel2 = (s2.velocity.x - s.velocity.x) * (-nx) + (s2.velocity.y - s.velocity.y) * (-ny) + (s2.velocity.z - s.velocity.z) * (-nz);
+                            if (rel2 < 0) {
+                                var imp2 = -rel2 * 0.6;
+                                s.velocity.x += imp2 * nx; s.velocity.y += imp2 * ny; s.velocity.z += imp2 * nz;
+                                s2.velocity.x *= 0.7; s2.velocity.y *= 0.7; s2.velocity.z *= 0.7;
+                            }
+                        } else {
+                            var push = overlap * 0.5;
+                            s.mesh.position.x += nx * push; s.mesh.position.y += ny * push; s.mesh.position.z += nz * push;
+                            s2.mesh.position.x -= nx * push; s2.mesh.position.y -= ny * push; s2.mesh.position.z -= nz * push;
+                            var rel3 = (s.velocity.x - s2.velocity.x) * nx + (s.velocity.y - s2.velocity.y) * ny + (s.velocity.z - s2.velocity.z) * nz;
+                            if (rel3 < 0) {
+                                var imp3 = rel3 * 0.6;
+                                s.velocity.x -= imp3 * nx; s.velocity.y -= imp3 * ny; s.velocity.z -= imp3 * nz;
+                                s2.velocity.x += imp3 * nx; s2.velocity.y += imp3 * ny; s2.velocity.z += imp3 * nz;
+                            }
+                        }
+                    }
+                }
+
+                if (s.mesh.position.x < bounds.minX) { s.mesh.position.x = bounds.minX; s.velocity.x *= -def.bounciness; }
+                if (s.mesh.position.x > bounds.maxX) { s.mesh.position.x = bounds.maxX; s.velocity.x *= -def.bounciness; }
+                if (s.mesh.position.y < bounds.minY) { s.mesh.position.y = bounds.minY; s.velocity.y *= -def.bounciness; }
+                if (s.mesh.position.y > bounds.maxY) { s.mesh.position.y = bounds.maxY; s.velocity.y *= -def.bounciness; }
+                if (s.mesh.position.z < bounds.minZ) { s.mesh.position.z = bounds.minZ; s.velocity.z *= -def.bounciness; }
+                if (s.mesh.position.z > bounds.maxZ) { s.mesh.position.z = bounds.maxZ; s.velocity.z *= -def.bounciness; }
+
+                if (!isGrabbed) {
+                    s.velocity.multiplyScalar(0.85);
+                    if (s.velocity.length() > MAX_SPEED) s.velocity.normalize().multiplyScalar(MAX_SPEED);
+                }
+
+                s.mesh.position.x += s.velocity.x;
+                s.mesh.position.y += s.velocity.y;
+                s.mesh.position.z += s.velocity.z;
+            }
+
+            renderer.render(scene, camera);
+        }
+
+        window.addEventListener('resize', function () {
+            var w = wrap.clientWidth, h = wrap.clientHeight;
+            if (!w || !h) return;
+            camera.aspect = w / h;
+            camera.updateProjectionMatrix();
+            renderer.setSize(w, h);
+            recomputeBounds();
+            spheres.forEach(function (s) {
+                s.mesh.position.x = Math.max(bounds.minX, Math.min(bounds.maxX, s.mesh.position.x));
+                s.mesh.position.y = Math.max(bounds.minY, Math.min(bounds.maxY, s.mesh.position.y));
+                s.mesh.position.z = Math.max(bounds.minZ, Math.min(bounds.maxZ, s.mesh.position.z));
+            });
+            if (grabbedSphere) clampGrabTarget();
+        });
+
+        animate();
+    }
+
+    function boot() {
+        renderExperiences();
+        renderLectures();
+        initBalls();
+    }
+
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', boot);
+    } else {
+        boot();
+    }
+})();
+</script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+</body>
+</html>
