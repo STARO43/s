@@ -464,7 +464,7 @@
 
         var scene = new THREE.Scene();
         var camera = new THREE.PerspectiveCamera(45, W / H, 0.1, 100);
-        camera.position.set(0, 0, 24);
+        camera.position.set(0, 0, 20);
 
         var renderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: true, alpha: true });
         renderer.setClearColor(0x000000, 0);
@@ -657,11 +657,11 @@
                 y: -((e.clientY - rect.top) / rect.height) * 2 + 1
             };
         }
-        function clampGrabTarget() {
-            grabTarget.x = Math.max(bounds.minX, Math.min(bounds.maxX, grabTarget.x));
-            grabTarget.y = Math.max(bounds.minY, Math.min(bounds.maxY, grabTarget.y));
-        }
-
+      function clampGrabTarget() {
+    var extra = RADIUS * 0.1;
+    grabTarget.x = Math.max(bounds.minX + extra, Math.min(bounds.maxX - extra, grabTarget.x));
+    grabTarget.y = Math.max(bounds.minY + extra, Math.min(bounds.maxY - extra, grabTarget.y));
+}
         wrap.addEventListener('pointerdown', function (e) {
             if (e.pointerType === 'mouse' && e.button !== 0) return;
             var ndc = pointerToNDC(e);
