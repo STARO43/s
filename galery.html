@@ -318,9 +318,19 @@ const USE_COMPOSER  = true;   // постобработка (аберрация,
     const galleryGroup = new THREE.Group();
     scene.add(galleryGroup);
 
-    const BASE_CARD_H = 46;
+        const BASE_CARD_H = 46;
     const MAX_CARD_W  = 160;
-    const GAP         = 8;
+    const GAP_RATIO = 0.17;
+    const GAP_MIN   = 6;
+    const GAP_MAX   = 12;
+    const GAP_STEP  = 0.5;
+
+    function computeGap(hA, hB) {
+      const avgH = (hA + hB) * 0.5;
+      const raw  = avgH * GAP_RATIO;
+      const q    = Math.round(raw / GAP_STEP) * GAP_STEP;
+      return clamp(q, GAP_MIN, GAP_MAX);
+    }
 
     const cards = [];
     let totalWidth   = 0;
@@ -805,13 +815,16 @@ const USE_COMPOSER  = true;   // постобработка (аберрация,
     function buildGallery(items) {
       const cardData = [];
       let x = 0;
+      let prevH = null;
       for (const item of items) {
         if (!item) continue;
         const { w, h } = computeCardSize(item);
+        if (prevH !== null) x += computeGap(prevH, h); // зазор перед текущей
         cardData.push({ item, w, h, x });
-        x += w + GAP;
+        x += w;                                          // ширина текущей
+        prevH = h;
       }
-      totalWidth = Math.max(0, x - GAP);
+      totalWidth = Math.max(0, x);
       const startX = -totalWidth / 2;
 
       for (const c of cards) {
