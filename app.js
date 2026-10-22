@@ -16,7 +16,8 @@ const $$ = (sel, root = document) => Array.from(root.querySelectorAll(sel));
 const GRAMOTINO_UPDATES = [
    
     { date: '27 · 09 · 2026', title: 'РАЗДЕЛ ПЕДАГОГИКИ',   text: 'Статьи и лекции' },
-    { date: '28 · 09 · 2026', title: 'РАЗДЕЛ ИСТОРИИ',   text: 'Видео лекций' }
+    { date: '28 · 09 · 2026', title: 'РАЗДЕЛ ИСТОРИИ',   text: 'Видео лекций' },
+    { date: '20 · 10 · 2026', title: 'РАЗДЕЛ ПРИРОДЫ',   text: 'Ссылки и лекции' }
 ];
 
 function initUpdatesBlock() {
