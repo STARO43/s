@@ -1,0 +1,571 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>Шары Premium Physics</title>
+  <style>
+    body {
+      margin: 0; padding: 0; background: #000;
+      display: flex; justify-content: center; align-items: center;
+      min-height: 100vh; min-width: 100vw; 
+      overflow: hidden; 
+      font-family: system-ui, sans-serif;
+    }
+    #window-container {
+      position: absolute; width: 100vw; height: 100vh;
+      background: #000;
+      border-radius: 0; 
+      overflow: hidden;
+      box-shadow: none;
+      touch-action: none;
+      user-select: none;
+    }
+    #canvas { display: block; width: 100%; height: 100%; }
+  </style>
+</head>
+<body>
+
+  <div id="window-container">
+    <canvas id="canvas"></canvas>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+
+  <script>
+    window.addEventListener('load', function() {
+      const canvas = document.getElementById('canvas');
+      const container = document.getElementById('window-container');
+
+      // ==========================================
+      // 1. СЦЕНА И КАМЕРА
+      // ==========================================
+      const scene = new THREE.Scene();
+      const camera = new THREE.PerspectiveCamera(45, container.clientWidth / container.clientHeight, 0.1, 100);
+      camera.position.set(0, 0, 22);
+
+      const renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
+      renderer.setSize(container.clientWidth, container.clientHeight);
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+      renderer.toneMapping = THREE.ACESFilmicToneMapping;
+      renderer.toneMappingExposure = 1.3;
+      renderer.shadowMap.enabled = true;
+      renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+
+      scene.add(new THREE.AmbientLight(0xffffff, 0.5));
+      const keyLight = new THREE.DirectionalLight(0xffffff, 2.0);
+      keyLight.position.set(10, 20, 15);
+      keyLight.castShadow = true;
+      scene.add(keyLight);
+      const fillLight = new THREE.DirectionalLight(0xffffff, 1.0);
+      fillLight.position.set(-15, 0, 10);
+      scene.add(fillLight);
+
+      // ==========================================
+      // 2. ГЕНЕРАТОРЫ ТЕКСТУР (PREMIUM)
+      // ==========================================
+      const themeColors = {
+        metal:    { top: '#000510', line1: '#0066ff', line2: '#001133' },
+        neon:     { top: '#0a0015', line1: '#ff00ff', line2: '#330055' },
+        obsidian: { top: '#050505', line1: '#ff4444', line2: '#220000' },
+        magma:    { top: '#0a0000', line1: '#ff3300', line2: '#330000' },
+        concrete: { top: '#001000', line1: '#00ff88', line2: '#003322' }
+      };
+
+      function generateLiquidMetal() {
+        const c = document.createElement('canvas'); c.width = 1024; c.height = 1024;
+        const ctx = c.getContext('2d');
+        ctx.fillStyle = '#b0b0b0'; ctx.fillRect(0, 0, 1024, 1024);
+        ctx.globalAlpha = 0.6;
+        for (let i = 0; i < 3000; i++) {
+          ctx.fillStyle = Math.random() > 0.5 ? '#ffffff' : '#444444';
+          ctx.beginPath(); ctx.arc(Math.random()*1024, Math.random()*1024, Math.random()*20+1, 0, Math.PI*2); ctx.fill();
+        }
+        return new THREE.CanvasTexture(c);
+      }
+
+      function generateNeonCeramic() {
+        const c = document.createElement('canvas'); c.width = 1024; c.height = 1024;
+        const ctx = c.getContext('2d');
+        ctx.fillStyle = '#050510'; ctx.fillRect(0, 0, 1024, 1024);
+        const colors = ['#ff00ff', '#00ffff', '#ff0055'];
+        ctx.globalCompositeOperation = 'screen';
+        ctx.globalAlpha = 0.8;
+        for (let i = 0; i < 20; i++) {
+            const x = Math.random() * 1024;
+            const y = Math.random() * 1024;
+            const r = Math.random() * 100 + 50;
+            const grad = ctx.createRadialGradient(x, y, 0, x, y, r);
+            grad.addColorStop(0, colors[Math.floor(Math.random()*colors.length)]);
+            grad.addColorStop(1, 'transparent');
+            ctx.fillStyle = grad;
+            ctx.beginPath(); ctx.arc(x, y, r, 0, Math.PI*2); ctx.fill();
+        }
+        ctx.globalCompositeOperation = 'source-over';
+        ctx.globalAlpha = 0.1;
+        ctx.fillStyle = '#ffffff';
+        for(let i=0; i<50; i++) {
+            ctx.beginPath();
+            ctx.arc(Math.random()*1024, Math.random()*1024, Math.random()*5+1, 0, Math.PI*2);
+            ctx.fill();
+        }
+        return new THREE.CanvasTexture(c);
+      }
+
+      function generateGlitchObsidian() {
+        const c = document.createElement('canvas'); c.width = 1024; c.height = 1024;
+        const ctx = c.getContext('2d');
+        ctx.fillStyle = '#111'; ctx.fillRect(0, 0, 1024, 1024);
+        ctx.strokeStyle = '#333';
+        ctx.lineWidth = 2;
+        ctx.globalAlpha = 0.5;
+        for(let i=0; i<1024; i+=20) {
+            ctx.beginPath(); ctx.moveTo(i, 0); ctx.lineTo(i, 1024); ctx.stroke();
+            ctx.beginPath(); ctx.moveTo(0, i); ctx.lineTo(1024, i); ctx.stroke();
+        }
+        ctx.strokeStyle = '#ff0044';
+        ctx.lineWidth = 1;
+        ctx.globalAlpha = 0.8;
+        for(let i=0; i<30; i++) {
+            ctx.beginPath();
+            ctx.moveTo(Math.random()*1024, Math.random()*1024);
+            ctx.lineTo(Math.random()*1024, Math.random()*1024);
+            ctx.stroke();
+        }
+        return new THREE.CanvasTexture(c);
+      }
+
+      function generateMagmaRock() {
+        const c = document.createElement('canvas'); c.width = 1024; c.height = 1024;
+        const ctx = c.getContext('2d');
+        ctx.fillStyle = '#220500'; ctx.fillRect(0, 0, 1024, 1024);
+        ctx.globalAlpha = 0.9;
+        for (let i = 0; i < 15; i++) {
+            const x = Math.random() * 1024;
+            const y = Math.random() * 1024;
+            const r = Math.random() * 150 + 50;
+            const grad = ctx.createRadialGradient(x, y, 0, x, y, r);
+            grad.addColorStop(0, '#ffaa00');
+            grad.addColorStop(0.5, '#ff4400');
+            grad.addColorStop(1, 'transparent');
+            ctx.fillStyle = grad;
+            ctx.beginPath(); ctx.arc(x, y, r, 0, Math.PI*2); ctx.fill();
+        }
+        return new THREE.CanvasTexture(c);
+      }
+
+      function generateCyberConcrete() {
+        const c = document.createElement('canvas'); c.width = 1024; c.height = 1024;
+        const ctx = c.getContext('2d');
+        ctx.fillStyle = '#f0f0f0'; ctx.fillRect(0, 0, 1024, 1024);
+        ctx.globalAlpha = 0.1;
+        ctx.fillStyle = '#aaaaaa';
+        for (let i = 0; i < 500; i++) {
+            ctx.beginPath();
+            ctx.arc(Math.random()*1024, Math.random()*1024, Math.random()*50+10, 0, Math.PI*2);
+            ctx.fill();
+        }
+        ctx.strokeStyle = '#d4af37';
+        ctx.lineWidth = 3;
+        ctx.globalAlpha = 0.6;
+        for(let i=0; i<20; i++) {
+            ctx.beginPath();
+            ctx.moveTo(Math.random()*1024, Math.random()*1024);
+            ctx.bezierCurveTo(
+                Math.random()*1024, Math.random()*1024,
+                Math.random()*1024, Math.random()*1024,
+                Math.random()*1024, Math.random()*1024
+            );
+            ctx.stroke();
+        }
+        return new THREE.CanvasTexture(c);
+      }
+
+      // ФИЗИКА: У металла есть гравитация, у остальных нет (или разная)
+      const materialsDef = {
+        metal:    { gen: generateLiquidMetal,   props: { roughness: 0.05, metalness: 0.9, clearcoat: 1.0 }, mass: 2.0, gravity: 0.3, torque: 0,    bounciness: 0.4 },
+        neon:     { gen: generateNeonCeramic,   props: { roughness: 0.1,  metalness: 0.1, clearcoat: 1.0, transmission: 0.2 }, mass: 1.0, gravity: 0,   torque: 0,    bounciness: 0.6 },
+        obsidian: { gen: generateGlitchObsidian, props: { roughness: 0.1, metalness: 0.8, clearcoat: 1.0 }, mass: 1.2, gravity: 0,   torque: 0.05, bounciness: 0.5 },
+        magma:    { gen: generateMagmaRock,     props: { roughness: 0.2,  metalness: 0.6, clearcoat: 0.8, emissive: 0xff2200, emissiveIntensity: 0.2 }, mass: 0.4, gravity: 0,   torque: 0,    bounciness: 1.0 },
+        concrete: { gen: generateCyberConcrete, props: { roughness: 0.3,  metalness: 0.0, clearcoat: 0.5 }, mass: 4.0, gravity: 0,   torque: 0,    bounciness: 0.1 }
+      };
+
+      const materialPool = {};
+      Object.keys(materialsDef).forEach(k => {
+        materialPool[k] = [];
+        for (let i = 0; i < 4; i++) {
+          const tex = materialsDef[k].gen();
+          tex.anisotropy = renderer.capabilities.getMaxAnisotropy();
+          materialPool[k].push(new THREE.MeshPhysicalMaterial({ map: tex, ...materialsDef[k].props }));
+        }
+      });
+
+      const materialOrder = ['metal', 'neon', 'obsidian', 'magma', 'concrete'];
+      let currentIndex = 0;
+      let currentGlobalType = materialOrder[currentIndex];
+
+      // ФОН
+      const bgGeometry = new THREE.PlaneGeometry(2, 2);
+      const bgMaterial = new THREE.ShaderMaterial({
+        uniforms: {
+          uTime:     { value: 0 },
+          uColorTop: { value: new THREE.Color() },
+          uColorLine1: { value: new THREE.Color() },
+          uColorLine2: { value: new THREE.Color() }
+        },
+        vertexShader: `varying vec2 vUv; void main() { vUv = uv; gl_Position = vec4(position, 1.0); }`,
+        fragmentShader: `
+          uniform float uTime;
+          uniform vec3 uColorTop;
+          uniform vec3 uColorLine1;
+          uniform vec3 uColorLine2;
+          varying vec2 vUv;
+          void main() {
+            vec2 uv = vUv;
+            float horizon = 0.4;
+            if (uv.y > horizon) {
+              vec3 sky = mix(uColorTop, vec3(0.0), uv.y);
+              gl_FragColor = vec4(sky, 1.0); return;
+            }
+            float perspective = (horizon - uv.y) / horizon;
+            float lineX = fract((uv.x - 0.5) / (perspective * 4.0) + uTime * 0.2);
+            float lineY = fract(1.0 / perspective - uTime * 0.5);
+            float gridX = smoothstep(0.02, 0.0, abs(lineX - 0.5) - 0.48);
+            float gridY = smoothstep(0.05, 0.0, abs(lineY - 0.5) - 0.45);
+            vec3 lineColor = mix(uColorLine1, uColorLine2, perspective);
+            lineColor *= (gridX + gridY) * (1.0 - perspective);
+            gl_FragColor = vec4(lineColor, 1.0);
+          }
+        `,
+        depthWrite: false, depthTest: false
+      });
+      const bgMesh = new THREE.Mesh(bgGeometry, bgMaterial);
+      bgMesh.frustumCulled = false;
+      bgMesh.renderOrder = -1;
+      scene.add(bgMesh);
+
+      function updateBackgroundColors(type) {
+        const colors = themeColors[type];
+        bgMaterial.uniforms.uColorTop.value.set(colors.top);
+        bgMaterial.uniforms.uColorLine1.value.set(colors.line1);
+        bgMaterial.uniforms.uColorLine2.value.set(colors.line2);
+      }
+
+      // ФУНКЦИЯ ОБНОВЛЕНИЯ МАТЕРИАЛОВ
+      function updateSphereMaterials(type) {
+        const materials = materialPool[type];
+        spheres.forEach((s, index) => {
+          s.mesh.material = materials[index % materials.length];
+        });
+      }
+
+      const RADIUS = 1.8;
+      // Границы adjusted for "floor" physics
+      const bounds = { minX: -8, maxX: 8, minY: -4, maxY: 4, minZ: -4, maxZ: 4 };
+
+      function recomputeBounds() {
+        const vFovRad = camera.fov * Math.PI / 180;
+        const dist = camera.position.z;
+        const halfH = Math.tan(vFovRad / 2) * dist;
+        const halfW = halfH * camera.aspect;
+
+        bounds.minX = -halfW + RADIUS;
+        bounds.maxX =  halfW - RADIUS;
+        bounds.minY = -halfH + RADIUS;
+        bounds.maxY =  halfH - RADIUS;
+
+        const depthRange = 4.0;
+        bounds.minZ = -depthRange;
+        bounds.maxZ =  depthRange;
+      }
+
+      const COUNT = 20;
+      const sphereGeo = new THREE.SphereGeometry(RADIUS, 64, 64);
+      let spheres = [];
+
+      // Инициализация шаров
+      for (let i = 0; i < COUNT; i++) {
+        // ВАЖНО: Сразу берем правильный материал из текущей темы
+        const matIndex = i % materialPool[currentGlobalType].length;
+        const mesh = new THREE.Mesh(sphereGeo, materialPool[currentGlobalType][matIndex]);
+        
+        mesh.castShadow = true;
+        mesh.receiveShadow = true;
+        // Разброс побольше, чтобы они падали интересно
+        mesh.position.set(
+          (Math.random() - 0.5) * 10,
+          (Math.random() - 0.5) * 10 + 5, // Чуть выше центра
+          (Math.random() - 0.5) * 6
+        );
+        scene.add(mesh);
+        spheres.push({ mesh: mesh, velocity: new THREE.Vector3() });
+      }
+
+      recomputeBounds();
+      
+      // Применяем цвета и материалы
+      updateBackgroundColors(currentGlobalType);
+      updateSphereMaterials(currentGlobalType);
+
+      // ==========================================
+      // 6. ВЗАИМОДЕЙСТВИЕ
+      // ==========================================
+      const raycaster = new THREE.Raycaster();
+      const mouse = new THREE.Vector2();
+      const mousePlane = new THREE.Plane(new THREE.Vector3(0, 0, 1), 0);
+      const currentMousePos = new THREE.Vector3();
+      const prevMousePos = new THREE.Vector3();
+      let isFirstMove = true;
+
+      const GRAB_OMEGA2 = 0.012;
+      const GRAB_DAMP   = 0.35;
+      const GRAB_MAX_SPEED = 0.8;
+
+      let grabbedSphere = null;
+      const grabTarget = new THREE.Vector3();
+
+      function pointerToNDC(e) {
+        const rect = container.getBoundingClientRect();
+        return {
+          x: ((e.clientX - rect.left) / rect.width) * 2 - 1,
+          y: -((e.clientY - rect.top) / rect.height) * 2 + 1
+        };
+      }
+
+      function clampGrabTarget() {
+        if (grabTarget.x < bounds.minX) grabTarget.x = bounds.minX;
+        if (grabTarget.x > bounds.maxX) grabTarget.x = bounds.maxX;
+        if (grabTarget.y < bounds.minY) grabTarget.y = bounds.minY;
+        if (grabTarget.y > bounds.maxY) grabTarget.y = bounds.maxY;
+      }
+
+      function handlePointerDown(e) {
+        const hits = raycaster.intersectObjects(spheres.map(s => s.mesh), false);
+        
+        if (e.type === 'mousedown' && e.button !== 0) return;
+
+        if (hits.length > 0) {
+          const s = spheres.find(sp => sp.mesh === hits[0].object);
+          if (s) {
+            grabbedSphere = s;
+            raycaster.ray.intersectPlane(mousePlane, grabTarget);
+            clampGrabTarget();
+            s.mesh.scale.setScalar(1.10);
+            if(e.pointerType === 'mouse') {
+                container.setPointerCapture(e.pointerId);
+            }
+            isFirstMove = true;
+          }
+        }
+      }
+
+      function handlePointerMove(e) {
+        const ndc = pointerToNDC(e);
+        mouse.x = ndc.x; mouse.y = ndc.y;
+        raycaster.setFromCamera(mouse, camera);
+
+        if (grabbedSphere) {
+          raycaster.ray.intersectPlane(mousePlane, grabTarget);
+          clampGrabTarget();
+          return;
+        }
+
+        if (raycaster.ray.intersectPlane(mousePlane, currentMousePos)) {
+          if (isFirstMove) { prevMousePos.copy(currentMousePos); isFirstMove = false; return; }
+          const speed = currentMousePos.distanceTo(prevMousePos);
+          if (speed > 0.1) {
+            spheres.forEach(s => {
+              const dx = s.mesh.position.x - currentMousePos.x;
+              const dy = s.mesh.position.y - currentMousePos.y;
+              const dist = Math.sqrt(dx*dx + dy*dy);
+              if (dist < 5.0 && dist > 0.001) {
+                const force = (5.0 - dist) * Math.min(speed, 1.0) * 0.05 / materialsDef[currentGlobalType].mass;
+                s.velocity.x += (dx / dist) * force;
+                s.velocity.y += (dy / dist) * force;
+              }
+            });
+          }
+          prevMousePos.copy(currentMousePos);
+        }
+      }
+
+      function releaseGrab(e) {
+        if (!grabbedSphere) return;
+        grabbedSphere.mesh.scale.setScalar(1);
+        grabbedSphere = null;
+        isFirstMove = true;
+        
+        if (e && e.pointerType === 'mouse') {
+            container.releasePointerCapture(e.pointerId);
+        }
+      }
+
+      // ЛОГИКА ПЕРЕКЛЮЧЕНИЯ ПО ДВОЙНОМУ КЛИКУ
+      container.addEventListener('dblclick', (e) => {
+        if (e.clientY < window.innerHeight / 2) {
+            currentIndex = (currentIndex + 1) % materialOrder.length;
+            currentGlobalType = materialOrder[currentIndex];
+            
+            updateBackgroundColors(currentGlobalType);
+            updateSphereMaterials(currentGlobalType);
+            
+            // При смене темы даем небольшой импульс, чтобы "разбудить" застрявшие шары
+            spheres.forEach(s => {
+                s.velocity.x += (Math.random() - 0.5) * 0.5;
+                s.velocity.y += (Math.random() - 0.5) * 0.5;
+            });
+        }
+      });
+
+      container.addEventListener('pointerdown', handlePointerDown);
+      container.addEventListener('pointermove', handlePointerMove);
+      container.addEventListener('pointerup', releaseGrab);
+      container.addEventListener('pointercancel', releaseGrab);
+
+      const clock = new THREE.Clock();
+      let globalTime = 0;
+      const MAX_SPEED = 0.5;
+
+      function animate() {
+        requestAnimationFrame(animate);
+        const dt = Math.min(clock.getDelta(), 0.1);
+        globalTime += dt;
+
+        bgMaterial.uniforms.uTime.value = globalTime;
+        const def = materialsDef[currentGlobalType];
+
+        for (let i = 0; i < spheres.length; i++) {
+          const s = spheres[i];
+          const isGrabbed = (s === grabbedSphere);
+
+          if (isGrabbed) {
+            const dx = grabTarget.x - s.mesh.position.x;
+            const dy = grabTarget.y - s.mesh.position.y;
+            s.velocity.x += dx * GRAB_OMEGA2;
+            s.velocity.y += dy * GRAB_OMEGA2;
+
+            const dampFactor = 1 / (1 + GRAB_DAMP);
+            s.velocity.x *= dampFactor;
+            s.velocity.y *= dampFactor;
+
+            const sp = Math.sqrt(s.velocity.x*s.velocity.x + s.velocity.y*s.velocity.y);
+            if (sp > GRAB_MAX_SPEED) {
+              const k = GRAB_MAX_SPEED / sp;
+              s.velocity.x *= k; s.velocity.y *= k;
+            }
+          } else {
+            // 1. ГРАВИТАЦИЯ (Только вниз по Y)
+            if (def.gravity > 0) s.velocity.y -= def.gravity * dt;
+
+            // 2. ВРАЩЕНИЕ
+            if (def.torque > 0) {
+              s.mesh.rotation.z -= def.torque * dt;
+              s.mesh.rotation.x += def.torque * 0.5 * dt;
+            }
+
+            // !!! УБРАНО ПРИТЯЖЕНИЕ К ЦЕНТРУ !!!
+            // Именно оно создавало "лагующую точку", где силы уравновешивались.
+            // Теперь шары просто падают и отскакивают от границ.
+          }
+
+          // Коллизии между шарами
+          for (let j = i + 1; j < spheres.length; j++) {
+            const s2 = spheres[j];
+            const dx = s.mesh.position.x - s2.mesh.position.x;
+            const dy = s.mesh.position.y - s2.mesh.position.y;
+            const dz = s.mesh.position.z - s2.mesh.position.z;
+            const dist = Math.sqrt(dx*dx + dy*dy + dz*dz);
+            const minDist = RADIUS * 2;
+
+            if (dist < minDist && dist > 0.01) {
+              const overlap = minDist - dist;
+              const nx = dx / dist, ny = dy / dist, nz = dz / dist;
+
+              const sGrabbed  = (s  === grabbedSphere);
+              const s2Grabbed = (s2 === grabbedSphere);
+
+              // Простая реакция на столкновение
+              if (sGrabbed && !s2Grabbed) {
+                s2.mesh.position.x -= nx * overlap;
+                s2.mesh.position.y -= ny * overlap;
+                s2.mesh.position.z -= nz * overlap;
+                const relVel = (s.velocity.x - s2.velocity.x) * nx + (s.velocity.y - s2.velocity.y) * ny + (s.velocity.z - s2.velocity.z) * nz;
+                if (relVel < 0) {
+                  const impulse = -relVel * 0.6;
+                  s2.velocity.x -= impulse * nx; s2.velocity.y -= impulse * ny; s2.velocity.z -= impulse * nz;
+                }
+              } else if (s2Grabbed && !sGrabbed) {
+                s.mesh.position.x += nx * overlap;
+                s.mesh.position.y += ny * overlap;
+                s.mesh.position.z += nz * overlap;
+                const relVel = (s2.velocity.x - s.velocity.x) * (-nx) + (s2.velocity.y - s.velocity.y) * (-ny) + (s2.velocity.z - s.velocity.z) * (-nz);
+                if (relVel < 0) {
+                  const impulse = -relVel * 0.6;
+                  s.velocity.x += impulse * nx; s.velocity.y += impulse * ny; s.velocity.z += impulse * nz;
+                }
+              } else {
+                const push = overlap * 0.5;
+                s.mesh.position.x += nx * push;
+                s.mesh.position.y += ny * push;
+                s.mesh.position.z += nz * push;
+                s2.mesh.position.x -= nx * push;
+                s2.mesh.position.y -= ny * push;
+                s2.mesh.position.z -= nz * push;
+                
+                const relVel = (s.velocity.x - s2.velocity.x) * nx + (s.velocity.y - s2.velocity.y) * ny + (s.velocity.z - s2.velocity.z) * nz;
+                if (relVel < 0) {
+                  const impulse = relVel * 0.6;
+                  s.velocity.x -= impulse * nx; s.velocity.y -= impulse * ny; s.velocity.z -= impulse * nz;
+                  s2.velocity.x += impulse * nx; s2.velocity.y += impulse * ny; s2.velocity.z += impulse * nz;
+                }
+              }
+            }
+          }
+
+          // Границы мира (Пол, Потолок, Стены)
+          if (s.mesh.position.x < bounds.minX) { s.mesh.position.x = bounds.minX; s.velocity.x *= -def.bounciness; }
+          if (s.mesh.position.x > bounds.maxX) { s.mesh.position.x = bounds.maxX; s.velocity.x *= -def.bounciness; }
+          
+          // Пол (минимальный Y)
+          if (s.mesh.position.y < bounds.minY) { 
+              s.mesh.position.y = bounds.minY; 
+              s.velocity.y *= -def.bounciness; 
+              // Небольшое трение о пол
+              s.velocity.x *= 0.95;
+              s.velocity.z *= 0.95;
+          }
+          if (s.mesh.position.y > bounds.maxY) { s.mesh.position.y = bounds.maxY; s.velocity.y *= -def.bounciness; }
+          
+          if (s.mesh.position.z < bounds.minZ) { s.mesh.position.z = bounds.minZ; s.velocity.z *= -def.bounciness; }
+          if (s.mesh.position.z > bounds.maxZ) { s.mesh.position.z = bounds.maxZ; s.velocity.z *= -def.bounciness; }
+
+          // Затухание скорости (сопротивление воздуха)
+          if (!isGrabbed) {
+            s.velocity.multiplyScalar(0.98); // Чуть меньше затухание, чтобы не замирали слишком быстро
+            if (s.velocity.length() > MAX_SPEED) s.velocity.normalize().multiplyScalar(MAX_SPEED);
+          }
+
+          s.mesh.position.x += s.velocity.x;
+          s.mesh.position.y += s.velocity.y;
+          s.mesh.position.z += s.velocity.z;
+        }
+
+        renderer.render(scene, camera);
+      }
+
+      window.addEventListener('resize', () => {
+        camera.aspect = container.clientWidth / container.clientHeight;
+        camera.updateProjectionMatrix();
+        renderer.setSize(container.clientWidth, container.clientHeight);
+        recomputeBounds();
+
+        if (grabbedSphere) {
+           clampGrabTarget();
+        }
+      });
+
+      animate();
+    });
+  </script>
+</body>
+</html>
